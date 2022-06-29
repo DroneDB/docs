@@ -5,9 +5,7 @@ sidebar_position: 3
 # Registry
 
 Registry is a simple, user-friendly aerial data management and storage
-application that you can self-host on your 
-
-Combined with [Hub](https://github.com/DroneDB/Hub), it provides a
+application that you can self-host on your own server. It provides a
 simple, fast and reliable platform for hosting and sharing geospatial
 images and data.
 
@@ -458,3 +456,7 @@ The number of worker threads used by the application.
 :::info
 The default value is `0`
 :::
+
+## Getting Help
+
+Commercial support is available. [Get in touch](https://dronedb.app/contact).

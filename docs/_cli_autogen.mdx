@@ -1,0 +1,492 @@
+### add
+
+```
+Add files and directories to an index.
+
+Usage:
+  ddb add *.JPG [args] [PATHS]
+
+  -w, --working-dir arg  Working directory (default: .)
+  -r, --recursive        Recursively add subdirectories and files
+  -p, --paths arg        Paths to add to index (files or directories)
+  -h, --help             Print help
+      --debug            Show debug output
+
+```
+
+### build
+
+```
+Build DroneDB files for efficient streaming over a network.
+
+Usage:
+  ddb build [-p path/to/file.laz] [--output out_dir] [args]
+
+  -o, --output arg       Output folder (default: .ddb/build)
+  -p, --path arg         File to process
+  -w, --working-dir arg  Working directory (default: .)
+  -f, --force            Force rebuild
+  -h, --help             Print help
+      --debug            Show debug output
+
+```
+
+### chattr
+
+```
+Manage database attributes
+
+Attributes:
+	public	mark database as publicly accessible
+
+
+Usage:
+  ddb chattr [+-attribute] [args]
+
+  -w, --working-dir arg  Working directory (default: .)
+  -h, --help             Print help
+      --debug            Show debug output
+
+```
+
+### clone
+
+```
+Clone a repository into a new directory
+
+Clones a repository into a newly created directory.
+
+Usage:
+  ddb clone (tag|url) folder [args]
+
+  -t, --target arg  Repository tag or full url
+  -f, --folder arg  Target folder (default: )
+  -h, --help        Print help
+      --debug       Show debug output
+
+```
+
+### cog
+
+```
+Build a Cloud Optimized GeoTIFF from an existing GeoTIFF.
+
+Usage:
+  ddb cog cog.tif input.tif [args]
+
+  -o, --output arg  Output Cloud Optimized GeoTIFF
+  -i, --input arg   Input GeoTIFF to process
+  -h, --help        Print help
+      --debug       Show debug output
+
+```
+
+### delta
+
+```
+Generate delta between two ddb databases
+
+Outputs the delta that applied to target turns it into source
+
+Usage:
+  ddb delta source target [args]
+
+  -s, --source arg  Source ddb
+  -t, --target arg  Target ddb (default: .)
+  -f, --format arg  Output format (text|json) (default: text)
+  -h, --help        Print help
+      --debug       Show debug output
+
+```
+
+### ept
+
+```
+Build an EPT index from point cloud files.
+
+Usage:
+  ddb ept outdir/ *.las [args]
+
+  -o, --output arg  Output directory where to store EPT data
+  -i, --input arg   File(s) to process
+  -h, --help        Print help
+      --debug       Show debug output
+
+```
+
+### geoproj
+
+```
+Project images to georeferenced rasters
+
+Usage:
+  ddb geoproj output/ *.JPG [args]
+
+  -o, --output arg  Output path (file or directory)
+  -i, --images arg  Images to project
+  -s, --size arg    Output image size (size[%]|0) (default: 100%)
+  -h, --help        Print help
+      --debug       Show debug output
+
+```
+
+### info
+
+```
+Retrieve information about files and directories
+
+Usage:
+  ddb info *.JPG [args]
+
+  -i, --input arg     File(s) to examine
+  -o, --output arg    Output file to write results to (default: stdout)
+  -f, --format arg    Output format (text|json|geojson) (default: text)
+  -r, --recursive     Recursively search in subdirectories
+  -d, --depth arg     Max recursion depth (default: 0)
+      --geometry arg  Geometry to output (for geojson format only)
+                      (auto|point|polygon) (default: auto)
+      --with-hash     Compute SHA256 hashes
+  -h, --help          Print help
+      --debug         Show debug output
+
+```
+
+### init
+
+```
+Initialize an index. If a directory is not specified, initializes the index in the current directory
+
+Usage:
+  ddb init [args] [DIRECTORY]
+
+  -w, --working-dir arg  Working directory (default: .)
+      --from-scratch     Create the index database from scratch instead of
+                         using a prebuilt one (slower)
+  -h, --help             Print help
+      --debug            Show debug output
+
+```
+
+### list
+
+```
+List indexed files and directories
+
+Usage:
+  ddb list *.JPG [args]
+
+  -i, --input arg        File(s) to list
+  -o, --output arg       Output file to write results to (default: stdout)
+  -w, --working-dir arg  Working directory (default: .)
+  -r, --recursive        Recursively search in subdirectories
+  -d, --depth arg        Max recursion depth (default: 0)
+  -f, --format arg       Output format (text|json) (default: text)
+  -h, --help             Print help
+      --debug            Show debug output
+
+```
+
+### login
+
+```
+Authenticate with a registry.
+
+Usage:
+  ddb login [args]
+
+      --server arg    Registry server to authenticate to (default:
+                      hub.dronedb.app)
+  -u, --username arg  Username
+  -p, --password arg  Password
+  -h, --help          Print help
+      --debug         Show debug output
+
+```
+
+### logout
+
+```
+Logout from all registries. To logout from a single registry, use the --server option.
+
+Usage:
+  ddb logout [args]
+
+      --server arg  Registry server to logout from (default: hub.dronedb.app)
+  -h, --help        Print help
+      --debug       Show debug output
+
+```
+
+### meta
+
+```
+Manage database metadata
+
+Usage:
+  ddb meta [add|set|rm|get|unset|ls|dump|restore] [key|ID] [data] [-p path] [args]
+
+  -c, --command arg      Command
+  -k, --key arg          Metadata key/ID (default: )
+  -p, --path arg         Path to associate metadata with (default: )
+  -d, --data arg         Data string|number|JSON to set (default: )
+  -w, --working-dir arg  Working directory (default: .)
+  -f, --format arg       Output format (text|json) (default: text)
+  -h, --help             Print help
+      --debug            Show debug output
+
+```
+
+### nxs
+
+```
+Generate nexus (NXS/NXZ) files from OBJs.
+
+Usage:
+  ddb nxs model.obj [output.nxz|output.nxs] [args]
+
+  -i, --input arg   File to process
+  -o, --output arg  Nexus output file
+      --overwrite   Overwrite output file if it exists
+  -h, --help        Print help
+      --debug       Show debug output
+
+```
+
+### password
+
+```
+Manage database passwords
+
+Usage:
+  ddb password [a,append|v,verify|c,clear] [password] [args]
+
+  -w, --working-dir arg  Working directory (default: .)
+  -c, --command arg      Command to execute
+  -a, --argument arg     Command argument (default: )
+  -h, --help             Print help
+      --debug            Show debug output
+
+```
+
+### pull
+
+```
+Pulls changes from a remote repository.
+
+Usage:
+  ddb pull
+
+  -r, --remote arg   The remote Registry (default: )
+  -t, --keep-theirs  Keep changes from remote registry and override local
+                     ones
+  -o, --keep-ours    Keep local changes override remote ones
+  -h, --help         Print help
+      --debug        Show debug output
+
+```
+
+### push
+
+```
+Pushes changes to a remote repository.
+
+Usage:
+  ddb push [remote] [args]
+
+  -r, --remote arg  The remote Registry (default: )
+  -h, --help        Print help
+      --debug       Show debug output
+
+```
+
+### remove
+
+```
+Remove files and directories from an index. The filesystem is left unchanged (actual files and directories will not be removed)
+
+Usage:
+  ddb rm image1.JPG image2.JPG [...] [args] [PATHS]
+
+  -w, --working-dir arg  Working directory (default: .)
+  -p, --paths arg        Paths to remove from index (files or directories)
+  -h, --help             Print help
+      --debug            Show debug output
+
+```
+
+### search
+
+```
+Search indexed files and directories
+
+Usage:
+  ddb search '*file*' [args]
+
+  -q, --query arg        Search query
+  -w, --working-dir arg  Working directory (default: .)
+  -f, --format arg       Output format (text|json) (default: text)
+  -h, --help             Print help
+      --debug            Show debug output
+
+```
+
+### setexif
+
+```
+Modify EXIF values in files.
+
+Usage:
+  ddb setexif *.JPG [args]
+
+  -i, --input arg    File(s) to modify
+      --gps-alt arg  Set GPS Altitude (decimal degrees)
+      --gps-lon arg  Set GPS Longitude (decimal degrees)
+      --gps-lat arg  Set GPS Latitude (decimal degrees)
+      --gps arg      Set GPS Latitude,Longitude,Altitude (decimal degrees,
+                     comma separated)
+  -h, --help         Print help
+      --debug        Show debug output
+
+```
+
+### share
+
+```
+Share files and folders to a registry
+
+Usage:
+  ddb share *.JPG [args]
+
+  -i, --input arg     Files and directories to share
+  -r, --recursive     Recursively share subdirectories
+  -t, --tag arg       Tag to use (organization/dataset or
+                      server[:port]/organization/dataset) (default: hub.dronedb.app//)
+  -p, --password arg  Optional password to protect dataset (default: )
+  -s, --server arg    Registry server to share dataset with (alias of: -t
+                      <server>//)
+  -q, --quiet         Do not display progress
+  -h, --help          Print help
+      --debug         Show debug output
+
+```
+
+### stamp
+
+```
+Generate a stamp of the current index.
+
+Usage:
+  ddb stamp
+
+  -w, --working-dir arg  Working directory (default: .)
+  -f, --format arg       Output format (text|json) (default: text)
+  -h, --help             Print help
+      --debug            Show debug output
+
+```
+
+### status
+
+```
+Show files and directories index status compared to the filesystem
+
+Usage:
+  ddb status [directory] [args]
+
+  -w, --working-dir arg  Working directory (default: .)
+  -h, --help             Print help
+      --debug            Show debug output
+
+```
+
+### sync
+
+```
+Sync files and directories in the index with changes from the filesystem
+
+Usage:
+  ddb sync
+
+  -w, --working-dir arg  Working directory (default: .)
+  -h, --help             Print help
+      --debug            Show debug output
+
+```
+
+### system
+
+```
+Manage ddb
+
+Commands:
+	clean	Cleanup user cache files
+
+
+Usage:
+  ddb system COMMAND
+
+  -c, --command arg  Command (default: )
+  -h, --help         Print help
+      --debug        Show debug output
+
+```
+
+### tag
+
+```
+Gets or sets the dataset tag.
+
+Usage:
+  ddb tag [tag] [args]
+
+  -t, --tag arg  New tag (default: )
+  -h, --help     Print help
+      --debug    Show debug output
+
+```
+
+### thumbs
+
+```
+Generate thumbnails for images and rasters
+
+Usage:
+  ddb thumbs [image.tif | *.JPG] -o [thumb.jpg | output/] [args]
+
+  -i, --input arg   File(s) to process
+  -o, --output arg  Output file or directory where to store thumbnail(s)
+  -s, --size arg    Size of the largest side of the images (default: 512)
+      --use-crc     Use CRC for output filenames
+  -h, --help        Print help
+      --debug       Show debug output
+
+```
+
+### tile
+
+```
+Generate tiles for GeoTIFFs, GeoImages and EPT
+
+Usage:
+  ddb tile [geo.tif | image.jpg | ept.json | https://host.com/cog.tif | https://host.com/image.jpg | https://host.com/ept.json] [output directory] [args]
+
+  -i, --input arg   Path or URL to file to tile
+  -o, --output arg  Output directory where to store tiles (default:
+                    {filename}_tiles/)
+  -f, --format arg  Output format (text|json) (default: text)
+  -z, arg           Zoom levels, either a single zoom level "N" or a range
+                    "min-max" or "auto" to generate all zoom levels (default:
+                    auto)
+  -x, arg           Generate a single tile with the specified coordinate
+                    (XYZ, unless --tms is used). Must be used with -y (default:
+                    auto)
+  -y, arg           Generate a single tile with the specified coordinate
+                    (XYZ, unless --tms is used). Must be used with -x (default:
+                    auto)
+  -s, --size arg    Tile size (default: 256)
+      --tms         Generate TMS tiles instead of XYZ
+  -h, --help        Print help
+      --debug       Show debug output
+
+```
+

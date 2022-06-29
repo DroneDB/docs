@@ -24,3 +24,15 @@ import WindowsSetupImage from '@site/docs/assets/windows_setup.png';
   </TabItem>
 </Tabs>
 
+## Features
+
+ * Browse aerial data files
+ * Synchronized Map <==> File views
+ * Copy/cut/paste filesystem operations
+ * Quickly share to [Hub](https://hub.dronedb.app)
+ * [Coming Soon]: Image Stitching / Processing
+
+<!-- 
+## Get a License
+
+ *  -->

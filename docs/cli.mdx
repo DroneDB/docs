@@ -1,0 +1,175 @@
+
+import CLIAutogen from './_cli_autogen.mdx';
+import CodeBlock from '@theme/CodeBlock';
+import TOCInline from '@theme/TOCInline';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# CLI
+
+`ddb` is a command line interface (CLI) to access DroneDB's functions. This makes it ideal for power users and for creating automated workflows.
+
+## Installation
+
+
+<Tabs>
+  <TabItem value="windows" label="Windows" default>
+    <ul><li>Download <a href="https://github.com/DroneDB/ddb-desktop/releases/download/v1.1.0/DroneDB_Setup.exe">DroneDB_Setup.exe</a></li>
+    <li>Verify it's working:</li>
+    </ul>
+<CodeBlock language="bash">
+{`C:\\> ddb --version
+1.0.6 (git commit 1952a82)`}
+    </CodeBlock>
+  </TabItem>
+  <TabItem value="macOS" label="macOS">
+    <ul><li>Not yet available. <a href="https://docs.google.com/forms/d/e/1FAIpQLSc8OBm-j01XUrUZ2bo3nhh5SdGEVgY_gIJh9qQ2NqqWVUTABA/viewform">Sign-up for updates</a></li></ul>
+  </TabItem>
+  <TabItem value="linux" label="Linux">
+    <CodeBlock language="bash">
+{`$ curl -fsSL https://get.dronedb.app -o get-ddb.sh
+$ sh get-ddb.sh
+$ ddb --version
+1.0.6 (git commit 1952a82)`}
+    </CodeBlock>
+  </TabItem>
+</Tabs>
+
+## Examples
+
+You can do all sort operations with `ddb`. We recommend to check out
+the list of [commands](#commands-reference):
+
+### Sharing datasets
+
+From a directory with images, simply type:
+
+```bash
+ddb share *.JPG
+```
+
+:::tip
+By default the images are shared with [Hub](https://hub.dronedb.app). You will need to
+[register an account](https://dronedb.app) to get a username and
+password. But you can also self-host your own
+[Registry](./registry).
+:::
+
+You can select a different server by typing:
+
+```bash
+ddb share *.JPG -s http://localhost:5000
+--> https://localhost:5000/r/admin/193514313aba4949ab5578b28ba1dd5b
+```
+
+Because we didn't set a `tag`, ddb generated a random one for you.
+You can change the tag by visiting the URL. You can also explicitly set
+a tag, like so:
+
+    ddb share *.JPG -t pierotofy/brighton
+
+Or if you're running your own Registry:
+
+    ddb share *.JPG -t http://localhost:5000/admin/brighton
+
+Tags are defined as:
+
+`[server]/organization/dataset`
+
+With the server component being optional.
+
+### Editing datasets
+
+Using the Web UI provided by Registry is the easiest way to make
+changes.
+
+You can also `clone` (download) an existing dataset from a
+Registry for offline use, make modifications, then sync back your
+changes.
+
+Let's use this dataset:
+<https://hub.dronedb.app/r/pierotofy/brighton-beach>
+
+You can clone it via:
+
+    ddb clone pierotofy/brighton-beach
+
+Let's add a `README.md` file that describes the dataset. Create a
+`README.md` file using
+[Markdown](https://www.markdownguide.org/cheat-sheet/) syntax and save
+it in the `brighton-beach` directory. Afterwards:
+
+    cd brighton-beach/
+    ddb add README.md
+
+Great! We are now ready to push the changes.
+
+    ddb push
+
+Uuups! This will trigger an error, since we don't have permission to
+make modifications to this dataset (it belongs to `pierotofy`). Let's
+make our own copy to a different Registry server and user:
+
+    ddb tag http://localhost:5000/admin/brighton-copy
+    ddb push
+
+### Metadata Entries
+
+DroneDB supports the addition of metadata to any file or directory
+within the index. This can be used to store information of any kind in
+JSON format:
+
+    ddb meta set pilot '{"name": "John Smith"}'
+    ddb meta get pilot --format json
+    --> {"data":{"name":"John S."},"id":"ff4f0f26-8741-4423-bde5-b445750937bb","mtime":1640985850}
+
+    ddb add photo.JPG
+    ddb meta add comments '{"text": "Nice one!", "author": "John S."}' -p photo.JPG
+    ddb meta get comments -p photo.JPG --format json
+    --> [{"data":{"author":"John S.","text":"Nice one!"},"id":"550d0b5c-108b-4996-b7e8-467b4cb87937","mtime":1640986217}]
+
+Singular and plural metadata keys are supported. Plural keys (ending
+with `s`) are treated as lists, whereas singular keys are objects.
+
+Metadata entries are synced on push/pull and people working on the same
+dataset while offline can later sync back online without conflicts.
+
+### Projecting images
+
+![geoproject](https://user-images.githubusercontent.com/1951843/176517923-d391fc9b-24cb-4604-a134-51be9155c806.png)
+
+You can project images onto a map.
+
+    ddb geoproj images/DJI_0018.JPG -o projected/
+
+# Creating static tiles (XYZ/TMS)
+
+DroneDB can create static tiles for GeoTIFFs, drone images and [EPT](https://entwine.io). It's similar to
+[gdal2tiles.py](https://gdal.org/programs/gdal2tiles.html), but
+it's a bit faster and can handle more formats. You can use
+these tiles in applications such as Leaflet or OpenLayers to display
+them on the web.
+
+    ddb tile DJI_0018.JPG output_tiles/
+    ddb tile ept.json output_tiles/
+    ddb tile orthophoto.tif output_tiles/
+    
+
+# Extracting GPS locations/footprints to GeoJSON
+
+You can quickly extract the locations of images to GeoJSON via:
+
+    ddb info *.JPG -f geojson -o gps.geojson
+
+Or for image footprints:
+
+    ddb info *.JPG -f geojson --geometry polygon -o footprint.geojson
+
+This works with orthophotos, elevation models and point clouds as well!
+
+    ddb info point_cloud.laz -f geojson --geometry polygon -o footprint.geojson
+
+
+## Commands Reference
+
+<CLIAutogen />

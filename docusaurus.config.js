@@ -61,18 +61,24 @@ const config = {
             position: 'left',
             label: 'Desktop',
           },
-        //   {
-        //     type: 'doc',
-        //     docId: 'intro',
-        //     position: 'left',
-        //     label: 'Hub',
-        //   },
-        //   {
-        //     type: 'doc',
-        //     docId: 'intro',
-        //     position: 'left',
-        //     label: 'Registry',
-        //   },
+          {
+            type: 'doc',
+            docId: 'registry',
+            position: 'left',
+            label: 'Registry',
+          },
+          {
+            type: 'doc',
+            docId: 'server',
+            position: 'left',
+            label: 'Server',
+          },
+          {
+            type: 'doc',
+            docId: 'cli',
+            position: 'left',
+            label: 'CLI',
+          },
         //   {
         //     type: 'doc',
         //     docId: 'intro',

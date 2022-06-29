@@ -12,19 +12,22 @@ A set of tools to inspect, manage and share aerial data.
 
 *![Summary](./assets/summary.svg)*
 
+:::info
 We will soon allow for processing of data. In the meanwhile, [WebODM](https://opendronemap.org/webodm/) can help you with that.
+:::
 
-## Better Tools
+## Useful Tools
 
 ### For Inspection
 
-You flew your drone. You captured lots of data. **Great!** Is your data good?
+You flew your drone. You captured some data. But *is your data good?*. You plug your SD card and check:
 
 ![explorer](./assets/brighton-explorer.png)
 
-*What is not shown in the screen above:*
  - Are the images georeferenced correctly (or at all)?
  - Did you miss to capture an image (or an entire section)?
+
+*Difficult to say*
 
 DroneDB Desktop can help provide more context:
 
@@ -34,7 +37,7 @@ DroneDB Desktop can help provide more context:
 
 That's insightful!
 
-Now you're ready to copy/move your images (or a subset of them) and send them to your favorite program for further processing/analysis.
+Now you're ready to copy/move your images and send them to your favorite program for further processing/analysis.
 
 You can use this tool to sort through your datasets more quickly or to examine your SD cards.
 
@@ -73,4 +76,4 @@ But you and your clients cannot interact with the files until you've downloaded 
 ### Advanced Users
 
  - Self-host your Hub with [Registry](./registry) or [Server](./server)
- - Install our [command line tool](./ddb)
+ - Install the [command line tool](./CLI)
