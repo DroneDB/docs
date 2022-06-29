@@ -29,6 +29,10 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
+article a{
+    --ifm-link-decoration: underline;
+}
+
 .img_node_modules-\@docusaurus-theme-classic-lib-theme-MDXComponents-Img-styles-module{
     border-radius: 4px;
     box-shadow: 2px 2px 6px #999;

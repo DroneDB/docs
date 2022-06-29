@@ -86,7 +86,7 @@ const config = {
         //     label: 'ddb',
         //   },
           {
-            href: 'https://github.com/facebook/docusaurus',
+            href: 'https://github.com/DroneDB',
             label: 'GitHub',
             position: 'right',
           },

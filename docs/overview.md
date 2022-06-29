@@ -8,7 +8,7 @@ Discover **DroneDB in less than 2 minutes**.
 
 ## What is DroneDB
 
-A set of tools to verify, manage and share aerial data.
+A set of tools to inspect, manage and share aerial data.
 
 *![Summary](./assets/summary.svg)*
 
@@ -16,20 +16,17 @@ We will soon allow for processing of data. In the meanwhile, [WebODM](https://op
 
 ## Better Tools
 
-### For Verification
+### For Inspection
 
-You just came back from a morning of drone flying. You captured lots of data. **Great!** Is your data correct?
-
-*What you know:*
- - The thumbnails look correct:
+You flew your drone. You captured lots of data. **Great!** Is your data good?
 
 ![explorer](./assets/brighton-explorer.png)
 
-*What you don't know:*
+*What is not shown in the screen above:*
  - Are the images georeferenced correctly (or at all)?
  - Did you miss to capture an image (or an entire section)?
 
-DroneDB Desktop can help:
+DroneDB Desktop can help provide more context:
 
 ![ddb](./assets/brighton-ddb.png)
 
@@ -43,7 +40,7 @@ You can use this tool to sort through your datasets more quickly or to examine y
 
 ### For Sharing
 
-You have lots of data:
+If you have some aerial data:
  - Images
  - Videos
  - Orthophotos
@@ -59,16 +56,21 @@ Google Drive? Dropbox? OneDrive? iCloud?
 
 ![Google Drive](./assets/google-drive.png)
 
-But your assets look so sad on these :( You can't interact with them until you've downloaded all of them.
+But you and your clients cannot interact with the files until you've downloaded them.
 
-[DroneDB Hub](https://hub.dronedb.app) (which you can self-host via Registry or Server) can help:
+[DroneDB Hub](https://hub.dronedb.app) is interactive; you can view images, point clouds, textured models, panoramas all in one place. You can of course download the files too.
 
 ![Hub 1](./assets/hub-1.png)
+
 ![Hub 2](./assets/hub-2.png)
 
-Hub is interactive; you can view images, point clouds, textured models, panoramas all in one place (and still download the raw files).
 
 ## Get Started
 
- - Install DroneDB Desktop
- - [Register](https://dronedb.app/register) for an account on Hub (it's free)
+ - Install [DroneDB Desktop](./desktop/installation)
+ - [Register](https://dronedb.app/register) an account on Hub (it's free)
+
+### Advanced Users
+
+ - Self-host your Hub with [Registry](./registry) or [Server](./server)
+ - Install our [command line tool](./ddb)
