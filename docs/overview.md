@@ -70,7 +70,7 @@ But you and your clients cannot interact with the files until you've downloaded 
 
 ## Get Started
 
- - Install [DroneDB Desktop](./desktop/installation)
+ - Install [DroneDB Desktop](./desktop#installation)
  - [Register](https://dronedb.app/register) an account on Hub (it's free)
 
 ### Advanced Users
