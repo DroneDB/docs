@@ -4,11 +4,11 @@ import styles from './styles.module.css';
 
 const FeatureList = [
   {
-    title: 'Validate',
+    title: 'Inspect',
     Svg: require('@site/static/img/validate-data.svg').default,
     description: (
       <>
-        Use <a href="#">DroneDB Desktop</a> to validate, sort and manage aerial data after a flight.
+        Use <a href="/docs/desktop">DroneDB Desktop</a> to inspect, sort and manage aerial data after a flight.
       </>
     ),
   },

@@ -101,30 +101,34 @@ const config = {
       footer: {
         style: 'dark',
         links: [
+        //   {
+        //     title: 'Docs',
+        //     items: [
+        //       {
+        //         label: 'Overview',
+        //         to: '/docs/overview',
+        //       },
+        //     ],
+        //   },
+        //   {
+        //     title: 'Social',
+        //     items: [
+        //       {
+        //         label: 'Twitter',
+        //         href: 'https://twitter.com/dronedb',
+        //       },
+        //     ],
+        //   },
           {
-            title: 'Docs',
-            items: [
-              {
-                label: 'Overview',
-                to: '/docs/overview',
-              },
-            ],
-          },
-          {
-            title: 'Social',
-            items: [
-              {
-                label: 'Twitter',
-                href: 'https://twitter.com/dronedb',
-              },
-            ],
-          },
-          {
-            title: 'Sites',
+            title: 'Links',
             items: [
               {
                 label: "dronedb.app",
                 href: "https://dronedb.app"
+              },
+              {
+                label: "GitHub",
+                href: "https://github.com/DroneDB"
               }
             ],
           },
