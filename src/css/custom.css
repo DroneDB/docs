@@ -33,11 +33,11 @@ article a{
     --ifm-link-decoration: underline;
 }
 
-.img_node_modules-\@docusaurus-theme-classic-lib-theme-MDXComponents-Img-styles-module{
+article div.theme-doc-markdown img{
     border-radius: 4px;
     box-shadow: 2px 2px 6px #999;
 }
 
-em .img_node_modules-\@docusaurus-theme-classic-lib-theme-MDXComponents-Img-styles-module{
+article div.theme-doc-markdown em img{
     box-shadow: none;
 }

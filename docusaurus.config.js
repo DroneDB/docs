@@ -80,6 +80,12 @@ const config = {
             position: 'left',
             label: 'CLI',
           },
+          {
+            type: 'doc',
+            docId: 'faq',
+            position: 'left',
+            label: 'FAQ',
+          },
         //   {
         //     type: 'doc',
         //     docId: 'intro',
