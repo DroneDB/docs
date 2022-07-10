@@ -15,3 +15,6 @@ Both implementations allow you to access the functionalities of [Hub](https://gi
 | **Data Storage**| Database + File System   | File System Only       |
 | **Language**    | .NET 6.0                 | NodeJS                |
 
+### Where can I buy a license for DroneDB Desktop?
+
+[https://dronedb.app/buy-ddb-desktop](https://dronedb.app/buy-ddb-desktop)

@@ -32,7 +32,8 @@ import WindowsSetupImage from '@site/docs/assets/windows_setup.png';
  * Quickly share to [Hub](https://hub.dronedb.app)
  * [Coming Soon]: Image Stitching / Processing
 
-<!-- 
 ## Get a License
 
- *  -->
+You can [purchase a license](https://dronedb.app/buy-ddb-desktop) by visiting this link: [https://dronedb.app/buy-ddb-desktop](https://dronedb.app/buy-ddb-desktop)
+
+All purchases directly support the project ❤
