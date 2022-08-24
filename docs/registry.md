@@ -81,6 +81,30 @@ Storage folder (pos. 0)    Required. Points to a directory on a filesystem where
 Go to [/account](https://localhost:5000/account) to change password.
 Otherwise, you can change the admin password by changing the value of the field `DefaultAdmin.Password` in the `appsettings.json` file. After changing the password you need to restart the application.
 
+### Use MySQL / MariaDB instead of Sqlite
+
+After the first run close the program and edit the file `appsettings.json` in `registry-data` folder:
+
+```json
+"AuthProvider": "Mysql",
+"RegistryProvider": "Mysql",
+"HangfireProvider": "Mysql",
+"ConnectionStrings": {
+  "IdentityConnection": "Server=db;Database=RegistryAuth;Uid=registry;Pwd=password",
+  "RegistryConnection": "Server=db;Database=RegistryData;Uid=registry;Pwd=password",
+  "HangfireConnection": "Server=db;Database=RegistryHangfire;Uid=registry;Pwd=password;Allow User Variables=true;Connect Timeout=300"
+  },
+```
+
+Make sure the user `registry` has the following permissions:
+
+```sql
+GRANT ALL PRIVILEGES ON *.* TO 'registry'@'%' IDENTIFIED BY 'password' WITH GRANT OPTION;
+```
+
+Then restart the application, the databases will be automatically created.
+
+
 ## Running with docker-compose
 
 ```bash
