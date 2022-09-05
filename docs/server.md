@@ -64,6 +64,14 @@ DroneDB Server will automatically index/sync the specified folder and serve it o
 
 ![image](https://user-images.githubusercontent.com/1951843/169094873-923dc83e-ca3e-4584-8ee4-7d318099474f.png)
 
+## STAC Endpoints
+
+You can access the server's public STAC Catalog from the `/stac` endpoint (e.g. http://localhost:5000/stac ). All `public` datasets `public` will be included in the STAC Catalog.
+
+Each dataset also exposes a STAC collection at `/orgs/:org/ds/:ds/stac`.
+
+You can browse the Catalog using the [STAC Browser](https://radiantearth.github.io/stac-browser/#/external/http:/localhost:5000/stac).
+
 ## Under the Hood
 
 We mentioned earlier that DroneDB Server organizes your data in a straightforward filesystem structure. What happens when we launch the server on an existing folder, or create a new dataset?
