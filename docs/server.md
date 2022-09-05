@@ -66,7 +66,7 @@ DroneDB Server will automatically index/sync the specified folder and serve it o
 
 ## STAC Endpoints
 
-You can access the server's public STAC Catalog from the `/stac` endpoint (e.g. http://localhost:5000/stac ). All `public` datasets `public` will be included in the STAC Catalog.
+You can access the server's public STAC Catalog from the `/stac` endpoint (e.g. http://localhost:5000/stac ). All **public** datasets will be included in the STAC Catalog.
 
 Each dataset also exposes a STAC collection at `/orgs/:org/ds/:ds/stac`.
 
