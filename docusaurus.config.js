@@ -1,7 +1,8 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
+const {themes} = require('prism-react-renderer');
+const lightCodeTheme = themes.github;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -10,9 +11,17 @@ const config = {
   url: 'https://docs.dronedb.app',
   baseUrl: '/',
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenAnchors: 'warn',
   favicon: 'img/favicon.ico',
   trailingSlash: false,
+
+  markdown: {
+    mdx1Compat: {
+      comments: false,
+      admonitions: false,
+      headingIds: false,
+    },
+  },
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -58,6 +67,12 @@ const config = {
         items: [
           {
             type: 'doc',
+            docId: 'overview',
+            position: 'left',
+            label: 'Overview',
+          },
+          {
+            type: 'doc',
             docId: 'desktop',
             position: 'left',
             label: 'Desktop',
@@ -67,12 +82,6 @@ const config = {
             docId: 'registry',
             position: 'left',
             label: 'Registry',
-          },
-          {
-            type: 'doc',
-            docId: 'server',
-            position: 'left',
-            label: 'Server',
           },
           {
             type: 'doc',
