@@ -11,7 +11,7 @@ DroneDB Desktop is a powerful application for browsing, inspecting, and sharing 
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import WindowsSetupImage from '@site/docs/assets/windows_setup.png';
+import WindowsSetupImage from '@site/docs/assets/windows_setup.webp';
 
 <Tabs>
   <TabItem value="windows" label="Windows" default>

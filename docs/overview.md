@@ -32,7 +32,7 @@ DroneDB consists of three main components:
 
 You flew your drone. You captured some data. But *is your data good?*
 
-![explorer](./assets/brighton-explorer.png)
+![explorer](./assets/brighton-explorer.webp)
 
  - Are the images georeferenced correctly (or at all)?
  - Did you miss to capture an image (or an entire section)?
@@ -41,9 +41,9 @@ You flew your drone. You captured some data. But *is your data good?*
 
 DroneDB Desktop provides rich context and visualization:
 
-![ddb](./assets/brighton-ddb.png)
+![ddb](./assets/brighton-ddb.webp)
 
-![ddb](./assets/brighton-ddb-2.png)
+![ddb](./assets/brighton-ddb-2.webp)
 
 ### Data Sharing
 
@@ -60,13 +60,13 @@ DroneDB supports a wide range of aerial data formats:
 
 Traditional cloud storage like Google Drive or Dropbox doesn't let you interact with geospatial data:
 
-![Google Drive](./assets/google-drive.png)
+![Google Drive](./assets/google-drive.webp)
 
 [DroneDB Hub](https://hub.dronedb.app) is interactive; you can view images, point clouds, textured models, panoramas all in one place with **measurements tools**, **STAC support**, and more:
 
-![Hub 1](./assets/hub-1.png)
+![Hub 1](./assets/hub-1.webp)
 
-![Hub 2](./assets/hub-2.png)
+![Hub 2](./assets/hub-2.webp)
 
 ### Key Capabilities
 
