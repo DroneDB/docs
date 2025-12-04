@@ -66,6 +66,8 @@ DroneDB Desktop integrates with [DroneDB Hub](https://hub.dronedb.app) for easy 
 
 ## Get a License
 
-You can [purchase a license](https://dronedb.app/buy-ddb-desktop) by visiting this link: [https://dronedb.app/buy-ddb-desktop](https://dronedb.app/buy-ddb-desktop)
+You can purchase a DroneDB Desktop license for **€39 (one-time payment)** with a 30-day money-back guarantee by visiting [dronedb.app/plans](https://dronedb.app/plans).
+
+On the same page, you can also subscribe to **DroneDB Hub** (the online Registry platform) with a **30-day free trial** on every plan – no commitment, cancel anytime!
 
 All purchases directly support the project ❤

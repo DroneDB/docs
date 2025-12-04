@@ -8,6 +8,10 @@ sidebar_position: 3
 
 DroneDB Registry is a comprehensive aerial data management and storage platform. It provides JWT authentication, a full REST API, and integrates with [Hub](https://github.com/DroneDB/Hub) to offer a complete solution for hosting and sharing geospatial data.
 
+:::tip Try it Online
+You can try the online hosted version of Registry (DroneDB Hub) at [dronedb.app/plans](https://dronedb.app/plans) with a **30-day free trial** on every plan – no commitment, cancel anytime!
+:::
+
 ## Features
 
 - **Dataset Management**: Create, organize, and share datasets with fine-grained permissions
