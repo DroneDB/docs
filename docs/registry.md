@@ -23,19 +23,21 @@ You can try the online hosted version of Registry (DroneDB Hub) at [dronedb.app/
 - **Import/Export**: Transfer datasets between Registry instances
 - **On-Demand Processing**: Automatic thumbnail, tile, and streaming format generation
 
-### Orthophoto and flight path
+### Orthophoto Measurements
 
-![orthophoto](https://user-images.githubusercontent.com/7868983/152324827-d16949b8-dd96-4d3a-b5c5-a732e999f070.png)
+Interactive measurement tools on orthophotos:
 
-### Files with previews
+![Orthophoto Measurements](./assets/ortho-measurements.webp)
 
-![files](https://user-images.githubusercontent.com/7868983/152324902-abfe0910-6115-46c5-b561-59bc5a417dda.png)
+### Point Cloud Measurements
 
-### Point cloud interactive view
+Measure distances and areas directly on point clouds:
 
-![point-cloud](https://user-images.githubusercontent.com/7868983/152324757-4ee73f71-bf8e-4c72-9910-7073a68daee3.png)
+![Point Cloud Measurements](./assets/point-cloud-measurements.webp)
 
-### Measurement Toolsies
+![Point Cloud Measurements Saved](./assets/point-cloud-measurements-saved.webp)
+
+### Live Examples
 
 - [Brighton Beach](https://hub.dronedb.app/r/hedo88/brighton-beach)
 - [ODM Seneca](https://hub.dronedb.app/r/hedo88/odm-seneca)

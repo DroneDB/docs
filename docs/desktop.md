@@ -31,8 +31,18 @@ import WindowsSetupImage from '@site/docs/assets/windows_setup.webp';
 ### File Browser
 Browse your aerial data files with rich previews and metadata extraction.
 
+![Details View - Images](./assets/details-view.webp)
+
+![Details View - Folders](./assets/details-view-2.webp)
+
+Switch to list view with thumbnails for a compact overview:
+
+![List View with Thumbnails](./assets/list-thumbnails.webp)
+
 ### Synchronized Map View
 View files on a map synchronized with the file browser. Click on the map to highlight files, or select files to see their locations.
+
+![Images on Map with Flight Path](./assets/images-on-map.webp)
 
 ### Key Capabilities
 
