@@ -1,10 +1,9 @@
 ---
-sidebar_position: 5
-description: ''
+sidebar_position: 4
+description: 'Command Line Interface for DroneDB'
 ---
 
 import CLIAutogen from './_cli_autogen.mdx';
-import CodeBlock from '@theme/CodeBlock';
 import TOCInline from '@theme/TOCInline';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -18,38 +17,44 @@ import TabItem from '@theme/TabItem';
 
 <Tabs>
   <TabItem value="windows" label="Windows" default>
-    <ul><li>Download <a href="https://github.com/DroneDB/ddb-desktop/releases/download/v1.1.0/DroneDB_Setup.exe">DroneDB_Setup.exe</a></li>
-    <li>Verify it's working:</li>
-    </ul>
-<CodeBlock language="bash">
-{`C:\\> ddb --version
-1.0.6 (git commit 1952a82)`}
-    </CodeBlock>
+
+- Download [the latest release](https://github.com/DroneDB/DroneDB/releases/latest) from GitHub
+- Extract the archive and add the folder to your PATH
+- Verify it's working:
+
+```bash
+C:\> ddb --version
+1.3.1 (git commit e416290)
+```
+
   </TabItem>
   <TabItem value="macOS" label="macOS">
-    <ul><li>Install <a href="https://brew.sh/">Homebrew</a></li>
-    <li>Then:</li>
-    </ul>
-<CodeBlock language="bash">
-{`[user:~] % brew install dronedb
+
+- Install [Homebrew](https://brew.sh/)
+- Then:
+
+```bash
+[user:~] % brew install dronedb
 [user:~] % ddb --version
-1.0.6 (git commit 1952a82)
-`}
-    </CodeBlock>
+1.3.1 (git commit e416290)
+```
+
   </TabItem>
   <TabItem value="linux" label="Linux">
-    <CodeBlock language="bash">
-{`$ curl -fsSL https://get.dronedb.app -o get-ddb.sh
+
+```bash
+$ curl -fsSL https://get.dronedb.app -o get-ddb.sh
 $ sh get-ddb.sh
 $ ddb --version
-1.0.6 (git commit 1952a82)`}
-    </CodeBlock>
+1.3.1 (git commit e416290)
+```
+
   </TabItem>
 </Tabs>
 
 ## Examples
 
-You can do all sort operations with `ddb`. We recommend to check out
+You can perform all sorts of operations with `ddb`. We recommend checking out
 the list of [commands](#commands-reference):
 
 ### Sharing datasets
@@ -78,11 +83,15 @@ Because we didn't set a `tag`, ddb generated a random one for you.
 You can change the tag by visiting the URL. You can also explicitly set
 a tag, like so:
 
-    ddb share *.JPG -t pierotofy/brighton
+```bash
+ddb share *.JPG -t pierotofy/brighton
+```
 
 Or if you're running your own Registry:
 
-    ddb share *.JPG -t http://localhost:5000/admin/brighton
+```bash
+ddb share *.JPG -t http://localhost:5000/admin/brighton
+```
 
 Tags are defined as:
 
@@ -100,30 +109,38 @@ Registry for offline use, make modifications, then sync back your
 changes.
 
 Let's use this dataset:
-<https://hub.dronedb.app/r/pierotofy/brighton-beach>
+[https://hub.dronedb.app/r/pierotofy/brighton-beach](https://hub.dronedb.app/r/pierotofy/brighton-beach)
 
 You can clone it via:
 
-    ddb clone pierotofy/brighton-beach
+```bash
+ddb clone pierotofy/brighton-beach
+```
 
 Let's add a `README.md` file that describes the dataset. Create a
 `README.md` file using
 [Markdown](https://www.markdownguide.org/cheat-sheet/) syntax and save
 it in the `brighton-beach` directory. Afterwards:
 
-    cd brighton-beach/
-    ddb add README.md
+```bash
+cd brighton-beach/
+ddb add README.md
+```
 
 Great! We are now ready to push the changes.
 
-    ddb push
+```bash
+ddb push
+```
 
 Uuups! This will trigger an error, since we don't have permission to
 make modifications to this dataset (it belongs to `pierotofy`). Let's
 make our own copy to a different Registry server and user:
 
-    ddb tag http://localhost:5000/admin/brighton-copy
-    ddb push
+```bash
+ddb tag http://localhost:5000/admin/brighton-copy
+ddb push
+```
 
 ### Metadata Entries
 
@@ -131,14 +148,16 @@ DroneDB supports the addition of metadata to any file or directory
 within the index. This can be used to store information of any kind in
 JSON format:
 
-    ddb meta set pilot '{"name": "John Smith"}'
-    ddb meta get pilot --format json
-    --> {"data":{"name":"John S."},"id":"ff4f0f26-8741-4423-bde5-b445750937bb","mtime":1640985850}
+```bash
+ddb meta set pilot '{"name": "John Smith"}'
+ddb meta get pilot --format json
+# Output: {"data":{"name":"John S."},"id":"ff4f0f26-8741-4423-bde5-b445750937bb","mtime":1640985850}
 
-    ddb add photo.JPG
-    ddb meta add comments '{"text": "Nice one!", "author": "John S."}' -p photo.JPG
-    ddb meta get comments -p photo.JPG --format json
-    --> [{"data":{"author":"John S.","text":"Nice one!"},"id":"550d0b5c-108b-4996-b7e8-467b4cb87937","mtime":1640986217}]
+ddb add photo.JPG
+ddb meta add comments '{"text": "Nice one!", "author": "John S."}' -p photo.JPG
+ddb meta get comments -p photo.JPG --format json
+# Output: [{"data":{"author":"John S.","text":"Nice one!"},"id":"550d0b5c-108b-4996-b7e8-467b4cb87937","mtime":1640986217}]
+```
 
 Singular and plural metadata keys are supported. Plural keys (ending
 with `s`) are treated as lists, whereas singular keys are objects.
@@ -152,35 +171,97 @@ dataset while offline can later sync back online without conflicts.
 
 You can project images onto a map.
 
-    ddb geoproj images/DJI_0018.JPG -o projected/
+```bash
+ddb geoproj images/DJI_0018.JPG -o projected/
+```
 
-# Creating static tiles (XYZ/TMS)
+### Creating static tiles (XYZ/TMS)
 
 DroneDB can create static tiles for GeoTIFFs, drone images and [EPT](https://entwine.io). It's similar to
 [gdal2tiles.py](https://gdal.org/programs/gdal2tiles.html), but
-it's a bit faster and can handle more formats. You can use
+it's faster and can handle more formats. You can use
 these tiles in applications such as Leaflet or OpenLayers to display
 them on the web.
 
-    ddb tile DJI_0018.JPG output_tiles/
-    ddb tile ept.json output_tiles/
-    ddb tile orthophoto.tif output_tiles/
-    
+```bash
+ddb tile DJI_0018.JPG output_tiles/
+ddb tile ept.json output_tiles/
+ddb tile orthophoto.tif output_tiles/
+```
 
-# Extracting GPS locations/footprints to GeoJSON
+### Building point cloud tiles (EPT)
+
+DroneDB can build EPT (Entwine Point Tiles) indexes for efficient streaming of point clouds:
+
+```bash
+ddb ept output/ point_cloud.laz
+```
+
+This creates a hierarchical structure that enables fast visualization of large point clouds in web browsers.
+
+### Generating Cloud Optimized GeoTIFFs (COG)
+
+Convert standard GeoTIFFs to Cloud Optimized GeoTIFFs for efficient streaming:
+
+```bash
+ddb cog output.tif input.tif
+```
+
+COGs enable range requests, making it possible to load only the needed portions of large rasters.
+
+### Extracting GPS locations/footprints to GeoJSON
 
 You can quickly extract the locations of images to GeoJSON via:
 
-    ddb info *.JPG -f geojson -o gps.geojson
+```bash
+ddb info *.JPG -f geojson -o gps.geojson
+```
 
 Or for image footprints:
 
-    ddb info *.JPG -f geojson --geometry polygon -o footprint.geojson
+```bash
+ddb info *.JPG -f geojson --geometry polygon -o footprint.geojson
+```
 
 This works with orthophotos, elevation models and point clouds as well!
 
-    ddb info point_cloud.laz -f geojson --geometry polygon -o footprint.geojson
+```bash
+ddb info point_cloud.laz -f geojson --geometry polygon -o footprint.geojson
+```
 
+### Generating STAC Catalogs
+
+DroneDB can generate STAC (SpatioTemporal Asset Catalog) compliant JSON for interoperability with other geospatial tools:
+
+```bash
+cd my-dataset/
+ddb stac
+```
+
+For a specific file:
+
+```bash
+ddb stac -p orthophoto.tif
+```
+
+### Building 3D Model Tiles (Nexus)
+
+For efficient web streaming of 3D meshes, DroneDB can generate Nexus files:
+
+```bash
+ddb nxs model.obj output.nxz
+```
+
+Supported input formats: OBJ, GLTF, GLB.
+
+### Generating Thumbnails
+
+Create thumbnails for images and rasters:
+
+```bash
+ddb thumbs *.JPG -o thumbs/
+ddb thumbs orthophoto.tif -o thumb.jpg -s 1024
+```
 
 ## Commands Reference
 

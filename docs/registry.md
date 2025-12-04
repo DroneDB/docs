@@ -6,10 +6,18 @@ sidebar_position: 3
 
 ![commits](https://img.shields.io/github/commit-activity/m/DroneDB/registry) ![languages](https://img.shields.io/github/languages/top/DroneDB/registry) ![.NET Core](https://github.com/DroneDB/Registry/workflows/.NET%20Core/badge.svg?branch=master)
 
-DroneDB Registry is a simple, user-friendly aerial data management and storage application. It features JWT authentication and implements a full REST API. 
+DroneDB Registry is a comprehensive aerial data management and storage platform. It provides JWT authentication, a full REST API, and integrates with [Hub](https://github.com/DroneDB/Hub) to offer a complete solution for hosting and sharing geospatial data.
 
-Combined with [Hub](https://github.com/DroneDB/Hub), it provides a simple, fast and reliable platform for hosting and sharing geospatial images and data.
-It also allows you to view orthophotos, point clouds and 3d models (obj) easily and effortlessly directly in the browser.
+## Features
+
+- **Dataset Management**: Create, organize, and share datasets with fine-grained permissions
+- **Interactive Visualization**: View orthophotos, point clouds, 3D models (OBJ, GLTF, GLB), and panoramas directly in the browser
+- **User Management**: Built-in user administration with role-based access control
+- **STAC Compliance**: Standard SpatioTemporal Asset Catalog API for interoperability
+- **Public & Private Datasets**: Flexible visibility controls for your data
+- **Measurements**: Interactive measurement tools on maps
+- **Import/Export**: Transfer datasets between Registry instances
+- **On-Demand Processing**: Automatic thumbnail, tile, and streaming format generation
 
 ### Orthophoto and flight path
 
@@ -23,62 +31,74 @@ It also allows you to view orthophotos, point clouds and 3d models (obj) easily 
 
 ![point-cloud](https://user-images.githubusercontent.com/7868983/152324757-4ee73f71-bf8e-4c72-9910-7073a68daee3.png)
 
-### Example repositories
+### Measurement Toolsies
 
 - [Brighton Beach](https://hub.dronedb.app/r/hedo88/brighton-beach)
 - [ODM Seneca](https://hub.dronedb.app/r/hedo88/odm-seneca)
 - [ODM Sance](https://hub.dronedb.app/r/hedo88/odm-sance)
 - [Panorama Example](https://hub.dronedb.app/r/pierotofy/panoexample/)
 
-## Getting started with Docker
+## Getting Started with Docker
 
-To get started, download [Docker](https://www.docker.com/community-edition) and install it. Then run this command:
+The fastest way to get started is with Docker. Download [Docker](https://www.docker.com/community-edition) and run:
 
-
-```
+```bash
 docker run -it --rm -p 5000:5000 -v ${PWD}/registry-data:/data dronedb/registry
 ```
 
-The data will be stored in the local folder `registry-data`.
-Open [https://localhost:5000](https://localhost:5000) in your browser to start using the application.
+Data will be stored in the local folder `registry-data`.
+Open [http://localhost:5000](http://localhost:5000) in your browser to start using the application.
 
-Default credentials are `admin` and `password`. 
+**Default credentials**: `admin` / `password`
 
-Useful links:
- - Swagger: [http://localhost:5000/swagger](http://localhost:5000/swagger)
- - Version: [http://localhost:5000/version](http://localhost:5000/version)
- - (req auth) Quick Health: [http://localhost:5000/quickhealth](http://localhost:5000/quickhealth)
- - (req auth) Health: [http://localhost:5000/health](http://localhost:5000/health)
- - (req auth) Hangfire: [http://localhost:5000/hangfire](http://localhost:5000/hangfire)
+:::warning
+Change the default password immediately after first login at [http://localhost:5000/account](http://localhost:5000/account)
+:::
+
+### Useful Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| [/scalar/v1](http://localhost:5000/scalar/v1) | API Documentation (Scalar UI) |
+| [/version](http://localhost:5000/version) | Version information |
+| [/quickhealth](http://localhost:5000/quickhealth) | Quick health check (requires auth) |
+| [/health](http://localhost:5000/health) | Detailed health check (requires auth) |
+| [/hangfire](http://localhost:5000/hangfire) | Background jobs dashboard (requires auth) |
+| [/stac](http://localhost:5000/stac) | STAC Catalog root |
 
 The log file is located in `registry-data/logs/registry.txt`.
 
-## Getting started natively
+## Getting Started Natively
 
-You need to install the latest version of the [DroneDB library](https://github.com/DroneDB/DroneDB/releases/latest) and add it to PATH. 
+### Prerequisites
 
-Download the [latest release](https://github.com/DroneDB/Registry/releases/latest) for your platform and run the following command:
+1. Install the latest version of the [DroneDB library](https://github.com/DroneDB/DroneDB/releases/latest) and add it to PATH
+2. Download the [latest Registry release](https://github.com/DroneDB/Registry/releases/latest) for your platform
+
+### Running
 
 ```bash
 ./Registry.Web ./registry-data
 ```
 
-There are several other command line options:
+### Command Line Options
 
 ```
 -a, --address              (Default: localhost:5000) Address to listen on
--c, --check                Check configuration and exit.
--r, --reset-hub            Reset the Hub folder by re-creating it.
---help                     Display this help screen.
---version                  Display version information.
-Storage folder (pos. 0)    Required. Points to a directory on a filesystem where to store Registry data.
+-c, --check                Check configuration and exit
+-r, --reset-hub            Reset the Hub folder by re-creating it
+--help                     Display this help screen
+--version                  Display version information
+Storage folder (pos. 0)    Required. Directory where Registry stores data
 ```
 
-> **_NOTE:_**  This configuration uses sqlite as database. It is for local testing only. If you want to use the application in a heavy load environment, check the following section.
+:::note
+This configuration uses SQLite as the database. For production environments with high load, use MySQL/MariaDB as described in the [MySQL/MariaDB Configuration](#use-mysql--mariadb-instead-of-sqlite) section.
+:::
 
 ### Change admin password
 
-Go to [/account](https://localhost:5000/account) to change password.
+Go to [/account](http://localhost:5000/account) to change password.
 Otherwise, you can change the admin password by changing the value of the field `DefaultAdmin.Password` in the `appsettings.json` file. After changing the password you need to restart the application.
 
 ### Use MySQL / MariaDB instead of Sqlite
@@ -199,7 +219,7 @@ then run
 docker-compose restart registry
 ````
 
-> **_Info:_** Any changes to the configuration file need to restart the registry container  
+> **_Info:_** Any changes to the configuration file need to restart the registry container
 
 ## Build Docker image
 
@@ -214,8 +234,8 @@ docker build . -t dronedb/registry
 
 ## Running from source
 
-`Registry` is written in C# on .NET Core 6 platform and runs natively on both Linux and Windows.
-To install the latest .NET SDK see the [official download page](https://dotnet.microsoft.com/en-us/download/dotnet/6.0). Before building registry ensure you have `ddblib` in your path, if not, download the [latest release](https://github.com/DroneDB/DroneDB/releases) and add it to `PATH`.
+Registry is written in C# on .NET 8 platform and runs natively on Linux, Windows, and macOS.
+To install the latest .NET SDK see the [official download page](https://dotnet.microsoft.com/en-us/download/dotnet/8.0). Before building registry ensure you have `ddblib` in your path, if not, download the [latest release](https://github.com/DroneDB/DroneDB/releases) and add it to `PATH`.
 
 Clone the repository:
 
@@ -225,13 +245,12 @@ cd Registry
 git submodule update --init --recursive
 ```
 
-Build the Hub interface (need [NodeJS 14+](https://nodejs.org/download/release/v14.18.3/)):
+Build the Hub interface (needs [NodeJS 18+](https://nodejs.org/)):
 
 ```bash
 cd Registry.Web/ClientApp
-npm install -g webpack@4
 npm install
-webpack
+npx webpack
 ```
 
 Build the solution from the command line:
@@ -261,12 +280,163 @@ With docker or docker-compose, you update the application by pulling the latest 
 ```bash
 docker-compose down
 docker-compose pull
-docker-compose up -d 
+docker-compose up -d
 ```
 
 ## Project architecture
 
 ![dronedb-registry-architecture](https://user-images.githubusercontent.com/7868983/151846022-891685f7-ef47-4b93-8199-d4ac4e788c5d.png)
+
+### Key Components
+
+- **Registry.Web**: ASP.NET Core web application
+- **Registry.Adapters**: Database and DroneDB library adapters
+- **Hub (Vue.js)**: Frontend SPA in `Registry.Web/ClientApp`
+- **Hangfire**: Background job processing
+
+## User Management
+
+Registry includes a built-in user management interface accessible to administrators.
+
+### Features
+
+- **Create/Delete Users**: Manage user accounts
+- **Role Management**: Create custom roles and assign them to users
+- **Organization Assignment**: Control which organizations each user can access
+- **Storage Quotas**: Set per-user storage limits (when `EnableStorageLimiter` is enabled)
+- **Password Management**: Reset user passwords
+
+### External Authentication
+
+For enterprise deployments, Registry supports external authentication providers via `ExternalAuthUrl`. When configured, local user management is disabled and authentication is delegated to the external provider.
+
+## Dataset Visibility
+
+Datasets support three visibility levels:
+
+| Level | Description |
+|-------|-------------|
+| **Private** | Only the owner and admins can access |
+| **Unlisted** | Accessible with direct link, not listed publicly |
+| **Public** | Visible to everyone, included in STAC catalog |
+
+Change visibility using:
+- **Web UI**: Dataset settings
+- **CLI**: `ddb chattr +public` or `ddb chattr -public`
+
+## STAC API
+
+Registry implements the [STAC specification](https://stacspec.org/) for standardized geospatial data discovery.
+
+### Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `/stac` | Root catalog with links to all public datasets |
+| `/orgs/{org}/ds/{ds}/stac` | STAC Collection for a specific dataset |
+
+### Browsing
+
+Use the [STAC Browser](https://radiantearth.github.io/stac-browser/) to explore your catalog:
+
+```
+https://radiantearth.github.io/stac-browser/#/external/http://localhost:5000/stac
+```
+
+## Import & Export
+
+### Importing Datasets
+
+Import datasets from another Registry instance via API:
+
+```bash
+POST /system/importdataset
+{
+  "sourceUrl": "https://source-registry.com",
+  "orgSlug": "source-org",
+  "dsSlug": "source-dataset",
+  "targetOrgSlug": "target-org",
+  "targetDsSlug": "target-dataset",
+  "token": "auth-token"
+}
+```
+
+### Importing Organizations
+
+Import entire organizations with all their datasets:
+
+```bash
+POST /system/importorg
+{
+  "sourceUrl": "https://source-registry.com",
+  "orgSlug": "source-org",
+  "targetOrgSlug": "target-org",
+  "token": "auth-token"
+}
+```
+
+## Reverse Proxy Configuration
+
+When running behind a reverse proxy (nginx, Apache, etc.), configure `ExternalUrlOverride` to ensure correct URL generation:
+
+```json
+{
+  "ExternalUrlOverride": "https://registry.yourdomain.com"
+}
+```
+
+### Nginx Example
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name registry.yourdomain.com;
+
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection keep-alive;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        client_max_body_size 0;
+    }
+}
+```
+
+## Troubleshooting
+
+### Common Issues
+
+**Container fails to start**
+- Check logs: `docker-compose logs registry`
+- Verify database connectivity
+- Ensure DroneDB library is properly installed
+
+**Authentication errors**
+- Verify `Secret` is set and consistent
+- Check token expiration settings
+- Clear browser cookies
+
+**File upload failures**
+- Check `MaxRequestBodySize` setting
+- Verify storage path permissions
+- Check available disk space
+
+### Health Checks
+
+Use the health endpoints to diagnose issues:
+
+```bash
+# Quick health (basic check)
+curl -H "Authorization: Bearer <token>" http://localhost:5000/quickhealth
+
+# Full health (includes database, DroneDB)
+curl -H "Authorization: Bearer <token>" http://localhost:5000/health
+```
 
 
 ## Configuration Reference
@@ -324,11 +494,11 @@ The additional cache provider, supported values:
 - `Redis`: Redis cache provider. Example value:
 ```bash
 {
-   "type": "Redis", 
-   "settings": { 
-      "InstanceAddress": "localhost:5002", 
-      "InstanceName": "registry" 
-   } 
+   "type": "Redis",
+   "settings": {
+      "InstanceAddress": "localhost:5002",
+      "InstanceName": "registry"
+   }
 }
 ```
 :::info
@@ -462,7 +632,7 @@ The default value is `00:30:00` (30 minutes).
 The number of days after which the JWT tokens will expire.
 
 :::info
-The default value is 30 days.
+The default value is `7` days.
 :::
 
 **UploadBatchTimeout**
@@ -473,12 +643,76 @@ The timeout for the share upload endpoint. It is the maximum time allowed betwee
 The default value is `01:00:00` (1 hour).
 :::
 
-**WorkerThreads**
+**VisibilityCacheExpiration**
 
-The number of worker threads used by the application.
+The expiration time for the dataset visibility cache (TimeSpan).
 
 :::info
-The default value is `0`
+The default value is `1.00:00:00` (1 day).
+:::
+
+**WorkerThreads**
+
+The number of worker threads used by the application. Use `-1` for automatic detection.
+
+:::info
+The default value is `-1`
+:::
+
+**DatasetsPath**
+
+The path to the datasets folder.
+
+:::info
+The default value is `./datasets`
+:::
+
+**TempPath**
+
+The path to the temporary files folder.
+
+:::info
+The default value is `./temp`
+:::
+
+**RemoteThumbGeneratorUrl**
+
+URL of a remote thumbnail generator service for offloading thumbnail generation.
+
+:::info
+The default value is `null`
+:::
+
+**ZipMemoryThreshold**
+
+Memory threshold (in bytes) before using disk-based ZIP creation.
+
+:::info
+The default value is `1073741824` (1 GB)
+:::
+
+**CleanupExpiredJobsCron**
+
+Cron expression for the job that cleans up expired jobs.
+
+:::info
+The default value is `0 * * * *` (every hour)
+:::
+
+**SyncJobStatesCron**
+
+Cron expression for the job that synchronizes job states.
+
+:::info
+The default value is `*/5 * * * *` (every 5 minutes)
+:::
+
+**ProcessPendingBuildsCron**
+
+Cron expression for the job that processes pending builds.
+
+:::info
+The default value is `* * * * *` (every minute)
 :::
 
 ## Getting Help
