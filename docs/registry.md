@@ -302,19 +302,18 @@ docker-compose up -d
 
 ## User Management
 
-Registry includes a built-in user management interface accessible to administrators.
+Registry includes a comprehensive user management system with role-based access control.
 
-### Features
+:::info Full Documentation
+For complete details on user management including API endpoints, roles, organizations, storage quotas, and authentication, see the dedicated [User Management Guide](./user-management.md).
+:::
 
-- **Create/Delete Users**: Manage user accounts
-- **Role Management**: Create custom roles and assign them to users
-- **Organization Assignment**: Control which organizations each user can access
-- **Storage Quotas**: Set per-user storage limits (when `EnableStorageLimiter` is enabled)
-- **Password Management**: Reset user passwords
-
-### External Authentication
-
-For enterprise deployments, Registry supports external authentication providers via `ExternalAuthUrl`. When configured, local user management is disabled and authentication is delegated to the external provider.
+**Key Features:**
+- User account creation and administration
+- Role-based access control with custom roles
+- Organization membership management
+- Per-user storage quotas
+- JWT authentication with external provider support
 
 ## Dataset Visibility
 
