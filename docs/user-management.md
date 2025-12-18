@@ -6,7 +6,7 @@ sidebar_position: 4
 
 Registry includes a comprehensive user management system with role-based access control (RBAC), organization management, and storage quotas. This guide covers all aspects of managing users in a Registry deployment.
 
-![User Management Overview](./assets/user-management-overview-placeholder.webp)
+![User Management Overview](./assets/user-management-interface.webp)
 
 :::tip
 For information on basic Registry setup and configuration, see the [Registry documentation](./registry.md).
@@ -94,7 +94,7 @@ You can customize the default admin in `appsettings.json`:
 
 Administrators can create new users through the web interface or API.
 
-![Create User Interface](./assets/user-create-placeholder.webp)
+![Create User Interface](./assets/user-create.webp)
 
 #### Via Web Interface
 
@@ -185,7 +185,6 @@ Returns:
 ]
 ```
 
-![User List Interface](./assets/user-list-placeholder.webp)
 
 ### Updating Users
 
@@ -245,7 +244,7 @@ curl -X PUT http://localhost:5000/users/username/changepwd \
 When an admin changes another user's password, the `currentPassword` field can be omitted or set to null.
 :::
 
-![Password Change Interface](./assets/user-password-change-placeholder.webp)
+![Password Change Interface](./assets/user-password-change.webp)
 
 ## Roles and Permissions
 
@@ -262,6 +261,8 @@ Registry uses a role-based access control system. Users can have one or more rol
 
 Administrators can create custom roles for fine-grained access control.
 
+![Role Management Interface](./assets/user-view-roles.webp)
+
 #### Creating a Role
 
 ```bash
@@ -272,6 +273,8 @@ curl -X POST http://localhost:5000/users/roles \
     "roleName": "editor"
   }'
 ```
+
+![Role Management Interface](./assets/user-add-roles.webp)
 
 #### Listing Roles
 
@@ -310,7 +313,6 @@ curl -X PUT http://localhost:5000/users/username \
   }'
 ```
 
-![Role Management Interface](./assets/user-roles-placeholder.webp)
 
 ## Organizations
 
@@ -342,6 +344,8 @@ flowchart LR
 
 ### Managing User Organizations
 
+![Organization Interface](./assets/user-list-orgs.webp)
+
 #### View User's Organizations
 
 ```bash
@@ -372,8 +376,6 @@ curl -X PUT http://localhost:5000/users/username/orgs \
   -d "orgSlugs=project-alpha&orgSlugs=project-beta"
 ```
 
-![Organization Assignment Interface](./assets/user-organizations-placeholder.webp)
-
 ### Creating Organizations
 
 ```bash
@@ -382,6 +384,8 @@ curl -X POST http://localhost:5000/orgs \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "slug=my-org&name=My Organization&description=A new organization&isPublic=true"
 ```
+
+![Creating Organizations Interface](./assets/user-add-org.webp)
 
 ### Updating Organizations
 
@@ -458,8 +462,6 @@ Response:
 
 - `total`: Storage quota in bytes (null if unlimited)
 - `used`: Current storage usage in bytes
-
-![Storage Usage Interface](./assets/user-storage-placeholder.webp)
 
 ### Storage Quota Behavior
 
@@ -610,7 +612,6 @@ Response:
 - `true` - Local user management is enabled
 - `false` - External authentication is configured
 
-![External Authentication Flow](./assets/user-external-auth-placeholder.webp)
 
 ## API Reference
 
