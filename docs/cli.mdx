@@ -32,26 +32,19 @@ The version number will vary depending on the release you downloaded.
 :::
 
   </TabItem>
-  <TabItem value="macOS" label="macOS">
+  <TabItem value="linux" label="Linux (Debian/Ubuntu)">
 
-- Install [Homebrew](https://brew.sh/)
-- Then:
-
-```bash
-[user:~] % brew install dronedb
-[user:~] % ddb --version
-x.x.x (git commit xxxxxxx)
-```
-
-  </TabItem>
-  <TabItem value="linux" label="Linux">
+Download the `.deb` package from the [latest release](https://github.com/DroneDB/DroneDB/releases/latest) and install it:
 
 ```bash
-$ curl -fsSL https://get.dronedb.app -o get-ddb.sh
-$ sh get-ddb.sh
+$ sudo dpkg -i dronedb_x.x.x_amd64.deb
 $ ddb --version
 x.x.x (git commit xxxxxxx)
 ```
+
+:::note
+Only Debian-based distributions (Debian, Ubuntu, Linux Mint, etc.) are officially supported.
+:::
 
   </TabItem>
 </Tabs>

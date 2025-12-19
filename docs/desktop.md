@@ -18,13 +18,11 @@ import WindowsSetupImage from '@site/docs/assets/windows_setup.webp';
     <ul><li>Download the latest release from <a href="https://github.com/DroneDB/DroneDB/releases/latest">GitHub Releases</a></li></ul>
     <img src={WindowsSetupImage} />
   </TabItem>
-  <TabItem value="macOS" label="macOS">
-    <ul><li>Not yet available. <a href="https://docs.google.com/forms/d/e/1FAIpQLSc8OBm-j01XUrUZ2bo3nhh5SdGEVgY_gIJh9qQ2NqqWVUTABA/viewform">Sign-up for updates</a></li></ul>
-  </TabItem>
-  <TabItem value="linux" label="Linux">
-    <ul><li>Not yet available. <a href="https://docs.google.com/forms/d/e/1FAIpQLSemnkHuE01Tpn-wjFm2xeZDx56OTzimrWdBYVbmsivCR_FPqA/viewform?usp=sf_link">Sign-up for updates</a></li></ul>
-  </TabItem>
 </Tabs>
+
+:::info Platform Support
+DroneDB Desktop is currently available for **Windows only**. Linux users can use the [CLI](./cli) for command-line access to DroneDB features.
+:::
 
 ## Features
 
