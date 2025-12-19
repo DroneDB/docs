@@ -16,12 +16,15 @@ const config = {
   trailingSlash: false,
 
   markdown: {
+    mermaid: true,
     mdx1Compat: {
       comments: false,
-      admonitions: false,
+      admonitions: true,
       headingIds: false,
     },
   },
+
+  themes: ['@docusaurus/theme-mermaid'],
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
