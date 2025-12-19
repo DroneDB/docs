@@ -10,7 +10,7 @@ Discover **DroneDB in less than 2 minutes**.
 
 A comprehensive set of tools to inspect, manage, and share aerial data. DroneDB provides a complete solution for organizing and distributing geospatial data including images, orthophotos, digital elevation models, point clouds, 3D models, and vector files.
 
-![Summary](./assets/summary.svg)
+<img src="/img/summary.svg" alt="Summary" />
 
 :::info
 For image processing and photogrammetry, we recommend [WebODM](https://opendronemap.org/webodm/). DroneDB excels at managing and sharing the resulting data.
@@ -53,8 +53,10 @@ DroneDB supports a wide range of aerial data formats:
 |----------|-------------------|
 | **Images** | JPG, JPEG, DNG, TIF, TIFF, PNG, GIF, WEBP |
 | **Videos** | MP4, MOV |
-| **Point Clouds** | LAS, LAZ, PLY |
-| **3D Models** | OBJ, GLTF, GLB |
+| **Point Clouds** | LAS, LAZ, PLY* |
+| **3D Models** | OBJ, GLTF, GLB, PLY* |
+
+*PLY files are automatically classified as point clouds or 3D models based on their content.
 | **Vector Data** | GeoJSON, DXF, DWG, SHP, SHZ, FGB, TopoJSON, KML, KMZ, GPKG |
 | **Other** | Markdown, PDF, and more |
 
@@ -76,6 +78,24 @@ Traditional cloud storage like Google Drive or Dropbox doesn't let you interact 
 - **3D Streaming**: Nexus format for efficient mesh streaming
 - **STAC Compliance**: Standard catalog format for interoperability
 - **Public & Private Datasets**: Flexible visibility controls
+
+### Entry Types
+
+DroneDB automatically classifies files into the following types based on their content and metadata:
+
+| Type | Description |
+|------|-------------|
+| **Image** | Standard images (JPG, PNG, etc.) without GPS data |
+| **GeoImage** | Georeferenced images with GPS coordinates |
+| **Panorama** | Wide-angle images (aspect ratio ≥ 2:1) |
+| **GeoPanorama** | Panoramas with GPS coordinates |
+| **Video** | Standard video files |
+| **GeoVideo** | Videos with embedded GPS data |
+| **GeoRaster** | Georeferenced rasters (orthophotos, DEMs) |
+| **PointCloud** | Point cloud files (LAS, LAZ, non-mesh PLY) |
+| **Model** | 3D models (OBJ, GLTF, GLB, mesh PLY) |
+| **Vector** | Vector data (GeoJSON, SHP, KML, etc.) |
+| **Markdown** | Documentation files |
 
 ## Get Started
 

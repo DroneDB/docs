@@ -13,11 +13,13 @@ DroneDB supports a wide range of geospatial file formats:
 |----------|---------|
 | **Images** | JPG, JPEG, DNG, TIF, TIFF, PNG, GIF, WEBP |
 | **Videos** | MP4, MOV |
-| **Point Clouds** | LAS, LAZ, PLY |
-| **3D Models** | OBJ, GLTF, GLB |
+| **Point Clouds** | LAS, LAZ, PLY* |
+| **3D Models** | OBJ, GLTF, GLB, PLY* |
 | **Vector Data** | GeoJSON, DXF, DWG, SHP, SHZ, FGB, TopoJSON, KML, KMZ, GPKG |
 | **Rasters** | GeoTIFF (orthophotos, DEMs) |
 | **Other** | Markdown (README.md), PDF |
+
+*PLY files are automatically classified as point clouds or 3D models based on their content.
 
 ### What is the difference between DroneDB Desktop and Registry?
 
@@ -66,7 +68,7 @@ Registry supports:
 
 ### Where can I buy a license for DroneDB Desktop?
 
-[https://dronedb.app/buy-ddb-desktop](https://dronedb.app/buy-ddb-desktop)
+[https://dronedb.app/plans](https://dronedb.app/plans)
 
 ### How do I get commercial support?
 

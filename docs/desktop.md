@@ -53,7 +53,7 @@ View files on a map synchronized with the file browser. Click on the map to high
 | **Metadata Extraction** | Automatic EXIF and GPS data extraction |
 | **Copy/Cut/Paste** | Standard filesystem operations |
 | **Quick Share** | Share directly to [Hub](https://hub.dronedb.app) |
-| **Format Support** | JPG, TIFF, DNG, LAS, LAZ, PLY, OBJ, GLTF, GLB, and more |
+| **Format Support** | JPG, TIFF, DNG, LAS, LAZ, PLY, OBJ, GLTF, GLB, GeoJSON, KML, and more |
 
 ### Supported File Types
 
@@ -61,9 +61,11 @@ View files on a map synchronized with the file browser. Click on the map to high
 |----------|---------|
 | **Images** | JPG, JPEG, DNG, TIF, TIFF, PNG, GIF, WEBP |
 | **Videos** | MP4, MOV |
-| **Point Clouds** | LAS, LAZ, PLY |
-| **3D Models** | OBJ, GLTF, GLB |
-| **Vector Data** | GeoJSON, KML, KMZ, SHP, DXF, DWG |
+| **Point Clouds** | LAS, LAZ, PLY* |
+| **3D Models** | OBJ, GLTF, GLB, PLY* |
+| **Vector Data** | GeoJSON, KML, KMZ, SHP, SHZ, DXF, DWG, FGB, TopoJSON, GPKG |
+
+*PLY files are automatically classified as point clouds or 3D models based on their content.
 
 ## Sharing to Hub
 
