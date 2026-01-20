@@ -251,13 +251,15 @@ cd Registry
 git submodule update --init --recursive
 ```
 
-Build the Hub interface (needs [NodeJS 18+](https://nodejs.org/)):
+Build the Hub interface (needs [Node.js 18+](https://nodejs.org/), recommended: 22.x LTS):
 
 ```bash
 cd Registry.Web/ClientApp
 npm install
-npx webpack
+npm run build
 ```
+
+> **Note**: The build script uses `--openssl-legacy-provider` for Node.js 17+ compatibility with webpack 4.
 
 Build the solution from the command line:
 
