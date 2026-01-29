@@ -331,6 +331,27 @@ Change visibility using:
 - **Web UI**: Dataset settings
 - **CLI**: `ddb chattr +public` or `ddb chattr -public`
 
+## Dataset Deletion
+
+When you delete a dataset, Registry uses a **deferred deletion** approach for reliability:
+
+1. **Immediate**: The dataset is removed from the database instantly, so it disappears from the UI
+2. **Background cleanup**: A Hangfire job handles:
+   - Cancelling any active build jobs (tiles, thumbnails, 3D conversions)
+   - Removing job tracking entries
+   - Deleting the filesystem folder
+
+This approach ensures that:
+- Users get immediate feedback when deleting datasets
+- Active build processes don't block deletion
+- Locked files (e.g., during 3D model conversion) don't cause errors
+
+If the background cleanup fails (e.g., files still locked), a daily recurring job (`cleanup-orphaned-datasets`) will automatically clean up any orphaned folders.
+
+:::info
+You can monitor cleanup jobs in the [Hangfire dashboard](/hangfire).
+:::
+
 ## STAC API
 
 Registry implements the [STAC specification](https://stacspec.org/) for standardized geospatial data discovery.
@@ -720,6 +741,14 @@ Cron expression for the job that processes pending builds.
 
 :::info
 The default value is `* * * * *` (every minute)
+:::
+
+**OrphanedDatasetCleanupCron**
+
+Cron expression for the job that cleans up orphaned dataset folders. This job runs daily to remove filesystem folders that no longer have a corresponding database entry (e.g., from failed deletions).
+
+:::info
+The default value is `0 3 * * *` (daily at 3:00 AM)
 :::
 
 ## Getting Help
