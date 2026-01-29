@@ -349,7 +349,7 @@ This approach ensures that:
 If the background cleanup fails (e.g., files still locked), a daily recurring job (`cleanup-orphaned-datasets`) will automatically clean up any orphaned folders.
 
 :::info
-You can monitor cleanup jobs in the [Hangfire dashboard](/hangfire).
+You can monitor cleanup jobs in the Hangfire dashboard at `/hangfire` on your Registry instance.
 :::
 
 ## STAC API
