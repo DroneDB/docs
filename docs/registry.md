@@ -4,9 +4,9 @@ sidebar_position: 3
 
 # Registry
 
-![commits](https://img.shields.io/github/commit-activity/m/DroneDB/registry) ![languages](https://img.shields.io/github/languages/top/DroneDB/registry) ![.NET Core](https://github.com/DroneDB/Registry/workflows/.NET%20Core/badge.svg?branch=master)
+![GitHub Release](https://img.shields.io/github/v/release/DroneDB/Registry) ![commits](https://img.shields.io/github/commit-activity/m/DroneDB/registry) ![languages](https://img.shields.io/github/languages/top/DroneDB/registry) ![.NET Core](https://github.com/DroneDB/Registry/workflows/.NET%20Core/badge.svg?branch=master)
 
-DroneDB Registry is a comprehensive aerial data management and storage platform. It provides JWT authentication, a full REST API, and integrates with [Hub](https://github.com/DroneDB/Hub) to offer a complete solution for hosting and sharing geospatial data.
+DroneDB Registry is a comprehensive geospatial data management and storage platform. It provides JWT authentication, a full REST API, and STAC compliance for interoperability.
 
 :::tip Try it Online
 You can try the online hosted version of Registry (DroneDB Hub) at [dronedb.app/plans](https://dronedb.app/plans) with a **30-day free trial** on every plan – no commitment, cancel anytime!
@@ -43,6 +43,56 @@ Measure distances and areas directly on point clouds:
 - [ODM Seneca](https://hub.dronedb.app/r/hedo88/odm-seneca)
 - [ODM Sance](https://hub.dronedb.app/r/hedo88/odm-sance)
 - [Panorama Example](https://hub.dronedb.app/r/pierotofy/panoexample/)
+
+## Supported Formats
+
+| Category | Formats |
+|----------|---------|
+| **Images** | JPG, JPEG, DNG, TIF, TIFF, PNG, GIF, WEBP |
+| **Point Clouds** | LAS, LAZ, PLY* |
+| **3D Models** | OBJ, GLTF, GLB, PLY* |
+| **Rasters** | GeoTIFF (orthophotos, DEMs) |
+| **Vector Data** | GeoJSON, SHP, SHZ, KML, KMZ, DXF, DWG, FGB, TopoJSON, GPKG |
+| **Panoramas** | 360° images (aspect ratio ≥ 2:1) with optional GPS |
+| **Videos** | MP4, MOV |
+| **Other** | Markdown, PDF |
+
+:::note
+*PLY files are automatically classified as point clouds or 3D models based on their content.
+:::
+
+## On-Demand Processing
+
+Registry automatically generates optimized formats for visualization:
+
+| Source | Generated Format | Description |
+|--------|------------------|-------------|
+| **GeoTIFF** | COG (Cloud Optimized GeoTIFF) | Efficient streaming for large orthophotos |
+| **Point Clouds** | EPT/COPC | Streaming format via Potree viewer |
+| **3D Models** | NXS (Nexus) | Progressive streaming for 3D meshes |
+| **Images** | Thumbnails, WebP tiles | Fast previews and map tiles |
+
+Processing happens in background via Hangfire jobs. Monitor progress at `/hangfire`.
+
+### Panorama Viewer
+
+Registry includes a built-in 360° panorama viewer for immersive visualization:
+
+- **Automatic detection**: Images with aspect ratio ≥ 2:1 are classified as panoramas
+- **GPS support**: GeoPanoramas include location data displayed on maps
+- **Interactive controls**: Pan, zoom, and fullscreen viewing
+
+To upload panoramas, simply add them to a dataset like any other image. Registry will automatically detect and render them with the panorama viewer.
+
+### Chunked Uploads
+
+For large files, Registry supports chunked uploads:
+
+- Files are split into manageable chunks for reliable upload
+- Automatic resume on connection failures
+- No file size limits (configurable via `MaxRequestBodySize`)
+
+The DroneDB CLI (`ddb push`) handles chunked uploads automatically.
 
 ## Getting Started with Docker
 
@@ -240,8 +290,8 @@ docker build . -t dronedb/registry
 
 ## Running from source
 
-Registry is written in C# on .NET 8 platform and runs natively on Linux, Windows, and macOS.
-To install the latest .NET SDK see the [official download page](https://dotnet.microsoft.com/en-us/download/dotnet/8.0). Before building registry ensure you have `ddblib` in your path, if not, download the [latest release](https://github.com/DroneDB/DroneDB/releases) and add it to `PATH`.
+Registry is written in C# on .NET 9 platform and runs natively on Linux, Windows, and macOS.
+To install the latest .NET SDK see the [official download page](https://dotnet.microsoft.com/en-us/download/dotnet/9.0). Before building registry ensure you have `ddblib` in your path, if not, download the [latest release](https://github.com/DroneDB/DroneDB/releases) and add it to `PATH`.
 
 Clone the repository:
 
@@ -251,7 +301,7 @@ cd Registry
 git submodule update --init --recursive
 ```
 
-Build the Hub interface (needs [Node.js 18+](https://nodejs.org/), recommended: 22.x LTS):
+Build the Hub interface (needs [Node.js 22+](https://nodejs.org/) LTS):
 
 ```bash
 cd Registry.Web/ClientApp

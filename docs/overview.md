@@ -8,7 +8,7 @@ Discover **DroneDB in less than 2 minutes**.
 
 ## What is DroneDB
 
-A comprehensive set of tools to inspect, manage, and share aerial data. DroneDB provides a complete solution for organizing and distributing geospatial data including images, orthophotos, digital elevation models, point clouds, 3D models, and vector files.
+A comprehensive set of tools to inspect, manage, and share geospatial data. DroneDB provides a complete solution for organizing and distributing images, orthophotos, digital elevation models, point clouds, 3D models, and vector files.
 
 <img src="/img/summary.svg" alt="Summary" />
 
@@ -23,14 +23,14 @@ DroneDB consists of three main components:
 | Component | Description |
 |-----------|-------------|
 | **DroneDB Core** | C++ library providing geospatial data management, indexing, and processing |
-| **DroneDB Desktop** | Desktop application for browsing and sharing aerial data |
+| **DroneDB Desktop** | Desktop application for browsing and sharing geospatial data |
 | **DroneDB Registry** | Web-based platform for hosting, managing and sharing datasets |
 
 ## Key Features
 
 ### Data Inspection
 
-You flew your drone. You captured some data. But *is your data good?*
+You have some geospatial data. But *is your data good?*
 
 ![explorer](./assets/brighton-explorer.webp)
 
@@ -47,7 +47,7 @@ DroneDB Desktop provides rich context and visualization:
 
 ### Data Sharing
 
-DroneDB supports a wide range of aerial data formats:
+DroneDB supports a wide range of geospatial data formats:
 
 | Category | Supported Formats |
 |----------|-------------------|
