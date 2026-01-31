@@ -9,7 +9,7 @@ Registry includes a comprehensive user management system with role-based access 
 ![User Management Overview](./assets/user-management-interface.webp)
 
 :::tip
-For information on basic Registry setup and configuration, see the [Registry documentation](./registry.md).
+For information on basic Registry setup and configuration, see the [Registry documentation](./registry/index.md).
 :::
 
 ## Overview
@@ -728,6 +728,6 @@ cat registry-data/logs/registry.txt
 
 ## Related Documentation
 
-- [Registry Overview](./registry.md) - Installation and configuration
+- [Registry Overview](./registry/index.md) - Installation and configuration
 - [CLI Reference](./cli.mdx) - Command line tools
-- [STAC API](./registry.md#stac-api) - Data discovery API
+- [STAC API](./registry/stac-api.md) - Data discovery API

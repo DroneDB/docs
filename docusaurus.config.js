@@ -15,6 +15,17 @@ const config = {
   favicon: 'img/favicon.ico',
   trailingSlash: false,
 
+  plugins: [
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        redirects: [
+          // Nessun redirect necessario - /docs/registry già mappa a registry/index.md
+        ],
+      },
+    ],
+  ],
+
   markdown: {
     mermaid: true,
     mdx1Compat: {
@@ -82,7 +93,7 @@ const config = {
           },
           {
             type: 'doc',
-            docId: 'registry',
+            docId: 'registry/index',
             position: 'left',
             label: 'Registry',
           },
