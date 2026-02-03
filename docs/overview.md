@@ -13,7 +13,7 @@ A comprehensive set of tools to inspect, manage, and share geospatial data. Dron
 <img src="/img/summary.svg" alt="Summary" />
 
 :::info
-For image processing and photogrammetry, we recommend [WebODM](https://opendronemap.org/webodm/). DroneDB excels at managing and sharing the resulting data.
+For image processing and photogrammetry, we recommend [WebODM](https://docs.webodm.org). DroneDB excels at managing and sharing the resulting data.
 :::
 
 ## Core Components
