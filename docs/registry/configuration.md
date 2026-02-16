@@ -247,6 +247,30 @@ Enable the storage limiter. Registry will limit the storage usage of the user ba
 The default value is `false`.
 :::
 
+### EnableDefaultUserOrganization
+
+Enables the automatic creation of a default personal organization when a new user is created. By default, every new user gets a personal organization with a slug matching their username.
+
+Set to `false` for enterprise deployments where organizations are assigned by administrators after user creation.
+
+:::info
+The default value is `true`.
+:::
+
+**Example** — disable default organization creation:
+```json
+{
+  "AppSettings": {
+    "EnableDefaultUserOrganization": false
+  }
+}
+```
+
+Or via environment variable:
+```bash
+AppSettings__EnableDefaultUserOrganization=false
+```
+
 ## Networking
 
 ### ExternalUrlOverride

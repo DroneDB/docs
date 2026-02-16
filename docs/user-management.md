@@ -318,6 +318,22 @@ curl -X PUT http://localhost:5000/users/username \
 
 Organizations group datasets and users. Users must belong to an organization to create and manage datasets within it.
 
+### Default Organization Behavior
+
+By default, when a new user is created, Registry automatically creates a personal organization with the user's username as the slug. This allows users to immediately start creating datasets.
+
+For enterprise deployments where organizations are managed centrally, this behavior can be disabled:
+
+```json title="appsettings.json"
+{
+  "AppSettings": {
+    "EnableDefaultUserOrganization": false
+  }
+}
+```
+
+When disabled, new users will not have any organization until an administrator assigns them. See [Configuration Reference](./registry/configuration.md#enabledefaultuserorganization) for details.
+
 ```mermaid
 flowchart LR
     subgraph Organization["Organization: project-alpha"]

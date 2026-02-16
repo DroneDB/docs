@@ -28,6 +28,21 @@ Registry includes a built-in 360° panorama viewer for immersive visualization:
 
 To upload panoramas, simply add them to a dataset like any other image. Registry will automatically detect and render them with the panorama viewer.
 
+### Map Interactions
+
+When browsing a dataset in the map view, geolocated images (GeoImages) provide interactive features:
+
+- **Image popup**: Click on an image marker to see a thumbnail preview with the image name, GPS coordinates, and action buttons:
+  - **Open in new tab**: View the full-resolution image in a new browser tab
+  - **Download**: Download the original image file
+  - **Copy coordinates**: One-click copy of the WGS84 coordinates (latitude, longitude) to clipboard
+- **Tooltip on hover**: Hover over an image marker to see the image filename. For clustered markers, the tooltip shows the number of images in the cluster.
+- **Raster footprint**: Single-clicking an image marker also displays the projected raster footprint on the map.
+
+:::tip
+Panorama markers behave differently: clicking a panorama marker opens the interactive 360° panorama viewer directly.
+:::
+
 ### Chunked Uploads
 
 For large files, Registry supports chunked uploads:
