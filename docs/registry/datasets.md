@@ -53,6 +53,46 @@ For large files, Registry supports chunked uploads:
 
 The DroneDB CLI (`ddb push`) handles chunked uploads automatically.
 
+## Dataset Thumbnail & Tagline
+
+Datasets can have a **custom thumbnail** and a **tagline** (short description) to make them easier to identify in the datasets list.
+
+### Tagline
+
+A tagline is a short text description (max 256 characters) that appears under the dataset name in the list view. It helps users quickly understand what each dataset contains.
+
+- **Set during creation**: The "Create Dataset" dialog includes a tagline field
+- **Edit anytime**: Change the tagline in the dataset settings dialog
+- **Searchable**: The datasets list search also filters by tagline text
+
+### Custom Thumbnail
+
+Each dataset can display a custom thumbnail image in the datasets list. Registry looks for specific files in the dataset root directory:
+
+| Priority | File Name |
+|----------|-----------|
+| 1 | `thumbnail.webp` |
+| 2 | `thumbnail.jpg` |
+| 3 | `thumbnail.png` |
+| 4 | `cover.webp` |
+| 5 | `cover.jpg` |
+| 6 | `cover.png` |
+
+The first matching file found is used as the thumbnail. If no candidate file exists, a placeholder icon is shown.
+
+**Managing thumbnails:**
+- **Upload via UI**: Use the dataset settings dialog to upload a thumbnail image
+- **Upload via API/CLI**: Simply add a file named `thumbnail.webp` (or any candidate name) to the dataset root
+- **Remove via UI**: The settings dialog provides a "Remove" button to delete the current thumbnail
+
+:::tip
+For best results, use a square or landscape image in WebP format. Thumbnails are automatically resized to fit the display. The default size is 512px but can be configured via `DefaultThumbnailSize` in application settings.
+:::
+
+:::info Configuration
+The list of candidate file names is configurable via the `DatasetThumbnailCandidates` setting in `appsettings.json`. The default thumbnail size can be changed via `DefaultThumbnailSize`.
+:::
+
 ## User Management
 
 Registry includes a comprehensive user management system with role-based access control.

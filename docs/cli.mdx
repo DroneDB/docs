@@ -260,6 +260,27 @@ ddb thumbs *.JPG -o thumbs/
 ddb thumbs orthophoto.tif -o thumb.jpg -s 1024
 ```
 
+### Re-processing indexed files after an upgrade
+
+When you upgrade DroneDB to a version that extracts additional metadata or supports new file types, existing indexed files are not automatically re-processed. Use `rescan` to update all metadata in place without re-adding files:
+
+```bash
+cd my-dataset/
+ddb rescan
+```
+
+Re-process only specific entry types (e.g., images and point clouds):
+
+```bash
+ddb rescan --type image,pointcloud
+```
+
+Continue processing even if individual files fail:
+
+```bash
+ddb rescan --continue-on-error
+```
+
 ## Commands Reference
 
 <CLIAutogen />

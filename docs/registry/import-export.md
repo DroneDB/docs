@@ -12,7 +12,7 @@ Transfer datasets and organizations between Registry instances.
 Import datasets from another Registry instance via API:
 
 ```bash
-POST /system/importdataset
+POST /sys/import-dataset
 {
   "sourceUrl": "https://source-registry.com",
   "orgSlug": "source-org",
@@ -39,7 +39,7 @@ POST /system/importdataset
 Import entire organizations with all their datasets:
 
 ```bash
-POST /system/importorg
+POST /sys/import-organization
 {
   "sourceUrl": "https://source-registry.com",
   "orgSlug": "source-org",

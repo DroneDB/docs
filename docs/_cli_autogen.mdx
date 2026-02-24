@@ -314,6 +314,27 @@ Usage:
 
 ```
 
+### rescan
+
+```
+Re-process all indexed files to update metadata.
+Useful when upgrading DroneDB to a version that extracts more metadata
+or supports new file types.
+
+Usage:
+  ddb rescan [args]
+
+  -w, --working-dir arg  Working directory (default: .)
+  -t, --type arg         Entry types to rescan (comma-separated).
+                         Valid types: generic, geoimage, georaster,
+                         pointcloud, image, dronedb, markdown, video,
+                         geovideo, model, panorama, geopanorama, vector
+      --continue-on-error  Continue processing if an error occurs
+  -h, --help             Print help
+      --debug            Show debug output
+
+```
+
 ### search
 
 ```

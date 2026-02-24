@@ -224,12 +224,16 @@ Browse STAC catalogs with tools like [STAC Browser](https://radiantearth.github.
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/sys/version` | Get Registry version |
-| POST | `/sys/importdataset` | Import dataset from another Registry |
-| POST | `/sys/importorg` | Import organization from another Registry |
-| POST | `/sys/cleanupbatches` | Cleanup expired batches |
-| POST | `/sys/cleanupdatasets` | Cleanup empty datasets |
-| POST | `/sys/move-datasets` | Move datasets between orgs (admin) |
-| POST | `/sys/merge-orgs` | Merge organizations (admin) |
+| GET | `/sys/features` | Get active feature flags |
+| GET | `/sys/build-pending-status` | Get background build job status |
+| POST | `/sys/import-dataset` | Import dataset from another Registry |
+| POST | `/sys/import-organization` | Import organization from another Registry |
+| POST | `/sys/move-datasets` | Move datasets between organizations *(admin, enforced server-side)* |
+| POST | `/sys/merge-organizations` | Merge one organization into another *(admin, enforced server-side)* |
+| POST | `/sys/cleanupbatches` | Purge expired or orphaned upload batches |
+| POST | `/sys/cleanupdatasets` | Remove empty dataset records |
+| POST | `/sys/migratevisibility` | Migrate dataset visibility from legacy format |
+| POST | `/sys/cleanup-jobindices` | Purge old job index records (optional `?retentionDays=N`) |
 
 ## Health Checks
 

@@ -59,6 +59,15 @@ server {
 - Verify DroneDB library is accessible
 - Check disk space and memory
 
+**JobIndices table growing too large**
+- The `JobIndices` table keeps track of build jobs. A scheduled cleanup task removes old terminal records automatically (default: every night at 4:00 AM, retaining 60 days). If the table has already grown very large, trigger an immediate one-off purge:
+  ```bash
+  curl -X POST -H "Authorization: Bearer <admin-token>" \
+    http://localhost:5000/system/cleanup-jobindices
+  ```
+  You can optionally override the retention period: `?retentionDays=30`.
+- See `JobIndexRetentionDays` and `JobIndexCleanupCron` in the [Configuration Reference](./configuration.md#jobindexcleanupcron).
+
 **Slow performance**
 - Consider switching from SQLite to MySQL/MariaDB
 - Add Redis cache for high-traffic instances

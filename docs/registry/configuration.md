@@ -214,7 +214,7 @@ The timeout for the share upload endpoint. It is the maximum time allowed betwee
 The default value is `01:00:00` (1 hour).
 :::
 
-### ZipMemoryThreshold
+### MaxZipMemoryThreshold
 
 Memory threshold (in bytes) before using disk-based ZIP creation.
 
@@ -271,6 +271,69 @@ Or via environment variable:
 AppSettings__EnableDefaultUserOrganization=false
 ```
 
+### EnableOrganizationMemberManagement
+
+Enables organization member management in the admin UI, allowing administrators to add and remove users from organizations directly.
+
+:::info
+The default value is `false`.
+:::
+
+### MaxConcurrentDownloadsPerUser
+
+Maximum number of concurrent download requests allowed per authenticated user. Set to `null` to disable throttling.
+
+:::info
+The default value is `null` (no limit).
+:::
+
+### MonitorToken
+
+Static bearer token required to access the monitoring endpoints (e.g., `/quickhealth`). When set, the endpoint requires the `Authorization: Bearer <token>` header instead of a regular JWT. Set to `null` to disable token-based monitoring access.
+
+:::info
+The default value is `null`.
+:::
+
+### PasswordPolicy
+
+Optional password complexity policy applied when creating or changing user passwords. Set to `null` (default) to disable all policy enforcement.
+
+:::info
+The default value is `null` (no policy).
+:::
+
+**Sub-fields:**
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `MinLength` | `int` | `8` | Minimum password length |
+| `RequireDigit` | `bool` | `false` | At least one digit (0–9) |
+| `RequireUppercase` | `bool` | `false` | At least one uppercase letter |
+| `RequireLowercase` | `bool` | `false` | At least one lowercase letter |
+| `RequireNonAlphanumeric` | `bool` | `false` | At least one non-alphanumeric character |
+
+**Example** — enforce a strong password policy:
+```json
+{
+  "AppSettings": {
+    "PasswordPolicy": {
+      "MinLength": 12,
+      "RequireDigit": true,
+      "RequireUppercase": true,
+      "RequireLowercase": true,
+      "RequireNonAlphanumeric": true
+    }
+  }
+}
+```
+
+Or via environment variables:
+```bash
+AppSettings__PasswordPolicy__MinLength=12
+AppSettings__PasswordPolicy__RequireDigit=true
+```
+
 ## Networking
 
 ### ExternalUrlOverride
@@ -291,7 +354,7 @@ The number of worker threads used by the application. Use `-1` for automatic det
 The default value is `-1`
 :::
 
-### RemoteThumbGeneratorUrl
+### RemoteThumbnailGeneratorUrl
 
 URL of a remote thumbnail generator service for offloading thumbnail generation.
 
@@ -309,9 +372,9 @@ Cron expression for the job that cleans up expired jobs.
 The default value is `0 * * * *` (every hour)
 :::
 
-### SyncJobStatesCron
+### SyncJobIndexStatesCron
 
-Cron expression for the job that synchronizes job states.
+Cron expression for the job that synchronizes job index states.
 
 :::info
 The default value is `*/5 * * * *` (every 5 minutes)
@@ -331,4 +394,34 @@ Cron expression for the job that cleans up orphaned dataset folders. This job ru
 
 :::info
 The default value is `0 3 * * *` (daily at 3:00 AM)
+:::
+
+### JobIndexCleanupCron
+
+Cron expression for the job that purges old terminal records (Succeeded, Failed, Deleted) from the `JobIndices` table. This prevents the table from growing indefinitely.
+
+:::info
+The default value is `0 4 * * *` (daily at 4:00 AM)
+:::
+
+### JobIndexRetentionDays
+
+Number of days to retain terminal (Succeeded/Failed/Deleted) job index records. Records whose last state change is older than this value are automatically purged by the cleanup job.
+
+:::info
+The default value is `60`
+:::
+
+**Example** — keep records for 30 days and run the cleanup at 2:00 AM:
+```json
+{
+  "AppSettings": {
+    "JobIndexRetentionDays": 30,
+    "JobIndexCleanupCron": "0 2 * * *"
+  }
+}
+```
+
+:::tip
+If the `JobIndices` table has already grown very large, you can trigger an immediate cleanup via the admin API endpoint `POST /sys/cleanup-jobindices`. An optional `retentionDays` query parameter lets you override the configured retention for that single run.
 :::
