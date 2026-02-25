@@ -7,10 +7,10 @@ sidebar_label: User Management
 
 Registry includes a comprehensive user management system with role-based access control (RBAC), organization management, and storage quotas. This guide covers all aspects of managing users in a Registry deployment.
 
-![User Management Overview](./assets/user-management-interface.webp)
+![User Management Overview](../assets/user-management-interface.webp)
 
 :::tip
-For information on basic Registry setup and configuration, see the [Registry documentation](./registry/index.md).
+For information on basic Registry setup and configuration, see the [Registry documentation](./index.md).
 :::
 
 ## Overview
@@ -245,7 +245,7 @@ curl -X PUT http://localhost:5000/users/username/changepwd \
 When an admin changes another user's password, the `currentPassword` field can be omitted or set to null.
 :::
 
-![Password Change Interface](./assets/user-password-change.webp)
+![Password Change Interface](../assets/user-password-change.webp)
 
 ## Roles and Permissions
 
@@ -262,7 +262,7 @@ Registry uses a role-based access control system. Users can have one or more rol
 
 Administrators can create custom roles for fine-grained access control.
 
-![Role Management Interface](./assets/user-view-roles.webp)
+![Role Management Interface](../assets/user-view-roles.webp)
 
 #### Creating a Role
 
@@ -275,7 +275,7 @@ curl -X POST http://localhost:5000/users/roles \
   }'
 ```
 
-![Role Management Interface](./assets/user-add-roles.webp)
+![Role Management Interface](../assets/user-add-roles.webp)
 
 #### Listing Roles
 
@@ -333,7 +333,7 @@ For enterprise deployments where organizations are managed centrally, this behav
 }
 ```
 
-When disabled, new users will not have any organization until an administrator assigns them. See [Configuration Reference](./registry/configuration.md#enabledefaultuserorganization) for details.
+When disabled, new users will not have any organization until an administrator assigns them. See [Configuration Reference](./configuration.md#enabledefaultuserorganization) for details.
 
 ```mermaid
 flowchart LR
@@ -361,7 +361,7 @@ flowchart LR
 
 ### Managing User Organizations
 
-![Organization Interface](./assets/user-list-orgs.webp)
+![Organization Interface](../assets/user-list-orgs.webp)
 
 #### View User's Organizations
 
@@ -402,7 +402,7 @@ curl -X POST http://localhost:5000/orgs \
   -d "slug=my-org&name=My Organization&description=A new organization&isPublic=true"
 ```
 
-![Creating Organizations Interface](./assets/user-add-org.webp)
+![Creating Organizations Interface](../assets/user-add-org.webp)
 
 ### Updating Organizations
 
@@ -745,6 +745,6 @@ cat registry-data/logs/registry.txt
 
 ## Related Documentation
 
-- [Registry Overview](./registry/index.md) - Installation and configuration
-- [CLI Reference](./cli.mdx) - Command line tools
-- [STAC API](./registry/stac-api.md) - Data discovery API
+- [Registry Overview](./index.md) - Installation and configuration
+- [CLI Reference](../cli.mdx) - Command line tools
+- [STAC API](./stac-api.md) - Data discovery API
