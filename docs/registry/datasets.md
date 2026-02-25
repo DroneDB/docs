@@ -98,7 +98,7 @@ The list of candidate file names is configurable via the `DatasetThumbnailCandid
 Registry includes a comprehensive user management system with role-based access control.
 
 :::info Full Documentation
-For complete details on user management including API endpoints, roles, organizations, storage quotas, and authentication, see the dedicated [User Management Guide](../user-management.md).
+For complete details on user management including API endpoints, roles, organizations, storage quotas, and authentication, see the dedicated [User Management Guide](../registry/user-management.md).
 :::
 
 **Key Features:**
