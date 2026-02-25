@@ -95,7 +95,7 @@ You can customize the default admin in `appsettings.json`:
 
 Administrators can create new users through the web interface or API.
 
-![Create User Interface](./assets/user-create.webp)
+![Create User Interface](../assets/user-create.webp)
 
 #### Via Web Interface
 
