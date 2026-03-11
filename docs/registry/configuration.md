@@ -297,10 +297,10 @@ The default value is `null`.
 
 ### PasswordPolicy
 
-Optional password complexity policy applied when creating or changing user passwords. Set to `null` (default) to disable all policy enforcement.
+Password complexity policy applied when creating or changing user passwords. Set to `null` to disable all policy enforcement.
 
 :::info
-The default value is `null` (no policy).
+The default policy requires at least **8 characters** and **one digit**.
 :::
 
 **Sub-fields:**
@@ -308,12 +308,12 @@ The default value is `null` (no policy).
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `MinLength` | `int` | `8` | Minimum password length |
-| `RequireDigit` | `bool` | `false` | At least one digit (0–9) |
+| `RequireDigit` | `bool` | `true` | At least one digit (0–9) |
 | `RequireUppercase` | `bool` | `false` | At least one uppercase letter |
 | `RequireLowercase` | `bool` | `false` | At least one lowercase letter |
 | `RequireNonAlphanumeric` | `bool` | `false` | At least one non-alphanumeric character |
 
-**Example** — enforce a strong password policy:
+**Example** — enforce a stronger password policy:
 ```json
 {
   "AppSettings": {
@@ -328,6 +328,15 @@ The default value is `null` (no policy).
 }
 ```
 
+**Example** — disable password policy entirely:
+```json
+{
+  "AppSettings": {
+    "PasswordPolicy": null
+  }
+}
+```
+
 Or via environment variables:
 ```bash
 AppSettings__PasswordPolicy__MinLength=12
@@ -336,6 +345,26 @@ AppSettings__PasswordPolicy__RequireDigit=true
 
 ## Networking
 
+### AllowedOrigins
+
+List of allowed CORS origins. When `null` or empty, all origins are permitted (open CORS). For production or on-premise deployments, restrict this to the actual origins that need access.
+
+:::info
+The default value is `null` (all origins allowed).
+:::
+
+**Example** — restrict to specific origins:
+```json
+{
+  "AppSettings": {
+    "AllowedOrigins": [
+      "https://hub.example.com",
+      "https://admin.example.com"
+    ]
+  }
+}
+```
+
 ### ExternalUrlOverride
 
 The external URL of Registry. This is used when the application is behind a reverse proxy.
@@ -343,6 +372,18 @@ The external URL of Registry. This is used when the application is behind a reve
 :::info
 The default value is `null`.
 :::
+
+### Security Headers
+
+Registry automatically adds the following security headers to all HTTP responses:
+
+| Header | Value | Purpose |
+|--------|-------|---------|
+| `X-Content-Type-Options` | `nosniff` | Prevents MIME type sniffing |
+| `X-Frame-Options` | `DENY` | Prevents clickjacking via iframes |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | Controls referrer information sent with requests |
+
+These headers are always enabled and require no configuration.
 
 ## Processing
 
