@@ -380,10 +380,14 @@ Registry automatically adds the following security headers to all HTTP responses
 | Header | Value | Purpose |
 |--------|-------|---------|
 | `X-Content-Type-Options` | `nosniff` | Prevents MIME type sniffing |
-| `X-Frame-Options` | `DENY` | Prevents clickjacking via iframes |
+| `X-Frame-Options` | `SAMEORIGIN` | Prevents clickjacking via cross-origin iframes while allowing same-origin embedding (e.g. PDF viewer) |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` | Controls referrer information sent with requests |
 
 These headers are always enabled and require no configuration.
+
+:::note
+For embed routes (URLs with `?embed=1`), the `X-Frame-Options` header is omitted to allow cross-origin iframe embedding.
+:::
 
 ## Processing
 
