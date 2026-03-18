@@ -234,7 +234,7 @@ The default value is:
 {
     "Email": "admin@example.com",
     "UserName": "admin",
-    "Password": "password"
+    "Password": "password123"
 }
 ```
 :::
