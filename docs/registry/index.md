@@ -50,7 +50,7 @@ Measure distances and areas directly on point clouds:
 | Category | Formats |
 |----------|---------|
 | **Images** | JPG, JPEG, DNG, TIF, TIFF, PNG, GIF, WEBP |
-| **Point Clouds** | LAS, LAZ, PLY* |
+| **Point Clouds** | LAS, LAZ, E57, PTS, XYZ, PLY* |
 | **3D Models** | OBJ, GLTF, GLB, PLY* |
 | **Rasters** | GeoTIFF (orthophotos, DEMs) |
 | **Vector Data** | GeoJSON, SHP, SHZ, KML, KMZ, DXF, DWG, FGB, TopoJSON, GPKG |
