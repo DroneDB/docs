@@ -222,6 +222,14 @@ Memory threshold (in bytes) before using disk-based ZIP creation.
 The default value is `1073741824` (1 GB)
 :::
 
+### MaxExportSizeBytes
+
+Maximum allowed size (in bytes) for a dataset export operation. Export requests that would exceed this limit are rejected.
+
+:::info
+The default value is `1073741824` (1 GB)
+:::
+
 ## User Management
 
 ### DefaultAdmin
