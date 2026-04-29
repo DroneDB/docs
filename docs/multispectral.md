@@ -63,13 +63,17 @@ Results are displayed with a configurable colormap (viridis, RdYlGn, etc.).
 
 Thermal R-JPEG files (produced by DJI Zenmuse XT/XT2, FLIR Vue, and others) are detected automatically. The viewer shows:
 
-- Colormap rendering with selectable palettes (iron, rainbow, grayscale, etc.)
+- Colormap rendering with selectable palettes (iron, rainbow, grayscale, terrain, greys, etc.)
 - Per-pixel temperature on hover
 - Temperature range (min/max) and calibration metadata in the detail panel
 
 Temperature values are derived from the raw 16-bit sensor data using the Planck calibration constants embedded in the file's EXIF metadata. Emissivity, reflected apparent temperature, atmospheric parameters, and IR window transmission are all taken into account.
 
 For georeferenced thermal GeoTIFFs (e.g. ODM orthophoto output), the raster is treated as containing direct temperature values in degrees Celsius and rendered accordingly.
+
+:::note Raster value APIs
+The underlying APIs for sampling raster values, querying temperature ranges, and computing area statistics are generic and work on any single-band raster — DEMs, DSMs, and thermal sources alike. See [Terrain Analytics](./terrain-analytics) for elevation-specific tools.
+:::
 
 ## CLI commands
 

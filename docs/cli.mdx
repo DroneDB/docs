@@ -54,6 +54,27 @@ Only Debian-based distributions (Debian, Ubuntu, Linux Mint, etc.) are officiall
 You can perform all sorts of operations with `ddb`. We recommend checking out
 the list of [commands](#commands-reference):
 
+### Glob patterns
+
+`ddb` accepts shell-style glob patterns wherever a path or list of paths is
+expected (for example with `add`, `share`, `list`, `info`):
+
+| Pattern | Matches |
+| --- | --- |
+| `*.JPG` | All `.JPG` files in the current directory |
+| `images/*.tif` | All `.tif` files directly under `images/` |
+| `**/*.las` | All `.las` files in the current directory and any subdirectory |
+| `images/**/*` | All files under `images/`, recursively |
+| `images/` | The directory itself plus everything under it (recursive) |
+
+Some shells (POSIX shells, PowerShell) expand globs before passing them to
+`ddb`. Windows `cmd.exe` does not — `ddb` performs the expansion for you in
+that case. Quote the pattern (e.g. `'**/*.JPG'`) if you want to force `ddb`
+to handle the expansion itself.
+
+The `.ddb` index folder is always skipped. Patterns that match nothing print a
+warning, and `ddb` exits with an error if no patterns matched anything at all.
+
 ### Sharing datasets
 
 From a directory with images, simply type:
@@ -281,6 +302,34 @@ Continue processing even if individual files fail:
 
 ```bash
 ddb rescan --continue-on-error
+```
+
+### Generating contour lines from a DEM
+
+`ddb contour` generates GeoJSON contour lines from any single-band elevation raster (DEM, DSM, DTM):
+
+```bash
+ddb contour dem.tif -o contours.geojson
+```
+
+Common options:
+
+| Option | Description |
+|--------|-------------|
+| `-i, --interval` | Contour interval in raster units (default: auto) |
+| `-n, --count` | Number of contour levels (alternative to `--interval`) |
+| `-b, --base` | Base offset for the first contour level |
+| `--min` | Clip values below this threshold |
+| `--max` | Clip values above this threshold |
+| `-t, --tolerance` | Simplification tolerance (0 = no simplification) |
+| `--band` | Band index to use (default: 1) |
+
+```bash
+# Every 10 m, simplified to 1 m tolerance
+ddb contour dem.tif -o contours.geojson -i 10 -t 1
+
+# 20 evenly spaced levels between min and max
+ddb contour dem.tif -o contours.geojson -n 20
 ```
 
 ## Commands Reference
