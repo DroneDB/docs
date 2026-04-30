@@ -415,6 +415,82 @@ URL of a remote thumbnail generator service for offloading thumbnail generation.
 The default value is `null`
 :::
 
+## Hub UI Customization
+
+The Hub web app (the Vue SPA shipped with Registry) reads its branding and feature flags from `AppSettings:HubOptions`. The block is exposed to the browser through the anonymous `/sys/features` endpoint and applied at runtime — `index.html` is no longer the place to customize the app.
+
+When you remove the section from `appsettings.json`, the Hub falls back to the default DroneDB banner (`/images/logo-banner.svg`) without any extra wordmark.
+
+### HubOptions
+
+Top-level container for branding and feature flags. Set to `null` (or omit it entirely) to use defaults.
+
+**Sub-fields:**
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `AppLogo` | `string` | `/images/logo-banner.svg` | URL of the banner image shown in the header. Set to an empty string to fall back to `AppIcon` + `AppName`. |
+| `AppName` | `string` | `null` | Wordmark next to `AppIcon`. When `null` no text is rendered (banner alone). |
+| `AppIcon` | `string` | `null` | Icon class shown when no logo is configured (`"dronedb"` for the default DroneDB mark, or any [Semantic UI icon](https://semantic-ui.com/elements/icon.html) name). |
+| `ShowRegistrationLink` | `bool` | `true` | Whether the Login page shows the "Sign up" link. |
+| `DisableDatasetCreation` | `bool` | `false` | Hides the "New dataset" button. |
+| `DisableStorageInfo` | `bool` | `false` | Hides the per-user storage indicator in the header. |
+| `DisableAccountManagement` | `bool` | `false` | Hides the account-management menu (useful when authentication is delegated to an external provider). |
+| `SingleOrganization` | `string` | `null` | When set, the Hub treats the app as single-tenant and routes the user directly to the named organization. |
+| `ReadOnlyOrgs` | `bool` | `null` | When `true`, organization create/delete/edit actions are hidden. |
+| `Favicon` | `object` | `null` | Optional favicon set (see below). |
+
+**Example** — minimal white-label deployment:
+```json
+{
+  "AppSettings": {
+    "HubOptions": {
+      "AppLogo": "/branding/acme-banner.svg",
+      "AppName": "Acme Maps",
+      "ShowRegistrationLink": false,
+      "DisableAccountManagement": true,
+      "SingleOrganization": "acme"
+    }
+  }
+}
+```
+
+:::tip
+All paths starting with `/branding/` are served from `{StoragePath}/branding/`, a folder that **survives Hub upgrades**. Drop your logos, favicons and `manifest.webmanifest` there and reference them from `HubOptions`. See [Updating](./production.md#updating).
+:::
+
+### HubOptions.Favicon
+
+When set, the Hub injects the matching `<link>` and `<meta>` tags into `<head>` at runtime. Any unset field is omitted. Drop the actual image/manifest files under `{StoragePath}/branding/` so they survive upgrades.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `FaviconIco` | `string` | URL of the `.ico` fallback (e.g. `/branding/favicon.ico`). |
+| `Favicon16` | `string` | URL of the 16×16 PNG. |
+| `Favicon32` | `string` | URL of the 32×32 PNG. |
+| `AppleTouchIcon` | `string` | URL of the 180×180 PNG used by iOS. |
+| `Manifest` | `string` | URL of `site.webmanifest`. The 192/512 PWA icons live inside the manifest itself. |
+| `ThemeColor` | `string` | CSS color string used for the `theme-color` meta tag. |
+
+**Example**:
+```json
+{
+  "AppSettings": {
+    "HubOptions": {
+      "AppLogo": "/branding/acme-banner.svg",
+      "Favicon": {
+        "FaviconIco": "/branding/favicon.ico",
+        "Favicon16": "/branding/favicon-16x16.png",
+        "Favicon32": "/branding/favicon-32x32.png",
+        "AppleTouchIcon": "/branding/apple-touch-icon.png",
+        "Manifest": "/branding/site.webmanifest",
+        "ThemeColor": "#0070e0"
+      }
+    }
+  }
+}
+```
+
 ## Scheduled Jobs
 
 ### CleanupExpiredJobsCron

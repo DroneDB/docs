@@ -153,6 +153,41 @@ docker-compose pull
 docker-compose up -d
 ```
 
+### Hub auto-update on startup
+
+Registry embeds the Hub web app (Vue SPA) as a versioned ZIP and extracts it to `{StoragePath}/ClientApp/` on first run. Starting from Registry 2.x, the embedded Hub carries a `version.txt` marker; on every startup Registry compares it to the version on disk and, on any mismatch (upgrade **or** downgrade), wipes the folder and re-extracts the embedded build. No manual step is required after a `docker pull` or a binary swap.
+
+Logs:
+
+```
+ -> Upgrading Hub: 2.0.0 -> 2.1.0
+ ?> Hub folder is ok (v2.1.0)
+```
+
+To force a re-extraction (for instance after editing files inside `ClientApp/` for debugging) run with `--reset-hub`:
+
+```bash
+dotnet Registry.Web.dll ./registry-data --reset-hub
+```
+
+### Hub update notice in the browser
+
+Once the server is upgraded, currently-loaded browser tabs still run the previous Hub bundle. The next call to `/sys/features` returns the new server version; the Hub detects the mismatch and forces a hard reload (the server already serves `index.html` with `Cache-Control: no-cache`). After the reload a one-shot dialog tells the user "DroneDB Hub has been updated", with links to the corresponding release pages on GitHub. The check is skipped in `embed` mode and during local development.
+
+### Persisted branding across upgrades
+
+Registry serves any file dropped under `{StoragePath}/branding/` from the URL prefix `/branding/`. This folder is **never touched by the Hub upgrade** — drop your logos, favicons, and `site.webmanifest` there and reference them from `AppSettings:HubOptions` (see [Hub UI Customization](./configuration.md#hub-ui-customization)).
+
+```text
+registry-data/
+├── ClientApp/         # replaced on every Hub upgrade
+├── branding/          # preserved across upgrades
+│   ├── acme-banner.svg
+│   ├── favicon.ico
+│   └── site.webmanifest
+└── appsettings.json
+```
+
 ## Project architecture
 
 ![dronedb-registry-architecture](https://user-images.githubusercontent.com/7868983/151846022-891685f7-ef47-4b93-8199-d4ac4e788c5d.png)
