@@ -234,6 +234,7 @@ Browse STAC catalogs with tools like [STAC Browser](https://radiantearth.github.
 | POST | `/sys/cleanupdatasets` | Remove empty dataset records |
 | POST | `/sys/migratevisibility` | Migrate dataset visibility from legacy format |
 | POST | `/sys/cleanup-jobindices` | Purge old job index records (optional `?retentionDays=N`) |
+| POST | `/sys/cleanup` | Run DroneDB `cleanup` on every dataset *(admin only, async)* |
 
 ## Health Checks
 

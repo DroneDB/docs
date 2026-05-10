@@ -525,6 +525,16 @@ Cron expression for the job that cleans up orphaned dataset folders. This job ru
 The default value is `0 3 * * *` (daily at 3:00 AM)
 :::
 
+### DatasetCleanupCron
+
+Cron expression for the recurring full-cleanup job that runs DroneDB `cleanup` (purge of stale entries and unused build artifacts) on every dataset of every organization. The same operation is also exposed via the admin API endpoint `POST /sys/cleanup`.
+
+Set this value to an empty string (`""`) to disable the recurring job entirely.
+
+:::info
+The default value is `0 0 * * *` (daily at midnight)
+:::
+
 ### JobIndexCleanupCron
 
 Cron expression for the job that purges old terminal records (Succeeded, Failed, Deleted) from the `JobIndices` table. This prevents the table from growing indefinitely.

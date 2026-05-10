@@ -73,6 +73,40 @@ server {
 - Add Redis cache for high-traffic instances
 - Check `WorkerThreads` configuration
 
+## Upgrading: Point clouds (EPT → COPC)
+
+Starting with Registry 2.3.0, point cloud streaming uses the **COPC** format
+(`build/<hash>/copc/cloud.copc.laz`) instead of the legacy **EPT** layout
+(`build/<hash>/ept/ept.json`). Backwards compatibility with old EPT artifacts
+has been intentionally dropped to keep the build pipeline simple, so any
+dataset that was built before the upgrade must be migrated **before** point
+clouds become viewable again.
+
+You have two options:
+
+1. **Run the migration script** (recommended). It rebuilds COPC artifacts in
+   place from the existing source LAS/LAZ files, without touching the
+   database. From the DroneDB repository:
+   ```bash
+   python scripts/migrate-to-copc.py /path/to/registry-data/datasets
+   ```
+   The script requires PDAL on `PATH` and is idempotent (already-migrated
+   datasets are skipped).
+
+2. **Trigger a rebuild** of each affected dataset from the Hub UI
+   (Settings → Rebuild) or via the `/build` API. This regenerates all build
+   artifacts, not only point clouds, and is therefore slower.
+
+After migration, run a one-off cleanup to drop orphaned EPT folders:
+```bash
+curl -X POST -H "Authorization: Bearer <admin-token>" \
+  -H "Content-Type: application/json" -d '{}' \
+  http://localhost:5000/system/cleanup
+```
+
+See `DatasetCleanupCron` in the [Configuration Reference](./configuration.md)
+for the recurring full-cleanup schedule.
+
 ## Health Checks
 
 Use the health endpoints to diagnose issues:

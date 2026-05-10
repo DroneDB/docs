@@ -28,6 +28,19 @@ Registry includes a built-in 360° panorama viewer for immersive visualization:
 
 To upload panoramas, simply add them to a dataset like any other image. Registry will automatically detect and render them with the panorama viewer.
 
+### Video Viewer
+
+MP4 and MOV files are streamed directly in the browser via an embedded HTML5 player. GeoVideos (videos with embedded GPS data) additionally show their flight path on the map.
+
+### Drag & Drop File Management
+
+Files and folders can be moved within a dataset by dragging and dropping them in the file browser:
+
+- **Within a view**: Drag any item onto a folder in the same view to move it.
+- **Across views**: Drag from the folder tree to the file grid (Explorer / FileBrowser) and vice versa — items move to the targeted folder regardless of which view originated the drag.
+- **Visual feedback**: The destination folder is highlighted while a drop is pending. Drops on non-folder targets are ignored.
+- **Multi-selection**: When multiple items are selected, all of them are moved in a single operation.
+
 ### Map Interactions
 
 When browsing a dataset in the map view, geolocated images (GeoImages) provide interactive features:
