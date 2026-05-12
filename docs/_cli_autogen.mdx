@@ -99,15 +99,29 @@ Usage:
 
 ```
 
-### ept
+### cleanup
 
 ```
-Build an EPT index from point cloud files.
+Remove stale database entries and orphaned build artifacts from a dataset.
 
 Usage:
-  ddb ept outdir/ *.las [args]
+  ddb cleanup [args]
 
-  -o, --output arg  Output directory where to store EPT data
+  -w, --working-dir arg  Working directory (default: .)
+  -h, --help             Print help
+      --debug            Show debug output
+
+```
+
+### copc
+
+```
+Build a COPC (Cloud Optimized Point Cloud) file from point cloud files.
+
+Usage:
+  ddb copc outdir/ *.las [args]
+
+  -o, --output arg  Output directory where to store the COPC file (cloud.copc.laz)
   -i, --input arg   File(s) to process
   -h, --help        Print help
       --debug       Show debug output
@@ -541,10 +555,10 @@ Usage:
 ### tile
 
 ```
-Generate tiles for GeoTIFFs, GeoImages and EPT
+Generate tiles for GeoTIFFs, GeoImages and COPC
 
 Usage:
-  ddb tile [geo.tif | image.jpg | ept.json | https://host.com/cog.tif | https://host.com/image.jpg | https://host.com/ept.json] [output directory] [args]
+  ddb tile [geo.tif | image.jpg | cloud.copc.laz | https://host.com/cog.tif | https://host.com/image.jpg | https://host.com/cloud.copc.laz] [output directory] [args]
 
   -i, --input arg   Path or URL to file to tile
   -o, --output arg  Output directory where to store tiles (default:

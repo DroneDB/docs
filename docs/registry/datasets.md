@@ -12,7 +12,7 @@ Registry automatically generates optimized formats for visualization:
 | Source | Generated Format | Description |
 |--------|------------------|-------------|
 | **GeoTIFF** | COG (Cloud Optimized GeoTIFF) | Efficient streaming for large orthophotos |
-| **Point Clouds** | EPT/COPC | Streaming format via Potree viewer |
+| **Point Clouds** | COPC (`copc/cloud.copc.laz`) | Single-file streaming format via Potree viewer |
 | **3D Models** | NXS (Nexus) | Progressive streaming for 3D meshes |
 | **Images** | Thumbnails, WebP tiles | Fast previews and map tiles |
 
@@ -30,7 +30,18 @@ To upload panoramas, simply add them to a dataset like any other image. Registry
 
 ### Video Viewer
 
-MP4 and MOV files are streamed directly in the browser via an embedded HTML5 player. GeoVideos (videos with embedded GPS data) additionally show their flight path on the map.
+MP4, MOV, WEBM, M4V, AVI, and MKV files can be played directly in the browser via the in-browser video lightbox. Click a video file in the file browser to open the lightbox player. GeoVideos (videos with embedded GPS data) additionally show their flight path on the map.
+
+### Clipboard Copy, Cut, and Paste
+
+Hub includes a full clipboard system for copying and moving files within a dataset or across datasets:
+
+- **Keyboard shortcuts**: `Ctrl+C` to copy, `Ctrl+X` to cut, `Ctrl+V` to paste — consistent with OS clipboard conventions.
+- **Right-click context menu**: Copy, Cut, and Paste actions are available in the context menu on any file or folder, including multi-selections.
+- **Intra-dataset copy**: duplicate files or folders within the same dataset.
+- **Cross-dataset transfer**: paste entries into a different dataset using copy semantics (the source is preserved).
+- **Conflict resolution**: when pasting over existing files, a dialog offers Skip All or Overwrite All, followed by a summary of the operation.
+- **Session persistence**: clipboard state survives page reloads via `sessionStorage`.
 
 ### Drag & Drop File Management
 
