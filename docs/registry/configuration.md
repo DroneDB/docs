@@ -295,6 +295,14 @@ Maximum number of concurrent download requests allowed per authenticated user. S
 The default value is `null` (no limit).
 :::
 
+### DisableAnonymousBulkDownloads
+
+When set to `true`, anonymous (unauthenticated) users cannot download bulk archives — that is, a whole dataset, a folder, or a multi-file selection. Single-file downloads remain allowed for anonymous users. Authenticated users are unaffected. This flag is also surfaced in the anonymous `/sys/features` response so the Hub web app can adapt its UI.
+
+:::info
+The default value is `false` (anonymous bulk downloads allowed).
+:::
+
 ### MonitorToken
 
 Static bearer token required to access the monitoring endpoints (e.g., `/quickhealth`). When set, the endpoint requires the `Authorization: Bearer <token>` header instead of a regular JWT. Set to `null` to disable token-based monitoring access.
@@ -493,12 +501,18 @@ When set, the Hub injects the matching `<link>` and `<meta>` tags into `<head>` 
 
 ## Scheduled Jobs
 
+All cron properties share the same resolution rules:
+
+- **Omitted or empty** → the built-in default cron is used.
+- **`"disabled"`, `"off"`, or `"none"`** (case-insensitive) → the recurring job is removed from Hangfire entirely.
+- **Any other value** → treated as a valid cron expression and applied as-is.
+
 ### CleanupExpiredJobsCron
 
 Cron expression for the job that cleans up expired jobs.
 
 :::info
-The default value is `0 * * * *` (every hour)
+The default value is Hangfire's `Cron.Daily()` (once a day)
 :::
 
 ### SyncJobIndexStatesCron
@@ -529,10 +543,16 @@ The default value is `0 3 * * *` (daily at 3:00 AM)
 
 Cron expression for the recurring full-cleanup job that runs DroneDB `cleanup` (purge of stale entries and unused build artifacts) on every dataset of every organization. The same operation is also exposed via the admin API endpoint `POST /sys/cleanup`.
 
-Set this value to an empty string (`""`) to disable the recurring job entirely.
-
 :::info
 The default value is `0 0 * * *` (daily at midnight)
+:::
+
+### ArtifactCompletenessCheckerCron
+
+Cron expression for the recurring job that scans every buildable entry in every dataset and enqueues a rebuild for any entry whose output artifacts are missing or empty. This is particularly useful after a build-output format migration (e.g. FGB→MVT, EPT→COPC) to bring the entire corpus up to the new layout without a manual sweep. The same operation is also exposed via the admin API endpoint `POST /sys/check-artifact-completeness`.
+
+:::info
+The default value is `0 2 * * *` (daily at 2:00 AM)
 :::
 
 ### JobIndexCleanupCron
