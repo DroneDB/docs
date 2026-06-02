@@ -265,7 +265,7 @@ Set to `false` for enterprise deployments where organizations are assigned by ad
 The default value is `true`.
 :::
 
-**Example** — disable default organization creation:
+**Example** - disable default organization creation:
 ```json
 {
   "AppSettings": {
@@ -297,7 +297,7 @@ The default value is `null` (no limit).
 
 ### DisableAnonymousBulkDownloads
 
-When set to `true`, anonymous (unauthenticated) users cannot download bulk archives — that is, a whole dataset, a folder, or a multi-file selection. Single-file downloads remain allowed for anonymous users. Authenticated users are unaffected. This flag is also surfaced in the anonymous `/sys/features` response so the Hub web app can adapt its UI.
+When set to `true`, anonymous (unauthenticated) users cannot download bulk archives - that is, a whole dataset, a folder, or a multi-file selection. Single-file downloads remain allowed for anonymous users. Authenticated users are unaffected. This flag is also surfaced in the anonymous `/sys/features` response so the Hub web app can adapt its UI.
 
 :::info
 The default value is `false` (anonymous bulk downloads allowed).
@@ -329,7 +329,7 @@ The default policy requires at least **8 characters** and **one digit**.
 | `RequireLowercase` | `bool` | `false` | At least one lowercase letter |
 | `RequireNonAlphanumeric` | `bool` | `false` | At least one non-alphanumeric character |
 
-**Example** — enforce a stronger password policy:
+**Example** - enforce a stronger password policy:
 ```json
 {
   "AppSettings": {
@@ -344,7 +344,7 @@ The default policy requires at least **8 characters** and **one digit**.
 }
 ```
 
-**Example** — disable password policy entirely:
+**Example** - disable password policy entirely:
 ```json
 {
   "AppSettings": {
@@ -369,7 +369,7 @@ List of allowed CORS origins. When `null` or empty, all origins are permitted (o
 The default value is `null` (all origins allowed).
 :::
 
-**Example** — restrict to specific origins:
+**Example** - restrict to specific origins:
 ```json
 {
   "AppSettings": {
@@ -425,7 +425,7 @@ The default value is `null`
 
 ## Hub UI Customization
 
-The Hub web app (the Vue SPA shipped with Registry) reads its branding and feature flags from `AppSettings:HubOptions`. The block is exposed to the browser through the anonymous `/sys/features` endpoint and applied at runtime — `index.html` is no longer the place to customize the app.
+The Hub web app (the Vue SPA shipped with Registry) reads its branding and feature flags from `AppSettings:HubOptions`. The block is exposed to the browser through the anonymous `/sys/features` endpoint and applied at runtime - `index.html` is no longer the place to customize the app.
 
 When you remove the section from `appsettings.json`, the Hub falls back to the default DroneDB banner (`/images/logo-banner.svg`) without any extra wordmark.
 
@@ -448,7 +448,7 @@ Top-level container for branding and feature flags. Set to `null` (or omit it en
 | `ReadOnlyOrgs` | `bool` | `null` | When `true`, organization create/delete/edit actions are hidden. |
 | `Favicon` | `object` | `null` | Optional favicon set (see below). |
 
-**Example** — minimal white-label deployment:
+**Example** - minimal white-label deployment:
 ```json
 {
   "AppSettings": {
@@ -571,7 +571,7 @@ Number of days to retain terminal (Succeeded/Failed/Deleted) job index records. 
 The default value is `60`
 :::
 
-**Example** — keep records for 30 days and run the cleanup at 2:00 AM:
+**Example** - keep records for 30 days and run the cleanup at 2:00 AM:
 ```json
 {
   "AppSettings": {

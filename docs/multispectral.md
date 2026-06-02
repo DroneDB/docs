@@ -72,7 +72,7 @@ Temperature values are derived from the raw 16-bit sensor data using the Planck 
 For georeferenced thermal GeoTIFFs (e.g. ODM orthophoto output), the raster is treated as containing direct temperature values in degrees Celsius and rendered accordingly.
 
 :::note Raster value APIs
-The underlying APIs for sampling raster values, querying temperature ranges, and computing area statistics are generic and work on any single-band raster — DEMs, DSMs, and thermal sources alike. See [Terrain Analytics](./terrain-analytics) for elevation-specific tools.
+The underlying APIs for sampling raster values, querying temperature ranges, and computing area statistics are generic and work on any single-band raster - DEMs, DSMs, and thermal sources alike. See [Terrain Analytics](./terrain-analytics) for elevation-specific tools.
 :::
 
 ## CLI commands

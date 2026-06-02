@@ -36,7 +36,7 @@ MP4, MOV, WEBM, M4V, AVI, and MKV files can be played directly in the browser vi
 
 Hub includes a full clipboard system for copying and moving files within a dataset or across datasets:
 
-- **Keyboard shortcuts**: `Ctrl+C` to copy, `Ctrl+X` to cut, `Ctrl+V` to paste — consistent with OS clipboard conventions.
+- **Keyboard shortcuts**: `Ctrl+C` to copy, `Ctrl+X` to cut, `Ctrl+V` to paste - consistent with OS clipboard conventions.
 - **Right-click context menu**: Copy, Cut, and Paste actions are available in the context menu on any file or folder, including multi-selections.
 - **Intra-dataset copy**: duplicate files or folders within the same dataset.
 - **Cross-dataset transfer**: paste entries into a different dataset using copy semantics (the source is preserved).
@@ -48,7 +48,7 @@ Hub includes a full clipboard system for copying and moving files within a datas
 Files and folders can be moved within a dataset by dragging and dropping them in the file browser:
 
 - **Within a view**: Drag any item onto a folder in the same view to move it.
-- **Across views**: Drag from the folder tree to the file grid (Explorer / FileBrowser) and vice versa — items move to the targeted folder regardless of which view originated the drag.
+- **Across views**: Drag from the folder tree to the file grid (Explorer / FileBrowser) and vice versa - items move to the targeted folder regardless of which view originated the drag.
 - **Visual feedback**: The destination folder is highlighted while a drop is pending. Drops on non-folder targets are ignored.
 - **Multi-selection**: When multiple items are selected, all of them are moved in a single operation.
 

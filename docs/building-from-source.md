@@ -103,7 +103,7 @@ Accepted values follow CMake conventions: `Release`, `Debug`, `RelWithDebInfo`, 
 
 [Untwine](https://github.com/hobuinc/untwine) is an optional component that dramatically accelerates the generation of **Cloud Optimized Point Clouds (COPC)** from LAS/LAZ files. It is included as a git submodule under `vendor/untwine`.
 
-If the submodule is not present, DroneDB automatically falls back to the built-in PDAL `writers.copc` pipeline — no configuration required.
+If the submodule is not present, DroneDB automatically falls back to the built-in PDAL `writers.copc` pipeline - no configuration required.
 
 ### Enabling Untwine
 
@@ -121,7 +121,7 @@ git submodule update --init vendor/untwine
 :::warning
 Untwine **must** be built with the **same build type** as DroneDB.
 
-Both executables share vcpkg-managed shared libraries (pdalcpp, gdal, proj, …). Mixing configurations — e.g. DroneDB in `Debug` and Untwine in `Release` — links them against different C runtimes, causing a crash at startup.
+Both executables share vcpkg-managed shared libraries (pdalcpp, gdal, proj, …). Mixing configurations - e.g. DroneDB in `Debug` and Untwine in `Release` - links them against different C runtimes, causing a crash at startup.
 :::
 
 The build scripts enforce this automatically: `full-build-win.ps1` passes `-BuildType` to both CMake invocations, and `full-build-linux.sh` passes the same first argument to both.

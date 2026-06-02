@@ -176,7 +176,7 @@ Once the server is upgraded, currently-loaded browser tabs still run the previou
 
 ### Persisted branding across upgrades
 
-Registry serves any file dropped under `{StoragePath}/branding/` from the URL prefix `/branding/`. This folder is **never touched by the Hub upgrade** — drop your logos, favicons, and `site.webmanifest` there and reference them from `AppSettings:HubOptions` (see [Hub UI Customization](./configuration.md#hub-ui-customization)).
+Registry serves any file dropped under `{StoragePath}/branding/` from the URL prefix `/branding/`. This folder is **never touched by the Hub upgrade** - drop your logos, favicons, and `site.webmanifest` there and reference them from `AppSettings:HubOptions` (see [Hub UI Customization](./configuration.md#hub-ui-customization)).
 
 ```text
 registry-data/

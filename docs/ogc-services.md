@@ -23,7 +23,7 @@ entries that you see in the web viewer.
 | WCS | 2.0.1 (1.1.x & 1.0.0 negotiable) | `/wcs` | GeoTIFF + PNG/JPEG `GetCoverage`, `ACCEPTVERSIONS` negotiation |
 | OGC API – Features | 1.0 | `/ogcapi` | JSON landing page, conformance, collections, items |
 | OGC API – Tiles | 1.0 | `/ogcapi/collections/{id}/tiles` | Vector (MVT `pbf`) and raster (`png`) tiles |
-| Vector Tiles (Mapbox) | — | `/mvt/{hash}/{z}/{x}/{y}.pbf` | Direct tile pyramid, also used by the built-in viewer |
+| Vector Tiles (Mapbox) | - | `/mvt/{hash}/{z}/{x}/{y}.pbf` | Direct tile pyramid, also used by the built-in viewer |
 
 All endpoints share the same authentication: Basic auth, JWT bearer tokens, or
 share-link tokens accepted by the rest of Registry. Public datasets work
@@ -184,7 +184,7 @@ Use `SECTIONS` to request a subset of the capabilities document, e.g.
 | `png` | `image/png` | raster |
 | `jpg` / `jpeg` | `image/jpeg` | raster |
 
-> WebP is **not** a supported WMTS tile format — requesting `.webp` returns
+> WebP is **not** a supported WMTS tile format - requesting `.webp` returns
 > `404 Not Found` (the route does not match) rather than a tile, because the
 > underlying tile generator only emits PNG/JPEG for rasters and MVT for vectors.
 
@@ -211,9 +211,9 @@ curl '{base}/wmts?service=WMTS&request=GetTile&version=1.0.0' \
 
 WCS supports three protocol generations and negotiates the version per request:
 
-- **`VERSION`** (WCS 1.0 / 1.1 style) — an exact match is used, otherwise the
+- **`VERSION`** (WCS 1.0 / 1.1 style) - an exact match is used, otherwise the
   highest supported version *less than or equal to* the requested one.
-- **`ACCEPTVERSIONS`** (OWS Common 2.0 style, comma-separated) — the **first**
+- **`ACCEPTVERSIONS`** (OWS Common 2.0 style, comma-separated) - the **first**
   version in the client's preference order that the server also supports is
   selected (client-driven order, not server-highest).
 - When neither is supplied, the server advertises its highest version (`2.0.1`).
@@ -284,7 +284,7 @@ All routes are relative to `{base}` = `/orgs/{orgSlug}/ds/{dsSlug}`.
 
 OGC exceptions follow the version-appropriate envelope. The service is detected
 from the request path and the protocol version is negotiated per service, so the
-same error always renders with the correct schema — including authentication and
+same error always renders with the correct schema - including authentication and
 authorization failures, which are emitted by the shared OGC pipeline rather than
 the generic Registry error page.
 

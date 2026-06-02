@@ -5,7 +5,7 @@ sidebar_label: Terrain Analytics
 
 # Terrain Analytics
 
-DroneDB provides a set of tools for analysing elevation data — DEMs, DSMs, and DTMs — directly in the CLI and in Hub. No GIS software required.
+DroneDB provides a set of tools for analysing elevation data - DEMs, DSMs, and DTMs - directly in the CLI and in Hub. No GIS software required.
 
 ## Contour lines
 
@@ -85,5 +85,5 @@ Sample a raster along a line to plot an elevation or value chart.
 In Hub, click the **Raster Profile** toolbar button, draw a line across the DEM, and an equispaced chart of elevation vs. distance is shown.
 
 :::tip
-Raster Profile, Contour Lines, and Stockpile Volume work on any single-band raster — DEMs, DSMs, DTMs, and single-band thermal GeoTIFFs.
+Raster Profile, Contour Lines, and Stockpile Volume work on any single-band raster - DEMs, DSMs, DTMs, and single-band thermal GeoTIFFs.
 :::
