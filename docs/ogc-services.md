@@ -32,7 +32,7 @@ anonymously.
 ## Quick start
 
 Pick a public dataset hosted on Hub, e.g. `https://hub.dronedb.app/orgs/demo/ds/example`,
-and replace `{base}` below with that base URL.
+and replace `\{base\}` below with that base URL.
 
 ### WMS GetCapabilities
 
