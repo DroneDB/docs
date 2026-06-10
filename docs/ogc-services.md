@@ -3,6 +3,24 @@ title: OGC Services (WMS / WFS / WMTS / WCS / OGC API)
 sidebar_label: OGC Services
 ---
 
+{/* Placeholder variables – prevent MDX v3 from evaluating {name} as JSX expressions */}
+export const base = '{base}';
+export const orgSlug = '{orgSlug}';
+export const dsSlug = '{dsSlug}';
+export const id = '{id}';
+export const hash = '{hash}';
+export const z = '{z}';
+export const x = '{x}';
+export const y = '{y}';
+export const ext = '{ext}';
+export const layer = '{layer}';
+export const style = '{style}';
+export const tileMatrixSet = '{tileMatrixSet}';
+export const tms = '{tms}';
+export const folder = '{folder}';
+export const collectionId = '{collectionId}';
+export const featureId = '{featureId}';
+
 # OGC Services
 
 DroneDB Registry exposes every published dataset through a complete suite of OGC web services.
@@ -172,7 +190,7 @@ Use `SECTIONS` to request a subset of the capabilities document, e.g.
 
 ### RESTful tiles
 
-```text
+```
 {base}/wmts/1.0.0/{layer}/{style}/{tileMatrixSet}/{z}/{y}/{x}.{ext}
 ```
 
