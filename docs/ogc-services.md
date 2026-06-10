@@ -32,7 +32,7 @@ anonymously.
 ## Quick start
 
 Pick a public dataset hosted on Hub, e.g. `https://hub.dronedb.app/orgs/demo/ds/example`,
-and replace `\{base\}` below with that base URL.
+and replace `{base}` below with that base URL.
 
 ### WMS GetCapabilities
 
@@ -172,7 +172,7 @@ Use `SECTIONS` to request a subset of the capabilities document, e.g.
 
 ### RESTful tiles
 
-```
+```text
 {base}/wmts/1.0.0/{layer}/{style}/{tileMatrixSet}/{z}/{y}/{x}.{ext}
 ```
 
