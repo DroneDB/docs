@@ -38,7 +38,7 @@ entries that you see in the web viewer.
 | WMS | 1.1.1 & 1.3.0 | `/wms` | Multi-layer compositing, transparent backgrounds, NDVI/NDRE/NDWI/EVI/SAVI styles |
 | WFS | 2.0.0 (1.1.0 alias) | `/wfs` | GeoJSON + GML output, BBOX filtering, paging via `count`/`startIndex` |
 | WMTS | 1.0.0 | `/wmts` | XYZ tile pyramid backed by the per-dataset MVT cache for vectors and COG for rasters |
-| WCS | 2.0.1 (1.1.x & 1.0.0 negotiable) | `/wcs` | GeoTIFF + PNG/JPEG `GetCoverage`, `ACCEPTVERSIONS` negotiation |
+| WCS | **1.0.0, 1.1.x, 2.0.1** | `/wcs` | GeoTIFF + PNG/JPEG `GetCoverage`, version negotiated via `ACCEPTVERSIONS` |
 | OGC API – Features | 1.0 | `/ogcapi` | JSON landing page, conformance, collections, items |
 | OGC API – Tiles | 1.0 | `/ogcapi/collections/{id}/tiles` | Vector (MVT `pbf`) and raster (`png`) tiles |
 | Vector Tiles (Mapbox) | - | `/mvt/{hash}/{z}/{x}/{y}.pbf` | Direct tile pyramid, also used by the built-in viewer |

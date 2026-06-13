@@ -332,6 +332,76 @@ ddb contour dem.tif -o contours.geojson -i 10 -t 1
 ddb contour dem.tif -o contours.geojson -n 20
 ```
 
+### Aligning GeoTIFFs to a reference
+
+`ddb align` corrects the georeferencing offset of an orthophoto or DEM by aligning it to a more accurate reference raster.
+
+```bash
+ddb align -i source.tif -r reference.tif -o aligned.tif
+```
+
+The output is always a Cloud Optimized GeoTIFF reprojected to EPSG:3857.
+
+**Alignment modes:**
+
+| Mode | Description |
+|------|-------------|
+| `similarity` (default) | 4-DOF transform: translation X/Y + rotation + uniform scale. Best for georeferencing corrections. |
+| `translation` | 2-DOF transform: translation X/Y only. Faster, use when no rotation or scale error is expected. |
+
+```bash
+# Fast translation-only alignment
+ddb align -i source.tif -r reference.tif -o aligned.tif -m translation
+
+# Validate compatibility without performing the alignment
+ddb align -i source.tif -r reference.tif --validate
+```
+
+The `--validate` flag checks that the source and reference are compatible (same CRS class, sufficient spatial overlap, compatible raster type) and prints a JSON result:
+
+```json
+{ "ok": true }
+```
+
+or, if incompatible:
+
+```json
+{ "ok": false, "errors": ["Insufficient overlap between source and reference"] }
+```
+
+The `--no-seed` flag disables the phase-correlation seed step. This makes the initial NCC search slower but can improve robustness on low-contrast rasters.
+
+## Environment Variables
+
+DroneDB reads the following environment variables at runtime. Variables marked **GDAL config** can also be set via `CPLSetConfigOption()` in the GDAL C API.
+
+### General
+
+| Variable | Description |
+|----------|-------------|
+| `DDB_LOG` | If set (any value), enables logging to file (`ddb-log.csv`) in the current directory. |
+| `DDB_DEBUG` | If set (any value), enables verbose debug output on the console. Equivalent to passing `--debug`. |
+| `DDB_HOME` | Override the DDB home directory (default: `~/.ddb`). Stores credentials and user profile. |
+| `DDB_DATA` | Override the DDB data directory used for bundled data files (timezone database, etc.). |
+
+### Point Cloud (COPC/EPT)
+
+| Variable | Description |
+|----------|-------------|
+| `DDB_UNTWINE_PATH` | Absolute path to the `untwine` binary. When set, this path is authoritative: if it does not point to a valid executable, Untwine is considered unavailable. Useful for pinning the backend or running tests. |
+| `DDB_USE_PDAL_COPC` | Set to `1` to force the PDAL COPC backend, bypassing Untwine. |
+| `DDB_COPC_BACKEND` | Explicit backend selection: `"untwine"`, `"pdal"`, or `"auto"` (default). Unknown values are silently ignored. `DDB_USE_PDAL_COPC=1` takes precedence. |
+
+### COG Build (GDAL config)
+
+These variables control `ddb build` and `ddb cog` for GeoRaster entries. They are read via `CPLGetConfigOption` and can also be passed as standard environment variables.
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DDB_COG_JPEG_QUALITY` | `75` | JPEG quality (1–100) for COG compression. Applied only to 8-bit RGB or RGBA rasters. LZW is used for all other cases. |
+| `DDB_WARP_MEMORY_MB` | `512` | GDALWarp memory buffer size in MB (`-wm` flag). Larger values reduce chunking overhead when multi-threading is active. |
+| `DDB_COG_CACHE_MB` | `1024` | GDAL block cache size in MB during COG build. Raised temporarily before the warp and restored afterwards. |
+
 ## Commands Reference
 
 <CLIAutogen />

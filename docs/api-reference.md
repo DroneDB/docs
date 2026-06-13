@@ -112,6 +112,23 @@ Authorization: Bearer <token>
 | GET | `.../builds` | List build jobs (paginated) |
 | POST | `.../builds/clear` | Clear completed build jobs |
 
+## Tasks (Processing Platform)
+
+**Base Route:** `/orgs/{orgSlug}/ds/{dsSlug}/tasks`
+
+See the [Processing Platform](./registry/processing-platform) page for full documentation, tool reference, and examples.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `.../tasks/tools` | List available tools with JSON Schema |
+| POST | `.../tasks` | Submit a new task (202) or get dedup hit (200) |
+| GET | `.../tasks` | List tasks (`?toolId=&state=&skip=0&take=50`) |
+| POST | `.../tasks/clear` | Delete all terminal tasks (`?toolId=` optional filter) |
+| GET | `.../tasks/{id}` | Get full task status, progress, log tail, artifact |
+| GET | `.../tasks/{id}/log` | Incremental log (`?since={cursor}`) |
+| GET | `.../tasks/{id}/result` | Download task artifact (range requests supported) |
+| DELETE | `.../tasks/{id}` | Cancel or mark task as Deleted |
+
 ## Share
 
 **Base Route:** `/share`
@@ -126,6 +143,14 @@ The Share API enables file uploads via the DroneDB CLI (`ddb share`).
 | POST | `/share/{token}/upload/chunked` | Upload large file in chunks |
 | POST | `/share/{token}/commit` | Finalize share |
 | POST | `/share/{token}/rollback` | Cancel share |
+
+**`POST /share/init` body fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `tag` | `string` | Full `org/dataset` tag for the destination dataset (optional). |
+| `orgSlug` | `string` | Destination organization slug. When `tag` is omitted, the dataset slug is auto-generated. |
+| `datasetName` | `string` | Human-readable dataset name (optional). |
 
 ## Push
 
@@ -224,8 +249,9 @@ Browse STAC catalogs with tools like [STAC Browser](https://radiantearth.github.
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/sys/version` | Get Registry version |
-| GET | `/sys/features` | Get active feature flags |
+| GET | `/sys/features` | Get active feature flags and platform catalog (no auth required) |
 | GET | `/sys/build-pending-status` | Get background build job status |
+| GET | `/sys/tasks` | List tasks across all users and datasets *(admin only)* (`?toolId=&state=&userId=&skip=0&take=50`) |
 | POST | `/sys/import-dataset` | Import dataset from another Registry |
 | POST | `/sys/import-organization` | Import organization from another Registry |
 | POST | `/sys/move-datasets` | Move datasets between organizations *(admin, enforced server-side)* |
@@ -235,6 +261,29 @@ Browse STAC catalogs with tools like [STAC Browser](https://radiantearth.github.
 | POST | `/sys/migratevisibility` | Migrate dataset visibility from legacy format |
 | POST | `/sys/cleanup-jobindices` | Purge old job index records (optional `?retentionDays=N`) |
 | POST | `/sys/cleanup` | Run DroneDB `cleanup` on every dataset *(admin only, async)* |
+| POST | `/sys/check-artifact-completeness` | Scan all datasets and enqueue rebuilds for incomplete build artifacts *(admin only, async)* |
+
+### `GET /sys/features` response fields
+
+This endpoint is available without authentication and is used by the Hub frontend to discover platform capabilities.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `organizationMemberManagement` | `bool` | Whether org-level member management is enabled |
+| `userManagement` | `bool` | Whether local user management is enabled (false when external auth is configured) |
+| `storageLimiter` | `bool` | Whether per-user storage limiting is enabled |
+| `maxConcurrentDownloadsPerUser` | `int?` | Concurrent download limit per user (`null` = unlimited) |
+| `disableAnonymousBulkDownloads` | `bool` | Whether anonymous bulk archive downloads are blocked |
+| `passwordPolicy` | `object?` | Active password complexity policy, or `null` |
+| `datasetThumbnailCandidates` | `string[]` | Ordered list of dataset thumbnail file name candidates |
+| `maxExportSizeBytes` | `long?` | Maximum raster export size in bytes (`null` = unlimited) |
+| `bulkDownloadAsyncThresholdBytes` | `long` | Selection size threshold above which bulk downloads are routed to the async task |
+| `taskTools` | `array` | Catalog of available task tools (id, version, title, required access, artifact flag, extension) |
+| `taskStates` | `array` | Task state machine with `{state, isTerminal}` per entry |
+| `hubOptions` | `object?` | Hub UI branding and feature flags |
+| `hubVersion` | `string?` | Semver of the Hub (Vue SPA) currently deployed |
+| `registryVersion` | `string?` | Registry backend assembly version |
+| `ddbVersion` | `string?` | Native DroneDB library version |
 
 ## Health Checks
 

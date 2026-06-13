@@ -14,6 +14,25 @@ Usage:
 
 ```
 
+### align
+
+```
+Align a GeoTIFF (ortho or DEM) to a reference GeoTIFF, correcting georeferencing offset.
+
+Usage:
+  ddb align -i source.tif -r reference.tif -o aligned.tif
+
+  -i, --input arg      Source GeoTIFF to align
+  -r, --reference arg  Reference GeoTIFF (ground truth, more accurate)
+  -o, --output arg     Output aligned GeoTIFF (COG, reprojected to EPSG:3857)
+  -m, --mode arg       similarity (default) | translation (default: similarity)
+      --validate       Only validate inputs; do not align
+      --no-seed        Disable phase-correlation seed (slower NCC search)
+  -h, --help           Print help
+      --debug          Show debug output
+
+```
+
 ### build
 
 ```

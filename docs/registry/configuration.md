@@ -423,6 +423,92 @@ URL of a remote thumbnail generator service for offloading thumbnail generation.
 The default value is `null`
 :::
 
+### DefaultThumbnailSize
+
+Default thumbnail size in pixels when no size is specified in the request (e.g. via `GET .../thumb?path=`).
+
+:::info
+The default value is `512`
+:::
+
+### DatasetThumbnailCandidates
+
+Ordered list of file names (in the dataset root) checked when computing the dataset thumbnail shown in the Hub UI. The first match found is used.
+
+:::info
+The default value is:
+```json
+["thumbnail.webp", "thumbnail.jpg", "thumbnail.png", "cover.webp", "cover.jpg", "cover.png"]
+```
+:::
+
+### ProcessingPlatform
+
+Configuration block for the asynchronous task substrate (Processing Platform). Bound from `AppSettings:ProcessingPlatform`. When omitted, all sub-fields use their built-in defaults.
+
+See the [Processing Platform](./processing-platform) page for a full description of the task system and REST API.
+
+**Quota and concurrency:**
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `MaxConcurrentTasksPerUser` | `3` | Maximum concurrent tasks per user |
+| `MaxQueuedTasksPerUser` | `20` | Maximum queued (non-terminal) tasks per user |
+| `MaxConcurrentTasksPerOrg` | `10` | Maximum concurrent tasks per organization |
+| `MaxConcurrentTasksGlobal` | `32` | Maximum concurrent tasks across all users |
+| `MaxEstimatedOutputBytesPerSubmit` | `21474836480` (20 GiB) | Hard cap on estimated output size per task submission |
+| `MaxArchiveExtractSizeBytes` | `5368709120` (5 GiB) | Maximum compressed archive size accepted by the `archive-extract` tool |
+| `OrgDailyOutputBytes` | `{"default": 107374182400}` | Per-org daily output budget in bytes, keyed by org slug. Use `"default"` as a fallback. |
+
+**Downloads:**
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `BulkDownloadAsyncThresholdBytes` | `524288000` (500 MB) | Selections above this size are routed to the async `bulk-download` task instead of direct streaming. Whole-dataset downloads always use the async path. |
+| `MaxConcurrentBulkDownloadsPerUser` | `1` | Maximum simultaneous `bulk-download` tasks per user. |
+
+**Raster export:**
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `DefaultRasterTileSize` | `512` | Tile size in pixels for block-windowed raster export. |
+
+**Deduplication:**
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `DedupEnabled` | `true` | When `true`, a task with the same parameters submitted within the lookback window returns a `200` dedup hit instead of creating a new task. |
+| `DedupLookbackHours` | `24` | Time window (hours) used when searching for duplicate tasks. |
+
+**Logging and progress:**
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `LogTailMaxLines` | `200` | Maximum lines kept in the task log ring buffer. |
+| `LogTailMaxBytes` | `32768` | Maximum bytes kept in the task log ring buffer. |
+| `ProgressUpdateThrottleSeconds` | `2` | Minimum seconds between persisted progress updates. |
+| `ArtifactTtlHours` | `24` | Hours before a task's work directory (and its artifact) is swept. |
+
+**Example:**
+```json
+{
+  "AppSettings": {
+    "ProcessingPlatform": {
+      "MaxConcurrentTasksPerUser": 5,
+      "MaxConcurrentTasksGlobal": 64,
+      "BulkDownloadAsyncThresholdBytes": 104857600,
+      "ArtifactTtlHours": 48
+    }
+  }
+}
+```
+
+Or via environment variables:
+```bash
+AppSettings__ProcessingPlatform__MaxConcurrentTasksPerUser=5
+AppSettings__ProcessingPlatform__ArtifactTtlHours=48
+```
+
 ## Hub UI Customization
 
 The Hub web app (the Vue SPA shipped with Registry) reads its branding and feature flags from `AppSettings:HubOptions`. The block is exposed to the browser through the anonymous `/sys/features` endpoint and applied at runtime - `index.html` is no longer the place to customize the app.
