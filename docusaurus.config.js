@@ -20,7 +20,23 @@ const config = {
       '@docusaurus/plugin-client-redirects',
       {
         redirects: [
-          // Nessun redirect necessario - /docs/registry già mappa a registry/index.md
+          // Desktop deprecated
+          { from: '/docs/desktop', to: '/docs/overview' },
+          // Moved to features/
+          { from: '/docs/multispectral', to: '/docs/features/multispectral' },
+          { from: '/docs/terrain-analytics', to: '/docs/features/terrain-analytics' },
+          // Moved to integrations/
+          { from: '/docs/api-reference', to: '/docs/integrations/api-reference' },
+          { from: '/docs/ogc-services', to: '/docs/integrations/ogc-services' },
+          { from: '/docs/registry/stac-api', to: '/docs/integrations/stac-api' },
+          // Moved to contributing/
+          { from: '/docs/building-from-source', to: '/docs/contributing/building-from-source' },
+          // Moved to registry/admin/
+          { from: '/docs/registry/production', to: '/docs/registry/admin/production' },
+          { from: '/docs/registry/configuration', to: '/docs/registry/admin/configuration' },
+          { from: '/docs/registry/user-management', to: '/docs/registry/admin/user-management' },
+          { from: '/docs/registry/processing-platform', to: '/docs/registry/admin/processing-platform' },
+          { from: '/docs/registry/troubleshooting', to: '/docs/registry/admin/troubleshooting' },
         ],
       },
     ],
@@ -87,9 +103,15 @@ const config = {
           },
           {
             type: 'doc',
-            docId: 'desktop',
+            docId: 'getting-started/index',
             position: 'left',
-            label: 'Desktop',
+            label: 'Getting Started',
+          },
+          {
+            type: 'doc',
+            docId: 'cli/index',
+            position: 'left',
+            label: 'CLI',
           },
           {
             type: 'doc',
@@ -99,9 +121,15 @@ const config = {
           },
           {
             type: 'doc',
-            docId: 'cli',
+            docId: 'features/index',
             position: 'left',
-            label: 'CLI',
+            label: 'Features',
+          },
+          {
+            type: 'doc',
+            docId: 'integrations/index',
+            position: 'left',
+            label: 'Integrations',
           },
           {
             type: 'doc',

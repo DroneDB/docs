@@ -61,7 +61,7 @@ The default value is `null`.
 
 ### Use MySQL / MariaDB instead of SQLite
 
-For production environments with high load, it's recommended to use MySQL or MariaDB. See the [Getting Started guide](./getting-started.md#use-mysql--mariadb-instead-of-sqlite) for setup instructions.
+For production environments with high load, it's recommended to use MySQL or MariaDB. See the [Getting Started guide](/docs/registry/getting-started#use-mysql--mariadb-instead-of-sqlite) for setup instructions.
 
 ### RegistryProvider
 

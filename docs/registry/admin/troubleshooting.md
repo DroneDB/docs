@@ -153,6 +153,6 @@ Available levels: `Verbose`, `Debug`, `Information`, `Warning`, `Error`, `Fatal`
 
 If you're still experiencing issues:
 
-1. Check the [FAQ](../faq.md)
+1. Check the [FAQ](/docs/faq)
 2. Search [GitHub Issues](https://github.com/DroneDB/Registry/issues)
 3. Commercial support is available at [dronedb.app/contact](https://dronedb.app/contact)

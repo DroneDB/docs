@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-sidebar_label: Registry
+sidebar_label: Overview
 ---
 
 # Registry

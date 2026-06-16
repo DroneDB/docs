@@ -60,7 +60,7 @@ Storage folder (pos. 0)    Required. Directory where Registry stores data
 ```
 
 :::note
-This configuration uses SQLite as the database. For production environments with high load, use MySQL/MariaDB as described in the [MySQL/MariaDB Configuration](./configuration.md#use-mysql--mariadb-instead-of-sqlite) section.
+This configuration uses SQLite as the database. For production environments with high load, use MySQL/MariaDB as described in the [MySQL/MariaDB Configuration](./admin/configuration#use-mysql--mariadb-instead-of-sqlite) section.
 :::
 
 ### Change admin password

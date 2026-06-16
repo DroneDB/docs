@@ -9,10 +9,10 @@ The Processing Platform is an asynchronous task substrate for running CPU- and I
 
 ## Concepts
 
-- **Tool** — a named, versioned operation (e.g. `raster-export`, `bulk-download`). Each tool declares required permissions, whether it produces a downloadable artifact, and a JSON Schema for its input parameters.
-- **Task** — a single execution of a tool on a dataset. Identified by a UUID `taskId`.
-- **Artifact** — the optional downloadable result of a task (e.g. a `.tif` or `.zip` file). Artifacts are stored in a work directory and automatically deleted after `ProcessingPlatform:ArtifactTtlHours` hours.
-- **Deduplication** — if a task with the same tool, version, and parameters is submitted within the `DedupLookbackHours` window, the server returns the existing task (`HTTP 200`) instead of creating a new one (`HTTP 202`).
+- **Tool** - a named, versioned operation (e.g. `raster-export`, `bulk-download`). Each tool declares required permissions, whether it produces a downloadable artifact, and a JSON Schema for its input parameters.
+- **Task** - a single execution of a tool on a dataset. Identified by a UUID `taskId`.
+- **Artifact** - the optional downloadable result of a task (e.g. a `.tif` or `.zip` file). Artifacts are stored in a work directory and automatically deleted after `ProcessingPlatform:ArtifactTtlHours` hours.
+- **Deduplication** - if a task with the same tool, version, and parameters is submitted within the `DedupLookbackHours` window, the server returns the existing task (`HTTP 200`) instead of creating a new one (`HTTP 202`).
 
 ## Task States
 
@@ -59,10 +59,10 @@ Content-Type: application/json
 ```
 
 **Responses:**
-- `202 Accepted` — new task created. `Location` header points to the status endpoint.
-- `200 OK` with `deduplicated: true` — an existing matching task was found and returned.
-- `400 Bad Request` — unknown tool, invalid parameters, or path traversal.
-- `413 / 429` — quota exceeded (output too large or concurrency limit reached).
+- `202 Accepted` - new task created. `Location` header points to the status endpoint.
+- `200 OK` with `deduplicated: true` - an existing matching task was found and returned.
+- `400 Bad Request` - unknown tool, invalid parameters, or path traversal.
+- `413 / 429` - quota exceeded (output too large or concurrency limit reached).
 
 **Response body:**
 ```json

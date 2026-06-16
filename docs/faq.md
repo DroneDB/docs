@@ -21,12 +21,13 @@ DroneDB supports a wide range of geospatial file formats:
 
 *PLY files are automatically classified as point clouds or 3D models based on their content.
 
-### What is the difference between DroneDB Desktop and Registry?
+### What is the difference between DroneDB CLI and Registry?
 
-**DroneDB Desktop** is a desktop application for browsing and inspecting aerial data locally on your computer. It's ideal for:
+**DroneDB CLI** (`ddb`) is a command-line tool for local data management. It's ideal for:
+- Indexing and organizing files on your local drives
 - Checking data quality after a drone flight
-- Organizing files on your local drives
-- Quick sharing to Hub
+- Building tiles, thumbnails, and derivative products
+- Power users and automated workflows
 
 **Registry** is a web-based platform for hosting and sharing datasets. It's ideal for:
 - Collaboration with team members
@@ -57,7 +58,11 @@ ddb chattr +public
 
 ### Can I self-host Registry?
 
-Yes! Registry is open source and can be self-hosted using Docker or natively. See the [Registry documentation](./registry) for detailed instructions.
+Yes! Registry is open source and can be self-hosted using Docker or natively. See the [Registry documentation](/docs/registry) for detailed instructions.
+
+### What happened to DroneDB Desktop?
+
+DroneDB Desktop (the standalone Windows application) has been deprecated. All functionality has been moved to the web-based [Registry/Hub](https://hub.dronedb.app) platform, which provides a richer feature set and works on any operating system with a browser.
 
 ### What databases does Registry support?
 
@@ -65,10 +70,6 @@ Registry supports:
 - **SQLite** (default, for development and small deployments)
 - **MySQL/MariaDB** (recommended for production)
 - **Microsoft SQL Server** (no automatic migrations)
-
-### Where can I buy a license for DroneDB Desktop?
-
-[https://dronedb.app/plans](https://dronedb.app/plans)
 
 ### How do I get commercial support?
 

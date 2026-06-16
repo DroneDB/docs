@@ -333,6 +333,6 @@ Common codes: `MissingParameterValue`, `InvalidParameterValue`, `LayerNotDefined
 
 ## See also
 
-- [Multispectral imagery](./multispectral.md)
-- [Building from source](./building-from-source.md)
-- [API reference](./api-reference.md)
+- [Multispectral imagery](/docs/features/multispectral)
+- [Building from source](/docs/contributing/building-from-source)
+- [API reference](./api-reference)

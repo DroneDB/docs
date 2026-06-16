@@ -1,0 +1,147 @@
+---
+sidebar_position: 4
+description: 'Command Line Interface for DroneDB'
+---
+
+import CLIAutogen from './_cli_autogen.mdx';
+import TOCInline from '@theme/TOCInline';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Reference
+
+`ddb` is a command line interface (CLI) to access DroneDB's functions. This makes it ideal for power users and for creating automated workflows.
+
+See the [CLI Overview](/docs/cli) page for a quick command summary and links to tutorials.
+
+## Quick Examples
+
+Below are concise examples for commands not covered in the [Examples](/docs/cli/examples) page.
+
+### Projecting images
+
+Project images onto a georeferenced map:
+
+```bash
+ddb geoproj images/DJI_0018.JPG -o projected/
+```
+
+### Creating static tiles (XYZ/TMS)
+
+Generate tiles for GeoTIFFs, drone images and [COPC](https://github.com/OpenDroneMap/cloud-optimized-point-cloud) point clouds. Similar to [gdal2tiles.py](https://gdal.org/programs/gdal2tiles.html) but faster and with more format support:
+
+```bash
+ddb tile DJI_0018.JPG output_tiles/
+ddb tile orthophoto.tif output_tiles/
+```
+
+### Building COPC point clouds
+
+Build COPC (Cloud Optimized Point Cloud) files for efficient streaming:
+
+```bash
+ddb copc output/ point_cloud.laz
+```
+
+Supported input formats: LAS, LAZ, E57, PTS, XYZ, PLY.
+
+### Generating Cloud Optimized GeoTIFFs (COG)
+
+Convert standard GeoTIFFs to COGs for efficient streaming with range requests:
+
+```bash
+ddb cog output.tif input.tif
+```
+
+### Extracting GPS locations/footprints to GeoJSON
+
+```bash
+# GPS points
+ddb info *.JPG -f geojson -o gps.geojson
+
+# Image footprints (polygons)
+ddb info *.JPG -f geojson --geometry polygon -o footprint.geojson
+```
+
+### Generating STAC Catalogs
+
+Generate STAC-compliant JSON for interoperability:
+
+```bash
+cd my-dataset/
+ddb stac
+
+# For a specific file
+ddb stac -p orthophoto.tif
+```
+
+### Building 3D Model Tiles (Nexus)
+
+Generate Nexus files for efficient web streaming of 3D meshes:
+
+```bash
+ddb nxs model.obj output.nxz
+```
+
+Supported input formats: OBJ, GLTF, GLB.
+
+### Generating Thumbnails
+
+```bash
+ddb thumbs *.JPG -o thumbs/
+ddb thumbs orthophoto.tif -o thumb.jpg -s 1024
+```
+
+### Re-processing indexed files after an upgrade
+
+When you upgrade DroneDB to a version that extracts additional metadata or supports new file types, use `rescan` to update all metadata in place:
+
+```bash
+cd my-dataset/
+ddb rescan
+
+# Only specific types
+ddb rescan --type image,pointcloud
+
+# Continue even if some files fail
+ddb rescan --continue-on-error
+```
+
+## Environment Variables
+
+:::tip
+For practical workflow examples (multispectral, terrain analytics, clone/push, metadata), see the [Examples](/docs/cli/examples) page.
+:::
+
+DroneDB reads the following environment variables at runtime. Variables marked **GDAL config** can also be set via `CPLSetConfigOption()` in the GDAL C API.
+
+### General
+
+| Variable | Description |
+|----------|-------------|
+| `DDB_LOG` | If set (any value), enables logging to file (`ddb-log.csv`) in the current directory. |
+| `DDB_DEBUG` | If set (any value), enables verbose debug output on the console. Equivalent to passing `--debug`. |
+| `DDB_HOME` | Override the DDB home directory (default: `~/.ddb`). Stores credentials and user profile. |
+| `DDB_DATA` | Override the DDB data directory used for bundled data files (timezone database, etc.). |
+
+### Point Cloud (COPC/EPT)
+
+| Variable | Description |
+|----------|-------------|
+| `DDB_UNTWINE_PATH` | Absolute path to the `untwine` binary. When set, this path is authoritative: if it does not point to a valid executable, Untwine is considered unavailable. Useful for pinning the backend or running tests. |
+| `DDB_USE_PDAL_COPC` | Set to `1` to force the PDAL COPC backend, bypassing Untwine. |
+| `DDB_COPC_BACKEND` | Explicit backend selection: `"untwine"`, `"pdal"`, or `"auto"` (default). Unknown values are silently ignored. `DDB_USE_PDAL_COPC=1` takes precedence. |
+
+### COG Build (GDAL config)
+
+These variables control `ddb build` and `ddb cog` for GeoRaster entries. They are read via `CPLGetConfigOption` and can also be passed as standard environment variables.
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DDB_COG_JPEG_QUALITY` | `75` | JPEG quality (1–100) for COG compression. Applied only to 8-bit RGB or RGBA rasters. LZW is used for all other cases. |
+| `DDB_WARP_MEMORY_MB` | `512` | GDALWarp memory buffer size in MB (`-wm` flag). Larger values reduce chunking overhead when multi-threading is active. |
+| `DDB_COG_CACHE_MB` | `1024` | GDAL block cache size in MB during COG build. Raised temporarily before the warp and restored afterwards. |
+
+## Commands Reference
+
+<CLIAutogen />

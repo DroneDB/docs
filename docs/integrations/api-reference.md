@@ -116,7 +116,7 @@ Authorization: Bearer <token>
 
 **Base Route:** `/orgs/{orgSlug}/ds/{dsSlug}/tasks`
 
-See the [Processing Platform](./registry/processing-platform) page for full documentation, tool reference, and examples.
+See the [Processing Platform](/docs/registry/admin/processing-platform) page for full documentation, tool reference, and examples.
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|

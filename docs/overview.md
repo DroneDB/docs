@@ -18,13 +18,18 @@ For image processing and photogrammetry, we recommend [WebODM](https://docs.webo
 
 ## Core Components
 
-DroneDB consists of three main components:
+DroneDB consists of two main components:
 
 | Component | Description |
 |-----------|-------------|
 | **DroneDB Core** | C++ library providing geospatial data management, indexing, and processing |
-| **DroneDB Desktop** | Desktop application for browsing and sharing geospatial data |
 | **DroneDB Registry** | Web-based platform for hosting, managing and sharing datasets |
+
+:::warning Desktop Application Deprecated
+DroneDB Desktop (the standalone Windows application) has been deprecated and is being phased out. All functionality has been moved to the web-based [Registry/Hub](https://hub.dronedb.app) platform. We recommend using Registry for all data inspection and sharing workflows.
+
+**Existing Desktop license holders**: if you purchased a DroneDB Desktop license, you are entitled to **3 months free** of the **Professional plan** on [DroneDB Hub](https://hub.dronedb.app). Contact us at [support@dronedb.app](mailto:support@dronedb.app) to activate your offer.
+:::
 
 ## Key Features
 
@@ -32,18 +37,16 @@ DroneDB consists of three main components:
 
 You have some geospatial data. But *is your data good?*
 
-![explorer](./assets/brighton-explorer.webp)
-
  - Are the images georeferenced correctly (or at all)?
  - Did you miss to capture an image (or an entire section)?
 
 *Difficult to say from a file browser*
 
-DroneDB Desktop provides rich context and visualization:
+[DroneDB Hub](https://hub.dronedb.app) provides rich context and visualization directly in your browser:
 
-![ddb](./assets/brighton-ddb.webp)
+![Hub 1](./assets/hub-1.webp)
 
-![ddb](./assets/brighton-ddb-2.webp)
+![Hub 2](./assets/hub-2.webp)
 
 ### Data Sharing
 
@@ -102,10 +105,11 @@ DroneDB automatically classifies files into the following types based on their c
 
 ## Get Started
 
- - Install [DroneDB Desktop](./desktop#installation)
  - [Register](https://dronedb.app/register) an account on Hub (it's free)
+ - Explore your first dataset at [hub.dronedb.app](https://hub.dronedb.app)
 
 ### Advanced Users
 
- - Self-host your own instance with [Registry](./registry)
- - Install the [command line tool](./cli)
+ - Self-host your own instance with [Registry](/docs/registry)
+ - Install the [command line tool](/docs/cli/cli-reference)
+ - See [Getting Started](/docs/getting-started) for a complete walkthrough

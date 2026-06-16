@@ -147,6 +147,28 @@ Usage:
 
 ```
 
+### contour
+
+```
+Generate contour lines (GeoJSON) from a DEM/DSM/DTM raster.
+
+Usage:
+  ddb contour [options] input.tif [args]
+
+      --input arg     Input single-band raster (DEM/DSM/DTM)
+  -o, --output arg    Output GeoJSON file (default: stdout)
+  -i, --interval arg  Vertical interval between contour levels (raster units) (default: 0)
+  -n, --count arg     Target number of contour levels (used when --interval is 0) (default: 0)
+  -b, --base arg      Reference base elevation (default: 0)
+      --min arg       Drop contours below this elevation (default: nan)
+      --max arg       Drop contours above this elevation (default: nan)
+  -s, --simplify arg  Geometry simplification tolerance (raster CRS units) (default: 0)
+      --band arg      1-based raster band index (default: 1)
+  -h, --help          Print help
+      --debug         Show debug output
+
+```
+
 ### geoproj
 
 ```
