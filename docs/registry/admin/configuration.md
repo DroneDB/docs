@@ -57,6 +57,34 @@ The URL of the external authentication provider.
 The default value is `null`.
 :::
 
+### LdapSettings
+
+LDAP/Active Directory authentication settings. Mutually exclusive with `ExternalAuthUrl`. When `Enabled` is `true`, the following sub-fields are required: `Server`, `BaseDn`, and `SearchFilter`.
+
+:::info
+See the [LDAP Authentication](./ldap-authentication) page for a complete guide with examples.
+:::
+
+**Sub-fields:**
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Enabled` | `bool` | `false` | Enables LDAP/Active Directory authentication |
+| `Server` | `string` | — | LDAP server hostname or IP |
+| `Port` | `int` | `636` | LDAP port (389 = plain, 636 = LDAPS) |
+| `UseSsl` | `bool` | `true` | Use SSL/TLS (LDAPS) |
+| `ValidateSslCertificate` | `bool` | `true` | Validate server SSL certificate chain |
+| `BaseDn` | `string` | — | Base DN for directory searches |
+| `BindDn` | `string` | `null` | Service account DN for search bind |
+| `BindPassword` | `string` | — | Service account password |
+| `SearchFilter` | `string` | `(sAMAccountName={0})` | LDAP search filter (`{0}` = escaped username) |
+| `UserDnFormat` | `string` | `null` | Optional direct DN format (bypasses search) |
+| `AdminGroupDns` | `string[]` | `[]` | LDAP group DNs that map to Registry admin role |
+| `EmailAttribute` | `string` | `mail` | LDAP attribute for user email |
+| `DisplayNameAttribute` | `string` | `displayName` | LDAP attribute for display name |
+| `GroupMembershipAttribute` | `string` | `memberOf` | LDAP attribute for group memberships |
+| `Timeout` | `int` | `30` | Timeout in seconds for LDAP operations |
+
 ## Database
 
 ### Use MySQL / MariaDB instead of SQLite
