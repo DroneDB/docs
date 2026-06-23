@@ -15,11 +15,12 @@ DroneDB supports a wide range of geospatial file formats:
 | **Videos** | MP4, MOV, WEBM, M4V, AVI, MKV |
 | **Point Clouds** | LAS, LAZ, E57, PTS, XYZ, PLY* |
 | **3D Models** | OBJ, GLTF, GLB, PLY* |
+| **Gaussian Splats** | PLY*, SPLAT, SPZ |
 | **Vector Data** | GeoJSON, DXF, DWG, SHP, SHZ, FGB, TopoJSON, KML, KMZ, GPKG |
 | **Rasters** | GeoTIFF (orthophotos, DEMs) |
 | **Other** | Markdown (README.md), PDF |
 
-*PLY files are automatically classified as point clouds or 3D models based on their content.
+*PLY files are automatically classified as point clouds, 3D models, or Gaussian Splats based on their content.
 
 ### What is the difference between DroneDB CLI and Registry?
 

@@ -14,6 +14,7 @@ Registry automatically generates optimized formats for visualization:
 | **GeoTIFF** | COG (Cloud Optimized GeoTIFF) | Efficient streaming for large orthophotos |
 | **Point Clouds** | COPC (`copc/cloud.copc.laz`) | Single-file streaming format via Potree viewer |
 | **3D Models** | NXS (Nexus) | Progressive streaming for 3D meshes |
+| **Gaussian Splats** | RAD LOD (`model.rad`) | Level-of-detail streaming via the in-browser splat viewer |
 | **Images** | Thumbnails, WebP tiles | Fast previews and map tiles |
 
 Processing happens in background via Hangfire jobs. Monitor progress at `/hangfire`.

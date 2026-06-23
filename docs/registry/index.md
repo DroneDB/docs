@@ -16,7 +16,7 @@ You can try the online hosted version of Registry (DroneDB Hub) at [dronedb.app/
 ## Features
 
 - **Dataset Management**: Create, organize, and share datasets with fine-grained permissions
-- **Interactive Visualization**: View orthophotos, point clouds, 3D models (OBJ, GLTF, GLB), and panoramas directly in the browser
+- **Interactive Visualization**: View orthophotos, point clouds, 3D models (OBJ, GLTF, GLB), Gaussian Splats, and panoramas directly in the browser
 - **User Management**: Built-in user administration with role-based access control
 - **STAC Compliance**: Standard SpatioTemporal Asset Catalog API for interoperability
 - **Public & Private Datasets**: Flexible visibility controls for your data
@@ -52,14 +52,15 @@ Measure distances and areas directly on point clouds:
 | **Images** | JPG, JPEG, DNG, TIF, TIFF, PNG, GIF, WEBP |
 | **Point Clouds** | LAS, LAZ, E57, PTS, XYZ, PLY* |
 | **3D Models** | OBJ, GLTF, GLB, PLY* |
+| **Gaussian Splats** | PLY*, SPLAT, SPZ |
 | **Rasters** | GeoTIFF (orthophotos, DEMs) |
 | **Vector Data** | GeoJSON, SHP, SHZ, KML, KMZ, DXF, DWG, FGB, TopoJSON, GPKG |
 | **Panoramas** | 360° images (aspect ratio ≥ 2:1) with optional GPS |
-| **Videos** | MP4, MOV |
+| **Videos** | MP4, MOV, WEBM, M4V, AVI, MKV |
 | **Other** | Markdown, PDF |
 
 :::note
-*PLY files are automatically classified as point clouds or 3D models based on their content.
+*PLY files are automatically classified as point clouds, 3D models, or Gaussian Splats based on their content.
 :::
 
 ## Getting Help
