@@ -142,8 +142,85 @@ ddb align -i source.tif -r reference.tif -o aligned.tif -m translation
 ddb align -i source.tif -r reference.tif --validate
 ```
 
+## Gaussian Splat Workflow
+
+Convert a Gaussian Splat PLY file to streaming-optimized SPZ + RAD format:
+
+```bash
+# 1. Index the Gaussian Splat output
+ddb add model.ply
+
+# 2. Build SPZ + RAD for streaming
+ddb gsplat model.ply
+
+# 3. Push to Hub
+ddb push
+```
+
+## Archive Upload and Extraction
+
+Upload a ZIP archive and extract it into a dataset:
+
+```bash
+# 1. Clone a dataset
+ddb clone my-org/survey-data
+
+# 2. Add an archive (extracts automatically)
+ddb add flight_2024_06.zip
+
+# 3. Build derivative products for extracted files
+ddb build
+```
+
+## Vector Data and MVT Generation
+
+Index vector data and generate Mapbox Vector Tiles:
+
+```bash
+# 1. Index a GeoJSON or GeoPackage file
+ddb add contours.geojson buildings.gpkg
+
+# 2. Build MVT tiles and GeoPackage
+ddb build
+
+# 3. Push to Hub for web visualization
+ddb push
+```
+
+## STAC Catalog Generation
+
+Export a dataset as a STAC (SpatioTemporal Asset Catalog) for interoperability:
+
+```bash
+# Generate STAC catalog (outputs JSON to stdout)
+ddb stac
+
+# Generate STAC with custom working directory
+ddb stac -w ./stac-output
+```
+
+## Registry Authentication
+
+Login to a Registry server for push/pull operations:
+
+```bash
+# Login to Hub (default)
+ddb login
+
+# Login to a self-hosted Registry
+ddb login -s http://localhost:5000
+
+# Logout from all servers
+ddb logout
+```
+
 ## See Also
 
 - [CLI Command Reference](/docs/cli/cli-reference)
 - [Features: Multispectral & Thermal](/docs/features/multispectral)
 - [Features: Terrain Analytics](/docs/features/terrain-analytics)
+- [Features: Raster Alignment](/docs/features/raster-alignment)
+- [Features: Gaussian Splats](/docs/features/gaussian-splat)
+- [Features: Vector Processing](/docs/features/vector-processing)
+- [Features: Archive Extraction](/docs/features/archive-extraction)
+- [Features: Bulk Operations](/docs/features/bulk-operations)

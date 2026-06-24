@@ -59,12 +59,12 @@ DroneDB supports a wide range of geospatial data formats:
 | **Videos** | MP4, MOV, WEBM, M4V, AVI, MKV |
 | **Point Clouds** | LAS, LAZ, E57, PTS, XYZ, PLY* |
 | **3D Models** | OBJ, GLTF, GLB, PLY* |
-| **Gaussian Splats** | PLY*, SPLAT, SPZ |
+| **Gaussian Splats** | PLY*, SPLAT, SPZ, KSPLAT |
 | **Vector Data** | GeoJSON, DXF, DWG, SHP, SHZ, FGB, TopoJSON, KML, KMZ, GPKG |
-| **Other** | Markdown, PDF, and more |
+| **Other** | Markdown, and generic files (PDF, etc.) |
 
 :::note
-*PLY files are automatically classified as point clouds, 3D models, or Gaussian Splats based on their content.
+*PLY files are automatically classified as point clouds, 3D models, or Gaussian Splats based on their content. Textured PLY files are treated as generic files.
 :::
 
 Traditional cloud storage like Google Drive or Dropbox doesn't let you interact with geospatial data:
@@ -98,11 +98,15 @@ DroneDB automatically classifies files into the following types based on their c
 | **GeoPanorama** | Panoramas with GPS coordinates |
 | **Video** | Standard video files |
 | **GeoVideo** | Videos with embedded GPS data |
-| **GeoRaster** | Georeferenced rasters (orthophotos, DEMs) |
+| **GeoRaster** | Georeferenced rasters (orthophotos, DEMs, multispectral) |
 | **PointCloud** | Point cloud files (LAS, LAZ, E57, PTS, XYZ, non-mesh PLY) |
 | **Model** | 3D models (OBJ, GLTF, GLB, mesh PLY) |
-| **Vector** | Vector data (GeoJSON, SHP, KML, etc.) |
-| **Markdown** | Documentation files |
+| **GaussianSplat** | Gaussian Splat files (PLY splat, SPZ, SPLAT, KSPLAT) |
+| **Vector** | Vector data (GeoJSON, SHP, KML, DXF, GPKG, etc.) |
+| **Markdown** | Documentation files (.md) |
+| **Directory** | Filesystem directories |
+| **Generic** | Files with no special handling |
+| **DroneDB** | Directories containing a .ddb database |
 
 ## Get Started
 

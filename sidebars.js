@@ -63,6 +63,13 @@ const sidebars = {
         'features/index',
         'features/multispectral',
         'features/terrain-analytics',
+        'features/raster-alignment',
+        'features/georaster-processing',
+        'features/gaussian-splat',
+        'features/vector-processing',
+        'features/archive-extraction',
+        'features/photogrammetry-integration',
+        'features/bulk-operations',
       ],
     },
     {

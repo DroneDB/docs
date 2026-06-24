@@ -15,9 +15,27 @@ Registry automatically generates optimized formats for visualization:
 | **Point Clouds** | COPC (`copc/cloud.copc.laz`) | Single-file streaming format via Potree viewer |
 | **3D Models** | NXS (Nexus) | Progressive streaming for 3D meshes |
 | **Gaussian Splats** | RAD LOD (`model.rad`) | Level-of-detail streaming via the in-browser splat viewer |
+| **Vector Data** | MVT tiles + GeoPackage | Mapbox Vector Tiles for web maps |
 | **Images** | Thumbnails, WebP tiles | Fast previews and map tiles |
 
 Processing happens in background via Hangfire jobs. Monitor progress at `/hangfire`.
+
+### Processing Tools
+
+Registry's Processing Platform exposes the following tools as background tasks:
+
+| Tool | Description |
+|------|-------------|
+| **build** | Generate derivative products (COG, COPC, NXS, MVT, thumbnails) |
+| **raster-export** | Export a raster as GeoTIFF with visualization params (preset, bands, formula, colormap) |
+| **align-raster** | Align a source GeoTIFF to a reference raster (similarity or translation mode) |
+| **archive-extract** | Extract a ZIP archive and index each file individually |
+| **merge-multispectral** | Merge single-band rasters into a multi-band COG |
+| **photogrammetry** | Send images to a remote NodeODM/ODX processing node |
+| **bulk-download** | Package dataset entries into a downloadable ZIP archive |
+| **rescan-index** | Re-process all indexed files to update metadata and rebuild derivatives |
+
+Tasks can be monitored via the `/hangfire` dashboard or the tasks API (`GET /tasks`, `GET /tasks/{id}`, `GET /tasks/{id}/log`, `GET /tasks/{id}/result`). Cancellation is supported via `DELETE /tasks/{id}` and retry via `POST /tasks/{id}/retry`.
 
 ### Panorama Viewer
 
