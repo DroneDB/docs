@@ -37,6 +37,93 @@ server {
 }
 ```
 
+### Tuning the reverse proxy for large uploads
+
+Registry **streams** uploads straight to storage as the bytes arrive, so a single
+large file is written only once. To preserve that throughput end to end, the
+reverse proxy in front of Registry must **not** re-buffer the whole request body
+before forwarding it. Otherwise every upload is written twice (once into the
+proxy's temporary area, once by Registry), the client sees no progress until the
+proxy has received the entire file, and the proxy needs scratch space as large as
+the upload.
+
+Two things matter for large uploads:
+
+- **Disable request-body buffering** at the proxy so the body is streamed to Registry.
+- **Remove (or raise) the proxy's body-size limit** so large files are not rejected.
+  You can still cap uploads centrally with the Registry `MaxRequestBodySize`
+  setting (see [Configuration](./configuration.md#maxrequestbodysize)); requests
+  over the limit are rejected with `413 Payload Too Large`.
+
+#### Nginx (high-throughput uploads)
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name registry.yourdomain.com;
+
+    # Allow large uploads (0 = unlimited, or set an explicit cap e.g. 20g)
+    client_max_body_size 0;
+
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+
+        # Stream the upload straight to Registry instead of spooling it to a
+        # temp file first. This is the single most important upload setting.
+        proxy_request_buffering off;
+        # Optional: also stream responses (downloads) without buffering.
+        proxy_buffering off;
+
+        # Generous timeouts for long transfers over slow links.
+        proxy_connect_timeout 60s;
+        proxy_send_timeout     3600s;
+        proxy_read_timeout     3600s;
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+With the default `proxy_request_buffering on`, nginx writes the entire upload to a
+temporary file (`client_body_temp`) before it even contacts Registry. Turning it
+**off** restores true streaming. Note that for chunked `Transfer-Encoding` nginx
+still buffers unless `proxy_http_version` is `1.1` (or `2`), so keep that line.
+
+#### Apache (httpd) with mod_proxy
+
+Apache's `mod_proxy_http` already streams request bodies to the backend (it does
+not spool the whole upload to disk), so the focus is on **limits and timeouts**:
+
+```apache
+<VirtualHost *:443>
+    ServerName registry.yourdomain.com
+
+    ProxyPreserveHost On
+    # timeout (seconds) keeps the backend connection open during long uploads
+    ProxyPass        / http://localhost:5000/ timeout=3600
+    ProxyPassReverse / http://localhost:5000/
+
+    # Allow large uploads (0 = unlimited, or set an explicit byte cap)
+    LimitRequestBody 0
+
+    # mod_reqtimeout aborts slow request bodies by default; relax it so large
+    # uploads over slow links are not killed mid-transfer. The deadline is
+    # extended as long as data keeps arriving at >= 1 KB/s.
+    RequestReadTimeout body=30,MinRate=1024
+
+    RequestHeader set X-Forwarded-Proto "https"
+</VirtualHost>
+```
+
+If large uploads fail with `408 Request Timeout` or a reset connection, the usual
+culprit is `mod_reqtimeout` (`RequestReadTimeout`) rather than `Timeout` or
+`ProxyTimeout`; adjust the `body=` rule as shown above. Make sure `mod_proxy`,
+`mod_proxy_http` and `mod_headers` are enabled.
+
 ## Common Issues
 
 **Container fails to start**

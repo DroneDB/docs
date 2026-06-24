@@ -212,10 +212,21 @@ The default value is `1.00:00:00` (1 day).
 
 ### MaxRequestBodySize
 
-The maximum request body size. It sets the `MultipartBodyLengthLimit` of the kestrel `FormOptions`.
+The maximum size, in bytes, accepted for a single upload request. Uploads larger
+than this are rejected with `413 Payload Too Large`. The limit is applied at the
+Kestrel connection level, so it is enforced for both the streamed dataset upload
+endpoint (`/orgs/{org}/ds/{ds}/obj`) and the share upload endpoint
+(`/share/upload/{token}`).
 
 :::info
-The default value is `null` (default).
+The default value is `null`, which means **no limit** (uploads are unbounded).
+Set it to a byte count, e.g. `21474836480` for 20 GiB, to cap uploads.
+:::
+
+:::tip
+When Registry runs behind a reverse proxy, also raise (or disable) the proxy's own
+body-size limit and turn off request buffering, so the limit is enforced once - by
+Registry. See [Reverse proxy tuning](./troubleshooting.md#tuning-the-reverse-proxy-for-large-uploads).
 :::
 
 ### BatchTokenLength
