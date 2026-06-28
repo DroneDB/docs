@@ -497,6 +497,7 @@ See the [Processing Platform](./processing-platform) page for a full description
 | `MaxConcurrentTasksGlobal` | `32` | Maximum concurrent tasks across all users |
 | `MaxEstimatedOutputBytesPerSubmit` | `21474836480` (20 GiB) | Hard cap on estimated output size per task submission |
 | `MaxArchiveExtractSizeBytes` | `5368709120` (5 GiB) | Maximum compressed archive size accepted by the `archive-extract` tool |
+| `DiskSafetyMarginBytes` | `268435456` (256 MiB) | Free disk head-room kept on the dataset volume while extracting an archive or importing a dataset. The streaming guard aborts and rolls back before the projected size would eat into this margin, so a decompression bomb cannot fill the volume. Set to `0` to disable the secondary disk-space guard (the uncompressed-size cap still applies). |
 | `OrgDailyOutputBytes` | `{"default": 107374182400}` | Per-org daily output budget in bytes, keyed by org slug. Use `"default"` as a fallback. |
 
 **Downloads:**
