@@ -25,7 +25,6 @@ The authentication provider, supported values:
  - `Sqlite`: SQLite database
  - `Mysql`: MySQL or MariaDB,
             ([compatibility](https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql#supported-database-servers-and-versions))
- - `Mssql`: Microsoft SQL Server (no migrations)
 
 :::info
 The default value is `Sqlite`
@@ -97,7 +96,6 @@ The Registry database provider, supported values:
 
  - `Sqlite`: SQLite database
  - `Mysql`: MySQL or MariaDB, ([compatibility](https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql#supported-database-servers-and-versions))
- - `Mssql`: Microsoft SQL Server (no migrations)
 
 :::info
 The default value is `Sqlite`
@@ -200,7 +198,7 @@ The expiration time of the tiles cache (TimeSpan).
 The default value is `00:30:00` (30 minutes).
 :::
 
-### VisibilityCacheExpiration
+### DatasetVisibilityCacheExpiration
 
 The expiration time for the dataset visibility cache (TimeSpan).
 
@@ -529,6 +527,20 @@ See the [Processing Platform](./processing-platform) page for a full description
 | `ProgressUpdateThrottleSeconds` | `2` | Minimum seconds between persisted progress updates. |
 | `ArtifactTtlHours` | `24` | Hours before a task's work directory (and its artifact) is swept. |
 
+**Remote node polling:**
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `RemoteNodePollIntervalSeconds` | `2` | Interval in seconds between polling remote processing nodes for task status updates. |
+| `RemoteNodePollMaxBackoffSeconds` | `30` | Maximum backoff interval (seconds) when polling remote nodes encounters repeated failures. |
+| `RemoteNodeRequestTimeoutSeconds` | `30` | Timeout in seconds for HTTP requests to remote processing nodes. |
+
+**Remote nodes configuration:**
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `NodeOdm` | `[]` | List of remote ODM processing nodes. Each entry has `Id` (string, default `"default"`), `Url` (string), `Token` (string, optional), and `Title` (string, optional). |
+
 **Example:**
 ```json
 {
@@ -710,3 +722,72 @@ The default value is `60`
 :::tip
 If the `JobIndices` table has already grown very large, you can trigger an immediate cleanup via the admin API endpoint `POST /sys/cleanup-jobindices`. An optional `retentionDays` query parameter lets you override the configured retention for that single run.
 :::
+
+### HangfireJobRetentionDays
+
+Number of days to retain Hangfire job records. Jobs older than this value are automatically purged.
+
+:::info
+The default value is `2`
+:::
+
+## Import
+
+Configuration for the dataset import feature (pulling data from remote sources). Bound from `AppSettings:Import`. When omitted, all sub-fields use their built-in defaults.
+
+**Size and sources:**
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `MaxImportSizeBytes` | `long` | `0` (unlimited) | Maximum size in bytes for a single import operation. Set to `0` for no limit. |
+| `AllowedSourceTypes` | `string[]?` | — | Allowed source types for imports (e.g., `"registry"`, `"http"`). When `null`, all types are allowed. |
+
+**Security (SSRF protection):**
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `SsrfAllowPrivateNetworks` | `bool` | `false` | Allow imports from private network addresses (10.x, 172.16-31.x, 192.168.x). Enable only in trusted environments. |
+| `SsrfAllowedHosts` | `string[]` | `[]` | Whitelist of allowed hostnames/IPs for imports. When empty, all hosts are allowed (unless `SsrfAllowPrivateNetworks` is `false`). |
+
+**HTTP behavior:**
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `MaxRedirects` | `int` | `5` | Maximum number of HTTP redirects to follow during import. |
+| `ConnectTimeoutSeconds` | `int` | `30` | Timeout in seconds for establishing a connection to the remote host. |
+| `TransferTimeoutSeconds` | `int` | `3600` | Timeout in seconds for the entire data transfer (1 hour). |
+| `RegistryDownloadConcurrency` | `int` | `4` | Number of concurrent connections when downloading from a Registry source. |
+| `RegistryDownloadMaxRetries` | `int` | `6` | Maximum number of retry attempts for failed Registry downloads. |
+
+**Example:**
+```json
+{
+  "AppSettings": {
+    "Import": {
+      "MaxImportSizeBytes": 10737418240,
+      "SsrfAllowPrivateNetworks": false,
+      "SsrfAllowedHosts": ["https://registry.example.com"],
+      "TransferTimeoutSeconds": 7200
+    }
+  }
+}
+```
+
+## Security
+
+### DataProtectionKeysPath
+
+Path to the folder where ASP.NET Core Data Protection keys are persisted. When set, encryption keys (used for cookies, tokens, etc.) survive application restarts and deployments. For production environments with multiple instances, set this to a shared, persistent volume so all instances use the same keys.
+
+:::info
+The default value is `null` (keys are stored in the temporary folder and lost on restart).
+:::
+
+**Example** - persist keys to a dedicated folder:
+```json
+{
+  "AppSettings": {
+    "DataProtectionKeysPath": "./data/protection-keys"
+  }
+}
+```
