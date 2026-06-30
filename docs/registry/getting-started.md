@@ -102,3 +102,81 @@ The stack is composed of:
  - MariaDB database
  - PHPMyAdmin, exposed on port [8080](http://localhost:8080)
  - Registry, exposed on port [5000](http://localhost:5000)
+
+## Production deployment notes
+
+Registry's build pipeline (Cloud Optimized GeoTIFF, point cloud and 3D/Nexus
+generation) writes large temporary files while processing datasets. On a busy server
+these can grow to several GB per build. Configure the deployment so this scratch never
+lands on the host root filesystem; otherwise a heavy workload (or a build that crashes
+mid-way) can fill the root partition and take the whole stack down.
+
+### Keep temporary files on the data volume
+
+Point the temporary directory at a sub-folder of the data volume (which should live on
+a large partition) instead of the container working directory or the `/tmp` tmpfs. Set
+these environment variables on every `registry` service (web server, processing nodes
+and thumbnailer):
+
+```yaml
+    environment:
+      - CPL_TMPDIR=/data/temp
+      - TMPDIR=/data/temp
+      - TEMP=/data/temp
+```
+
+The official `dronedb/registry` image already ships these defaults, so you only need to
+override them if your temp folder lives elsewhere. Make sure `/data/temp` is backed by
+the large volume (it is, when you bind-mount the whole `/data` or its `temp` sub-path).
+
+:::note
+Recent DroneDB releases also scope each build's scratch to a per-build temporary folder
+under the dataset's `.ddb/build` directory and reclaim it automatically; a daily
+cleanup job removes anything left behind by a crashed build. The environment variables
+above are an additional safety net for any other GDAL temporary files.
+:::
+
+### Bind-mount the whole `/data`, not just sub-paths
+
+Bind-mount the entire `/data` directory (or back it with a named volume on the large
+partition):
+
+```yaml
+    volumes:
+      - ./data:/data
+      - ./appsettings.json:/data/appsettings.json
+```
+
+:::warning
+Avoid mounting only individual sub-paths of `/data` (for example only `/data/datasets`,
+`/data/cache` and so on). Anything the container writes to an unmounted part of `/data`
+then goes to the container writable layer or, with older images that declared
+`VOLUME /data`, to an anonymous Docker volume on the host root filesystem. Those
+anonymous volumes are never reclaimed by `docker compose down && up` and accumulate
+stale scratch over time. Current images no longer declare `VOLUME /data` for this
+reason.
+:::
+
+### Move Docker's data-root to the large partition
+
+As a structural safety net, store all Docker data (images, containers and volumes) on
+the large partition instead of the root disk. Edit `/etc/docker/daemon.json`:
+
+```json
+{
+  "data-root": "/data/docker"
+}
+```
+
+Then restart Docker. This guarantees no container can exhaust the root filesystem.
+
+### Bound container log growth
+
+Cap container log size so logs cannot grow without limit. In `/etc/docker/daemon.json`:
+
+```json
+{
+  "log-driver": "json-file",
+  "log-opts": { "max-size": "50m", "max-file": "5" }
+}
+```
