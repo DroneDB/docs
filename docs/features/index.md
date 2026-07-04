@@ -22,5 +22,5 @@ DroneDB provides a range of advanced features beyond basic data management.
 ## Data integration
 
 - **[Archive Extraction](/docs/features/archive-extraction)** - Upload and extract ZIP archives directly into a dataset, with automatic file indexing
-- **[Photogrammetry Integration](/docs/features/photogrammetry-integration)** - Send drone images to a remote NodeODM/ODX processing node and retrieve results
+- **[Photogrammetry Integration](/docs/features/photogrammetry-integration)** - Send drone images to a remote NodeODX/ODX processing node and retrieve results
 - **[Bulk Operations](/docs/features/bulk-operations)** - Bulk download (ZIP), index rescan, cleanup stale entries, and database comparison (delta)

@@ -5,7 +5,7 @@ sidebar_label: Photogrammetry Integration
 
 # Photogrammetry Integration
 
-DroneDB Registry integrates with photogrammetry processing platforms (NodeODM, OpenDroneMap, ODX) to send drone images for processing and retrieve the results directly into a dataset.
+DroneDB Registry integrates with photogrammetry processing platforms (NodeODX, OpenDroneMap, ODX) to send drone images for processing and retrieve the results directly into a dataset.
 
 ## How it works
 
@@ -13,7 +13,7 @@ The Processing Platform in Registry can submit a batch of images to a remote pho
 
 ## Processing nodes
 
-A processing node is a remote instance of NodeODM, OpenDroneMap, or ODX that accepts processing jobs via API. Nodes are registered in Registry with:
+A processing node is a remote instance of NodeODX, OpenDroneMap, or ODX that accepts processing jobs via API. Nodes are registered in Registry with:
 
 | Setting | Description |
 |---------|-------------|
@@ -36,7 +36,7 @@ The job runs as a background Hangfire task. Progress and logs are streamed to th
 
 ### Processing options
 
-Common NodeODM/ODX options available through the processing platform:
+Common NodeODX/ODX options available through the processing platform:
 
 | Option | Description |
 |--------|-------------|
@@ -50,7 +50,7 @@ Common NodeODM/ODX options available through the processing platform:
 
 ## Task artifacts
 
-When processing completes, the results are downloaded as a ZIP archive (typically `all.zip` from NodeODM) and stored as a task artifact. The archive can be extracted into the dataset using the [Archive Extraction](./archive-extraction) feature.
+When processing completes, the results are downloaded as a ZIP archive (typically `all.zip` from NodeODX) and stored as a task artifact. The archive can be extracted into the dataset using the [Archive Extraction](./archive-extraction) feature.
 
 ## Workflow example
 

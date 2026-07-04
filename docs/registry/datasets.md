@@ -31,7 +31,7 @@ Registry's Processing Platform exposes the following tools as background tasks:
 | **align-raster** | Align a source GeoTIFF to a reference raster (similarity or translation mode) |
 | **archive-extract** | Extract a ZIP archive and index each file individually |
 | **merge-multispectral** | Merge single-band rasters into a multi-band COG |
-| **photogrammetry** | Send images to a remote NodeODM/ODX processing node |
+| **photogrammetry** | Send images to a remote NodeODX/ODX processing node |
 | **bulk-download** | Package dataset entries into a downloadable ZIP archive |
 | **rescan-index** | Re-process all indexed files to update metadata and rebuild derivatives |
 

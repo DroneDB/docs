@@ -539,7 +539,7 @@ See the [Processing Platform](./processing-platform) page for a full description
 
 | Field | Default | Description |
 |-------|---------|-------------|
-| `NodeOdm` | `[]` | List of remote ODM processing nodes. Each entry has `Id` (string, default `"default"`), `Url` (string), `Token` (string, optional), and `Title` (string, optional). |
+| `NodeOdx` | `[]` | List of remote ODM processing nodes. Each entry has `Id` (string, default `"default"`), `Url` (string), `Token` (string, optional), and `Title` (string, optional). |
 
 **Example:**
 ```json
