@@ -742,6 +742,19 @@ Configuration for the dataset import feature (pulling data from remote sources).
 | `MaxImportSizeBytes` | `long` | `0` (unlimited) | Maximum size in bytes for a single import operation. Set to `0` for no limit. |
 | `AllowedSourceTypes` | `string[]?` | — | Allowed source types for imports (e.g., `"registry"`, `"http"`). When `null`, all types are allowed. |
 
+**File type filtering:**
+
+These two lists apply to **every path that writes files into a dataset**: single-file URL import (`import-file`), archive extraction (`archive-extract`), archive URL import (`archive-url`), direct web upload (multipart/streamed), CLI push sync, and cross-dataset transfer. Matching is case-insensitive and works with or without the leading dot.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `BlockedFileExtensions` | `string[]` | executables/scripts deny-list | Extensions rejected on every upload/import path (block-list mode). Files whose extension is in this list are skipped during archive extraction and rejected outright on all other paths. Ignored when `AllowedFileExtensions` is non-empty. |
+| `AllowedFileExtensions` | `string[]` | `[]` (disabled) | When non-empty, switches to allow-list mode: **only** files whose extension is listed are accepted on every upload/import path; every other file is rejected, and `BlockedFileExtensions` is ignored. |
+
+:::info
+The allow-list takes precedence over the block-list. Leave `AllowedFileExtensions` empty to reject a known set of dangerous types (block-list), or populate it to permit only an explicit set of safe types (allow-list). The built-in `BlockedFileExtensions` default covers common executables, scripts and installers (`.exe`, `.dll`, `.bat`, `.ps1`, `.sh`, `.js`, `.jar`, `.msi`, ...). Disallowed files inside an archive are skipped (the rest of the archive is still extracted); on direct upload, CLI push, and transfer the operation is rejected outright with a clear error message that names the file(s) and the reason. The frontend will not auto-retry blocked uploads.
+:::
+
 **Security (SSRF protection):**
 
 | Field | Type | Default | Description |
