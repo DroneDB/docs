@@ -102,8 +102,8 @@ docker build . -t dronedb/registry
 
 ## Running from source
 
-Registry is written in C# on .NET 9 platform and runs natively on Linux, Windows, and macOS.
-To install the latest .NET SDK see the [official download page](https://dotnet.microsoft.com/en-us/download/dotnet/9.0). Before building registry ensure you have `ddblib` in your path, if not, download the [latest release](https://github.com/DroneDB/DroneDB/releases) and add it to `PATH`.
+Registry is written in C# on .NET 10 and runs natively on Linux, Windows, and macOS.
+To install the latest .NET SDK see the [official download page](https://dotnet.microsoft.com/en-us/download/dotnet/10.0). Before building registry ensure you have `ddblib` in your path, if not, download the [latest release](https://github.com/DroneDB/DroneDB/releases) and add it to `PATH`.
 
 Clone the repository:
 
@@ -113,7 +113,7 @@ cd Registry
 git submodule update --init --recursive
 ```
 
-Build the Hub interface (needs [Node.js 22+](https://nodejs.org/) LTS):
+Build the Hub interface (needs [Node.js 24+](https://nodejs.org/) LTS):
 
 ```bash
 cd Registry.Web/ClientApp

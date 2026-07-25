@@ -13,7 +13,7 @@ Registry automatically generates optimized formats for visualization:
 |--------|------------------|-------------|
 | **GeoTIFF** | COG (Cloud Optimized GeoTIFF) | Efficient streaming for large orthophotos |
 | **Point Clouds** | COPC (`copc/cloud.copc.laz`) | Single-file streaming format via Potree viewer |
-| **3D Models** | NXS (Nexus) | Progressive streaming for 3D meshes |
+| **3D Models** | NXS (Nexus) + OGC 3D Tiles | Progressive streaming for 3D meshes; 3D Tiles are generated as a best-effort additive artifact for the unified viewer |
 | **Gaussian Splats** | RAD LOD (`model.rad`) | Level-of-detail streaming via the in-browser splat viewer |
 | **Vector Data** | MVT tiles + GeoPackage | Mapbox Vector Tiles for web maps |
 | **Images** | Thumbnails, WebP tiles | Fast previews and map tiles |
@@ -26,7 +26,7 @@ Registry's Processing Platform exposes the following tools as background tasks:
 
 | Tool | Description |
 |------|-------------|
-| **build** | Generate derivative products (COG, COPC, NXS, MVT, thumbnails) |
+| **build** | Generate derivative products (COG, COPC, NXS, MVT, 3D Tiles, thumbnails) |
 | **raster-export** | Export a raster as GeoTIFF with visualization params (preset, bands, formula, colormap) |
 | **align-raster** | Align a source GeoTIFF to a reference raster (similarity or translation mode) |
 | **archive-extract** | Extract a ZIP archive and index each file individually |
@@ -34,6 +34,8 @@ Registry's Processing Platform exposes the following tools as background tasks:
 | **photogrammetry** | Send images to a remote NodeODX/ODX processing node |
 | **bulk-download** | Package dataset entries into a downloadable ZIP archive |
 | **rescan-index** | Re-process all indexed files to update metadata and rebuild derivatives |
+| **import-file** | Download a single file from an http/https URL into the dataset |
+| **import-dataset** | Populate a new dataset from another Registry instance or a downloadable archive |
 
 Tasks can be monitored via the `/hangfire` dashboard or the tasks API (`GET /tasks`, `GET /tasks/{id}`, `GET /tasks/{id}/log`, `GET /tasks/{id}/result`). Cancellation is supported via `DELETE /tasks/{id}` and retry via `POST /tasks/{id}/retry`.
 
@@ -163,7 +165,11 @@ Datasets support three visibility levels:
 
 Change visibility using:
 - **Web UI**: Dataset settings
-- **CLI**: `ddb chattr +public` or `ddb chattr -public`
+- **CLI**: `ddb meta set visibility 1` (public) or `ddb meta set visibility 0` (private)
+
+:::info
+`ddb chattr` is deprecated. Use `ddb meta set visibility` instead.
+:::
 
 ## Dataset Deletion
 

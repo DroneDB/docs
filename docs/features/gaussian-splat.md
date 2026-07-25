@@ -24,11 +24,15 @@ PLY files are automatically classified as point clouds, 3D models, or Gaussian S
 
 DroneDB converts Gaussian Splat sources into a streaming-optimized format:
 
-1. **Source** (PLY, SPLAT, or other) is indexed
-2. **SPZ** compressed archive is generated (`model.spz`)
-3. **RAD** level-of-detail container is built (`model.rad`) for progressive streaming
+1. **Source** (PLY, SPLAT, SPZ, or KSPLAT) is indexed
+2. **SPZ** compressed archive is generated as a temporary input (`model.spz`)
+3. **`build-lod`** converts the SPZ into a **RAD** level-of-detail container (`model.rad`) for progressive streaming
 
-The RAD format enables the viewer to load coarse splats first and progressively refine the scene as the user navigates.
+The RAD format enables the viewer to load coarse splats first and progressively refine the scene as the user navigates. After a successful build, the intermediate `.spz` file is removed; the only delivery artifact is `model.rad` (plus `bounds.json` and `georef.json` when georeferencing is available).
+
+:::info Prerequisites
+LOD streaming requires the `build-lod` binary. The DroneDB build scripts compile it automatically from the `vendor/spark` submodule if a Rust toolchain (`cargo`) is installed. Without `build-lod`, DroneDB can still serve plain SPZ files, but no RAD LOD streaming is available.
+:::
 
 ## CLI
 
@@ -40,7 +44,17 @@ ddb add model.ply
 ddb gsplat model.ply
 ```
 
-The `gsplat` command converts the source file to SPZ format and generates the RAD LOD container. A `GsplatGeoref` sidecar file (`georef.json`) is created with SRS and offset information following the ODM convention.
+The `gsplat` command converts the source file to SPZ format. When `build-lod` is available, the build pipeline then generates the RAD LOD container. A `GsplatGeoref` sidecar file (`georef.json`) is created with SRS and offset information following the ODM convention.
+
+You can tune spherical-harmonics quantization with the `DDB_GSPLAT_SH_BITS` environment variable:
+
+```bash
+# Reduce SH bit depth to save bandwidth (values 1-8)
+DDB_GSPLAT_SH_BITS=5 ddb gsplat model.ply
+
+# Control first-band and remaining-bands bit depth independently
+DDB_GSPLAT_SH_BITS=5,4 ddb gsplat model.ply
+```
 
 ## In Hub
 

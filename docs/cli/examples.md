@@ -142,6 +142,23 @@ ddb align -i source.tif -r reference.tif -o aligned.tif -m translation
 ddb align -i source.tif -r reference.tif --validate
 ```
 
+## 3D Tiles Workflow
+
+Generate OGC 3D Tiles from an OBJ/glTF/GLB model for web streaming:
+
+```bash
+# 1. Index the model
+ddb add model.obj
+
+# 2. Generate OGC 3D Tiles (requires Obj2Tiles binary)
+ddb 3dtiles model.obj ./3dtiles
+
+# 3. Push to Hub
+ddb push
+```
+
+When you `ddb add` a `.3tz` archive (ZIP-packaged OGC 3D Tiles with `tileset.json` at the root), DroneDB indexes it as a `Tiles3D` entry and extracts it on build for direct streaming.
+
 ## Gaussian Splat Workflow
 
 Convert a Gaussian Splat PLY file to streaming-optimized SPZ + RAD format:

@@ -9,7 +9,7 @@ DroneDB Registry integrates with photogrammetry processing platforms (NodeODX, O
 
 ## How it works
 
-The Processing Platform in Registry can submit a batch of images to a remote photogrammetry node. The node processes the images and produces outputs (orthophoto, DEM, point cloud, 3D model, etc.). The results are downloaded as a task artifact and added to the dataset.
+The Processing Platform in Registry can submit a batch of images to a remote NodeODX/ODX processing node. The node processes the images and produces outputs (orthophoto, DEM, point cloud, 3D model, etc.). The results are downloaded as a ZIP archive (typically `all.zip` from NodeODX) and extracted directly into the source dataset, or into a newly created dataset. Extracted files are indexed and per-file build jobs are enqueued automatically.
 
 ## Processing nodes
 
@@ -36,21 +36,36 @@ The job runs as a background Hangfire task. Progress and logs are streamed to th
 
 ### Processing options
 
-Common NodeODX/ODX options available through the processing platform:
+The Registry `photogrammetry` tool accepts the following parameters:
 
-| Option | Description |
-|--------|-------------|
-| `--dsm` | Generate Digital Surface Model |
-| `--dtm` | Generate Digital Terrain Model |
-| `--orthophoto` | Generate orthophoto (default) |
-| `--pc` | Generate point cloud |
-| `--3d-tiles` | Generate 3D tiles |
-| `--feature-quality` | Processing quality (low, medium, high) |
-| `--gsd` | Estimated ground sample distance |
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `folder` | `string` | Dataset folder to scan for images (default: whole dataset) |
+| `images` | `string[]` | Explicit list of image entry paths to process |
+| `nodeId` | `string` | Target NodeODX node id (default: first configured node) |
+| `name` | `string` | Task name shown on the node |
+| `options` | `{name, value}[]` | NodeODX/ODX options array passed verbatim to the processing node (e.g. `[{"name":"dsm","value":true}]`) |
+| `destPath` | `string` | Destination folder within the dataset for extracted results (required unless `createNewDataset` is `true`) |
+| `createNewDataset` | `boolean` | If `true`, create a new dataset for the results instead of extracting into the current dataset |
+| `newDatasetName` | `string` | Slug for the new dataset (kebab-case, max 128 chars; auto-generated if omitted) |
+| `newDatasetOrgSlug` | `string` | Organization slug for the new dataset (default: same as source) |
+| `newDatasetVisibility` | `string` | Visibility for the new dataset: `PRIVATE`, `UNLISTED`, or `PUBLIC` (default: `PRIVATE`) |
 
-## Task artifacts
+Common NodeODX options to place inside the `options` array:
 
-When processing completes, the results are downloaded as a ZIP archive (typically `all.zip` from NodeODX) and stored as a task artifact. The archive can be extracted into the dataset using the [Archive Extraction](./archive-extraction) feature.
+| Option | Example | Description |
+|--------|---------|-------------|
+| `dsm` | `{"name":"dsm","value":true}` | Generate Digital Surface Model |
+| `dtm` | `{"name":"dtm","value":true}` | Generate Digital Terrain Model |
+| `orthophoto` | `{"name":"orthophoto","value":true}` | Generate orthophoto |
+| `pc` | `{"name":"pc","value":true}` | Generate point cloud |
+| `3d-tiles` | `{"name":"3d-tiles","value":true}` | Generate 3D tiles |
+| `feature-quality` | `{"name":"feature-quality","value":"high"}` | Processing quality (`low`, `medium`, `high`) |
+| `gsd` | `{"name":"gsd","value":0.01}` | Estimated ground sample distance |
+
+### Task output
+
+When processing completes, the result bundle is extracted directly into the dataset (or into the newly created dataset). No separate downloadable artifact is produced. Extracted files are indexed automatically and their derivative builds (COG, COPC, NXS, 3D Tiles, etc.) are enqueued in the background.
 
 ## Workflow example
 
@@ -58,7 +73,7 @@ When processing completes, the results are downloaded as a ZIP archive (typicall
 1. Upload drone images to a Hub dataset
 2. Submit photogrammetry job via processing platform
 3. Wait for processing to complete (monitor via task panel)
-4. Extract the results archive into the dataset
+4. Results are extracted and indexed automatically in the destination dataset
 5. View orthophoto, DEM, point cloud, and 3D model in Hub
 ```
 

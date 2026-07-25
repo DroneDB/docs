@@ -16,6 +16,7 @@ DroneDB provides a range of advanced features beyond basic data management.
 
 ## 3D visualization
 
+- **[OGC 3D Tiles](/docs/features/3d-tiles)** - Stream large 3D models as OGC 3D Tiles (.3tz) or generate them from OBJ/glTF/GLB models
 - **[Gaussian Splats](/docs/features/gaussian-splat)** - 3D Gaussian Splatting support (PLY, SPZ, SPLAT, KSPLAT) with progressive LOD streaming
 - **[Vector Processing](/docs/features/vector-processing)** - Vector data indexing, MVT tile generation, GeoPackage with spatial index, and multi-layer support
 

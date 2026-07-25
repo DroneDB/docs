@@ -58,7 +58,7 @@ DroneDB supports a wide range of geospatial data formats:
 | **Multispectral / Thermal** | Multi-band GeoTIFF, FLIR R-JPEG, thermal GeoTIFF |
 | **Videos** | MP4, MOV, WEBM, M4V, AVI, MKV |
 | **Point Clouds** | LAS, LAZ, E57, PTS, XYZ, PLY* |
-| **3D Models** | OBJ, GLTF, GLB, PLY* |
+| **3D Models** | OBJ, GLTF, GLB, PLY*, OGC 3D Tiles (.3tz) |
 | **Gaussian Splats** | PLY*, SPLAT, SPZ, KSPLAT |
 | **Vector Data** | GeoJSON, DXF, DWG, SHP, SHZ, FGB, TopoJSON, KML, KMZ, GPKG |
 | **Other** | Markdown, and generic files (PDF, etc.) |
@@ -81,8 +81,8 @@ Traditional cloud storage like Google Drive or Dropbox doesn't let you interact 
 
 - **Automatic Metadata Extraction**: EXIF, sensor data, GPS coordinates
 - **Spatial Indexing**: SQLite with SpatiaLite extensions
-- **On-Demand Processing**: Dynamic tiling, thumbnails, EPT generation
-- **3D Streaming**: Nexus format for efficient mesh streaming
+- **On-Demand Processing**: Dynamic tiling, thumbnails, COPC generation
+- **3D Streaming**: Nexus format and OGC 3D Tiles for efficient mesh streaming
 - **STAC Compliance**: Standard catalog format for interoperability
 - **Public & Private Datasets**: Flexible visibility controls
 
@@ -101,6 +101,7 @@ DroneDB automatically classifies files into the following types based on their c
 | **GeoRaster** | Georeferenced rasters (orthophotos, DEMs, multispectral) |
 | **PointCloud** | Point cloud files (LAS, LAZ, E57, PTS, XYZ, non-mesh PLY) |
 | **Model** | 3D models (OBJ, GLTF, GLB, mesh PLY) |
+| **Tiles3D** | OGC 3D Tiles archives (.3tz) and generated 3D Tiles tilesets |
 | **GaussianSplat** | Gaussian Splat files (PLY splat, SPZ, SPLAT, KSPLAT) |
 | **Vector** | Vector data (GeoJSON, SHP, KML, DXF, GPKG, etc.) |
 | **Markdown** | Documentation files (.md) |

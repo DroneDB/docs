@@ -64,7 +64,7 @@ Authorization: Bearer <token>
 | PUT | `/orgs/{orgSlug}/ds/{dsSlug}` | Update dataset |
 | DELETE | `/orgs/{orgSlug}/ds/{dsSlug}` | Delete dataset |
 | POST | `/orgs/{orgSlug}/ds/{dsSlug}/rename` | Rename dataset |
-| POST | `/orgs/{orgSlug}/ds/{dsSlug}/chattr` | Change attributes (visibility) |
+| POST | `/orgs/{orgSlug}/ds/{dsSlug}/meta/visibility/set` | Set dataset visibility (`0`=private, `1`=public) |
 
 ## Objects
 
@@ -102,7 +102,7 @@ Authorization: Bearer <token>
 |--------|----------|-------------|
 | GET | `.../thumb?path=` | Generate thumbnail |
 | GET | `.../tiles/{tz}/{tx}/{ty}.png` | Generate map tile |
-| GET | `.../build/{hash}/*` | Get build files (COG, NXS, EPT) |
+| GET | `.../build/{hash}/*` | Get build files (COG, COPC, NXS, MVT, 3D Tiles, RAD) |
 
 ### Build Jobs
 

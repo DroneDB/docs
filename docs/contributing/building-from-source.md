@@ -15,6 +15,7 @@ DroneDB uses **vcpkg** for dependency management and **CMake** for building.
 | CMake | 3.21+ |
 | Python | 3.x |
 | Git | any recent version |
+| Rust toolchain (`cargo`) | any recent stable version (required for Gaussian Splat LOD) |
 | Visual Studio (Windows only) | 2019+ with "Desktop development with C++" workload |
 
 ## Windows
@@ -59,6 +60,8 @@ cd DroneDB
 | `build/ddb.dll` | Core library |
 | `build/ddbtest.exe` | Test suite |
 | `build/untwine.exe` | COPC accelerator *(optional, see below)* |
+| `build/build-lod.exe` | Gaussian Splat LOD producer *(optional, see below)* |
+| `build/Obj2Tiles.exe` | OGC 3D Tiles generator *(optional, see below)* |
 
 ---
 
@@ -96,6 +99,8 @@ Accepted values follow CMake conventions: `Release`, `Debug`, `RelWithDebInfo`, 
 | `build/libddb.so` | Core library |
 | `build/ddbtest` | Test suite |
 | `build/untwine` | COPC accelerator *(optional, see below)* |
+| `build/build-lod` | Gaussian Splat LOD producer *(optional, see below)* |
+| `build/Obj2Tiles` | OGC 3D Tiles generator *(optional, see below)* |
 
 ---
 
@@ -127,6 +132,45 @@ Both executables share vcpkg-managed shared libraries (pdalcpp, gdal, proj, …)
 The build scripts enforce this automatically: `full-build-win.ps1` passes `-BuildType` to both CMake invocations, and `full-build-linux.sh` passes the same first argument to both.
 
 A Untwine build failure is **non-blocking**: the scripts print a warning and DroneDB continues to work using the PDAL fallback.
+
+---
+
+## Gaussian Splat LOD producer (`build-lod`, optional)
+
+If the `vendor/spark` git submodule is initialised, the build script automatically compiles Spark's `build-lod` Rust CLI and places the binary next to `ddbcmd`. This binary is required for Gaussian Splat LOD streaming.
+
+> **Prerequisite:** A Rust toolchain (`cargo`) must be installed. Download it from [rustup.rs](https://rustup.rs).
+
+```bash
+# Initialise the submodule
+git submodule update --init vendor/spark
+
+# Then run the build script as usual
+.\full-build-win.ps1               # Windows
+./full-build-linux.sh              # Linux
+```
+
+If `build-lod` is missing, DroneDB can still serve Gaussian Splats but without LOD streaming (plain `model.spz`).
+
+---
+
+## Obj2Tiles OGC 3D Tiles generator (optional)
+
+[Obj2Tiles](https://github.com/OpenDroneMap/Obj2Tiles) generates OGC 3D Tiles (`tileset.json` + `b3dm`) from OBJ/glTF/GLB models. DroneDB invokes it via the `ddb 3dtiles` command and co-produces 3D Tiles automatically when building `Model` entries.
+
+The DroneDB build scripts attempt to download a precompiled Obj2Tiles binary automatically. You can also download it manually and place it next to `ddbcmd`:
+
+```powershell
+# Windows
+.\scripts\download-obj2tiles.ps1 -TargetDir build
+```
+
+```bash
+# Linux
+./scripts/download-obj2tiles.sh build
+```
+
+If Obj2Tiles is unavailable, 3D Tiles generation is skipped as a best-effort artifact; Nexus output and other builds still complete normally.
 
 ---
 

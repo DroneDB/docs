@@ -47,6 +47,7 @@ sidebar_label: CLI Overview
 | `ddb cog` | Build a Cloud Optimized GeoTIFF |
 | `ddb copc` | Build a Cloud Optimized Point Cloud |
 | `ddb nxs` | Generate Nexus files from OBJ 3D models |
+| `ddb 3dtiles` | Generate OGC 3D Tiles (tileset.json + b3dm) from OBJ/glTF/GLB |
 | `ddb gsplat` | Convert Gaussian Splat to compressed SPZ + RAD LOD |
 | `ddb stac` | Generate STAC catalogs |
 | `ddb contour` | Generate contour lines from DEMs |

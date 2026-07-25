@@ -325,6 +325,59 @@ Re-processes all indexed entries to refresh metadata (EXIF, geospatial propertie
 
 Both parameters are optional. Omit `types` to rescan all entry types.
 
+---
+
+### `import-file`
+
+Downloads a single file from an `http`/`https` URL into the dataset. The file is streamed through an SSRF-hardened, budget-guarded downloader, then indexed with `AddRaw` and enqueued for derivative builds when applicable.
+
+| Field | Value |
+|-------|-------|
+| Required access | Write |
+| Produces artifact | No |
+
+**Parameters:**
+```json
+{
+  "url": "https://example.com/data/orthophoto.tif",
+  "fileName": "orthophoto.tif",
+  "folder": "imports",
+  "overwrite": false,
+  "username": null,
+  "password": null,
+  "sizeBytes": null
+}
+```
+
+`url` and `fileName` are required. `password` must be an encrypted credential if provided.
+
+---
+
+### `import-dataset`
+
+Populates a freshly created (empty) dataset from a remote source. Supported source types depend on server configuration; commonly `registry` (another Registry instance) and `archive-url`.
+
+| Field | Value |
+|-------|-------|
+| Required access | Write |
+| Produces artifact | No |
+
+**Parameters:**
+```json
+{
+  "sourceType": "registry",
+  "budgetBytes": null,
+  "params": {
+    "sourceUrl": "https://source-registry.example.com",
+    "orgSlug": "source-org",
+    "dsSlug": "source-dataset",
+    "token": "auth-token"
+  }
+}
+```
+
+`sourceType` and `params` are required. The contents of `params` are source-specific.
+
 ## Admin Dashboard
 
 Administrators can view tasks across all users and datasets:

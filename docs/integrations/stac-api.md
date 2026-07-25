@@ -11,8 +11,14 @@ Registry implements the [STAC specification](https://stacspec.org/) for standard
 
 | Endpoint | Description |
 |----------|-------------|
-| `/stac` | Root catalog with links to all public datasets |
-| `/orgs/{org}/ds/{ds}/stac` | STAC Collection for a specific dataset |
+| `/stac` | STAC API landing page (root catalog) with conformance classes and links |
+| `/stac/conformance` | Conformance declaration listing supported STAC API conformance classes |
+| `/stac/collections` | List all STAC collections the current user can access |
+| `/stac/collections/{orgSlug}/{dsSlug}` | STAC Collection for a specific dataset |
+| `/stac/collections/{orgSlug}/{dsSlug}/items` | STAC ItemCollection for a dataset, with optional `bbox`, `datetime`, `limit`, and `offset` filters |
+| `/stac/collections/{orgSlug}/{dsSlug}/items/{featureId}` | Single STAC item (feature) from a dataset |
+| `/stac/search` | Cross-collection item search (`GET` and `POST`) with `bbox`, `datetime`, `collections`, `ids`, and `intersects` filters |
+| `/orgs/{orgSlug}/ds/{dsSlug}/stac` | Dataset collection shortcut (same collection object as `/stac/collections/{org}/{ds}`) |
 
 ## Browsing
 

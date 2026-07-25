@@ -75,7 +75,7 @@ ddb stac
 ddb stac -p orthophoto.tif
 ```
 
-### Building 3D Model Tiles (Nexus)
+### Building 3D Model Tiles
 
 Generate Nexus files for efficient web streaming of 3D meshes:
 
@@ -84,6 +84,18 @@ ddb nxs model.obj output.nxz
 ```
 
 Supported input formats: OBJ, GLTF, GLB.
+
+Generate OGC 3D Tiles (`tileset.json` + `b3dm`) for the unified 3D viewer (requires the optional Obj2Tiles binary):
+
+```bash
+ddb 3dtiles model.obj ./3dtiles
+
+# Force a local (non-georeferenced) tileset
+ddb 3dtiles model.obj ./3dtiles --local
+
+# Explicit WGS84 origin
+ddb 3dtiles model.obj ./3dtiles --lat 43.7 --lon 10.4 --alt 50
+```
 
 ### Generating Thumbnails
 
@@ -124,7 +136,7 @@ DroneDB reads the following environment variables at runtime. Variables marked *
 | `DDB_HOME` | Override the DDB home directory (default: `~/.ddb`). Stores credentials and user profile. |
 | `DDB_DATA` | Override the DDB data directory used for bundled data files (timezone database, etc.). |
 
-### Point Cloud (COPC/EPT)
+### Point Cloud (COPC)
 
 | Variable | Description |
 |----------|-------------|
@@ -141,6 +153,12 @@ These variables control `ddb build` and `ddb cog` for GeoRaster entries. They ar
 | `DDB_COG_JPEG_QUALITY` | `75` | JPEG quality (1–100) for COG compression. Applied only to 8-bit RGB or RGBA rasters. LZW is used for all other cases. |
 | `DDB_WARP_MEMORY_MB` | `512` | GDALWarp memory buffer size in MB (`-wm` flag). Larger values reduce chunking overhead when multi-threading is active. |
 | `DDB_COG_CACHE_MB` | `1024` | GDAL block cache size in MB during COG build. Raised temporarily before the warp and restored afterwards. |
+
+### Gaussian Splats
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DDB_GSPLAT_SH_BITS` | SPZ defaults | Override spherical-harmonics bit depth for SPZ packing. One value (`5`) sets `sh1Bits`; two comma-separated values (`5,4`) set `sh1Bits` and `shRestBits`. Each value must be between `1` and `8`. |
 
 ## Commands Reference
 

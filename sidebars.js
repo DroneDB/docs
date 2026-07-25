@@ -65,6 +65,7 @@ const sidebars = {
         'features/terrain-analytics',
         'features/raster-alignment',
         'features/georaster-processing',
+        'features/3d-tiles',
         'features/gaussian-splat',
         'features/vector-processing',
         'features/archive-extraction',

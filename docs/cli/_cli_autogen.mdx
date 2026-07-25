@@ -50,24 +50,6 @@ Usage:
 
 ```
 
-### chattr
-
-```
-Manage database attributes
-
-Attributes:
-	public	mark database as publicly accessible
-
-
-Usage:
-  ddb chattr [+-attribute] [args]
-
-  -w, --working-dir arg  Working directory (default: .)
-  -h, --help             Print help
-      --debug            Show debug output
-
-```
-
 ### clone
 
 ```
@@ -616,6 +598,41 @@ Usage:
                     auto)
   -s, --size arg    Tile size (default: 256)
       --tms         Generate TMS tiles instead of XYZ
+  -h, --help        Print help
+      --debug       Show debug output
+
+```
+
+### 3dtiles
+
+```
+Generate OGC 3D Tiles (tileset.json + b3dm) from OBJs using Obj2Tiles.
+
+Usage:
+  ddb 3dtiles model.obj [output_dir]
+
+  -i, --input arg    Model to process (OBJ/GLTF/GLB)
+  -o, --output arg   Output 3D Tiles directory (defaults to a 3dtiles/ folder next to the input)
+      --lat arg      Latitude of the model origin (WGS84). With --lon, forces a georeferenced tileset
+      --lon arg      Longitude of the model origin (WGS84). With --lat, forces a georeferenced tileset
+      --alt arg      Altitude of the model origin in meters (used with --lat/--lon) (default: 0)
+      --local        Force a non-georeferenced (local) tileset, skipping sidecar auto-detection (default: false)
+      --overwrite    Overwrite the output directory if it exists (default: false)
+  -h, --help         Print help
+      --debug        Show debug output
+
+```
+
+### gsplat
+
+```
+Convert a Gaussian Splat (.ply/.splat/.spz) to the compressed .spz format.
+
+Usage:
+  ddb gsplat input.{ply|splat|spz} [output.spz]
+
+  -i, --input arg   Gaussian Splat file to convert (.ply, .splat or .spz)
+  -o, --output arg  Output .spz file
   -h, --help        Print help
       --debug       Show debug output
 

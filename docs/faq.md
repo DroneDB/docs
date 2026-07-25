@@ -14,8 +14,8 @@ DroneDB supports a wide range of geospatial file formats:
 | **Images** | JPG, JPEG, DNG, TIF, TIFF, PNG, GIF, WEBP |
 | **Videos** | MP4, MOV, WEBM, M4V, AVI, MKV |
 | **Point Clouds** | LAS, LAZ, E57, PTS, XYZ, PLY* |
-| **3D Models** | OBJ, GLTF, GLB, PLY* |
-| **Gaussian Splats** | PLY*, SPLAT, SPZ |
+| **3D Models** | OBJ, GLTF, GLB, PLY*, OGC 3D Tiles (.3tz) |
+| **Gaussian Splats** | PLY*, SPLAT, SPZ, KSPLAT |
 | **Vector Data** | GeoJSON, DXF, DWG, SHP, SHZ, FGB, TopoJSON, KML, KMZ, GPKG |
 | **Rasters** | GeoTIFF (orthophotos, DEMs) |
 | **Other** | Markdown (README.md), PDF |
@@ -54,7 +54,12 @@ You can change dataset visibility in several ways:
 
 **Via CLI:**
 ```bash
-ddb chattr +public
+ddb meta set visibility 1
+```
+
+To make it private again:
+```bash
+ddb meta set visibility 0
 ```
 
 ### Can I self-host Registry?
