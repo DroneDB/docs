@@ -44,6 +44,27 @@ ddb 3dtiles model.obj ./3dtiles --lat 43.7 --lon 10.4 --alt 50
 
 By default, `ddb 3dtiles` auto-detects georeferencing from sidecar files next to the input model (following the ODM/Obj2Tiles convention). You can override this with `--lat`/`--lon`/`--alt`, or force a local/engineering coordinate system with `--local`.
 
+### Adaptive Tile Hierarchy
+
+DroneDB uses a **face-count-driven heuristic** to select the right tile hierarchy depth for each model, rather than a single one-size-fits-all tile configuration. Small models (&lt;10K faces) produce a single tile at the finest level of detail, avoiding unnecessary build time. Large models get progressively deeper splits. The hierarchy depth is hard-capped at **6** (≤ 4096 finest-LOD tiles) so that no model, regardless of size, can produce an unbounded number of `.b3dm` files.
+
+| Model Size | Faces | Tile Hierarchy Depth | Max Tiles (finest LOD) |
+|------------|-------|---------------------|------------------------|
+| Tiny | < 10K | 0 | 1 |
+| Small | 10K–50K | 1 | 4 |
+| Medium | 50K–200K | 2 | 16 |
+| Large | 200K–750K | 4 | 256 |
+| XL | 750K–3M | 5 | 1024 |
+| XXL | 3M–12M | 5 | 1024 |
+| Massive | > 12M | 6 (capped) | 4096 |
+
+In debug/testing scenarios, you can skip the heuristic and force the default parameters:
+
+```bash
+# Skip adaptive sizing; use defaults (divisions=3, lods=3, octree=true)
+ddb 3dtiles model.obj ./3dtiles --force-defaults
+```
+
 ## Ingesting a `.3tz` archive
 
 Add a `.3tz` file to a DroneDB index like any other file:
