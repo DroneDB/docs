@@ -168,6 +168,79 @@ POST /orgs/{orgSlug}/ds/{dsSlug}/tasks/clear?toolId=
 
 Permanently removes all terminal (`Succeeded`/`Failed`/`Deleted`) tasks for the dataset from the history and purges their artifacts. The optional `toolId` query parameter limits clearing to a specific tool.
 
+## Feature Gating
+
+Administrators can restrict which heavy tools are available, to whom, and on which organizations, without touching code or redeploying tool assemblies. Gating is purely configuration-driven and layers on top of the existing per-tool `RequiredAccess` (Read/Write) check - it never widens access, only narrows it.
+
+### Configuration
+
+Gating rules are bound from `AppSettings:ProcessingPlatform:Tools`, a dictionary keyed by tool id (e.g. `build`, `photogrammetry`, `bulk-download`). Tools not listed use the defaults below (fully enabled, unrestricted):
+
+| Setting | Type | Default | Description |
+|---------|------|---------|--------------|
+| `Availability` | `Enabled` \| `Disabled` \| `Hidden` | `Enabled` | Global switch for the tool. |
+| `DisabledMessage` | string | `null` | Tooltip shown in the UI and returned in the `403` body when the tool is blocked. Ignored when `Hidden`. |
+| `AllowedRoles` | string[] | `[]` (empty = all) | Allowlist of roles permitted to use the tool. The special value `"admin"` maps to the system administrator role; any other value is checked via the normal role membership. |
+| `AllowedOrgs` | string[] | `[]` (empty = all) | Allowlist of organization slugs permitted to use the tool. |
+| `HideWhenNotAllowed` | bool | `true` | When a caller fails the role or org allowlist: `true` hides the tool entirely, `false` shows it disabled with `DisabledMessage`. |
+| `MaxConcurrentPerUser` | int | `0` (inherit) | Per-tool override of the global `MaxConcurrentTasksPerUser`. `0` means "use the global limit". |
+| `MaxQueuedPerUser` | int | `0` (inherit) | Per-tool override of the global `MaxQueuedTasksPerUser`. `0` means "use the global limit". |
+
+### Availability states
+
+- **Enabled** - fully available (still subject to the role/org allowlists below).
+- **Disabled** - shown in the UI greyed out with `DisabledMessage` as a tooltip; submitting is rejected with `403`.
+- **Hidden** - not shown in the UI at all; submitting is rejected with `403`.
+
+### Evaluation order
+
+For each request, the effective state of a tool is computed in this order (first match wins):
+
+1. `Availability: Hidden` -> tool is hidden.
+2. `Availability: Disabled` -> tool is disabled with `DisabledMessage`.
+3. `AllowedRoles` is non-empty and the caller has none of the listed roles -> denied by allowlist.
+4. `AllowedOrgs` is non-empty, an organization context is available, and it isn't in the list -> denied by allowlist.
+5. Otherwise -> tool is fully enabled.
+
+A denial by allowlist (steps 3-4) becomes **Hidden** or **Disabled** depending on `HideWhenNotAllowed`. The organization allowlist (step 4) is only evaluated in an org-scoped context (see below); the global features endpoint has no organization to check against and skips it.
+
+### Example configuration
+
+```json
+{
+  "AppSettings": {
+    "ProcessingPlatform": {
+      "Tools": {
+        "photogrammetry": {
+          "Availability": "Disabled",
+          "DisabledMessage": "Photogrammetry processing is temporarily disabled for maintenance."
+        },
+        "import-dataset": {
+          "Availability": "Enabled",
+          "AllowedRoles": ["admin"],
+          "HideWhenNotAllowed": true
+        },
+        "bulk-download": {
+          "AllowedOrgs": ["default", "trusted-partner"],
+          "HideWhenNotAllowed": false,
+          "DisabledMessage": "Bulk download is limited to approved organizations."
+        }
+      }
+    }
+  }
+}
+```
+
+### Where gating is surfaced
+
+| Endpoint | Organization context | Effect |
+|----------|----------------------|--------|
+| `GET /sys/features` | None (global) | `taskTools[]` includes `hidden`, `disabled`, `disabledMessage` per tool, computed without the org allowlist. |
+| `GET /orgs/{orgSlug}/ds/{dsSlug}/tasks/tools` | Yes | Same three fields, now also evaluating the org allowlist for `orgSlug`. |
+| `POST /orgs/{orgSlug}/ds/{dsSlug}/tasks` | Yes | Server-side enforcement: a `Hidden` or `Disabled` tool is rejected with `403` and `DisabledMessage` (or a default message), regardless of what the client sends. |
+
+The UI reads `hidden`/`disabled`/`disabledMessage` to hide the tool or grey it out with a tooltip, but the `403` enforcement at submit time is authoritative - gating cannot be bypassed by calling the API directly.
+
 ## Available Tools
 
 ### `build`
