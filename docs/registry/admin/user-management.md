@@ -642,7 +642,7 @@ Response:
 | `GET` | `/users` | List all users | Admin |
 | `GET` | `/users/detailed` | List users with details | Admin |
 | `PUT` | `/users/{userName}` | Update user | Admin |
-| `DELETE` | `/users/{userName}` | Delete user | Admin |
+| `DELETE` | `/users` | Delete user | Admin |
 | `POST` | `/users/changepwd` | Change own password | Yes |
 | `PUT` | `/users/{userName}/changepwd` | Change user password | Admin |
 | `GET` | `/users/roles` | List all roles | Yes |
@@ -656,6 +656,26 @@ Response:
 | `GET` | `/users/{userName}/orgs` | Get user organizations | Admin |
 | `PUT` | `/users/{userName}/orgs` | Set user organizations | Admin |
 | `GET` | `/users/management-enabled` | Check if management enabled | No |
+
+#### Deleting a user
+
+`DELETE /users` takes the target in a **form-encoded body**, not in the URL path:
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `UserName` | Yes | Username of the account to delete |
+| `Successor` | No | Username receiving the organizations, datasets and batches. When omitted, all of the user's data is deleted |
+| `ConflictResolution` | No | How to resolve dataset name clashes in the successor's organizations: `0` halt, `1` overwrite, `2` rename (default) |
+
+```bash
+curl -X DELETE "https://hub.dronedb.app/users" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d "UserName=jdoe" \
+  -d "Successor=archive" \
+  -d "ConflictResolution=2"
+```
+
+The response reports how many organizations, datasets and batches were transferred or deleted.
 
 ### Organizations Endpoints
 

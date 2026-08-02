@@ -198,7 +198,7 @@ The Push API enables syncing local datasets to Registry via the DroneDB CLI (`dd
 | GET | `/users/detailed` | List users with extended info |
 | POST | `/users` | Create user |
 | PUT | `/users/{userName}` | Update user |
-| DELETE | `/users/{userName}` | Delete user |
+| DELETE | `/users` | Delete user (form body: `UserName`, optional `Successor`, `ConflictResolution`) |
 
 ### Password Management
 
