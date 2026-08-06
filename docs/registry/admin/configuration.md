@@ -731,6 +731,16 @@ Number of days to retain Hangfire job records. Jobs older than this value are au
 The default value is `2`
 :::
 
+### HangfireInvisibilityTimeoutHours
+
+MySQL storage only: the number of hours a running job is considered "active" before the storage backend treats it as abandoned and makes it eligible for re-dequeuing by another worker. The default is `4` hours.
+
+Raise this value if your builds can take longer than the configured timeout (e.g. large point clouds, large meshes, big orthophoto generation). If a job exceeds the timeout it may be picked up a second time by another worker, leading to collisions with DroneDB's native build lock.
+
+:::info
+This setting has no effect when `HangfireProvider` is `InMemory`.
+:::
+
 ## Import
 
 Configuration for the dataset import feature (pulling data from remote sources). Bound from `AppSettings:Import`. When omitted, all sub-fields use their built-in defaults.
