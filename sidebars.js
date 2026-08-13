@@ -41,6 +41,7 @@ const sidebars = {
         'registry/getting-started',
         'registry/datasets',
         'registry/import-export',
+        'registry/data-export-and-deletion',
         {
           type: 'category',
           label: 'Administration',
