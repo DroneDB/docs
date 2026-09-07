@@ -102,7 +102,7 @@ docker build . -t dronedb/registry
 
 ## Running from source
 
-Registry is written in C# on .NET 10 and runs natively on Linux, Windows, and macOS.
+Registry is written in C# on .NET 10. It is officially shipped and tested for **Linux and Windows** (the Docker image builds on Ubuntu): while the .NET layer itself also runs on macOS, the native DroneDB library (`libddb`) it loads via P/Invoke is only published for Windows and Linux, so macOS builds are unsupported.
 To install the latest .NET SDK see the [official download page](https://dotnet.microsoft.com/en-us/download/dotnet/10.0). Before building registry ensure you have `ddblib` in your path, if not, download the [latest release](https://github.com/DroneDB/DroneDB/releases) and add it to `PATH`.
 
 Clone the repository:

@@ -24,7 +24,7 @@ ddb contour dem.tif -o contours.geojson
 | `-b, --base` | Base offset for the first contour level |
 | `--min` | Ignore values below this threshold |
 | `--max` | Ignore values above this threshold |
-| `-t, --tolerance` | Douglas-Peucker simplification tolerance (0 = disabled) |
+| `-s, --simplify` | Geometry simplification tolerance in raster CRS units (0 = disabled) |
 | `--band` | Band index (1-based, default: 1) |
 | `-o, --output` | Output GeoJSON path |
 
@@ -32,7 +32,7 @@ ddb contour dem.tif -o contours.geojson
 
 ```bash
 # Contours every 10 m, simplified to 1 m
-ddb contour dem.tif -o contours.geojson -i 10 -t 1
+ddb contour dem.tif -o contours.geojson -i 10 -s 1
 
 # 20 evenly spaced levels
 ddb contour dem.tif -o contours.geojson -n 20
