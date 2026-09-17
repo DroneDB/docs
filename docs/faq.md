@@ -66,9 +66,9 @@ ddb meta set visibility 0
 
 Yes! Registry is open source and can be self-hosted using Docker or natively. See the [Registry documentation](/docs/registry) for detailed instructions.
 
-### What happened to DroneDB Desktop?
+### What is the status of DroneDB Desktop?
 
-DroneDB Desktop (the standalone Windows application) has been deprecated. All functionality has been moved to the web-based [Registry/Hub](https://hub.dronedb.app) platform, which provides a richer feature set and works on any operating system with a browser.
+DroneDB Desktop (the standalone Windows application) serves a niche offline user base and is still available as a one-time purchase on the [plans page](https://dronedb.app/plans). It is now in **maintenance mode**: no further developments are planned. For active development we recommend the web-based [Registry/Hub](https://hub.dronedb.app) platform, which provides a richer feature set and works on any operating system with a browser.
 
 ### What databases does Registry support?
 

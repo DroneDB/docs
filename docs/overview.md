@@ -25,8 +25,8 @@ DroneDB consists of two main components:
 | **DroneDB Core** | C++ library providing geospatial data management, indexing, and processing |
 | **DroneDB Registry** | Web-based platform for hosting, managing and sharing datasets |
 
-:::warning Desktop Application Deprecated
-DroneDB Desktop (the standalone Windows application) has been deprecated and is being phased out. All functionality has been moved to the web-based [Registry/Hub](https://hub.dronedb.app) platform. We recommend using Registry for all data inspection and sharing workflows.
+:::info Desktop Application Maintenance Mode
+DroneDB Desktop (the standalone Windows application) serves a niche offline user base and is still available as a one-time purchase on the [plans page](https://dronedb.app/plans). It is now in **maintenance mode**: no further developments are planned. For data inspection and sharing workflows we recommend using [Registry/Hub](https://hub.dronedb.app).
 
 **Existing Desktop license holders**: if you purchased a DroneDB Desktop license, you are entitled to **3 months free** of the **Professional plan** on [DroneDB Hub](https://hub.dronedb.app). Contact us at [support@dronedb.app](mailto:support@dronedb.app) to activate your offer.
 :::

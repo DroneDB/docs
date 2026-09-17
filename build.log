@@ -1,0 +1,33 @@
+2026-09-17 11:17:56.915 DEBUG [884897] [initializeGDALandPROJ@292] Initializing GDAL and PROJ libraries
+2026-09-17 11:17:56.917 DEBUG [884897] [initializeGDALandPROJ@306] GDAL and PROJ initialization completed
+2026-09-17 11:17:56.917 DEBUG [884897] [initializeGDALandPROJ@312] PROJ is working and available for coordinate transformations
+2026-09-17 11:17:56.917 DEBUG [884897] [setupSignalHandlers@208] Setting up signal handlers
+2026-09-17 11:17:56.917 DEBUG [884897] [setupSignalHandlers@251] Unix signal handlers installed
+2026-09-17 11:17:56.917 DEBUG [884897] [setupSignalHandlers@259] Cross-platform crash handlers installed
+2026-09-17 11:17:56.917 DEBUG [884897] [DDBRegisterProcess@332] Registered FLIR XMP namespace
+2026-09-17 11:17:56.917 VERB  [884897] [ddb::utils::printVersions@278] DDB v1.11.5 (git commit 9022794)
+2026-09-17 11:17:56.917 DEBUG [884897] [ddb::utils::printVersions@279] Build info: Release build (GCC 15.2) compiled Sep  8 2026 19:13:12
+2026-09-17 11:17:56.917 VERB  [884897] [ddb::utils::printVersions@281] SQLite: 3.53.1
+2026-09-17 11:17:56.917 VERB  [884897] [ddb::utils::printVersions@282] SpatiaLite: 5.1.0
+2026-09-17 11:17:56.917 VERB  [884897] [ddb::utils::printVersions@283] GDAL: 3.12.4
+2026-09-17 11:17:56.917 VERB  [884897] [ddb::utils::printVersions@284] CURL: libcurl/8.20.0 OpenSSL/3.6.2 zlib/1.3.2
+2026-09-17 11:17:56.917 VERB  [884897] [ddb::utils::printVersions@285] PDAL: 2.10.1
+2026-09-17 11:17:56.917 VERB  [884897] [ddb::utils::printVersions@288] PROJ: Rel. 9.8.1, April 10th, 2026 (search path: /home/hedo/.local/share/proj:/mnt/data/repos/DroneDB/build)
+2026-09-17 11:17:56.917 VERB  [884897] [ddb::utils::printVersions@290] PROJ_LIB = (null)
+2026-09-17 11:17:56.917 VERB  [884897] [ddb::utils::printVersions@291] GDAL_DATA = (null)
+2026-09-17 11:17:56.917 VERB  [884897] [ddb::utils::printVersions@292] PROJ_DATA = /mnt/data/repos/DroneDB/build
+2026-09-17 11:17:56.917 DEBUG [884897] [ddb::utils::printVersions@294] Current locale (LC_ALL): LC_CTYPE=en_US.UTF-8;LC_NUMERIC=C;LC_TIME=C;LC_COLLATE=C;LC_MONETARY=C;LC_MESSAGES=C;LC_PAPER=C;LC_NAME=C;LC_ADDRESS=C;LC_TELEPHONE=C;LC_MEASUREMENT=C;LC_IDENTIFICATION=C
+2026-09-17 11:17:56.917 DEBUG [884897] [ddb::utils::printVersions@295] Current locale (LC_CTYPE): en_US.UTF-8
+2026-09-17 11:17:56.917 DEBUG [884897] [ddb::utils::printVersions@296] LC_ALL env var: C
+2026-09-17 11:17:56.917 DEBUG [884897] [ddb::open@63] /mnt/data/repos/DroneDB-Roadmap/LocalTestData/cbv-test/.ddb/dbase.sqlite exists
+2026-09-17 11:17:56.917 DEBUG [884897] [ddb::SqliteDatabase::open@22] Opening connection to /mnt/data/repos/DroneDB-Roadmap/LocalTestData/cbv-test/.ddb/dbase.sqlite
+2026-09-17 11:17:56.921 DEBUG [884897] [ddb::Database::ensureSchemaConsistency@120] Ensuring schema consistency
+2026-09-17 11:17:56.921 DEBUG [884897] [ddb::Database::ensureSchemaConsistency@123] Database schema version: 1
+2026-09-17 11:17:56.921 DEBUG [884897] [ddb::Database::ensureSchemaConsistency@136] Database schema is up to date
+2026-09-17 11:17:56.921 DEBUG [884897] [ddb::build@417] In build('model3d/Maillage_texturé_2.obj','.ddb/build')
+2026-09-17 11:17:56.925 DEBUG [884897] [ddb::buildInternal@204] Building entry model3d/Maillage_texturé_2.obj type 11
+2026-09-17 11:17:56.926 DEBUG [884897] [ddb::buildInternal@243] Acquiring inter-process build lock for: .ddb/build/0a59fa2a1a05bb7d3b650140e61a913dec68dad38d073b6fe46e748cc950f2c5/nxs
+2026-09-17 11:17:56.926 DEBUG [884897] [ddb::BuildLock::acquireLock@254] Attempting to acquire build lock: .ddb/build/0a59fa2a1a05bb7d3b650140e61a913dec68dad38d073b6fe46e748cc950f2c5/nxs.building
+2026-09-17 11:17:56.926 DEBUG [884897] [ddb::BuildLock::acquireLock@372] Build lock acquired successfully: .ddb/build/0a59fa2a1a05bb7d3b650140e61a913dec68dad38d073b6fe46e748cc950f2c5/nxs.building
+2026-09-17 11:17:57.119 DEBUG [884897] [ddb::{anonymous}::performNexusBuild@291] Building nexus file .ddb/build/0a59fa2a1a05bb7d3b650140e61a913dec68dad38d073b6fe46e748cc950f2c5/nxs-temp-uSJ9zqBqgZiEee09/model.nxz from /mnt/data/repos/DroneDB-Roadmap/LocalTestData/cbv-test/model3d/Maillage_texturé_2.obj
+2026-09-17 11:17:57.122 DEBUG [884897] [ddb::obj2tiles::findObj2TilesBinary@224] Obj2Tiles binary discovered via DDB_OBJ2TILES_PATH at /mnt/data/repos/DroneDB/build/Obj2Tiles
