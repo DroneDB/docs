@@ -62,7 +62,7 @@ docker run -it --rm -p 5000:5000 -v ${PWD}/registry-data:/data dronedb/registry
 
 Open [http://localhost:5000](http://localhost:5000) in your browser.
 
-**Default credentials**: `admin` / `password`
+**Default credentials**: `admin` / `password123`
 
 :::warning
 Change the default password immediately after first login at [http://localhost:5000/account](http://localhost:5000/account)

@@ -16,7 +16,7 @@ docker run -it --rm -p 5000:5000 -v ${PWD}/registry-data:/data dronedb/registry
 Data will be stored in the local folder `registry-data`.
 Open [http://localhost:5000](http://localhost:5000) in your browser to start using the application.
 
-**Default credentials**: `admin` / `password`
+**Default credentials**: `admin` / `password123`
 
 :::warning
 Change the default password immediately after first login at [http://localhost:5000/account](http://localhost:5000/account)

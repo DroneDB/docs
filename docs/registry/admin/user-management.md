@@ -72,7 +72,7 @@ When Registry starts for the first time, a default administrator account is crea
 | Field | Default Value |
 |-------|---------------|
 | Username | `admin` |
-| Password | `password` |
+| Password | `password123` |
 | Email | `admin@example.com` |
 
 :::warning Security Notice
@@ -542,7 +542,7 @@ Registry uses JSON Web Tokens (JWT) for authentication.
 ```bash
 curl -X POST http://localhost:5000/users/authenticate \
   -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "username=admin&password=password"
+  -d "username=admin&password=password123"
 ```
 
 Response:
