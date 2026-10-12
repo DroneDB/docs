@@ -160,6 +160,40 @@ culprit is `mod_reqtimeout` (`RequestReadTimeout`) rather than `Timeout` or
 - Add Redis cache for high-traffic instances
 - Check `WorkerThreads` configuration
 
+## Dataset initialization fails on macOS
+
+**Symptoms**
+- Creating a dataset fails with `filesystem error: cannot copy: Permission denied`.
+- The logs repeat `Table 'entries' not found (not a valid database: ...)` every minute
+  for one or more datasets, often `public/default`.
+
+**Cause**
+
+`/data` is a host folder that Docker Desktop shares through virtiofs. DroneDB cannot
+copy its empty index template onto this file system. Each failed attempt leaves a
+`.ddb` folder with an empty `dbase.sqlite` file. Registry then treats the dataset as
+initialized and does not try again.
+
+**Solution**
+
+Run Registry with a named volume for `/data`, as shown in
+[macOS: use a named volume](../getting-started.md#macos-use-a-named-volume).
+
+To keep the settings and users from the old folder, copy them into the volume before
+you start the new container. This command also removes the broken `.ddb` folders, so
+Registry creates the dataset indexes again:
+
+```bash
+docker volume create registry-data
+docker run --rm -v registry-data:/data -v /ABSOLUTE/PATH/TO/OLD/DATA:/old alpine \
+  sh -c 'cp -a /old/. /data/ && rm -rf /data/datasets/*/*/.ddb'
+```
+
+:::caution
+The `rm` command removes the index of every dataset in the volume. Use it only for an
+instance where no dataset was initialized correctly.
+:::
+
 ## Upgrading: Point clouds (EPT → COPC)
 
 Starting with Registry 2.3.0, point cloud streaming uses the **COPC** format

@@ -40,6 +40,18 @@ ddb 3dtiles model.obj ./3dtiles --local
 ddb 3dtiles model.obj ./3dtiles --lat 43.7 --lon 10.4 --alt 50
 ```
 
+### Output and interrupted-build recovery
+
+The public C++ `ddb::obj2tiles::runObj2Tiles` runner requires an absent or empty output directory. It rejects a nonempty destination before launching Obj2Tiles and preserves its existing files. Use a fresh destination for each direct runner call; an exit-0 tool that creates no `tileset.json` still fails.
+
+The CLI and higher-level `buildModel3DTiles` builder stage replacements in a fresh directory before publishing them. This allows intentional rebuilds while preserving the previous published tileset if generation fails.
+
+An interrupted publication can leave `3dtiles-old/` beside `3dtiles/`. Recovery runs under the native tiles lock before a Model build returns for already-complete Nexus output. It restores a backup with a nonempty `tileset.json` when the final tileset is missing or incomplete, and removes a superseded backup only when the final sentinel is complete. A busy lock leaves these directories untouched for a later attempt.
+
+`DDBIsBuildComplete` remains read-only. A Model with complete Nexus output remains complete without optional 3D Tiles. It reports incomplete only for the identifiable interrupted-swap case: a usable backup and a missing or incomplete final tileset. Registry's artifact-completeness sweep can therefore enqueue a normal build that restores the existing tiles without regenerating Nexus.
+
+An optional tiles-generation timeout or tool failure after Nexus succeeds is logged and preserves prior published tiles. It does not create a primary-build retry loop. See [build and retry behavior](/docs/integrations/api-reference#pending-builds-and-retries).
+
 ### Georeferencing
 
 By default, `ddb 3dtiles` auto-detects georeferencing from sidecar files next to the input model (following the ODM/Obj2Tiles convention). You can override this with `--lat`/`--lon`/`--alt`, or force a local/engineering coordinate system with `--local`.

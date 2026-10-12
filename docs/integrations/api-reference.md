@@ -112,6 +112,35 @@ Authorization: Bearer <token>
 | GET | `.../builds` | List build jobs (paginated) |
 | POST | `.../builds/clear` | Clear completed build jobs |
 
+### Pending builds and retries
+
+Missing companion files defer a native build and create or refresh a `.pending` marker. Registry's pending coordinator enqueues an indexed entry job when at least **60 seconds** have elapsed since its last attempt, provided that path has no active build job. The coordinator reports enqueue/skip counts; the pending tool's `Pending build check complete` message also covers fallback and no-op checks.
+
+The native build lock remains authoritative for output ownership. Coordinators for the same organization and dataset use shared coordination in the configured Hangfire storage, acquiring it before reading pending entries and active jobs and holding it through synchronous enqueue and JobIndex publication. Retry scheduling and sweep state updates use the same coordination. Other datasets proceed independently. A failed enqueue or index publication remains an explicit storage failure and can weaken duplicate suppression.
+
+For an entry already pending, the build retains its marker through preflight and the attempt. It refreshes the timestamp by atomic replacement while preserving dependency hints; if a full disk prevents replacement, the original marker remains. Lock contention leaves the original marker untouched.
+
+| Build outcome | Pending marker and retry behavior |
+|---------------|-----------------------------------|
+| Missing companion | Deferred success; marker records dependencies and the latest attempt. |
+| Low-free-space preflight, an identified no-space-on-device write error, or a supervised idle timeout aborting the primary build | Existing marker retained; the entry job remains failed and visible, and Registry may schedule a bounded retry. |
+| Invalid input, a dependency path outside the dataset, missing required tools, or an ordinary unexplained nonzero tool exit | Permanent failure; marker consumed and the failed entry job remains visible without an automatic pending retry. |
+| Successful build or already-complete output | Marker consumed. |
+
+An arbitrary fresh build failure does not create a pending marker. A failed per-entry job triggers the pending retry scheduler only if **that job's path and hash** still match a native pending entry; a different pending entry in the dataset is insufficient. Failures confined to optional Model tiles after Nexus succeeds remain best-effort tiles failures.
+
+Delayed coordinators keep the existing delays of **1, 2, 5, 10, 20, 40, then 60 minutes**, with a maximum of **12 scheduled retries per recovery epoch**. A live coordinator is preserved. After the chain is missing, terminal, or exhausted, the low-frequency sweep may restart one bounded epoch even when the dataset checksum is unchanged. Observed pending status and checksum updates preserve the live retry budget and coordinator ID; controls clear when native pending work disappears. Missing or malformed state and unavailable stamp data permit a bounded recovery check.
+
+Retry controls are stored in the configured Hangfire storage, so separate hosts share one coordinator ID and attempt budget even when each uses a local observation cache. Legacy cached controls are imported once; dataset cache invalidation does not erase the shared retry chain.
+
+For Gaussian Splat builds, `DDB_BUILDLOD_IDLE_TIMEOUT_SECONDS` sets the build-lod idle deadline to an integer from **1 to 86400 seconds**. The default remains **3600 seconds**. Invalid values fail before the runner changes its output files.
+
+### Native build API compatibility
+
+`DDBBuild`, `DDBIsBuildComplete`, and the C/PInvoke build signatures remain unchanged, as do serialized Hangfire wrapper signatures and pending-info JSON keys (`hash`, `path`, `missingDependencies`, `lastAttempt`). Completeness checks remain read-only, with the narrow [interrupted Model tiles-swap exception](/docs/features/3d-tiles#output-and-interrupted-build-recovery).
+
+Direct C++ `ddb::obj2tiles::runObj2Tiles` calls now require an absent or empty destination; intentional replacements use the higher-level builder's staging/swap. `ddb::process::Result` adds `descendantsTerminated`, reported by `describe()` and runner logs when drain-grace cleanup terminates remaining descendants. A successful direct-child exit stays successful; `timedOut` remains an idle-timeout signal. This changes the exported C++ result layout, so rebuild native C++ consumers together with libddb.
+
 ## Tasks (Processing Platform)
 
 **Base Route:** `/orgs/{orgSlug}/ds/{dsSlug}/tasks`

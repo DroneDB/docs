@@ -60,6 +60,16 @@ The fastest way to get started is with Docker:
 docker run -it --rm -p 5000:5000 -v ${PWD}/registry-data:/data dronedb/registry
 ```
 
+:::warning macOS users
+On macOS, do not bind-mount a local folder to `/data`. Use a named volume instead:
+
+```bash
+docker run -it --rm -p 5000:5000 -v registry-data:/data dronedb/registry
+```
+
+See [macOS: use a named volume](../registry/getting-started.md#macos-use-a-named-volume).
+:::
+
 Open [http://localhost:5000](http://localhost:5000) in your browser.
 
 **Default credentials**: `admin` / `password123`

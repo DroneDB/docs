@@ -16,6 +16,11 @@ docker run -it --rm -p 5000:5000 -v ${PWD}/registry-data:/data dronedb/registry
 Data will be stored in the local folder `registry-data`.
 Open [http://localhost:5000](http://localhost:5000) in your browser to start using the application.
 
+:::warning macOS users
+On macOS, do not bind-mount a local folder to `/data`. Use a named volume instead. See
+[macOS: use a named volume](#macos-use-a-named-volume).
+:::
+
 **Default credentials**: `admin` / `password123`
 
 :::warning
@@ -34,6 +39,46 @@ Change the default password immediately after first login at [http://localhost:5
 | [/stac](http://localhost:5000/stac) | STAC Catalog root |
 
 The log file is located in `registry-data/logs/registry.txt`.
+
+### macOS: use a named volume
+
+On macOS, Docker Desktop shares host folders with the container through a virtual
+file system (virtiofs). DroneDB cannot create dataset indexes on this file system. If
+you bind-mount a local folder to `/data`, Registry starts, but it cannot initialize
+datasets. The logs show errors such as:
+
+```text
+filesystem error: cannot copy: Permission denied [/root/.ddb/templates/empty-dbase-<rev>.sqlite] [./datasets/.../.ddb/dbase.sqlite]
+Table 'entries' not found (not a valid database: /data/./datasets/.../.ddb/dbase.sqlite)
+```
+
+Store `/data` in a Docker named volume instead. A named volume is kept inside the Docker
+Desktop Linux VM, so it does not use virtiofs:
+
+```bash
+docker volume create registry-data
+docker run -d --name registry --restart unless-stopped \
+  -p 5000:5000 \
+  -v registry-data:/data \
+  dronedb/registry
+```
+
+To change the port on the host, change only the first number. For example, use
+`-p 5010:5000` to open Registry at `http://localhost:5010`.
+
+With a named volume, the files are not in a folder on your Mac. To read them, use these
+commands:
+
+```bash
+# Follow the application log
+docker logs -f registry
+
+# Copy the whole data folder to the Mac (for backup or inspection)
+docker cp registry:/data ./registry-data-backup
+```
+
+To recover an instance that you started with a local folder, see
+[Dataset initialization fails on macOS](./admin/troubleshooting.md#dataset-initialization-fails-on-macos).
 
 ## Getting Started Natively
 
@@ -155,6 +200,11 @@ then goes to the container writable layer or, with older images that declared
 anonymous volumes are never reclaimed by `docker compose down && up` and accumulate
 stale scratch over time. Current images no longer declare `VOLUME /data` for this
 reason.
+:::
+
+:::warning macOS
+On macOS, back `/data` with a named volume, not a host folder. See
+[macOS: use a named volume](#macos-use-a-named-volume).
 :::
 
 ### Move Docker's data-root to the large partition
