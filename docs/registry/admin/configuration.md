@@ -661,6 +661,14 @@ Cron expression for the job that synchronizes job index states.
 The default value is `*/5 * * * *` (every 5 minutes)
 :::
 
+### RecoverIndexedJobPublicationsCron
+
+Cron expression for the job that completes indexed job publications interrupted before the job became runnable (for example by a restart right after the job was created). Such jobs wait in the `Indexing` state and are published on their original job id; jobs with an unusable publication record are cancelled.
+
+:::info
+The default value is `* * * * *` (every minute)
+:::
+
 ### ProcessPendingBuildsCron
 
 Cron expression for the job that processes pending builds.
