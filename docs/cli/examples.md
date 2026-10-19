@@ -21,6 +21,8 @@ Practical examples of common DroneDB CLI workflows.
 
 Some shells (POSIX shells, PowerShell) expand globs before passing them to `ddb`. Quote the pattern (e.g., `'**/*.JPG'`) if you want `ddb` to handle the expansion.
 
+Commands that look up entries in the index (`ddb search`, `ddb ls`, `ddb rm`) match a path without `*` exactly, including letter case: `ddb rm IMG_0001.JPG` does not remove `img_0001.jpg`. A path with `*` is a pattern, matched without regard to letter case (e.g., `ddb search '*.jpg'` also lists `.JPG` files).
+
 ## Sharing Datasets
 
 Share images to [Hub](https://hub.dronedb.app) or a self-hosted Registry:

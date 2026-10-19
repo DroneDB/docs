@@ -206,6 +206,22 @@ The expiration time for the dataset visibility cache (TimeSpan).
 The default value is `1.00:00:00` (1 day).
 :::
 
+### AuthorizationCacheExpiration
+
+How long Registry reuses what it knows about a user for access checks: whether the
+user exists, has the admin role, or is deactivated (TimeSpan). Without it, every
+request (each map tile, thumbnail and point cloud range request) reads these facts
+from the identity database again.
+
+Role changes, deactivations and user deletions made through Registry take effect
+immediately. The expiration only bounds changes made elsewhere, for example by another
+Registry instance that shares the database or by direct database edits. Set it to
+`00:00:00` to disable the cache.
+
+:::info
+The default value is `00:00:30` (30 seconds).
+:::
+
 ## Upload & Sharing
 
 ### MaxRequestBodySize
