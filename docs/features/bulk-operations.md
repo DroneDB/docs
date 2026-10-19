@@ -37,14 +37,47 @@ Re-process all indexed files to update metadata, geometry, and type classificati
 ddb rescan
 ```
 
+To rescan only some entries, filter by entry type (`-t`), by file extension (`-e`), or both. An entry must match both filters:
+
+```bash
+ddb rescan -t georaster,pointcloud
+ddb rescan -e dwg,dxf
+```
+
+Extensions ignore case and an optional leading dot (`.DWG` is the same as `dwg`). Compound extensions such as `copc.laz` are allowed.
+
 ### In Hub
 
-Use the **Rescan Index** processing task to re-scan the dataset. This clears caches and rebuilds derivative products.
+Use the **Rescan Index** processing task to re-scan the dataset.
 
 | Parameter | Description |
 |-----------|-------------|
 | **Types** | Comma-separated entry types to rescan (omit for all) |
+| **Extensions** | Comma-separated file extensions to rescan (omit for all) |
 | **Stop on error** | Halt processing on the first error (default: off) |
+
+Without a filter, the task clears the caches and rebuilds all derivative products of the dataset. With a type or extension filter, it rebuilds only the entries that it rescanned.
+
+### Across all datasets
+
+Administrators can rescan the matching entries of every dataset with one request, for example to re-read all DWG and DXF drawings after an upgrade that adds support for them:
+
+```bash
+curl -X POST -H "Authorization: Bearer <admin-token>" \
+  -H "Content-Type: application/json" \
+  -d '{"extensions": ["dwg", "dxf"]}' \
+  http://localhost:5000/sys/rescan
+```
+
+| Field | Description |
+|-------|-------------|
+| `types` | Entry types to rescan, e.g. `["vector"]` |
+| `extensions` | File extensions to rescan, e.g. `["dwg", "dxf"]` |
+| `organizationSlug` | Limit the rescan to one organization (optional) |
+| `datasetSlug` | Limit the rescan to one dataset; needs `organizationSlug` (optional) |
+| `stopOnError` | Stop a dataset rescan at its first error (default: `false`) |
+
+At least one of `types` and `extensions` is required. The endpoint returns `202 Accepted` with the id of a background job. That job submits a **rescan-index** task, with the same filters, for each dataset that has matching entries. Each task shows in the tasks of its dataset. The tasks run on the build queue, so the number of build workers limits how many datasets are rescanned at the same time.
 
 ## Cleanup
 

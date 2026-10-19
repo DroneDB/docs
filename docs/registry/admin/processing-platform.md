@@ -392,11 +392,16 @@ Re-processes all indexed entries to refresh metadata (EXIF, geospatial propertie
 ```json
 {
   "types": "image,geoimage",
+  "extensions": "jpg,tif",
   "stopOnError": false
 }
 ```
 
-Both parameters are optional. Omit `types` to rescan all entry types.
+All parameters are optional. Omit `types` to rescan all entry types and `extensions` to rescan all file extensions. An entry must match both filters. An unknown type or an invalid extension (for example `*.dwg`) is rejected with `400 Bad Request`.
+
+Without a filter, the task clears the build cache and rebuilds the whole dataset. With a filter, it rebuilds only the rescanned entries that can be built, one at a time. A failed rebuild does not fail the task: the [artifact completeness check](./configuration.md#artifactcompletenesscheckercron) enqueues the entry again.
+
+To run this task on every dataset that has matching entries, use `POST /sys/rescan` (see [Bulk Operations](/docs/features/bulk-operations#across-all-datasets)).
 
 ---
 
