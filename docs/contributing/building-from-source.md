@@ -62,6 +62,7 @@ cd DroneDB
 | `build/untwine.exe` | COPC accelerator *(optional, see below)* |
 | `build/build-lod.exe` | Gaussian Splat LOD producer *(optional, see below)* |
 | `build/Obj2Tiles.exe` | OGC 3D Tiles generator *(optional, see below)* |
+| `build/dwg2dxf.exe` | DWG to DXF converter *(optional, see below)* |
 
 ---
 
@@ -101,6 +102,7 @@ Accepted values follow CMake conventions: `Release`, `Debug`, `RelWithDebInfo`, 
 | `build/untwine` | COPC accelerator *(optional, see below)* |
 | `build/build-lod` | Gaussian Splat LOD producer *(optional, see below)* |
 | `build/Obj2Tiles` | OGC 3D Tiles generator *(optional, see below)* |
+| `build/dwg2dxf` | DWG to DXF converter *(optional, see below)* |
 
 ---
 
@@ -171,6 +173,27 @@ The DroneDB build scripts attempt to download a precompiled Obj2Tiles binary aut
 ```
 
 If Obj2Tiles is unavailable, 3D Tiles generation is skipped as a best-effort artifact; Nexus output and other builds still complete normally.
+
+---
+
+## LibreDWG `dwg2dxf` DWG converter (optional)
+
+[GNU LibreDWG](https://www.gnu.org/software/libredwg/) `dwg2dxf` converts DWG drawings to DXF before DroneDB builds them. It is GPL-3.0-or-later and runs only as a separate process. `scripts/build-libredwg.sh` downloads the release pinned in `scripts/libredwg-version`, verifies its GNU signature, and builds a static binary next to `ddbcmd`. You need `curl`, `gpg`, `pkg-config` and a C toolchain.
+
+```bash
+# Linux
+./scripts/build-libredwg.sh build
+
+# Windows binary, cross-compiled on Linux (needs mingw-w64)
+./scripts/build-libredwg.sh build "" x86_64-w64-mingw32
+```
+
+```powershell
+# Windows, natively in MSYS2 (MINGW64)
+.\scripts\build-libredwg.ps1 -TargetDir build
+```
+
+`full-build-linux.sh` runs the script automatically and continues if it fails. Without the converter, DWG builds fail with a message that names it; all other formats are unaffected. The real-converter tests in `ddbtest` skip when it is missing. Set `DDB_DWG2DXF_PATH` to use a binary in another location.
 
 ---
 
