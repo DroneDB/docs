@@ -330,6 +330,17 @@ Common codes: `MissingParameterValue`, `InvalidParameterValue`, `LayerNotDefined
   because they are deterministic build artefacts keyed by entry hash.
 - The layer catalog (entries enumeration) is cached in Redis for 5 minutes
   per `(org, dataset, folder)`.
+- WMS `GetMap` images are cached on the server for 10 minutes after their last
+  use. The `BBOX` is snapped to the pixel grid of the request (pixel size and
+  corner rounded to the pixel), so requests that differ by less than half a
+  pixel, and a view panned back to after dragging the map, are served from the
+  cache. The image covers the snapped `BBOX`: at most half a pixel from the
+  requested one.
+- Raster tiles of WMTS `GetTile` and OGC API – Tiles share the server tile cache
+  of the dataset map (one render per tile and format).
+- WCS raster probes (size, bands, CRS used by `DescribeCoverage`) are cached per
+  file content for a day.
+- These server caches are cleared when the dataset is rebuilt or changed.
 
 ## See also
 

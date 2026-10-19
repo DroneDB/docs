@@ -170,6 +170,21 @@ Programs that use the DroneDB library (Registry, the language bindings) keep idl
 
 A connection is reused only if the dataset's `.ddb/dbase.sqlite` is still the same file. A host that deletes, moves or replaces a dataset folder calls `DDBReleaseConnections` first; Registry does this.
 
+### Map tiles and renders (library hosts)
+
+Programs that use the DroneDB library also keep the rasters and point clouds they tile or render open between calls. A tile of a raster seen recently skips the open, the coordinate system set-up and the reprojection set-up (about 2–3 ms per tile) and reuses GDAL's block cache; a point-cloud tile skips the COPC header read. Band statistics used to stretch non-8-bit rasters (DSM, thermal, multispectral) come from the raster, from the `.stats.json` file written next to a built COG, or are computed once per version of the file.
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DDB_RASTER_CACHE_SIZE` | `8` | Idle tilers (or open rasters) kept per file. `0` disables the reuse. |
+| `DDB_RASTER_CACHE_MAX` | `64` | Idle tilers and open rasters kept in total. |
+| `DDB_RASTER_CACHE_IDLE_SECONDS` | `60` | Idle ones are closed after this many seconds. |
+| `DDB_PCTILE_RESOLUTION_OFFSET` | `2` | A point-cloud tile reads the COPC levels down to the resolution of this many zoom levels above the tile (`2`: 4× the tile's pixel size). |
+
+A kept raster is used again only while the file has the same modification time, size and (on Linux and macOS) inode, so a rebuilt COG is opened again. `DDBReleaseConnections` also closes the rasters kept under the folder; builds close those of the output they replace.
+
+Tiles are PNG (zlib level 1), JPEG or WebP (`DDBMemoryTileFmt` with `"webp"`, lossy, quality 80). A tile without transparent pixels has no alpha band. Thumbnails are WebP at quality 80; only non-8-bit images are stretched to the 0–255 range.
+
 ### Gaussian Splats
 
 | Variable | Default | Description |
