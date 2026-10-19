@@ -71,6 +71,12 @@ sidebar_label: CLI Overview
 | `ddb cleanup` | Remove stale entries and orphaned artifacts |
 | `ddb system` | Manage ddb (subcommand: `clean` for user cache cleanup) |
 
+## Indexing threads
+
+`ddb add` (and a Registry that indexes uploads) hashes and reads the metadata of several files at
+the same time. The environment variable `DDB_INDEX_THREADS` sets how many: a number of threads,
+`0` for every core, `1` for one file at a time. The default is the number of cores, up to 8.
+
 ## Installation
 
 See the [CLI Installation](/docs/getting-started/installation#cli-installation) page for setup instructions.

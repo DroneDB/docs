@@ -194,6 +194,13 @@ The Push API enables syncing local datasets to Registry via the DroneDB CLI (`dd
 | POST | `.../push/meta` | Upload metadata |
 | POST | `.../push/commit` | Finalize push |
 
+* `init` takes the form fields `checksum` (checksum of the client's last synced stamp) and `stamp` (the client's stamp, any size). It computes the delta once, returns the files to upload and a `token`. When the dataset changed since the client's last sync, it answers `pullRequired: true`.
+* `upload` takes a streamed `multipart/form-data` body with the fields `path` and `token` and one file part, in any order. The file is written once, to the dataset volume. When the request has a `Content-Length`, the storage quota is checked before the file is written.
+* `meta` takes the fields `token` and `meta` (a metadata dump).
+* `commit` applies the delta computed by `init`, if the dataset did not change in the meantime (otherwise it fails: push again). Each uploaded file must match the hash declared in the stamp; a mismatch fails the commit before the dataset changes. The files are moved into the dataset, not copied.
+
+A host that verifies the uploaded bytes itself can skip the hash check with the environment variable `DDB_VERIFY_PUSH_HASHES=0` (it applies to `DDBApplyDelta`).
+
 ## Metadata
 
 **Base Route:** `/orgs/{orgSlug}/ds/{dsSlug}/meta`

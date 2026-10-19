@@ -97,6 +97,27 @@ curl '{base}/wfs?service=WFS&request=GetFeature&version=2.0.0' \
      -G > features.geojson
 ```
 
+### WFS feature ids
+
+Each feature has a stable id, `<typeName>.<fid>` (the type name as an XML name, the feature id
+of the layer's GeoPackage), the same in every page. Use it with `RESOURCEID` or the
+`GetFeatureById` stored query; both read the features by id instead of scanning the layer.
+`numberMatched` is the number of features that match the request before paging, so clients
+can page with `count`/`startIndex`. In OGC API – Features, the item id is the feature id
+(`.../items/{fid}`).
+
+```bash
+curl '{base}/wfs?service=WFS&request=GetFeature&version=2.0.0' \
+     --data-urlencode 'typeNames=contours.gpkg' \
+     --data-urlencode 'resourceId=contours.gpkg.12,contours.gpkg.40' -G
+
+curl '{base}/wfs?service=WFS&request=GetFeature&version=2.0.0' \
+     --data-urlencode 'storedQuery_Id=urn:ogc:def:query:OGC-WFS::GetFeatureById' \
+     --data-urlencode 'id=contours.gpkg.12' -G
+```
+
+The ids change when the layer is built again (a rebuilt GeoPackage numbers its features again).
+
 ### MVT tile
 
 ```bash

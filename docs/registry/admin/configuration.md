@@ -705,6 +705,8 @@ The default value is `0 3 * * *` (daily at 3:00 AM)
 
 Cron expression for the recurring full-cleanup job that runs DroneDB `cleanup` (purge of stale entries and unused build artifacts) on every dataset of every organization. The same operation is also exposed via the admin API endpoint `POST /sys/cleanup`.
 
+The recurring job also deletes what interrupted uploads leave in each dataset, when nothing was written to it for 24 hours: push folders of pushes that were never committed (`.ddb/tmp/push-*`) and temporary upload files (`.uploads/*.tmp`).
+
 :::info
 The default value is `0 0 * * *` (daily at midnight)
 :::
