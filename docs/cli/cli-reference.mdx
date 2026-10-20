@@ -180,6 +180,7 @@ Programs that use the DroneDB library also keep the rasters and point clouds the
 | `DDB_RASTER_CACHE_MAX` | `64` | Idle tilers and open rasters kept in total. |
 | `DDB_RASTER_CACHE_IDLE_SECONDS` | `60` | Idle ones are closed after this many seconds. |
 | `DDB_PCTILE_RESOLUTION_OFFSET` | `2` | A point-cloud tile reads the COPC levels down to the resolution of this many zoom levels above the tile (`2`: 4× the tile's pixel size). |
+| `DDB_COPC_NODE_CACHE_MB` | `256` | Memory for the decoded COPC nodes that point-cloud tiles share: neighbouring tiles read the same nodes, which are decompressed once. `0` disables the cache. |
 
 A kept raster is used again only while the file has the same modification time, size and (on Linux and macOS) inode, so a rebuilt COG is opened again. `DDBReleaseConnections` also closes the rasters kept under the folder; builds close those of the output they replace.
 
