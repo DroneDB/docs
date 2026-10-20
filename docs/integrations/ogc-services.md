@@ -36,7 +36,7 @@ entries that you see in the web viewer.
 | Standard | Version | Endpoint root | Notes |
 |----------|---------|---------------|-------|
 | WMS | 1.1.1 & 1.3.0 | `/wms` | Multi-layer compositing, transparent backgrounds, NDVI/NDRE/NDWI/EVI/SAVI styles |
-| WFS | 2.0.0 (1.1.0 alias) | `/wfs` | GeoJSON + GML output, BBOX filtering, paging via `count`/`startIndex` |
+| WFS | 2.0.0 (1.1.0 alias) | `/wfs` | GeoJSON + GML output, BBOX and FES 2.0 filters, paging via `count`/`startIndex` |
 | WMTS | 1.0.0 | `/wmts` | XYZ tile pyramid backed by the per-dataset MVT cache for vectors and COG for rasters |
 | WCS | **1.0.0, 1.1.x, 2.0.1** | `/wcs` | GeoTIFF + PNG/JPEG `GetCoverage`, version negotiated via `ACCEPTVERSIONS` |
 | OGC API – Features | 1.0 | `/ogcapi` | JSON landing page, conformance, collections, items |
@@ -117,6 +117,27 @@ curl '{base}/wfs?service=WFS&request=GetFeature&version=2.0.0' \
 ```
 
 The ids change when the layer is built again (a rebuilt GeoPackage numbers its features again).
+
+### WFS filters
+
+`GetFeature` accepts a FES 2.0 `FILTER` (key-value or in a POST `wfs:Query`), for GML and GeoJSON
+output, and pages the features that match with `count`/`startIndex`; `numberMatched` counts
+all of them. These filters are evaluated in the layer's GeoPackage, at any size:
+`And`, `Or`, `Not`, the comparisons, `PropertyIsBetween`, `PropertyIsLike`, `PropertyIsNull`
+and `PropertyIsNil` on the layer's fields, and one `BBOX` on its own or inside the top-level
+`And`. A value compares as the field's type: a number field as numbers, a text field as text.
+`matchCase="false"` is evaluated there for equality with ASCII text.
+
+Other filters (`ResourceId` mixed with other operators, functions, `matchAction="All"`, the
+synthetic `ddbSeq` property) are evaluated by the Registry on the first 10 000 features of the
+layer.
+
+```bash
+curl '{base}/wfs?service=WFS&request=GetFeature&version=2.0.0' -G \
+     --data-urlencode 'typeNames=contours.gpkg' \
+     --data-urlencode 'outputFormat=application/json' \
+     --data-urlencode 'filter=<fes:Filter xmlns:fes="http://www.opengis.net/fes/2.0"><fes:PropertyIsGreaterThan><fes:ValueReference>elevation</fes:ValueReference><fes:Literal>1200</fes:Literal></fes:PropertyIsGreaterThan></fes:Filter>'
+```
 
 ### MVT tile
 
