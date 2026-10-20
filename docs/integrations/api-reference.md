@@ -141,6 +141,12 @@ For Gaussian Splat builds, `DDB_BUILDLOD_IDLE_TIMEOUT_SECONDS` sets the build-lo
 
 Direct C++ `ddb::obj2tiles::runObj2Tiles` calls now require an absent or empty destination; intentional replacements use the higher-level builder's staging/swap. `ddb::process::Result` adds `descendantsTerminated`, reported by `describe()` and runner logs when drain-grace cleanup terminates remaining descendants. A successful direct-child exit stays successful; `timedOut` remains an idle-timeout signal. This changes the exported C++ result layout, so rebuild native C++ consumers together with libddb.
 
+### CAD drawings
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `.../cad/crs` | Set the coordinate system of a `.dxf` or `.dwg` drawing (form fields `path`, `crs`): writes the drawing's `.prj` and returns its entry. `crs` is an EPSG code (`EPSG:32632`), WKT or PROJ string, or `local` to keep the drawing in its own coordinates. `400` for another file type or an invalid coordinate system. |
+
 ## Tasks (Processing Platform)
 
 **Base Route:** `/orgs/{orgSlug}/ds/{dsSlug}/tasks`

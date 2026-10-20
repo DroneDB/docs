@@ -61,12 +61,14 @@ DWG files are converted to a temporary DXF with [GNU LibreDWG](https://www.gnu.o
 DXF and DWG files usually carry no coordinate system that GDAL can read. DroneDB looks for one in this order:
 
 1. A `.prj` file with the same name next to the drawing (`site.dwg` and `site.prj`). This is optional, and it takes priority. It uses the same convention as ArcGIS for CAD files. A `.prj` that holds a local coordinate system, for example `LOCAL_CS["Drawing"]`, keeps the drawing off the map on purpose.
-2. The coordinate system stored in the drawing by AutoCAD or Civil 3D (geographic location, the `GEODATA` object). Most survey drawings have one.
+2. The coordinate system stored in the drawing by AutoCAD or Civil 3D (geographic location, the `GEODATA` object). Most survey drawings have one. A drawing placed on a local grid (a design point of the drawing at a reference point of a projected coordinate system, with a north direction and a unit scale) is placed on the map as well.
 3. For DXF only: coordinates that fit in longitude and latitude are read as WGS84 (EPSG:4326), because GIS tools export longitude/latitude data as DXF without a coordinate system. This is never done for DWG, which only CAD software writes. The file details in the Hub show "assumed" when this rule applied.
 
 The Hub shows where the coordinate system came from in the file details (**coordinate system** row).
 
-When none applies, the drawing has **no geolocation**. DroneDB builds it in its own coordinates and does not place it on the map. The Hub opens it in the 3D viewer without a globe and shows the drawing units from the file (for example "Local coordinates (m)"). To put such a drawing on the map, upload a `.prj` with the same name. DroneDB then rebuilds the drawing. Deleting the `.prj` makes it local again.
+When none applies, the drawing has **no geolocation**. DroneDB builds it in its own coordinates and does not place it on the map. The Hub opens it in the 3D viewer without a globe and shows the drawing units from the file (for example "Local coordinates (m)").
+
+To set or change a drawing's coordinate system in the Hub, right-click the drawing and choose **Tools › Set Coordinate System**. Enter an EPSG code (a number such as `32632` is read as `EPSG:32632`) or a WKT definition, or choose **Local drawing coordinates** to keep the drawing off the map. The Hub saves it as the drawing's `.prj` (ESRI WKT, which other GIS software reads too) and DroneDB rebuilds the drawing. Uploading a `.prj` by hand does the same. Deleting the `.prj` goes back to the drawing's own coordinate system.
 
 Drawings without geolocation are not published through WMS, WFS, WMTS or the OGC API collection list, because they cannot be served in any coordinate system.
 
