@@ -200,7 +200,11 @@ The default value is `00:30:00` (30 minutes).
 
 ### DatasetVisibilityCacheExpiration
 
-The expiration time for the dataset visibility cache (TimeSpan).
+The expiration time for the dataset visibility cache (TimeSpan). Each Registry process also
+keeps a visibility it has read in memory for [`DatasetLookupCacheExpiration`](#datasetlookupcacheexpiration),
+so the access check of a request (each point cloud range request) needs no cache round trip.
+A visibility change made through this Registry instance takes effect immediately; other
+instances see it when their copy expires.
 
 :::info
 The default value is `1.00:00:00` (1 day).
