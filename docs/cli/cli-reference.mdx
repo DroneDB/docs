@@ -185,7 +185,7 @@ Programs that use the DroneDB library also keep the rasters and point clouds the
 
 A kept raster is used again only while the file has the same modification time, size and (on Linux and macOS) inode, so a rebuilt COG is opened again. `DDBReleaseConnections` also closes the rasters kept under the folder; builds close those of the output they replace.
 
-Tiles are PNG (zlib level 1), JPEG or WebP (`DDBMemoryTileFmt` with `"webp"`, lossy, quality 80). A tile without transparent pixels has no alpha band. Thumbnails are WebP at quality 80; only non-8-bit images are stretched to the 0–255 range.
+Tiles are PNG (zlib level 1), JPEG or WebP (`DDBMemoryTileFmt` with `"webp"`, lossy, quality 80). A tile without transparent pixels has no alpha band. Thumbnails are WebP at quality 80; only non-8-bit images are stretched to the 0–255 range. A JPEG that stores a smaller copy of the photo (the MPF preview of DJI cameras and most phones) with the same proportions and at least as long as the thumbnail is thumbnailed from that copy, about three times faster.
 
 ### Gaussian Splats
 
