@@ -70,6 +70,12 @@ docker run -it --rm -p 5000:5000 -v registry-data:/data dronedb/registry
 See [macOS: use a named volume](../registry/getting-started.md#macos-use-a-named-volume).
 :::
 
+:::warning Apple Silicon (M1 to M4) and other ARM computers
+The image is built for `linux/amd64` only. If Docker stops with `no matching manifest for linux/arm64/v8`,
+add `--platform linux/amd64` to the command. See
+[Apple Silicon and other ARM computers](../registry/getting-started.md#apple-silicon-and-other-arm-computers).
+:::
+
 Open [http://localhost:5000](http://localhost:5000) in your browser.
 
 **Default credentials**: `admin` / `password123`
