@@ -8,6 +8,12 @@ sidebar_label: Configuration Reference
 The configuration file is `appsettings.json`, if not present it will be
 created with default values (`appsettings-default.json`).
 
+Settings are validated when Registry starts: an invalid value stops it with every failure
+listed (exit code `1`). To check a file without starting Registry, run
+`Registry.Web <storage folder> --check` (exit code `0` when the settings are valid; it reads
+the environment too and writes nothing). Registry does not rewrite the file when it starts;
+only a missing `Secret` or `ThumbnailGeneratorToken` is generated and written.
+
 ## Authentication
 
 ### AuthCookieName
@@ -115,6 +121,16 @@ The default value is `InMemory`
 :::
 
 The `HangfireConnection` connection string should be changed accordingly.
+
+### MySqlServerVersion
+
+Optional. The MySQL or MariaDB server version Entity Framework targets, for example
+`10.6.0-mariadb`. When empty, Registry detects the version once per process. A wrong value
+makes Entity Framework write SQL for another server.
+
+:::info
+The default value is `null` (detected).
+:::
 
 ## Storage
 
@@ -484,6 +500,35 @@ The external URL of Registry. This is used when the application is behind a reve
 The default value is `null`.
 :::
 
+### KnownProxies
+
+IP addresses of the reverse proxies whose `X-Forwarded-For` and `X-Forwarded-Proto` headers
+Registry trusts. From them it takes the client address (rate limits, download limits, logs)
+and the scheme (HSTS, `Secure` cookies). From any other peer the headers are ignored, so a
+client cannot fake its address.
+
+:::info
+The default value is `["127.0.0.1", "::1"]` (a proxy on the same host).
+:::
+
+### KnownNetworks
+
+CIDR networks whose forwarded headers Registry trusts, in addition to `KnownProxies`: for
+proxies without a fixed address. With nginx on the host in front of a port published by
+Docker, the peer Registry sees is the Docker bridge gateway (`172.x.0.1`), so the production
+template sets Docker's default bridge pool:
+
+```json
+"KnownNetworks": [ "172.16.0.0/12" ]
+```
+
+An invalid address or network stops the start. See
+[Behind a reverse proxy](./production.md#behind-a-reverse-proxy).
+
+:::info
+The default value is `[]`.
+:::
+
 ### Security Headers
 
 Registry automatically adds the following security headers to all HTTP responses:
@@ -538,6 +583,78 @@ URL of a remote thumbnail generator service for offloading thumbnail generation.
 :::info
 The default value is `null`
 :::
+
+### ThumbnailGeneratorToken
+
+Shared secret of the web server and a thumbnail generator host (sent in the
+`X-Thumbnail-Token` header). Registry generates it on the first start when it is empty. A
+thumbnail generator host refuses to start without it; both read the same `appsettings.json`.
+
+### HostBudget
+
+The Registry processes that share the machine. When they are declared, each process takes its
+share of the cores and memory (its weight over the sum of the weights) for its background
+workers, its render lanes and the DroneDB library's CPU pool, instead of each process planning
+the whole machine.
+
+```json
+"HostBudget": {
+    "WebServers": 1,
+    "ProcessingNodes": 2
+}
+```
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `WebServers`, `ProcessingNodes`, `ThumbnailGenerators` | `0` | Processes of each kind on the machine (`0` = not declared). |
+| `Cores` | `0` | Logical processors of the machine (`0` = those this process sees). |
+| `MemoryMb` | `0` | Memory of the machine in MiB (`0` = what this process sees). |
+| `WebServerWeight`, `ProcessingNodeWeight`, `ThumbnailGeneratorWeight` | `1`, `2`, `1` | Relative share of each kind of process. |
+| `IoThreads` | `0` | Disk-bound threads for the whole machine, split like the cores (`0` = the library's default, 4 per process). |
+
+With nothing declared, each process plans the whole machine. The production compose file sets
+`AppSettings__HostBudget__WebServers=1` and `AppSettings__HostBudget__ProcessingNodes=2`. The
+effective budget is shown in the admin configuration page.
+
+### ProcessingBudget
+
+Concurrency and native resources of background jobs. Native builds run on their own queue.
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `HeavyWorkers` | derived | Concurrent jobs that run native builds (COG, COPC, Nexus, LOD, raster tools). |
+| `LightWorkers` | derived | Concurrent other jobs (imports, exports, cleanup, thumbnails, scheduling). |
+| `BuildThreads` | derived | Threads one native build may use (`DDB_BUILD_THREADS`). |
+| `BuildCacheMb` | derived | GDAL block cache during a raster build, in MB (`DDB_COG_CACHE_MB`). |
+| `BuildWarpMemoryMb` | derived | GDAL warp memory during a raster build, in MB (`DDB_WARP_MEMORY_MB`). |
+
+`0` means derived from the host (or from the host budget when it is declared).
+
+### Ddb (DroneDB library settings)
+
+A top-level section (next to `AppSettings`, not inside it) with the process settings Registry
+passes to the DroneDB library with `DDBConfigure` before it initializes it. A value left out is
+not sent, and the library uses its environment variable or its default; `CacheDir` is the
+exception: Registry always sends it (`<TempPath>/ddb-cache` by default). See
+[DroneDB Library](/docs/integrations/library#process-configuration).
+
+```json
+"Ddb": {
+    "CpuPoolSize": 6,
+    "GdalCacheMb": 512
+}
+```
+
+| Field | Range | When left out | Description |
+|-------|-------|---------------|-------------|
+| `CpuPoolSize` | 0 to 4096 | from the host budget when declared, else `DDB_CPU_POOL_SIZE` or cores − 1 | Worker threads the library may run at once beside the calling threads. |
+| `IoThreads` | 1 to 256 | from the host budget when declared, else `DDB_IO_THREADS` or 4 | Threads of one disk-bound section (hashing, deleting build folders). |
+| `MinFreeDiskMb` | 0 or more | `DDB_MIN_FREE_DISK_MB` or 512 | Free MiB a build needs on the volume it writes to; `0` turns the check off. |
+| `GdalCacheMb` | 16 to 1048576 | `DDB_GDAL_CACHE_MB` or 1024, as an upper bound | Size in MiB of GDAL's block cache, shared by the whole process (tiles, renders, thumbnails, statistics, builds). When set, it is the size of the cache (raising or lowering GDAL's default, winning over `GDAL_CACHEMAX`). Processes on one host each have their own cache: size it per role. |
+| `CacheDir` | absolute path | `<TempPath>/ddb-cache` | Where the library caches thumbnails, tiles, index templates and DSM tiles. |
+
+An explicit value here wins over the host budget and the environment variables. The effective
+values are logged at start.
 
 ### DefaultThumbnailSize
 
