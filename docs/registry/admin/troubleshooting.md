@@ -39,46 +39,64 @@ server {
 
 ### Tuning the reverse proxy for large uploads
 
-Registry **streams** uploads straight to storage as the bytes arrive, so a single
-large file is written only once. To preserve that throughput end to end, the
-reverse proxy in front of Registry must **not** re-buffer the whole request body
-before forwarding it. Otherwise every upload is written twice (once into the
-proxy's temporary area, once by Registry), the client sees no progress until the
-proxy has received the entire file, and the proxy needs scratch space as large as
-the upload.
+Registry **streams** uploads straight to storage as the bytes arrive, and it hashes
+each file while it is written, so the response follows the last byte within
+milliseconds. A reverse proxy keeps that behaviour only if it forwards the body as
+it arrives and, over HTTP/2, gives each upload stream a large enough window.
 
-Two things matter for large uploads:
+Four settings matter:
 
-- **Disable request-body buffering** at the proxy so the body is streamed to Registry.
-- **Remove (or raise) the proxy's body-size limit** so large files are not rejected.
-  You can still cap uploads centrally with the Registry `MaxRequestBodySize`
-  setting (see [Configuration](./configuration.md#maxrequestbodysize)); requests
-  over the limit are rejected with `413 Payload Too Large`.
+- **Request-body buffering.** With buffering on (the nginx default), the proxy writes
+  the whole upload to a temporary file before it contacts Registry. The upload is
+  written to disk twice, the proxy needs scratch space as large as the file, and the
+  browser shows 100 % while the proxy is still replaying the file to Registry
+  (*file size ÷ temp-disk speed*: tens of seconds per GB on mechanical disks).
+  Buffering off streams the body to Registry.
+- **The HTTP/2 stream window.** With buffering off and HTTP/2 enabled, nginx
+  advertises `http2_body_preread_size` (64 KB by default) as the window of each
+  upload stream and refills it one buffer at a time. Each stream then moves at most
+  *window ÷ round-trip time*: 1.6 MB/s at 40 ms, 0.64 MB/s at 100 ms, whatever the
+  uplink. A single large file uses one stream, so it is the worst case. Raise the
+  window to 2 MB (20 MB/s per stream at 100 ms). HTTP/1.1 is not affected: TCP does
+  the flow control.
+- **Body-size limit.** Remove (or raise) the proxy's limit. You can still cap uploads
+  centrally with the Registry `MaxRequestBodySize` setting (see
+  [Configuration](./configuration.md#maxrequestbodysize)); larger requests are
+  rejected with `413 Payload Too Large` before any byte is stored.
+- **Read timeout.** `proxy_read_timeout` must cover the time between the last byte of
+  the upload and the response. Registry hashes while it receives the file, so this is
+  normally the index commit (milliseconds). Two cases make it longer: buffering on
+  (the replay above) and older Registry versions, which hash after the upload
+  (*file size ÷ min(hash rate, disk read rate)*, e.g. 10 GB on a mechanical-disk host
+  ≈ 70 s). Keep it at 600 s or more.
 
-#### Nginx (high-throughput uploads)
+#### Nginx
 
 ```nginx
 server {
-    listen 443 ssl;
+    listen 443 ssl;            # or "listen 443 ssl http2;" (nginx < 1.25) / "http2 on;"
     server_name registry.yourdomain.com;
 
-    # Allow large uploads (0 = unlimited, or set an explicit cap e.g. 20g)
+    # Allow large uploads (0 = unlimited, or an explicit cap e.g. 20g)
     client_max_body_size 0;
+
+    # Required when HTTP/2 is enabled and request buffering is off: the per-stream
+    # upload window (server level, not allowed inside location). Costs up to 2 MB of
+    # memory per upload in flight.
+    http2_body_preread_size 2m;
+    client_body_buffer_size 2m;
 
     location / {
         proxy_pass http://localhost:5000;
-        proxy_http_version 1.1;
+        proxy_http_version 1.1;          # required for unbuffered request bodies
 
-        # Stream the upload straight to Registry instead of spooling it to a
-        # temp file first. This is the single most important upload setting.
+        # Stream the upload to Registry instead of spooling it to a temp file first
         proxy_request_buffering off;
-        # Optional: also stream responses (downloads) without buffering.
-        proxy_buffering off;
 
-        # Generous timeouts for long transfers over slow links.
-        proxy_connect_timeout 60s;
-        proxy_send_timeout     3600s;
-        proxy_read_timeout     3600s;
+        proxy_connect_timeout 600s;
+        proxy_send_timeout    600s;
+        proxy_read_timeout    600s;
+        send_timeout          600s;
 
         proxy_set_header Host              $host;
         proxy_set_header X-Real-IP         $remote_addr;
@@ -88,15 +106,17 @@ server {
 }
 ```
 
-With the default `proxy_request_buffering on`, nginx writes the entire upload to a
-temporary file (`client_body_temp`) before it even contacts Registry. Turning it
-**off** restores true streaming. Note that for chunked `Transfer-Encoding` nginx
-still buffers unless `proxy_http_version` is `1.1` (or `2`), so keep that line.
+Buffering **on** is still a valid choice, for example for a proxy that must absorb
+slow clients: it does not hit the HTTP/2 window limit, but it keeps the second copy
+on disk and the wait after 100 %. Response buffering (`proxy_buffering`) can stay on:
+Registry's live task updates (server-sent events) turn it off per response with
+`X-Accel-Buffering: no`.
 
 #### Apache (httpd) with mod_proxy
 
 Apache's `mod_proxy_http` already streams request bodies to the backend (it does
-not spool the whole upload to disk), so the focus is on **limits and timeouts**:
+not spool the whole upload to disk), so the focus is on **limits, timeouts and the
+HTTP/2 window**:
 
 ```apache
 <VirtualHost *:443>
@@ -104,7 +124,7 @@ not spool the whole upload to disk), so the focus is on **limits and timeouts**:
 
     ProxyPreserveHost On
     # timeout (seconds) keeps the backend connection open during long uploads
-    ProxyPass        / http://localhost:5000/ timeout=3600
+    ProxyPass        / http://localhost:5000/ timeout=600
     ProxyPassReverse / http://localhost:5000/
 
     # Allow large uploads (0 = unlimited, or set an explicit byte cap)
@@ -115,6 +135,10 @@ not spool the whole upload to disk), so the focus is on **limits and timeouts**:
     # extended as long as data keeps arriving at >= 1 KB/s.
     RequestReadTimeout body=30,MinRate=1024
 
+    # With mod_http2 (Protocols h2 http/1.1): the per-stream window is 64 KB by
+    # default and caps every upload at window ÷ round-trip time
+    H2WindowSize 2097152
+
     RequestHeader set X-Forwarded-Proto "https"
 </VirtualHost>
 ```
@@ -124,7 +148,34 @@ culprit is `mod_reqtimeout` (`RequestReadTimeout`) rather than `Timeout` or
 `ProxyTimeout`; adjust the `body=` rule as shown above. Make sure `mod_proxy`,
 `mod_proxy_http` and `mod_headers` are enabled.
 
+#### Caddy and Traefik
+
+Both stream request bodies and use 1 MB HTTP/2 windows: no upload settings are
+needed. Keep their default timeouts above the longest upload.
+
+#### Checking the result: upload diagnostics
+
+In the Hub, open **My Account → Upload diagnostics** and press **Run test**. The Hub
+sends 8 MB of random data to Registry (`POST /sys/upload-probe`, discarded on
+arrival) on one connection and then on six in parallel, and shows the protocol the
+browser negotiated (`h2` or `http/1.1`), the round-trip time and the throughput.
+When a single HTTP/2 stream runs at about 64 KB (or 1 MB) ÷ round-trip time, the
+page shows "The reverse proxy window is limiting uploads" with a link to this
+section. The test is limited to a few runs per minute per user.
+
+#### "504 Gateway Timeout" after the upload reached 100 %
+
+The proxy gave up waiting for the response while Registry was still adding the file
+(see **Read timeout** above). The file is usually in the dataset. The Hub does not
+upload it again: it asks Registry for the state of that upload
+(`GET /orgs/{org}/ds/{ds}/obj/uploads/{uploadId}`) and marks the file done once
+Registry reports it. Raise `proxy_read_timeout` if this happens often.
+
 ## Common Issues
+
+**`no matching manifest for linux/arm64/v8` when you pull the image**
+- The `dronedb/registry` image is built for `linux/amd64` only. You are on an Apple Silicon Mac or another ARM computer.
+- Add `--platform linux/amd64` to the `docker run` command. See [Apple Silicon and other ARM computers](../getting-started.md#apple-silicon-and-other-arm-computers).
 
 **Container fails to start**
 - Check logs: `docker-compose logs registry`

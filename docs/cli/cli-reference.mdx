@@ -170,6 +170,11 @@ Programs that use the DroneDB library (Registry, the language bindings) keep idl
 
 A connection is reused only if the dataset's `.ddb/dbase.sqlite` is still the same file. A host that deletes, moves or replaces a dataset folder calls `DDBReleaseConnections` first; Registry does this.
 
+Index writes do not checkpoint: their changes stay in `.ddb/dbase.sqlite-wal` until SQLite's automatic checkpoint (every ~4 MB of changes), the last connection closes, a host calls `DDBCheckpoint`, or the host process exits normally (the library then checkpoints its idle connections). A checkpoint after every write would sync the disk two or three times per call (15 ms on an SSD, more on hard disks). So:
+
+- copy or back up the whole `.ddb` folder, `dbase.sqlite-wal` included; to copy `dbase.sqlite` alone, call `DDBCheckpoint` (or close the connections with `DDBReleaseConnections`) first;
+- never replace `dbase.sqlite` while connections are open: the frames left in `dbase.sqlite-wal` would be applied to the new file. `DDBReleaseConnections` before the replacement closes the connections and empties the WAL.
+
 ### Map tiles and renders (library hosts)
 
 Programs that use the DroneDB library also keep the rasters and point clouds they tile or render open between calls. A tile of a raster seen recently skips the open, the coordinate system set-up and the reprojection set-up (about 2–3 ms per tile) and reuses GDAL's block cache; a point-cloud tile skips the COPC header read. Band statistics used to stretch non-8-bit rasters (DSM, thermal, multispectral) come from the raster, from the `.stats.json` file written next to a built COG, or are computed once per version of the file.

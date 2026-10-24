@@ -226,6 +226,21 @@ Registry instance that shares the database or by direct database edits. Set it t
 The default value is `00:00:30` (30 seconds).
 :::
 
+### DatasetLookupCacheExpiration
+
+How long Registry reuses a dataset's database record (with its organization and the
+organization's members) when it resolves `/orgs/{org}/ds/{ds}` routes (TimeSpan). An upload
+of 40 files otherwise reads the same record 40 times, and every request of an organization
+member read the members again.
+
+Changes saved by this Registry instance (rename, move, delete, visibility, members) take
+effect immediately. The expiration only bounds changes made elsewhere, for example by a
+processing node or by direct database edits. Set it to `00:00:00` to disable the cache.
+
+:::info
+The default value is `00:00:30` (30 seconds).
+:::
+
 ## Upload & Sharing
 
 ### MaxRequestBodySize
@@ -273,11 +288,7 @@ The default value is `01:00:00` (1 hour).
 
 ### MaxZipMemoryThreshold
 
-Memory threshold (in bytes) before using disk-based ZIP creation.
-
-:::info
-The default value is `1073741824` (1 GB)
-:::
+Removed. Folder and multi-file downloads are streamed to the client as the ZIP archive is written: no download is kept in memory or in a temporary file, whatever its size. The setting is ignored if it is still present in `appsettings.json`.
 
 ### MaxExportSizeBytes
 
@@ -286,6 +297,33 @@ Maximum allowed size (in bytes) for a dataset export operation. Export requests 
 :::info
 The default value is `1073741824` (1 GB)
 :::
+
+### Uploads
+
+Tuning of the upload pipeline (`POST .../obj`, bundles and chunked uploads). Every field
+is optional.
+
+```json
+"Uploads": {
+    "ThumbnailPrecomputeWorkers": 2,
+    "ThumbnailPrecomputeCapacity": 256,
+    "InvalidationWindowMs": 2000,
+    "QuotaWindowSeconds": 10,
+    "ReceiptHours": 24,
+    "MaxPartsPerRequest": 64,
+    "MaxChunkBytes": 134217728
+}
+```
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `ThumbnailPrecomputeWorkers` | `2` | Background workers that pre-generate the thumbnails of uploaded images. A thumbnail that is not pre-generated is generated when it is first viewed. |
+| `ThumbnailPrecomputeCapacity` | `256` | Thumbnails waiting for a worker. When the queue is full, further uploads skip pre-generation. |
+| `InvalidationWindowMs` | `2000` | How long the OGC and dataset-thumbnail cache invalidations of an upload burst are collected before they run once for the whole burst. |
+| `QuotaWindowSeconds` | `10` | How long one storage-use evaluation serves a user's uploads. The sizes of the uploads in between are added to it, so the quota still holds. |
+| `ReceiptHours` | `24` | How long the outcome of an upload can be asked for by its `X-Upload-Id` (see the [API reference](/docs/integrations/api-reference#upload--modification)). |
+| `MaxPartsPerRequest` | `64` | Most file parts accepted in one bundled upload request. |
+| `MaxChunkBytes` | `134217728` (128 MB) | Largest chunk accepted by a chunked (resumable) upload. |
 
 ## User Management
 
@@ -471,6 +509,27 @@ The number of worker threads used by the application. Use `-1` for automatic det
 :::info
 The default value is `-1`
 :::
+
+### NativeConcurrency
+
+How many native renders run at once in this Registry process. Requests beyond the limit wait
+for a free slot (and stop waiting when the client goes away), so a burst of map tiles or
+thumbnails cannot take every CPU core from the rest of the server.
+
+```json
+"NativeConcurrency": {
+    "Tiles": 0,
+    "Heavy": 0
+}
+```
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `Tiles` | `max(2, cores / 2)` | Map tiles and map renders (WMTS, WMS, OGC API tiles). |
+| `Heavy` | `max(1, cores / 4)` | Thumbnails and coverage renders (WCS). |
+
+`0` or a negative value means the default. The number of renders running per lane is reported
+by the `registry.native.in_flight` gauge (meter `Registry.NativeWork`, tag `lane`).
 
 ### RemoteThumbnailGeneratorUrl
 

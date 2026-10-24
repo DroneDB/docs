@@ -56,7 +56,7 @@ Authorization: Bearer <token>
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/orgs/{orgSlug}/ds` | List all datasets in organization |
+| GET | `/orgs/{orgSlug}/ds` | List datasets in organization (all of them, or a page: see below) |
 | GET | `/orgs/{orgSlug}/ds/{dsSlug}` | Get dataset entries |
 | GET | `/orgs/{orgSlug}/ds/{dsSlug}/ex` | Get extended dataset info |
 | GET | `/orgs/{orgSlug}/ds/{dsSlug}/stamp` | Get dataset checksum and metadata |
@@ -65,6 +65,18 @@ Authorization: Bearer <token>
 | DELETE | `/orgs/{orgSlug}/ds/{dsSlug}` | Delete dataset |
 | POST | `/orgs/{orgSlug}/ds/{dsSlug}/rename` | Rename dataset |
 | POST | `/orgs/{orgSlug}/ds/{dsSlug}/meta/visibility/set` | Set dataset visibility (`0`=private, `1`=public) |
+
+**Paging the dataset list.** Without query parameters `GET /orgs/{orgSlug}/ds` returns every
+dataset, as before. With any of the parameters below it returns one page and the number of
+matching datasets in the `X-Total-Count` response header.
+
+| Parameter | Description |
+|-----------|-------------|
+| `skip`, `take` | Page offset and size (`take` at most 500). |
+| `q` | Case-insensitive search in the dataset name, slug and tagline. |
+| `sort` | `name` (default), `creationDate`, `entries`, `size` or `visibility`; `desc=true` reverses it. |
+| `slugs` | Comma-separated slugs: only these datasets. |
+| `includeThumbnailCheck` | Also report whether each dataset of the page has a thumbnail (works without paging too). |
 
 ## Objects
 
@@ -83,10 +95,45 @@ Authorization: Bearer <token>
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `.../obj` | Upload object (multipart form) |
+| POST | `.../obj` | Upload one or more files, or create a folder (multipart form) |
+| GET | `.../obj/uploads/{uploadId}` | Outcome of an upload sent with `X-Upload-Id` |
+| POST | `.../obj/chunk` | Store one chunk of a resumable upload |
+| GET | `.../obj/chunk/{fileId}` | Chunks of a resumable upload that are stored and missing |
+| POST | `.../obj/chunk/{fileId}/commit` | Add a resumable upload whose chunks are all stored |
 | PUT | `.../obj` | Move/rename object |
 | DELETE | `.../obj?path=` | Delete object |
 | DELETE | `.../obj/batch` | Delete multiple objects |
+
+**`POST .../obj`.** Each file part is stored at the `path` field sent before it; a single file
+may also send `path` after the file. Without a file part, a folder is created at `path`.
+Access, the storage quota (from `Content-Length`) and a `path` sent before its file are
+checked before the first byte is stored, so a refused upload fails at once (`401`, `403`,
+`404`, `507`) instead of after the transfer.
+
+* One file part: `201` with the entry.
+* Several file parts (a bundle, at most 64): `200` with one result per file,
+  `[{ "path", "entry", "error", "status" }]`. A file that fails does not fail the others.
+
+**`X-Upload-Id`.** A client may send a unique id with an upload (8 to 64 letters, digits, `-` or `_`). If the response is lost, for example a proxy timeout after the last
+byte, ask `GET .../obj/uploads/{uploadId}` before sending the file again:
+
+| Status | Meaning |
+|--------|---------|
+| `200` | The upload is done (`state: "Done"`, with the results) or failed (`state: "Failed"`, with the error). |
+| `202` | The server is still receiving or adding the files. Ask again later. |
+| `404` | Unknown id: send the file again. |
+
+Repeating a `POST .../obj` with the id of an upload that is done returns its results
+without storing the files again. Receipts are kept for 24 hours.
+
+**Resumable (chunked) uploads.** For files too large for one request, send chunks with
+`POST .../obj/chunk`. The form fields `fileId`, `chunkIndex`, `totalChunks`, `totalFileSize`,
+`chunkSize` and `path` must come before the `chunk` file part. Chunks may arrive in any order
+and may be sent again; each response lists the chunks still missing. After an interruption,
+`GET .../obj/chunk/{fileId}` tells which chunks to resend. `POST .../obj/chunk/{fileId}/commit`
+adds the file (`201` with the entry; `409` with the missing chunks). Committing again returns
+the same entry. Chunks are at most 128 MB, and an upload that is not committed is removed
+after 24 hours.
 
 ### Download
 
@@ -157,7 +204,8 @@ See the [Processing Platform](/docs/registry/admin/processing-platform) page for
 |--------|----------|-------------|
 | GET | `.../tasks/tools` | List available tools with JSON Schema |
 | POST | `.../tasks` | Submit a new task (202) or get dedup hit (200) |
-| GET | `.../tasks` | List tasks (`?toolId=&state=&skip=0&take=50`) |
+| GET | `.../tasks` | List tasks (`?toolId=&state=&skip=0&take=50`). Sends an `ETag`; `If-None-Match` with it returns `304` while the list is unchanged |
+| GET | `.../tasks/events` | Server-sent events (`text/event-stream`): a `tasks` event whenever the dataset's task list changes, and a comment every 25 s to keep the connection open |
 | POST | `.../tasks/clear` | Delete all terminal tasks (`?toolId=` optional filter) |
 | GET | `.../tasks/{id}` | Get full task status, progress, log tail, artifact |
 | GET | `.../tasks/{id}/log` | Incremental log (`?since={cursor}`) |
@@ -292,6 +340,7 @@ Browse STAC catalogs with tools like [STAC Browser](https://radiantearth.github.
 |--------|----------|-------------|
 | GET | `/sys/version` | Get Registry version |
 | GET | `/sys/features` | Get active feature flags and platform catalog (no auth required) |
+| POST | `/sys/upload-probe` | Upload self-test: reads and discards the body (at most 16 MB) and returns `{ bytes, serverMs }`. Any signed-in user, 28 requests per minute |
 | GET | `/sys/build-pending-status` | Get background build job status |
 | GET | `/sys/tasks` | List tasks across all users and datasets *(admin only)* (`?toolId=&state=&userId=&skip=0&take=50`) |
 | POST | `/sys/import-dataset` | Import dataset from another Registry |
