@@ -46,16 +46,23 @@ DroneDB extracts the following metadata at index time:
 
 ## Vegetation indices
 
-When a multispectral raster is displayed in Hub, the viewer computes vegetation indices on the fly from the available bands. The set of available indices depends on which band types the sensor provides.
+When a multispectral raster is displayed in Hub, the **Plant Health** panel of the Map tab computes vegetation indices on the fly from the available bands. The bands are those of the sensor profile matched at index time (band names, descriptions and colour interpretation), so each index reads the right band whatever the band order of the camera. The panel lists every formula; the ones the raster cannot compute are disabled (✗), with the reason in their tooltip and in the formulas dialog.
 
 | Index | Required bands | Description |
 |-------|----------------|-------------|
 | NDVI  | R, NIR | Normalized Difference Vegetation Index |
 | NDRE  | RedEdge, NIR | Normalized Difference RedEdge Index |
 | GNDVI | G, NIR | Green Normalized Difference Vegetation Index |
-| EVI   | R, G, NIR | Enhanced Vegetation Index |
-| SAVI  | R, NIR | Soil-Adjusted Vegetation Index |
-| OSAVI | R, NIR | Optimized SAVI |
+| EVI   | R, B, NIR | Enhanced Vegetation Index (reflectance rasters only) |
+| SAVI  | R, NIR | Soil-Adjusted Vegetation Index (reflectance rasters only) |
+| OSAVI | R, NIR | Optimized SAVI (reflectance rasters only) |
+
+A formula is disabled for one of two reasons:
+
+- **A band is missing**: "Requires bands: ..." names the bands the formula reads.
+- **The raster is not reflectance** (SAVI, OSAVI and EVI): these formulas add constants (+0.5, +0.16, +1, 6 × Red, 7.5 × Blue) that assume reflectance values from 0 to 1. On integer rasters (8- or 16-bit digital numbers) they give wrong values, for example SAVI 1.5 times NDVI, so they are offered only for floating-point rasters. The reason reads "SAVI needs reflectance values (0 to 1, a floating-point raster): the raster is UInt16, whose values are not reflectance". Use NDVI, NDRE or another ratio index on such rasters, or process a reflectance orthophoto.
+
+The same rule applies to the thumbnails, map tiles, raster exports and statistics of a formula, and to the [WMS spectral styles](/docs/integrations/ogc-services#which-styles-a-raster-offers). A band value that is NaN counts as no data, like the nodata value of the band.
 
 Results are displayed with a configurable colormap (viridis, RdYlGn, etc.).
 
@@ -166,7 +173,7 @@ ddb add odm_orthophoto/multispectral_masked.tif
 ddb push
 ```
 
-Hub will detect the sensor profile, display all five bands, and offer NDVI/NDRE rendering out of the box.
+Hub will detect the sensor profile, display all five bands, and offer NDVI/NDRE rendering out of the box (SAVI, OSAVI and EVI too when the orthophoto holds floating-point reflectance values).
 
 :::tip
 For thermal surveys, skip step 2 and 3. Add the thermal R-JPEGs directly: DroneDB extracts calibration data and temperature values at index time.
