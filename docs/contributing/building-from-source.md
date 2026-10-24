@@ -11,12 +11,12 @@ DroneDB uses **vcpkg** for dependency management and **CMake** for building.
 
 | Requirement | Version |
 |-------------|---------|
-| C++17 compiler (GCC / Clang / MSVC) | GCC 9+, Clang 9+, MSVC 2019+ |
+| C++20 compiler (GCC / Clang / MSVC) | CI builds with GCC 13 (Ubuntu 24.04) and the MSVC of the current Windows runner |
 | CMake | 3.21+ |
 | Python | 3.x |
 | Git | any recent version |
 | Rust toolchain (`cargo`) | any recent stable version (required for Gaussian Splat LOD) |
-| Visual Studio (Windows only) | 2019+ with "Desktop development with C++" workload |
+| Visual Studio (Windows only) | 2022 or later with "Desktop development with C++" workload |
 
 ## Windows
 
@@ -56,9 +56,10 @@ cd DroneDB
 
 | File | Description |
 |------|-------------|
-| `build/ddbcmd.exe` | Command-line tool |
-| `build/ddb.dll` | Core library |
-| `build/ddbtest.exe` | Test suite |
+| `build/ddbcmd.exe` | Command-line tool (contains the library; it does not load `ddb.dll`) |
+| `build/ddb.dll` | DroneDB library for host programs: exports the C API of `ddb.h` only |
+| `build/ddb_unit_tests.exe` | Unit tests (offline) |
+| `build/ddbtest.exe` | Integration tests |
 | `build/untwine.exe` | COPC accelerator *(optional, see below)* |
 | `build/build-lod.exe` | Gaussian Splat LOD producer *(optional, see below)* |
 | `build/Obj2Tiles.exe` | OGC 3D Tiles generator *(optional, see below)* |
@@ -96,13 +97,30 @@ Accepted values follow CMake conventions: `Release`, `Debug`, `RelWithDebInfo`, 
 
 | File | Description |
 |------|-------------|
-| `build/ddbcmd` | Command-line tool |
-| `build/libddb.so` | Core library |
-| `build/ddbtest` | Test suite |
+| `build/ddbcmd` | Command-line tool (contains the library; it does not load `libddb.so`) |
+| `build/libddb.so` | DroneDB library for host programs: exports the C API of `ddb.h` only |
+| `build/ddb_unit_tests` | Unit tests (offline) |
+| `build/ddbtest` | Integration tests |
 | `build/untwine` | COPC accelerator *(optional, see below)* |
 | `build/build-lod` | Gaussian Splat LOD producer *(optional, see below)* |
 | `build/Obj2Tiles` | OGC 3D Tiles generator *(optional, see below)* |
 | `build/dwg2dxf` | DWG to DXF converter *(optional, see below)* |
+
+---
+
+## Version and C API files
+
+DroneDB has one version for the library, its C ABI and the release: the `version` field of `package.json`. CMake generates `build/generated/include/ddb_version.h` from it at configure time (`DDB_VERSION_*`, and `DDB_ABI_MAJOR`/`DDB_ABI_MINOR`, the major and minor of the version). `cmake --install` installs the C API only: `ddb.h`, `ddb_export.h`, `ddb_version.h` and `ddb.symbols`.
+
+`src/include/ddb.symbols` lists every exported function. CI fails when the library exports anything else, when the list changes without the matching version bump (a removed export needs a new major version, a new export at least a new minor), or when a `v*` tag differs from `package.json`. Check locally with:
+
+```bash
+python3 scripts/check-abi.py exports --library build/libddb.so   # the exported symbols equal the manifest (or build/ddb.dll)
+python3 scripts/check-abi.py bump                                # vs the previous release tag: the matching version bump
+python3 scripts/check-abi.py tag --tag v2.0.0                    # a release tag equals package.json
+```
+
+See [DroneDB Library (C API)](/docs/integrations/library) for the contract itself.
 
 ---
 
@@ -198,6 +216,22 @@ If Obj2Tiles is unavailable, 3D Tiles generation is skipped as a best-effort art
 ---
 
 ## Running Tests
+
+The tests are split into offline unit tests (`ddb_unit_tests`) and integration tests (`ddbtest`, which downloads test data). Run them through ctest from the build folder, by label:
+
+```bash
+cd build
+ctest -L unit -j 8            # offline unit tests, in parallel
+ctest -L integration          # integration tests
+ctest -LE slow                # everything but the slow tests
+ctest -L cli                  # the ddb command line
+ctest -L headers              # every installed header compiles on its own
+ctest -L shared               # libddb loaded by a host through the C API
+```
+
+Each test process works in its own folder under `<temp>/ddb_test_areas/`, removed when it ends (kept after a failure), so concurrent runs do not interfere. Test data downloads go to a shared cache: `DDB_TEST_CACHE_DIR`, else `<temp>/ddb_test_cache`.
+
+You can still run a binary directly:
 
 ```bash
 # Linux
