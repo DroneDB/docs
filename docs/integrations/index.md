@@ -12,6 +12,7 @@ DroneDB Registry provides multiple integration options for connecting with exter
 - **[REST API](/docs/integrations/api-reference)** - Full REST API for programmatic access to all Registry features
 - **[STAC API](/docs/integrations/stac-api)** - SpatioTemporal Asset Catalog compliance for standardized geospatial data discovery
 - **[OGC Services](/docs/integrations/ogc-services)** - WMS, WFS, WMTS, WCS, and OGC API standards for GIS integration
+- **[DroneDB Library (C API)](/docs/integrations/library)** - Embed the DroneDB library in your own program: versions, configuration, errors, cancellation and the build manifest
 
 ## Use Cases
 
@@ -22,3 +23,4 @@ DroneDB Registry provides multiple integration options for connecting with exter
 | STAC catalogs | STAC API |
 | Custom web apps | REST API + OGC API |
 | MapLibre / OpenLayers | MVT tiles + OGC API |
+| C, C++, .NET, Python (FFI) programs | DroneDB Library (C API) |

@@ -82,6 +82,7 @@ const sidebars = {
         'integrations/api-reference',
         'integrations/stac-api',
         'integrations/ogc-services',
+        'integrations/library',
       ],
     },
     {
