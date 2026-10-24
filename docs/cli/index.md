@@ -77,6 +77,17 @@ sidebar_label: CLI Overview
 the same time. The environment variable `DDB_INDEX_THREADS` sets how many: a number of threads,
 `0` for every core, `1` for one file at a time. The default is the number of cores, up to 8.
 
+## Output and exit codes
+
+`ddb` writes the output of a command (text, JSON, GeoJSON) to **stdout** and its log messages (warnings, `--debug` records) to **stderr**, so the output of `ddb info -f json` or `ddb list -f json` can be piped to another program as it is. Before DroneDB 2.0 the log went to stdout too, and several failures exited with `0`.
+
+| Exit code | When |
+|-----------|------|
+| `0` | The command succeeded; also `ddb --help` and `ddb <command> --help` |
+| `1` | The command failed: no arguments, an unknown command, an invalid argument or format (`-f` that the command does not write), a failed push or pull, a Registry that cannot be reached. The message is on stderr |
+
+`ddb push`, `ddb pull`, `ddb clone` and `ddb share` accept only `http` and `https` Registry URLs. A Registry that cannot be reached fails at once with `could not connect to <url>: <reason>`, without asking for a password.
+
 ## Installation
 
 See the [CLI Installation](/docs/getting-started/installation#cli-installation) page for setup instructions.
