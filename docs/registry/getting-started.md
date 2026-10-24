@@ -21,6 +21,13 @@ On macOS, do not bind-mount a local folder to `/data`. Use a named volume instea
 [macOS: use a named volume](#macos-use-a-named-volume).
 :::
 
+:::warning Apple Silicon (M1 to M4) and other ARM computers
+The `dronedb/registry` image is built for Intel/AMD (`linux/amd64`) processors only. On an ARM
+computer, `docker run` fails with `no matching manifest for linux/arm64/v8`. Add
+`--platform linux/amd64` to the command. See
+[Apple Silicon and other ARM computers](#apple-silicon-and-other-arm-computers).
+:::
+
 **Default credentials**: `admin` / `password123`
 
 :::warning
@@ -58,10 +65,14 @@ Desktop Linux VM, so it does not use virtiofs:
 ```bash
 docker volume create registry-data
 docker run -d --name registry --restart unless-stopped \
+  --platform linux/amd64 \
   -p 5000:5000 \
   -v registry-data:/data \
   dronedb/registry
 ```
+
+The `--platform linux/amd64` line is required on Apple Silicon Macs and has no effect on Intel
+Macs. See [Apple Silicon and other ARM computers](#apple-silicon-and-other-arm-computers).
 
 To change the port on the host, change only the first number. For example, use
 `-p 5010:5000` to open Registry at `http://localhost:5010`.
@@ -79,6 +90,37 @@ docker cp registry:/data ./registry-data-backup
 
 To recover an instance that you started with a local folder, see
 [Dataset initialization fails on macOS](./admin/troubleshooting.md#dataset-initialization-fails-on-macos).
+
+### Apple Silicon and other ARM computers
+
+The Registry Docker image is published for `linux/amd64` only. On an Apple Silicon Mac
+(M1, M2, M3, M4) or another ARM computer, Docker cannot find an image for your processor and
+`docker run` stops with this error:
+
+```text
+docker: no matching manifest for linux/arm64/v8 in the manifest list entries
+```
+
+To run the image, ask Docker for the `linux/amd64` platform. Docker Desktop then runs the image
+through emulation:
+
+```bash
+docker run -d --name registry --restart unless-stopped \
+  --platform linux/amd64 \
+  -p 5000:5000 \
+  -v registry-data:/data \
+  dronedb/registry
+```
+
+:::note
+- On macOS, keep the named volume from the previous section.
+- Emulation is slower than a native image. Processing of large datasets takes more time.
+- In Docker Desktop, open **Settings → General** and turn on **Use Rosetta for x86_64/amd64
+  emulation on Apple Silicon**. Without it, Docker uses a slower emulator.
+:::
+
+A native `linux/arm64` image is not available yet. To avoid emulation, use
+[Getting Started Natively](#getting-started-natively) with the release for your platform.
 
 ## Getting Started Natively
 
