@@ -20,6 +20,8 @@ Registry automatically generates optimized formats for visualization:
 
 Processing happens in background via Hangfire jobs. Monitor progress at `/hangfire`.
 
+Which entry types are built, which have a thumbnail and what each build produces is decided by the DroneDB library, not by Registry: `GET /sys/features` lists the entry types (`entryTypes`, with `buildable`, `thumbnail` and the artifact roles), and each entry of a listing lists the artifacts that exist (`artifacts`, with their role, URL and media type). The Hub reads both, so a viewer opens only when the artifacts it needs are listed. A thumbnail asked for an entry whose type has none (a video, a text file) answers `404`.
+
 ### Processing Tools
 
 Registry's Processing Platform exposes the following tools as background tasks:
