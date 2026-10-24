@@ -147,9 +147,11 @@ after 24 hours.
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `.../thumb?path=` | Generate thumbnail |
-| GET | `.../tiles/{tz}/{tx}/{ty}.png` | Generate map tile |
-| GET | `.../build/{hash}/*` | Get build files (COG, COPC, NXS, MVT, 3D Tiles, RAD) |
+| GET | `.../thumb?path=` | Generate thumbnail (WebP). `404` when the entry's type has no thumbnail (`entryTypes[].thumbnail` is `none` in `GET /sys/features`) |
+| GET | `.../tiles/{tz}/{tx}/{ty}.{png\|webp\|jpg}` | Map tile in the format of the extension (`image/png`, `image/webp`, `image/jpeg`); `{ty}@2x` for retina tiles |
+| GET, HEAD | `.../build/{hash}/*` | Build files (COG, COPC, NXS, MVT, 3D Tiles, RAD). `HEAD` sends the headers of `GET` without the body. Downloads carry the DroneDB library's media types: COG `image/tiff; application=geotiff; profile=cloud-optimized`, COPC `application/vnd.laszip+copc`, GeoPackage `application/geopackage+sqlite3` |
+
+Entries in listings and pending builds carry `artifacts: [{role, url, mediaType}]`, the build outputs that exist (the roles are listed in [DroneDB Library](/docs/integrations/library#build-manifest)). A client reads the URL of an artifact from this list and never composes `/build/` paths itself.
 
 ### Build Jobs
 
@@ -161,7 +163,7 @@ after 24 hours.
 
 ### Pending builds and retries
 
-Missing companion files defer a native build and create or refresh a `.pending` marker. Registry's pending coordinator enqueues an indexed entry job when at least **60 seconds** have elapsed since its last attempt, provided that path has no active build job. The coordinator reports enqueue/skip counts; the pending tool's `Pending build check complete` message also covers fallback and no-op checks.
+Missing companion files defer a native build and create or refresh a `.pending` marker. Registry's pending coordinator enqueues an indexed entry job when the `retryAfter` time the DroneDB library reports for the entry has passed (its last attempt + **60 seconds**; Registry keeps no copy of the backoff), provided that path has no active build job. The coordinator reports enqueue/skip counts; the pending tool's `Pending build check complete` message also covers fallback and no-op checks.
 
 The native build lock remains authoritative for output ownership. Coordinators for the same organization and dataset use shared coordination in the configured Hangfire storage, acquiring it before reading pending entries and active jobs and holding it through synchronous enqueue and JobIndex publication. Retry scheduling and sweep state updates use the same coordination. Other datasets proceed independently. A failed enqueue or index publication remains an explicit storage failure and can weaken duplicate suppression.
 
@@ -184,9 +186,9 @@ For Gaussian Splat builds, `DDB_BUILDLOD_IDLE_TIMEOUT_SECONDS` sets the build-lo
 
 ### Native build API compatibility
 
-`DDBBuild`, `DDBIsBuildComplete`, and the C/PInvoke build signatures remain unchanged, as do serialized Hangfire wrapper signatures and pending-info JSON keys (`hash`, `path`, `missingDependencies`, `lastAttempt`). Completeness checks remain read-only, with the narrow [interrupted Model tiles-swap exception](/docs/features/3d-tiles#output-and-interrupted-build-recovery).
+`DDBBuild`, `DDBIsBuildComplete`, and the C/PInvoke build signatures remain unchanged, as do serialized Hangfire wrapper signatures and pending-info JSON keys (`hash`, `path`, `missingDependencies`, `lastAttempt`; DroneDB 2.0 adds `retryAfter`). Completeness checks remain read-only, with the narrow [interrupted Model tiles-swap exception](/docs/features/3d-tiles#output-and-interrupted-build-recovery).
 
-Direct C++ `ddb::obj2tiles::runObj2Tiles` calls now require an absent or empty destination; intentional replacements use the higher-level builder's staging/swap. `ddb::process::Result` adds `descendantsTerminated`, reported by `describe()` and runner logs when drain-grace cleanup terminates remaining descendants. A successful direct-child exit stays successful; `timedOut` remains an idle-timeout signal. This changes the exported C++ result layout, so rebuild native C++ consumers together with libddb.
+The DroneDB library 2.0 exports only its C API (`ddb.h`): its C++ classes and functions are internal and not available to consumers. See [DroneDB Library](/docs/integrations/library).
 
 ### CAD drawings
 
@@ -269,6 +271,8 @@ A host that verifies the uploaded bytes itself can skip the hash check with the 
 | DELETE | `.../meta/{id}` | Remove specific metadata entry |
 | POST | `.../meta/dump` | Export all metadata |
 
+A key ending in `s` names a list, written with `POST .../meta/{key}` (add); any other key holds one value, written with `.../set`. Using the wrong one answers `400` with the rule. `GET .../meta/{key}` for a key nobody wrote answers `404`.
+
 ## Users
 
 **Base Route:** `/users`
@@ -343,8 +347,12 @@ Browse STAC catalogs with tools like [STAC Browser](https://radiantearth.github.
 | POST | `/sys/upload-probe` | Upload self-test: reads and discards the body (at most 16 MB) and returns `{ bytes, serverMs }`. Any signed-in user, 28 requests per minute |
 | GET | `/sys/build-pending-status` | Get background build job status |
 | GET | `/sys/tasks` | List tasks across all users and datasets *(admin only)* (`?toolId=&state=&userId=&skip=0&take=50`) |
-| POST | `/sys/import-dataset` | Import dataset from another Registry |
-| POST | `/sys/import-organization` | Import organization from another Registry |
+| POST | `/sys/import-dataset` | Queue the import of a dataset from another Registry: `202 {jobId, statusUrl}` (see [Import & Export](/docs/registry/import-export)) *(admin only)* |
+| POST | `/sys/import-organization` | Queue the import of an organization from another Registry: `202 {jobId, statusUrl}` *(admin only)* |
+| GET | `/sys/imports/{jobId}` | State and result of an import job: `{jobId, state, result, error}` *(admin only)* |
+| DELETE | `/sys/imports/{jobId}` | Cancel an import job (`204`) *(admin only)* |
+| POST | `/sys/rescan` | Rescan the entries of given types and extensions in all datasets, one organization or one dataset (one `rescan-index` task per dataset) *(admin only)* |
+| POST | `/sys/fix-invalid-slugs` | Rename organizations and datasets whose slug breaks the slug rules; `?dryRun=true` (the default) returns the plan only *(admin only)* |
 | POST | `/sys/move-datasets` | Move datasets between organizations *(admin, enforced server-side)* |
 | POST | `/sys/merge-organizations` | Merge one organization into another *(admin, enforced server-side)* |
 | POST | `/sys/cleanupbatches` | Purge expired or orphaned upload batches |
@@ -371,6 +379,8 @@ This endpoint is available without authentication and is used by the Hub fronten
 | `bulkDownloadAsyncThresholdBytes` | `long` | Selection size threshold above which bulk downloads are routed to the async task |
 | `taskTools` | `array` | Catalog of available task tools (id, version, title, required access, artifact flag, extension) |
 | `taskStates` | `array` | Task state machine with `{state, isTerminal}` per entry |
+| `entryTypes` | `array` | The DroneDB library's entry types: `{id, name, buildable, thumbnail, sidecarExtensions, roles}`; `thumbnail` is `none`, `file` (rendered from the file) or `build` (from a build artifact) |
+| `archiveExtensions` | `string[]` | Archive suffixes the server extracts: lowercase, without the dot, compound ones first (`tar.gz` before `gz`) |
 | `hubOptions` | `object?` | Hub UI branding and feature flags |
 | `hubVersion` | `string?` | Semver of the Hub (Vue SPA) currently deployed |
 | `registryVersion` | `string?` | Registry backend assembly version |
@@ -380,23 +390,37 @@ This endpoint is available without authentication and is used by the Hub fronten
 
 | Endpoint | Description |
 |----------|-------------|
+| `/health/live` | Liveness probe for container health checks (no auth) |
 | `/version` | Application version (no auth) |
-| `/quickhealth` | Basic health check (requires auth) |
-| `/health` | Full health check (requires auth) |
+| `/quickhealth` | Basic health check (admin, or the `MonitorToken` as a bearer token or `?token=`) |
+| `/health` | Full health check, including the database and the DroneDB library (admin or `MonitorToken`) |
 
 ## Error Responses
 
-API errors return JSON with the following structure:
+API errors are RFC 9457 `ProblemDetails`, with the media type `application/problem+json`:
 
 ```json
 {
-  "error": "Error message description"
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+  "title": "Forbidden",
+  "status": 403,
+  "detail": "The current user is not allowed to read this dataset",
+  "traceId": "00-...",
+  "noRetry": true
 }
 ```
 
+Read the message from `detail`. `noRetry: true` means that repeating the same request will not help. Validation errors of a request body are `ValidationProblemDetails`, with an `errors` object per field and the joined messages in `detail`. Since Registry 3.0 the old `{"error": "..."}` body is gone; a client that also talks to older servers falls back to `error`.
+
 Common HTTP status codes:
 - `400` - Bad Request (invalid parameters)
-- `401` - Unauthorized (missing or invalid token)
-- `403` - Forbidden (insufficient permissions)
+- `401` - Unauthorized (not signed in, or the credentials are no longer valid)
+- `403` - Forbidden (signed in without permission; it was `401` before Registry 3.0). Admin-only endpoints answer "Only administrators can perform this operation"
 - `404` - Not Found
+- `409` - Conflict
+- `413` - Payload Too Large (`noRetry: true`)
+- `429` - Too Many Requests (download limit; `Retry-After`)
+- `503` - Service Unavailable (temporary: a busy index, a build holding it, the server stopping; `Retry-After`)
 - `500` - Internal Server Error
+
+A request whose client disconnects stops its work and gets no answer (logged as `499`).
