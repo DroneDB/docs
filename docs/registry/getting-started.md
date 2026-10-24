@@ -40,8 +40,9 @@ Change the default password immediately after first login at [http://localhost:5
 |----------|-------------|
 | [/scalar/v1](http://localhost:5000/scalar/v1) | API Documentation (Scalar UI) |
 | [/version](http://localhost:5000/version) | Version information |
-| [/quickhealth](http://localhost:5000/quickhealth) | Quick health check (requires auth) |
-| [/health](http://localhost:5000/health) | Detailed health check (requires auth) |
+| [/health/live](http://localhost:5000/health/live) | Liveness probe (no auth) |
+| [/quickhealth](http://localhost:5000/quickhealth) | Quick health check (admin or `MonitorToken`) |
+| [/health](http://localhost:5000/health) | Detailed health check (admin or `MonitorToken`) |
 | [/hangfire](http://localhost:5000/hangfire) | Background jobs dashboard (requires auth) |
 | [/stac](http://localhost:5000/stac) | STAC Catalog root |
 

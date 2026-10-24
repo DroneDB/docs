@@ -37,6 +37,12 @@ server {
 }
 ```
 
+Registry applies `X-Forwarded-For` and `X-Forwarded-Proto` only when the proxy's address is in
+`KnownProxies` or `KnownNetworks` (see
+[Behind a reverse proxy](./production.md#behind-a-reverse-proxy)). If the logs show the same
+`172.x.0.1` address for every client, or all anonymous users share one rate limit, add the
+Docker bridge range to `KnownNetworks`.
+
 ### Tuning the reverse proxy for large uploads
 
 Registry **streams** uploads straight to storage as the bytes arrive, and it hashes
@@ -182,6 +188,15 @@ Registry reports it. Raise `proxy_read_timeout` if this happens often.
 - Verify database connectivity
 - Ensure DroneDB library is properly installed
 
+**"Unable to use the DDB library" at start**
+- Registry needs the DroneDB library 2.x, with every function Registry calls. Use the Docker image, or install the DroneDB build pinned in `Directory.Build.props` of your Registry version.
+
+**Registry exits with code 1 and "Invalid setting: ..."**
+- A setting in `appsettings.json` or the environment is invalid; the message names the key. Fix it and check with `Registry.Web <storage folder> --check` (see [Configuration](./configuration.md)).
+
+**Container never becomes healthy**
+- The health check must call `/healthcheck.sh` (the image's own check) or `GET /health/live`. `/quickhealth` needs the `MonitorToken` or an administrator, so a `curl .../quickhealth` health check never passes.
+
 **Authentication errors**
 - Verify `Secret` is set and consistent
 - Check token expiration settings
@@ -201,7 +216,7 @@ Registry reports it. Raise `proxy_read_timeout` if this happens often.
 - The `JobIndices` table keeps track of build jobs. A scheduled cleanup task removes old terminal records automatically (default: every night at 4:00 AM, retaining 60 days). If the table has already grown very large, trigger an immediate one-off purge:
   ```bash
   curl -X POST -H "Authorization: Bearer <admin-token>" \
-    http://localhost:5000/system/cleanup-jobindices
+    http://localhost:5000/sys/cleanup-jobindices
   ```
   You can optionally override the retention period: `?retentionDays=30`.
 - See `JobIndexRetentionDays` and `JobIndexCleanupCron` in the [Configuration Reference](./configuration.md#jobindexcleanupcron).
@@ -284,12 +299,18 @@ for the recurring full-cleanup schedule.
 Use the health endpoints to diagnose issues:
 
 ```bash
+# Liveness (no auth): the process serves HTTP
+curl http://localhost:5000/health/live
+
 # Quick health (basic check)
 curl -H "Authorization: Bearer <token>" http://localhost:5000/quickhealth
 
 # Full health (includes database, DroneDB)
 curl -H "Authorization: Bearer <token>" http://localhost:5000/health
 ```
+
+`<token>` is an administrator's token or the `MonitorToken`; the token can also be passed as
+`?token=<MonitorToken>`.
 
 ### Health Check Response
 
@@ -306,8 +327,11 @@ The `/health` endpoint returns detailed status for:
 
 | Deployment | Log Location |
 |------------|--------------|
-| Docker | `docker-compose logs registry` |
-| Native | `registry-data/logs/registry.txt` |
+| Docker | `docker-compose logs registry`; files in `data/logs/`: `registry-web*.txt`, `registry-node-<host name>*.txt`, `registry-thumbs*.txt` |
+| Native | `registry-data/logs/registry*.txt` |
+
+Log files roll daily and the last 14 are kept (100 MB at most per file). Give each processing
+node container a fixed `hostname`: its log file is named after it.
 
 ### Adjusting Log Verbosity
 
