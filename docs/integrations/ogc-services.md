@@ -35,7 +35,7 @@ entries that you see in the web viewer.
 
 | Standard | Version | Endpoint root | Notes |
 |----------|---------|---------------|-------|
-| WMS | 1.1.1 & 1.3.0 | `/wms` | Multi-layer compositing, transparent backgrounds, NDVI/NDRE/NDWI/EVI/SAVI styles |
+| WMS | 1.1.1 & 1.3.0 | `/wms` | Multi-layer compositing, transparent backgrounds, NDVI/NDRE/NDWI/SAVI/EVI styles on the rasters that support them |
 | WFS | 2.0.0 (1.1.0 alias) | `/wfs` | GeoJSON + GML output, BBOX and FES 2.0 filters, paging via `count`/`startIndex` |
 | WMTS | 1.0.0 | `/wmts` | XYZ tile pyramid backed by the per-dataset MVT cache for vectors and COG for rasters |
 | WCS | **1.0.0, 1.1.x, 2.0.1** | `/wcs` | GeoTIFF + PNG/JPEG `GetCoverage`, version negotiated via `ACCEPTVERSIONS` |
@@ -80,11 +80,48 @@ Supported `STYLES`:
 | `NDVI` | `(NIR − Red) / (NIR + Red)` | vegetation health |
 | `NDRE` | `(NIR − RedEdge) / (NIR + RedEdge)` | crop stress, late-season chlorophyll |
 | `NDWI` | `(Green − NIR) / (Green + NIR)` | water bodies |
-| `SAVI` | `((NIR − Red) / (NIR + Red + 0.5)) × 1.5` | sparse vegetation |
-| `EVI`  | `2.5 × (NIR − Red) / (NIR + 6×Red − 7.5×Blue + 1)` | dense canopies |
+| `SAVI` | `1.5 × (NIR − Red) / (NIR + Red + 0.5)` | sparse vegetation (reflectance rasters only) |
+| `EVI`  | `2.5 × (NIR − Red) / (NIR + 6×Red − 7.5×Blue + 1)` | dense canopies (reflectance rasters only) |
 
-Spectral indices require a multispectral GeoRaster (≥3 bands using the
-DroneDB convention `R=1, G=2, B=3, RedEdge=4, NIR=5`).
+The index is drawn with a red-yellow-green ramp over the range −1 to 1.
+
+#### Which styles a raster offers
+
+Each raster layer lists in `GetCapabilities` only the spectral styles the DroneDB library can
+render for it (the `indexLayer` list of the library's raster info), and `GetMap` accepts the same
+list. A style the raster does not list is refused with `StyleNotDefined` (`400`). The rules:
+
+- **Bands come from the sensor profile.** The library maps the bands with the same sensor
+  detection as the map tiles and thumbnails (band names, descriptions, colour interpretation). This
+  gives the right bands on MicaSense RedEdge/Altum and DJI P4 Multispectral (Blue first), and the
+  indices their bands allow on 4-band sensors (Mavic 3M, Parrot Sequoia: Green, Red, RedEdge, NIR:
+  no Blue, so no EVI).
+- **Fixed order as a fallback.** A raster whose bands are not named by a sensor profile and that
+  has five data bands or more is read in the order `R=1, G=2, B=3, RedEdge=4, NIR=5`. Any other
+  raster offers no spectral style.
+- **SAVI and EVI need reflectance.** Their formulas add constants that assume reflectance values
+  from 0 to 1, so they are offered only for floating-point rasters (for example a reflectance
+  orthophoto from OpenDroneMap). Integer rasters (8- or 16-bit digital numbers) offer NDVI, NDRE
+  and NDWI only.
+
+The list is read once per raster version and cached for a day. See
+[Multispectral imagery](/docs/features/multispectral#vegetation-indices) for the same rules in the
+Hub.
+
+#### Edges and transparency
+
+Pixels with no data stay transparent: the alpha band of the raster, the nodata value of a band the
+index reads, or a NaN value. Along the edge of the alpha band the output alpha is partial
+(anti-aliased), and SAVI and EVI keep the colour of the values inside the edge. The area outside a
+raster that has neither an alpha band nor a nodata value is transparent too.
+
+#### Temporary failures
+
+When the library cannot read a raster's style list at that moment (the dataset index is busy, a
+build holds it, the disk is full, or the server is shutting down), `GetCapabilities` and `GetMap`
+answer `503 Service Unavailable` with a `Retry-After` header and an OGC exception
+(`ServiceUnavailable`), instead of leaving the styles out. Ask again after the delay. A raster the
+library cannot read at all offers the default style only.
 
 ### WFS GetFeature (GeoJSON)
 
@@ -356,14 +393,21 @@ the generic Registry error page.
 | WCS 2.0 | `ows:ExceptionReport` (OWS 2.0 namespace) |
 | WFS 2.0 / WMTS 1.0 / WCS 1.1 | `ows:ExceptionReport` (OWS 1.1 namespace) |
 
-Authentication failures return HTTP `401` with a `WWW-Authenticate: Basic`
-challenge and an exception envelope (code `AuthenticationFailed`) matching the
-requested service. Datasets that cannot be found return `404` with code
-`NotFound`.
+Anonymous requests to a private dataset return HTTP `401` with a
+`WWW-Authenticate: Basic` challenge and an exception envelope (code
+`AuthenticationFailed`) matching the requested service. A signed-in user without
+access to the dataset gets `403` with code `AccessDenied` and no challenge (since
+Registry 3.0; it was a `401` before). Datasets that cannot be found return `404`
+with code `NotFound`; an invalid organization or dataset slug returns `400` with
+code `InvalidParameterValue`.
+
+A request whose client disconnects stops its render and gets no answer (status
+`499` in the server log). A request the server cancels itself (shutdown, timeout)
+or cannot serve now gets `503` with `Retry-After` and code `ServiceUnavailable`.
 
 Common codes: `MissingParameterValue`, `InvalidParameterValue`, `LayerNotDefined`,
-`OperationNotSupported`, `InvalidFormat`, `VersionNegotiationFailed`,
-`AuthenticationFailed`.
+`StyleNotDefined`, `OperationNotSupported`, `InvalidFormat`, `VersionNegotiationFailed`,
+`AuthenticationFailed`, `AccessDenied`, `ServiceUnavailable`.
 
 ## Caching
 
@@ -380,8 +424,10 @@ Common codes: `MissingParameterValue`, `InvalidParameterValue`, `LayerNotDefined
   requested one.
 - Raster tiles of WMTS `GetTile` and OGC API – Tiles share the server tile cache
   of the dataset map (one render per tile and format).
-- WCS raster probes (size, bands, CRS used by `DescribeCoverage`) are cached per
-  file content for a day.
+- The raster information WMS and WCS read from the DroneDB library (the spectral
+  styles of a layer; the size, bands and CRS used by `DescribeCoverage`) is read
+  once per file content, source file and library version and cached for a day; a
+  read that fails is not cached.
 - These server caches are cleared when the dataset is rebuilt or changed.
 
 ## See also
