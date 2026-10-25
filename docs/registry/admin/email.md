@@ -117,6 +117,12 @@ curl -X POST https://registry.example.com/sys/email/test \
 | `400` | E-mail is off, or the address is not valid. |
 | `502` | The server refused the e-mail or could not be reached. The `detail` of the answer gives the server's reply, for example `The mail server smtp.example.com:587 replied 535: authentication failed`. |
 
+## Clients
+
+`GET /sys/features` (no sign-in needed) has `emailEnabled`: `true` when the server sends e-mail. The Hub and other
+clients read it to hide or disable what needs e-mail (for example an invitation or a "send me a reset link" form) on
+a server where e-mail is off. It shows nothing else of the settings.
+
 ## Health check
 
 When e-mail is on, the health report (`/health`) has an `SMTP health check` entry. It connects to the server and logs

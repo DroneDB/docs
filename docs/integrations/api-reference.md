@@ -361,6 +361,7 @@ Browse STAC catalogs with tools like [STAC Browser](https://radiantearth.github.
 | POST | `/sys/cleanup-jobindices` | Purge old job index records (optional `?retentionDays=N`) |
 | POST | `/sys/cleanup` | Run DroneDB `cleanup` on every dataset *(admin only, async)* |
 | POST | `/sys/check-artifact-completeness` | Scan all datasets and enqueue rebuilds for incomplete build artifacts *(admin only, async)* |
+| POST | `/sys/email/test` | Send a test e-mail with the current SMTP settings, body `{"to": "address"}` *(admin only; see [E-mail](../registry/admin/email#test-the-settings))* |
 
 ### `GET /sys/features` response fields
 
@@ -373,6 +374,7 @@ This endpoint is available without authentication and is used by the Hub fronten
 | `storageLimiter` | `bool` | Whether per-user storage limiting is enabled |
 | `maxConcurrentDownloadsPerUser` | `int?` | Concurrent download limit per user (`null` = unlimited) |
 | `disableAnonymousBulkDownloads` | `bool` | Whether anonymous bulk archive downloads are blocked |
+| `emailEnabled` | `bool` | Whether the server sends e-mail (`AppSettings:Smtp:Enabled`). When `false`, hide or disable what needs e-mail: the server would drop it |
 | `passwordPolicy` | `object?` | Active password complexity policy, or `null` |
 | `datasetThumbnailCandidates` | `string[]` | Ordered list of dataset thumbnail file name candidates |
 | `maxExportSizeBytes` | `long?` | Maximum raster export size in bytes (`null` = unlimited) |
