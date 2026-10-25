@@ -362,6 +362,8 @@ Browse STAC catalogs with tools like [STAC Browser](https://radiantearth.github.
 | POST | `/sys/cleanup` | Run DroneDB `cleanup` on every dataset *(admin only, async)* |
 | POST | `/sys/check-artifact-completeness` | Scan all datasets and enqueue rebuilds for incomplete build artifacts *(admin only, async)* |
 | POST | `/sys/email/test` | Send a test e-mail with the current SMTP settings, body `{"to": "address"}` *(admin only; see [E-mail](../registry/admin/email#test-the-settings))* |
+| GET | `/sys/update-info` | The last update-check result: installed and latest version, merged release notes, whether they contain security fixes, the licence-request link and the declared use *(admin only; see [Update check](../registry/admin/update-check))* |
+| PUT | `/sys/update-check/settings` | Store the declared use and the opt-in contact, body `{"useDeclaration", "contactEmail", "contactConsent"}`; an address needs `contactConsent: true`, an empty one clears it; returns the update info *(admin only)* |
 
 ### `GET /sys/features` response fields
 
@@ -375,6 +377,8 @@ This endpoint is available without authentication and is used by the Hub fronten
 | `maxConcurrentDownloadsPerUser` | `int?` | Concurrent download limit per user (`null` = unlimited) |
 | `disableAnonymousBulkDownloads` | `bool` | Whether anonymous bulk archive downloads are blocked |
 | `emailEnabled` | `bool` | Whether the server sends e-mail (`AppSettings:Smtp:Enabled`). When `false`, hide or disable what needs e-mail: the server would drop it |
+| `updateCheckEnabled` | `bool` | Whether the daily update check runs (`AppSettings:UpdateCheckCron` is not `disabled`). When `false`, the Hub does not ask for update info |
+| `instanceHash` | `string` | SHA-256 (lowercase hex) of `ddb-instance-v1:` followed by the lowercase instance ID: lets dronedb.app confirm that a public URL belongs to the deployment that reported it, without publishing the ID |
 | `passwordPolicy` | `object?` | Active password complexity policy, or `null` |
 | `datasetThumbnailCandidates` | `string[]` | Ordered list of dataset thumbnail file name candidates |
 | `maxExportSizeBytes` | `long?` | Maximum raster export size in bytes (`null` = unlimited) |
