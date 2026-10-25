@@ -584,6 +584,39 @@ See the [E-mail](./email) page for the setup, provider examples, the test e-mail
 }
 ```
 
+## Update Check
+
+Registry asks dronedb.app once a day for new versions and release notes, and sends the data that the
+[Update check](./update-check) page lists. All three keys are in `AppSettings`.
+
+### UpdateCheckCron
+
+When the update check runs. It follows the [rules of the scheduled jobs](#scheduled-jobs): empty runs it once a day, at a
+time that depends on the instance, `"disabled"`, `"off"` or `"none"` switches it off (nothing is sent), and any other
+value is a cron expression.
+
+:::info
+The default value is empty (once a day).
+:::
+
+### UpdateCheckEndpoint
+
+Address of the update check service. It must be an absolute `https` URL, or Registry does not start. Change it only to
+use a test or staging service.
+
+:::info
+The default value is `https://dronedb.app/wp-json/dronedb/v1/update-check`
+:::
+
+### UpdateCheckEmail
+
+Which new versions are e-mailed to the administrators: `security` (only versions with security fixes), `all` or `off`.
+It needs [`Smtp`](#smtp): while e-mail is off, no update e-mail is sent.
+
+:::info
+The default value is `security`
+:::
+
 ## Processing
 
 ### WorkerThreads

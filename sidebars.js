@@ -52,6 +52,7 @@ const sidebars = {
             'registry/admin/user-management',
             'registry/admin/ldap-authentication',
             'registry/admin/email',
+            'registry/admin/update-check',
             'registry/admin/processing-platform',
             'registry/admin/troubleshooting',
           ],
