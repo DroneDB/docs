@@ -545,6 +545,45 @@ These headers are always enabled and require no configuration.
 For embed routes (URLs with `?embed=1`), the `X-Frame-Options` header is omitted to allow cross-origin iframe embedding.
 :::
 
+## E-mail
+
+### Smtp
+
+The outgoing e-mail server. E-mail is off by default: while `Enabled` is `false`, every e-mail Registry would send is
+logged and dropped. When `Enabled` is `true`, `Host` and `FromAddress` are required, and `UserName` and `Password` must
+be set together (or both left empty for a server without login).
+
+:::info
+See the [E-mail](./email) page for the setup, provider examples, the test e-mail and the health check.
+:::
+
+**Sub-fields:**
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Enabled` | `bool` | `false` | Sends e-mail through the server below |
+| `Host` | `string` | — | SMTP server host name |
+| `Port` | `int` | `587` | SMTP port: 587 (STARTTLS), 465 (SSL on connect), 25 (local relay) |
+| `Security` | `string` | `StartTls` | `StartTls`, `SslOnConnect` or `None` |
+| `ValidateServerCertificate` | `bool` | `true` | Validate the server certificate chain (the host name is always checked) |
+| `UserName` | `string` | `null` | SMTP account user name |
+| `Password` | `string` | `null` | SMTP account password. Prefer the `AppSettings__Smtp__Password` environment variable |
+| `FromAddress` | `string` | — | Address the e-mails are sent from |
+| `FromName` | `string` | `null` | Sender name. When `null`, the Hub application name (`HubOptions.AppName`, else `DroneDB`) |
+| `ReplyTo` | `string` | `null` | Address replies go to |
+| `TimeoutSeconds` | `int` | `30` | Timeout of each SMTP operation |
+
+```json
+"Smtp": {
+  "Enabled": true,
+  "Host": "smtp.example.com",
+  "Port": 587,
+  "Security": "StartTls",
+  "UserName": "registry@example.com",
+  "FromAddress": "registry@example.com"
+}
+```
+
 ## Processing
 
 ### WorkerThreads
