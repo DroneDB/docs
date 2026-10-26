@@ -21,6 +21,7 @@ DroneDB indexes, processes, and serves vector data for web visualization and OGC
 | TopoJSON | `.topojson` | Topology-encoded geometry |
 | KML | `.kml` | Keyhole Markup Language |
 | KMZ | `.kmz` | Zipped KML (multi-layer) |
+| GPX | `.gpx` | GPS tracks, routes and waypoints (multi-layer) |
 
 ## Processing pipeline
 
@@ -33,7 +34,9 @@ When a vector file is added to a DroneDB index, the build process generates:
 
 ### Multi-layer support
 
-GeoPackage and KMZ sources can contain multiple layers. DroneDB preserves all layers during processing, making them available as separate tile layers and OGC collections.
+GeoPackage, KMZ and GPX sources can contain multiple layers. DroneDB keeps every layer that holds at least one feature, making them available as separate tile layers and OGC collections. An empty layer (for example the waypoints of a GPX that has only a track) is left out; when no layer holds a feature, all of them are kept.
+
+GDAL reads a GPX as five layers: `waypoints`, `routes`, `tracks`, `route_points` and `track_points`. The `*_points` layers hold each point of a route or track with its own attributes (time, elevation).
 
 ### Reprojection
 

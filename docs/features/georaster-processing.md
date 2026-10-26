@@ -7,6 +7,12 @@ sidebar_label: Georaster Processing
 
 DroneDB provides tools for processing and analyzing georeferenced rasters -- orthophotos, DEMs, multispectral imagery, and thermal data.
 
+## Input formats
+
+A GeoTIFF (`.tif`, `.tiff`) or JPEG 2000 (`.jp2`, `.j2k`) file that has a coordinate system is a georaster. DroneDB builds it into a Cloud Optimized GeoTIFF, which the map streams as tiles. A file of these formats without a coordinate system is a plain image.
+
+A JPEG 2000 keeps its georeference in its GeoJP2 or GMLJP2 box. A nodata value is not read from a JPEG 2000 (GDAL keeps it only in a `.aux.xml` file, which DroneDB does not read); transparency stored as an alpha channel is kept.
+
 ## Border Masking
 
 Remove black or white border pixels from an orthophoto by making them transparent. This is useful for orthomosaics that have empty areas around the survey footprint.

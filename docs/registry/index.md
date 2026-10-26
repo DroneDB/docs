@@ -49,12 +49,12 @@ Measure distances and areas directly on point clouds:
 
 | Category | Formats |
 |----------|---------|
-| **Images** | JPG, JPEG, DNG, TIF, TIFF, PNG, GIF, WEBP |
+| **Images** | JPG, JPEG, DNG, TIF, TIFF, JP2, J2K, PNG, GIF, WEBP |
 | **Point Clouds** | LAS, LAZ, E57, PTS, XYZ, PLY* |
 | **3D Models** | OBJ, GLTF, GLB, PLY* |
 | **Gaussian Splats** | PLY*, SPLAT, SPZ |
-| **Rasters** | GeoTIFF (orthophotos, DEMs) |
-| **Vector Data** | GeoJSON, SHP, SHZ, KML, KMZ, DXF, DWG, FGB, TopoJSON, GPKG |
+| **Rasters** | GeoTIFF, JPEG 2000 (orthophotos, DEMs) |
+| **Vector Data** | GeoJSON, SHP, SHZ, KML, KMZ, GPX, DXF, DWG, FGB, TopoJSON, GPKG |
 | **Panoramas** | 360° images (aspect ratio ≥ 2:1) with optional GPS |
 | **Videos** | MP4, MOV, WEBM, M4V, AVI, MKV |
 | **Other** | Markdown, PDF |
