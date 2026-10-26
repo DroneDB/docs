@@ -77,13 +77,21 @@ ddb stac -p orthophoto.tif
 
 ### Building 3D Model Tiles
 
-Generate Nexus files for efficient web streaming of 3D meshes:
+Generate bm3d files, DroneDB's multiresolution 3D model format, for efficient web streaming of 3D meshes:
 
 ```bash
-ddb nxs model.obj output.nxz
+ddb bm3d model.obj output.bm3d
 ```
 
-Supported input formats: OBJ, GLTF, GLB.
+Supported input formats: OBJ (with its MTL and textures), PLY and STL (ASCII and binary). The `ddb bm3d` command runs the `bm3d` program, which is found as described for `DDB_BM3D_PATH` below.
+
+### Building one file's derivatives
+
+`ddb build` builds the derivative products of an indexed file (a COG, a COPC, a bm3d model, tiles, thumbnails). `--threads N` caps the threads of that build, from 1 to 4096; it lowers the `DDB_BUILD_THREADS` budget and never raises it, and Untwine and `build-lod` run as separate programs that it does not bound:
+
+```bash
+ddb build -p orthophoto.tif --threads 2
+```
 
 Generate OGC 3D Tiles (`tileset.json` + `b3dm`) for the unified 3D viewer (requires the optional Obj2Tiles binary):
 
@@ -150,6 +158,12 @@ Integer variables accept digits only: a value such as `1024MB` is ignored and th
 | `DDB_USE_PDAL_COPC` | Set to `1` to force the PDAL COPC backend, bypassing Untwine. |
 | `DDB_COPC_BACKEND` | Explicit backend selection: `"untwine"`, `"pdal"`, or `"auto"` (default). Unknown values are silently ignored. `DDB_USE_PDAL_COPC=1` takes precedence. |
 
+### 3D Models (bm3d)
+
+| Variable | Description |
+|----------|-------------|
+| `DDB_BM3D_PATH` | Absolute path to the `bm3d` program that builds `.bm3d` models. When it is not set, the program is looked for next to the `ddb` executable, next to `libddb`, in `../bin` and on `PATH`. |
+
 ### COG Build (GDAL config)
 
 These variables control `ddb build` and `ddb cog` for GeoRaster entries. They are read via `CPLGetConfigOption` and can also be passed as standard environment variables.
@@ -159,7 +173,7 @@ These variables control `ddb build` and `ddb cog` for GeoRaster entries. They ar
 | `DDB_COG_JPEG_QUALITY` | `75` | JPEG quality (1–100) for COG compression. Applied only to 8-bit RGB or RGBA rasters. LZW is used for all other cases. |
 | `DDB_WARP_MEMORY_MB` | `512` | GDALWarp memory buffer size in MB (`-wm` flag). Larger values reduce chunking overhead when multi-threading is active. |
 | `DDB_COG_CACHE_MB` | `1024` | GDAL block cache size in MB during a COG build. The cache is set to this value for the build (raised or lowered) and the previous value is restored when the last concurrent build ends. |
-| `DDB_BUILD_THREADS` | `min(8, cores)` | Threads one COG build uses for warping and compression (GDAL `NUM_THREADS`). `0` uses all cores. Lower it when several builds run at the same time. |
+| `DDB_BUILD_THREADS` | `min(8, cores)` | Threads one build uses: GDAL's warping and compression in a COG build (`NUM_THREADS`), the `bm3d` program in a 3D model build. `0` uses all cores. Lower it when several builds run at the same time, or use `ddb build --threads` for one build. |
 | `DDB_GDAL_CACHE_MB` | `1024` | Upper bound for GDAL's process-wide block cache, applied at start-up (GDAL's own default is 5 % of RAM). Never raises the cache. Ignored when `GDAL_CACHEMAX` is set. Environment variable only (digits, 16 to 1048576), not a GDAL config option. A program using the library sets the exact size with `DDBConfigure`'s `gdalCacheMb`, which can raise the cache and wins over `GDAL_CACHEMAX` (Registry: `Ddb:GdalCacheMb`). |
 
 A COG build needs about `DDB_COG_CACHE_MB` + `DDB_WARP_MEMORY_MB` + 1 GB of driver temporaries: 2.4 GB was measured for a 72 MB, 40 001 × 90 001 px thermal mosaic with the defaults.

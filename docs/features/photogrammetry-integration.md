@@ -65,7 +65,7 @@ Common NodeODX options to place inside the `options` array:
 
 ### Task output
 
-When processing completes, the result bundle is extracted directly into the dataset (or into the newly created dataset). No separate downloadable artifact is produced. Extracted files are indexed automatically and their derivative builds (COG, COPC, NXS, 3D Tiles, etc.) are enqueued in the background.
+When processing completes, the result bundle is extracted directly into the dataset (or into the newly created dataset). No separate downloadable artifact is produced. Extracted files are indexed automatically and their derivative builds (COG, COPC, bm3d, 3D Tiles, etc.) are enqueued in the background.
 
 ## Workflow example
 

@@ -62,7 +62,7 @@ ddb build
 
 ## In Registry (Processing Platform)
 
-Archive extraction runs as a background Hangfire job. You can monitor progress at `/hangfire` or via the tasks API. The job automatically enqueues build tasks for any extracted entries that support derivative products (COG, COPC, NXS, etc.).
+Archive extraction runs as a background Hangfire job. You can monitor progress at `/hangfire` or via the tasks API. The job automatically enqueues build tasks for any extracted entries that support derivative products (COG, COPC, bm3d, etc.).
 
 :::tip
 For very large archives, consider using the `ddb push` command instead of web upload to avoid browser timeouts.

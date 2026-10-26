@@ -193,7 +193,7 @@ The stack is composed of:
 
 ## Production deployment notes
 
-Registry's build pipeline (Cloud Optimized GeoTIFF, point cloud and 3D/Nexus
+Registry's build pipeline (Cloud Optimized GeoTIFF, point cloud and 3D/bm3d
 generation) writes large temporary files while processing datasets. On a busy server
 these can grow to several GB per build. Configure the deployment so this scratch never
 lands on the host root filesystem; otherwise a heavy workload (or a build that crashes

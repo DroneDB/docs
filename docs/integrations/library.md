@@ -31,7 +31,7 @@ Every release publishes, next to the `.deb` and the Windows zip:
 | `ddb.symbols` | The list of exported functions |
 | `SHA256SUMS` | The SHA-256 of every asset |
 
-The library exports exactly the functions listed in `ddb.symbols` (106 in 2.0.0) and nothing else; its C++ classes and functions are internal. Pin a release by version and SHA-256, and build against that release's headers.
+The library exports exactly the functions listed in `ddb.symbols` (107 in 2.0.0) and nothing else; its C++ classes and functions are internal. Pin a release by version and SHA-256, and build against that release's headers.
 
 ## Start-up and shutdown
 
@@ -118,14 +118,18 @@ A cancel token stops the work of a call from another thread:
 3. `DDBCancel(token)` from any thread: the call stops at its next checkpoint and returns `DDBERR_CANCELED`;
 4. `DDBFreeCancelToken(token)` when the host no longer needs it.
 
-The `cancellable` list of `DDBGetCapabilities()` names the exports that honour a token. In 2.0.0 there are 26:
+The `cancellable` list of `DDBGetCapabilities()` names the exports that honour a token. In 2.0.0 there are 27:
 
 - tiles, renders and thumbnails: `DDBTile`, `DDBMemoryTile`, `DDBMemoryTileEx`, `DDBMemoryTileFmt`, `DDBRenderRasterRegion`, `DDBRenderRasterRegionEx`, `DDBRenderRasterIndex`, `DDBGenerateThumbnail`, `DDBGenerateMemoryThumbnail`, `DDBGenerateMemoryThumbnailEx`;
-- exports and builds: `DDBExportRaster`, `DDBExportRaster2`, `DDBBuild`;
+- exports and builds: `DDBExportRaster`, `DDBExportRaster2`, `DDBBuild`, `DDBBuildEx`;
 - raster analysis: `DDBGetRasterMetadata`, `DDBGetRasterValueInfo`, `DDBGetRasterPointValue`, `DDBGetRasterAreaStats`, `DDBGetRasterProfile`, `DDBCalculateVolume`, `DDBDetectStockpile`, `DDBDetectAllStockpiles`, `DDBGenerateContours`, `DDBMaskBorders`;
 - deltas: `DDBComputeDeltaLocals`, `DDBApplyDelta`, `DDBApplyDeltaEx`.
 
 A canceled call leaves no partial output (a canceled `DDBMaskBorders` writes no file). `DDBApplyDelta` and `DDBApplyDeltaEx` are atomic to a cancel: they stop while they read and hash the added files, with the dataset and the source files as they were, and once they start to change the dataset they apply the delta whole and return `DDBERR_NONE`.
+
+## Builds
+
+`DDBBuild(ddbPath, source, dest, force, pendingOnly)` builds the derivative products of an entry. `DDBBuildEx(ddbPath, source, dest, force, pendingOnly, optionsJson)` takes the same arguments and a JSON object of options; `DDBBuild` is `DDBBuildEx` without options. The only option is `{"threads": N}`, an integer from 1 to 4096 (not `2.0`, `true` or `"2"`): the most threads each build of the call may use. It only lowers the `DDB_BUILD_THREADS` budget and never raises it. It bounds the GDAL threads of a raster build, the `bm3d` program of a 3D model build, the cores of Obj2Tiles and the PDAL `writers.copc` fallback; Untwine and `build-lod` have no thread option and are not bounded. `NULL`, `""` and `{}` mean no cap. A malformed text, a value that is not an object, any other key, or a `threads` outside the rule returns `DDBERR_EXCEPTION` with a message that names the problem, before anything is built. Registry uses the cap for the [background rebuild](/docs/registry/admin/configuration#processingbudget) of models.
 
 ## Build manifest
 
@@ -139,7 +143,7 @@ The library owns the layout of build outputs, the build state and the rules of e
 | `DDBResolveBuildFile` | The checked absolute path of a file of a build (`.../build/{hash}/{path}`, tiles included) |
 | `DDBCopyBuildArtifacts` | Copies an entry's build, with its pending marker, to another dataset |
 
-An artifact is `{role, path, kind, mediaType, downloadName?, index?, legacy?}`: `path` is relative to the build root, `kind` is `file` or `dir` (`index` names the descriptor of a directory), `downloadName` is set for downloadable artifacts. Roles say what an artifact is for, never where it is, and are only ever added: pass an unknown role through.
+An artifact is `{role, path, kind, mediaType, downloadName?, index?, legacy?, fallbackFor?}`: `path` is relative to the build root, `kind` is `file` or `dir` (`index` names the descriptor of a directory), `downloadName` is set for downloadable artifacts. A `legacy: true` artifact is the output of an older build layout. Its `fallbackFor` names the role it stands in for, and the artifact is listed only while that role is missing, so a client that reads the roles in its order of preference shows the old output until a rebuild writes the new one. Roles say what an artifact is for, never where it is, and are only ever added: pass an unknown role through.
 
 | Role | Artifact | Media type |
 |------|----------|------------|
@@ -148,11 +152,14 @@ An artifact is `{role, path, kind, mediaType, downloadName?, index?, legacy?}`: 
 | `vector.mvt` | Mapbox Vector Tiles (directory; index: the TileJSON) | `application/json` |
 | `vector.local` | Drawing-coordinate metadata of a CAD drawing without a CRS | `application/json` |
 | `pointcloud.copc` | Cloud Optimized Point Cloud | `application/vnd.laszip+copc` |
-| `pointcloud.ept` | Entwine Point Tiles of datasets built before COPC (legacy, read only) | `application/json` |
-| `model.nexus` | Nexus multiresolution mesh | `application/octet-stream` |
+| `pointcloud.ept` | Entwine Point Tiles of datasets built before COPC (legacy, read only; `fallbackFor: "pointcloud.copc"`) | `application/json` |
+| `model.bm3d` | bm3d multiresolution 3D model (`bm3d/model.bm3d`) | `application/vnd.dronedb.bm3d` |
+| `model.nexus` | Nexus multiresolution mesh of models built before bm3d (`nxs/model.nxz`; legacy, read only; `fallbackFor: "model.bm3d"`) | `application/octet-stream` |
 | `model.3dtiles` | OGC 3D Tiles (directory; index: `tileset.json`) | `application/json` |
 | `gsplat.lod`, `gsplat.spz` | Level-of-detail and SPZ Gaussian Splats | `application/octet-stream` |
 | `gsplat.bounds`, `gsplat.georef` | Bounding box and georeference of a splat | `application/json` |
+
+A rebuild of a model writes `bm3d/` and removes `nxs/` only after `bm3d/` is published, and a failed rebuild keeps `nxs/`, so a model stays viewable while it is rebuilt.
 
 Registry passes these artifacts to clients as `artifacts: [{role, url, mediaType}]` on each entry.
 

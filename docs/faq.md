@@ -14,7 +14,7 @@ DroneDB supports a wide range of geospatial file formats:
 | **Images** | JPG, JPEG, DNG, TIF, TIFF, JP2, J2K, PNG, GIF, WEBP |
 | **Videos** | MP4, MOV, WEBM, M4V, AVI, MKV |
 | **Point Clouds** | LAS, LAZ, E57, PTS, XYZ, PLY* |
-| **3D Models** | OBJ, GLTF, GLB, PLY*, OGC 3D Tiles (.3tz) |
+| **3D Models** | OBJ, GLTF, GLB, STL, PLY*, OGC 3D Tiles (.3tz) |
 | **Gaussian Splats** | PLY*, SPLAT, SPZ, KSPLAT |
 | **Vector Data** | GeoJSON, DXF, DWG, SHP, SHZ, FGB, TopoJSON, KML, KMZ, GPKG, GPX |
 | **Rasters** | GeoTIFF, JPEG 2000 (orthophotos, DEMs) |

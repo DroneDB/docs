@@ -16,7 +16,7 @@ You can try the online hosted version of Registry (DroneDB Hub) at [dronedb.app/
 ## Features
 
 - **Dataset Management**: Create, organize, and share datasets with fine-grained permissions
-- **Interactive Visualization**: View orthophotos, point clouds, 3D models (OBJ, GLTF, GLB), Gaussian Splats, and panoramas directly in the browser
+- **Interactive Visualization**: View orthophotos, point clouds, 3D models (OBJ, GLTF, GLB, STL), Gaussian Splats, and panoramas directly in the browser
 - **User Management**: Built-in user administration with role-based access control
 - **STAC Compliance**: Standard SpatioTemporal Asset Catalog API for interoperability
 - **Public & Private Datasets**: Flexible visibility controls for your data
@@ -51,7 +51,7 @@ Measure distances and areas directly on point clouds:
 |----------|---------|
 | **Images** | JPG, JPEG, DNG, TIF, TIFF, JP2, J2K, PNG, GIF, WEBP |
 | **Point Clouds** | LAS, LAZ, E57, PTS, XYZ, PLY* |
-| **3D Models** | OBJ, GLTF, GLB, PLY* |
+| **3D Models** | OBJ, GLTF, GLB, STL, PLY* |
 | **Gaussian Splats** | PLY*, SPLAT, SPZ |
 | **Rasters** | GeoTIFF, JPEG 2000 (orthophotos, DEMs) |
 | **Vector Data** | GeoJSON, SHP, SHZ, KML, KMZ, GPX, DXF, DWG, FGB, TopoJSON, GPKG |

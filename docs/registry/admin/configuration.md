@@ -694,11 +694,12 @@ Concurrency and native resources of background jobs. Native builds run on their 
 
 | Field | Default | Description |
 |-------|---------|-------------|
-| `HeavyWorkers` | derived | Concurrent jobs that run native builds (COG, COPC, Nexus, LOD, raster tools). |
+| `HeavyWorkers` | derived | Concurrent jobs that run native builds (COG, COPC, bm3d, LOD, raster tools). |
 | `LightWorkers` | derived | Concurrent other jobs (imports, exports, cleanup, thumbnails, scheduling). |
-| `BuildThreads` | derived | Threads one native build may use (`DDB_BUILD_THREADS`): GDAL's threads in a raster build, the cores a Nexus (3D model) build keeps busy. |
+| `BuildThreads` | derived | Threads one native build may use (`DDB_BUILD_THREADS`): GDAL's threads in a raster build, the threads of the `bm3d` program in a 3D model build. |
 | `BuildCacheMb` | derived | GDAL block cache during a raster build, in MB (`DDB_COG_CACHE_MB`). |
 | `BuildWarpMemoryMb` | derived | GDAL warp memory during a raster build, in MB (`DDB_WARP_MEMORY_MB`). |
+| `BackgroundRebuildThreads` | `2` | Threads of each [background rebuild](#artifactcompletenesscheckercron) (minimum `1`; `0` or unset is the default). It is passed to the library as the cap of the build, so it lowers `BuildThreads` and never raises it. It does not follow the size of the host. |
 
 `0` means derived from the host (or from the host budget when it is declared).
 
@@ -966,6 +967,8 @@ The default value is `0 0 * * *` (daily at midnight)
 ### ArtifactCompletenessCheckerCron
 
 Cron expression for the recurring job that scans every buildable entry in every dataset and enqueues a rebuild for any entry whose output artifacts are missing or empty. This is particularly useful after a build-output format migration (e.g. FGB→MVT, EPT→COPC) to bring the entire corpus up to the new layout without a manual sweep. The same operation is also exposed via the admin API endpoint `POST /sys/check-artifact-completeness`.
+
+An entry whose build lists an artifact of an older layout (a model with only the Nexus file `nxs/model.nxz`, from before bm3d) is not queued with the builds that users wait for. It goes to the background `rebuilds` queue, which has its own Hangfire server of **one worker**, and each rebuild is capped at `ProcessingBudget:BackgroundRebuildThreads` threads. The first check after an upgrade therefore rebuilds the old models one after the other, without competing with user builds, and an entry that already has a build job is skipped. Until a rebuild publishes `bm3d/`, the model stays viewable from `nxs/` in the previous viewer; a failed rebuild keeps it, and a retryable failure is retried like a build and stays a background rebuild.
 
 :::info
 The default value is `0 2 * * *` (daily at 2:00 AM)

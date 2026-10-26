@@ -60,6 +60,7 @@ cd DroneDB
 | `build/ddb.dll` | DroneDB library for host programs: exports the C API of `ddb.h` only |
 | `build/ddb_unit_tests.exe` | Unit tests (offline) |
 | `build/ddbtest.exe` | Integration tests |
+| `build/bm3d.exe` | 3D model builder (`.bm3d` files; see below) |
 | `build/untwine.exe` | COPC accelerator *(optional, see below)* |
 | `build/build-lod.exe` | Gaussian Splat LOD producer *(optional, see below)* |
 | `build/Obj2Tiles.exe` | OGC 3D Tiles generator *(optional, see below)* |
@@ -101,6 +102,7 @@ Accepted values follow CMake conventions: `Release`, `Debug`, `RelWithDebInfo`, 
 | `build/libddb.so` | DroneDB library for host programs: exports the C API of `ddb.h` only |
 | `build/ddb_unit_tests` | Unit tests (offline) |
 | `build/ddbtest` | Integration tests |
+| `build/bm3d` | 3D model builder (`.bm3d` files; see below) |
 | `build/untwine` | COPC accelerator *(optional, see below)* |
 | `build/build-lod` | Gaussian Splat LOD producer *(optional, see below)* |
 | `build/Obj2Tiles` | OGC 3D Tiles generator *(optional, see below)* |
@@ -121,6 +123,21 @@ python3 scripts/check-abi.py tag --tag v2.0.0                    # a release tag
 ```
 
 See [DroneDB Library (C API)](/docs/integrations/library) for the contract itself.
+
+---
+
+## bm3d 3D model builder
+
+[bm3d](https://github.com/DroneDB/bm3d) builds the multiresolution `.bm3d` model of a `Model` entry from OBJ, PLY or STL. It replaces the Nexus builder (`ddb-nexus` and `libnxs`) of DroneDB 1.x. It is the git submodule `vendor/bm3d`, pinned to a bm3d release tag (CI checks that the tag matches the bm3d version), and the build scripts compile it with DroneDB; it is not optional. The 3D builder no longer needs Eigen. DroneDB runs it as a separate program and never links it, and the `.deb` package installs it as `usr/bin/bm3d` (the Windows zip holds `bm3d.exe`).
+
+```bash
+# After a checkout that did not use --recurse-submodules
+git submodule update --init vendor/bm3d
+```
+
+`ddb` looks for `bm3d` next to its own executable, next to `libddb`, in `../bin` and on `PATH`; set `DDB_BM3D_PATH` to use a program in another location.
+
+bm3d is GPL-3.0 (its web viewer is MIT). DroneDB ships the program with the licence texts of bm3d and of the code it comes from (Nexus, VCGLib, corto, meshoptimizer), and the source offer for the binary is the bm3d release at the tag that `vendor/bm3d` points to.
 
 ---
 
@@ -190,7 +207,7 @@ The DroneDB build scripts attempt to download a precompiled Obj2Tiles binary aut
 ./scripts/download-obj2tiles.sh build
 ```
 
-If Obj2Tiles is unavailable, 3D Tiles generation is skipped as a best-effort artifact; Nexus output and other builds still complete normally.
+If Obj2Tiles is unavailable, 3D Tiles generation is skipped as a best-effort artifact; bm3d output and other builds still complete normally.
 
 ---
 

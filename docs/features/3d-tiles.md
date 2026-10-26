@@ -5,7 +5,7 @@ sidebar_label: OGC 3D Tiles
 
 # OGC 3D Tiles
 
-DroneDB supports [OGC 3D Tiles](https://www.ogc.org/standard/3dtiles/) for efficient streaming of large 3D models in the browser. 3D Tiles can be generated from existing OBJ/glTF/GLB models, or ingested directly as `.3tz` archives (ZIP-packaged 3D Tiles with `tileset.json` at the root).
+DroneDB supports [OGC 3D Tiles](https://www.ogc.org/standard/3dtiles/) for efficient streaming of large 3D models in the browser. 3D Tiles can be generated from existing OBJ/glTF/GLB/PLY/STL models, or ingested directly as `.3tz` archives (ZIP-packaged 3D Tiles with `tileset.json` at the root).
 
 ## Supported formats
 
@@ -13,14 +13,17 @@ DroneDB supports [OGC 3D Tiles](https://www.ogc.org/standard/3dtiles/) for effic
 |--------|-----------|-------------|
 | **OBJ** | `.obj` | Wavefront 3D model (requires MTL + textures) |
 | **glTF** | `.gltf` / `.glb` | GL Transmission Format |
+| **STL** | `.stl` | Triangle mesh, ASCII or binary |
 | **3D Tiles archive** | `.3tz` | ZIP archive containing a `tileset.json` and associated tile files |
 
 ## Entry types
 
 - A `.3tz` archive is indexed as a **`Tiles3D`** entry.
-- An OBJ/glTF/GLB file is indexed as a **`Model`** entry.
+- An OBJ/glTF/GLB/STL file (and a mesh PLY) is indexed as a **`Model`** entry. `.stl` files were not Models before DroneDB 2.0: an existing `.stl` becomes a Model after a [rescan](/docs/features/bulk-operations#rescan-index) of the dataset (the **Rescan Index** action in Registry).
 
-When a `Model` entry is built, DroneDB generates a Nexus (NXS/NXZ) stream as the primary artifact and **co-produces an additive OGC 3D Tiles tileset** in a sibling `3dtiles/` folder as a best-effort artifact for the unified 3D viewer.
+When a `Model` entry is built, DroneDB generates a **bm3d** file (`bm3d/model.bm3d`) as the primary artifact and **co-produces an additive OGC 3D Tiles tileset** in a sibling `3dtiles/` folder as a best-effort artifact for the unified 3D viewer.
+
+bm3d is DroneDB's own multiresolution 3D model format, with its own builder (the `bm3d` program, run by `ddb bm3d`) and web viewer, derived from Nexus. It accepts OBJ, PLY and STL (ASCII and binary); Obj2Tiles reads STL through an OBJ that DroneDB writes for it. Models built before 2.0 have a Nexus file (`nxs/model.nxz`) instead. They keep opening in the previous viewer until Registry's background rebuild reaches them, which writes `bm3d/` and removes `nxs/` only once `bm3d/` is published (a failed rebuild keeps `nxs/`). The previous viewer is removed in the next major release.
 
 ## Generating 3D Tiles from the CLI
 
@@ -46,11 +49,11 @@ The public C++ `ddb::obj2tiles::runObj2Tiles` runner requires an absent or empty
 
 The CLI and higher-level `buildModel3DTiles` builder stage replacements in a fresh directory before publishing them. This allows intentional rebuilds while preserving the previous published tileset if generation fails.
 
-An interrupted publication can leave `3dtiles-old/` beside `3dtiles/`. Recovery runs under the native tiles lock before a Model build returns for already-complete Nexus output. It restores a backup with a nonempty `tileset.json` when the final tileset is missing or incomplete, and removes a superseded backup only when the final sentinel is complete. A busy lock leaves these directories untouched for a later attempt.
+An interrupted publication can leave `3dtiles-old/` beside `3dtiles/`. Recovery runs under the native tiles lock before a Model build returns for already-complete bm3d output. It restores a backup with a nonempty `tileset.json` when the final tileset is missing or incomplete, and removes a superseded backup only when the final sentinel is complete. A busy lock leaves these directories untouched for a later attempt.
 
-`DDBIsBuildComplete` remains read-only. A Model with complete Nexus output remains complete without optional 3D Tiles. It reports incomplete only for the identifiable interrupted-swap case: a usable backup and a missing or incomplete final tileset. Registry's artifact-completeness sweep can therefore enqueue a normal build that restores the existing tiles without regenerating Nexus.
+`DDBIsBuildComplete` remains read-only. A Model with complete bm3d output remains complete without optional 3D Tiles. It reports incomplete only for the identifiable interrupted-swap case: a usable backup and a missing or incomplete final tileset. Registry's artifact-completeness sweep can therefore enqueue a normal build that restores the existing tiles without regenerating the bm3d file.
 
-An optional tiles-generation timeout or tool failure after Nexus succeeds is logged and preserves prior published tiles. It does not create a primary-build retry loop. See [build and retry behavior](/docs/integrations/api-reference#pending-builds-and-retries).
+An optional tiles-generation timeout or tool failure after the bm3d build succeeds is logged and preserves prior published tiles. It does not create a primary-build retry loop. See [build and retry behavior](/docs/integrations/api-reference#pending-builds-and-retries).
 
 ### Georeferencing
 
@@ -100,4 +103,4 @@ During build, the `.3tz` archive is extracted into `build/{hash}/3dtiles/` and v
 
 ## Build requirements
 
-3D Tiles generation depends on the **Obj2Tiles** binary from [OpenDroneMap](https://github.com/OpenDroneMap/Obj2Tiles). The DroneDB build scripts attempt to download it automatically; see [Building from Source](/docs/contributing/building-from-source#obj2tiles-ogc-3d-tiles-generator-optional) for manual setup. If Obj2Tiles is unavailable, 3D Tiles generation is skipped and other artifacts (NXS, COPC, COG, etc.) still complete normally.
+3D Tiles generation depends on the **Obj2Tiles** binary from [OpenDroneMap](https://github.com/OpenDroneMap/Obj2Tiles). The DroneDB build scripts attempt to download it automatically; see [Building from Source](/docs/contributing/building-from-source#obj2tiles-ogc-3d-tiles-generator-optional) for manual setup. If Obj2Tiles is unavailable, 3D Tiles generation is skipped and other artifacts (bm3d, COPC, COG, etc.) still complete normally.

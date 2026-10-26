@@ -245,7 +245,7 @@ The UI reads `hidden`/`disabled`/`disabledMessage` to hide the tool or grey it o
 
 ### `build`
 
-Triggers the derivative build for a dataset entry (COG, COPC, NXS, vector tiles). Equivalent to `POST .../build` but tracked asynchronously.
+Triggers the derivative build for a dataset entry (COG, COPC, bm3d, vector tiles). Equivalent to `POST .../build` but tracked asynchronously.
 
 | Field | Value |
 |-------|-------|

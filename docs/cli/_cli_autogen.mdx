@@ -33,18 +33,36 @@ Usage:
 
 ```
 
+### bm3d
+
+```
+Generate bm3d (multiresolution 3D model) files from 3D models (OBJ/PLY/STL).
+
+Usage:
+  ddb bm3d model.obj [output.bm3d] [args]
+
+  -i, --input arg   File to process
+  -o, --output arg  bm3d output file
+      --overwrite   Overwrite output file if it exists
+  -h, --help        Print help
+      --debug       Show debug output
+
+```
+
 ### build
 
 ```
 Build DroneDB files for efficient streaming over a network.
 
 Usage:
-  ddb build [-p path/to/file.laz] [--output out_dir] [args]
+  ddb build [-p path/to/file.laz] [--output out_dir] [--threads n] [args]
 
   -o, --output arg       Output folder (default: .ddb/build)
   -p, --path arg         File to process
   -w, --working-dir arg  Working directory (default: .)
   -f, --force            Force rebuild
+      --threads arg      Most threads one build may use, 1 to 4096 
+                         (default: the DDB_BUILD_THREADS budget)
   -h, --help             Print help
       --debug            Show debug output
 
@@ -302,22 +320,6 @@ Usage:
   -o, --output arg  Output Cloud Optimized GeoTIFF path
       --validate    Only validate inputs, don't merge
   -i, --input arg   Input single-band raster files
-  -h, --help        Print help
-      --debug       Show debug output
-
-```
-
-### nxs
-
-```
-Generate nexus (NXS/NXZ) files from OBJs.
-
-Usage:
-  ddb nxs model.obj [output.nxz|output.nxs] [args]
-
-  -i, --input arg   File to process
-  -o, --output arg  Nexus output file
-      --overwrite   Overwrite output file if it exists
   -h, --help        Print help
       --debug       Show debug output
 

@@ -13,12 +13,14 @@ Registry automatically generates optimized formats for visualization:
 |--------|------------------|-------------|
 | **GeoTIFF** | COG (Cloud Optimized GeoTIFF) | Efficient streaming for large orthophotos |
 | **Point Clouds** | COPC (`copc/cloud.copc.laz`) | Single-file streaming format via Potree viewer |
-| **3D Models** | NXS (Nexus) + OGC 3D Tiles | Progressive streaming for 3D meshes; 3D Tiles are generated as a best-effort additive artifact for the unified viewer |
+| **3D Models** | bm3d + OGC 3D Tiles | Progressive streaming for 3D meshes; 3D Tiles are generated as a best-effort additive artifact for the unified viewer |
 | **Gaussian Splats** | RAD LOD (`model.rad`) | Level-of-detail streaming via the in-browser splat viewer |
 | **Vector Data** | MVT tiles + GeoPackage | Mapbox Vector Tiles for web maps |
 | **Images** | Thumbnails, WebP tiles | Fast previews and map tiles |
 
 Processing happens in background via Hangfire jobs. Monitor progress at `/hangfire`.
+
+Models built before bm3d have only a Nexus file. They still open in the previous viewer until the [background rebuild](/docs/registry/admin/configuration#artifactcompletenesscheckercron) reaches them; the next major release removes that viewer.
 
 Which entry types are built, which have a thumbnail and what each build produces is decided by the DroneDB library, not by Registry: `GET /sys/features` lists the entry types (`entryTypes`, with `buildable`, `thumbnail` and the artifact roles), and each entry of a listing lists the artifacts that exist (`artifacts`, with their role, URL and media type). The Hub reads both, so a viewer opens only when the artifacts it needs are listed. A thumbnail asked for an entry whose type has none (a video, a text file) answers `404`.
 
@@ -28,7 +30,7 @@ Registry's Processing Platform exposes the following tools as background tasks:
 
 | Tool | Description |
 |------|-------------|
-| **build** | Generate derivative products (COG, COPC, NXS, MVT, 3D Tiles, thumbnails) |
+| **build** | Generate derivative products (COG, COPC, bm3d, MVT, 3D Tiles, thumbnails) |
 | **raster-export** | Export a raster as GeoTIFF with visualization params (preset, bands, formula, colormap) |
 | **align-raster** | Align a source GeoTIFF to a reference raster (similarity or translation mode) |
 | **archive-extract** | Extract a ZIP archive and index each file individually |

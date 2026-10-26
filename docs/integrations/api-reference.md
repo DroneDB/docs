@@ -149,9 +149,9 @@ after 24 hours.
 |--------|----------|-------------|
 | GET | `.../thumb?path=` | Generate thumbnail (WebP). `404` when the entry's type has no thumbnail (`entryTypes[].thumbnail` is `none` in `GET /sys/features`) |
 | GET | `.../tiles/{tz}/{tx}/{ty}.{png\|webp\|jpg}` | Map tile in the format of the extension (`image/png`, `image/webp`, `image/jpeg`); `{ty}@2x` for retina tiles |
-| GET, HEAD | `.../build/{hash}/*` | Build files (COG, COPC, NXS, MVT, 3D Tiles, RAD). `HEAD` sends the headers of `GET` without the body. Downloads carry the DroneDB library's media types: COG `image/tiff; application=geotiff; profile=cloud-optimized`, COPC `application/vnd.laszip+copc`, GeoPackage `application/geopackage+sqlite3` |
+| GET, HEAD | `.../build/{hash}/*` | Build files (COG, COPC, bm3d, MVT, 3D Tiles, RAD). `HEAD` sends the headers of `GET` without the body. Downloads carry the DroneDB library's media types: COG `image/tiff; application=geotiff; profile=cloud-optimized`, COPC `application/vnd.laszip+copc`, GeoPackage `application/geopackage+sqlite3` |
 
-Entries in listings and pending builds carry `artifacts: [{role, url, mediaType}]`, the build outputs that exist (the roles are listed in [DroneDB Library](/docs/integrations/library#build-manifest)). A client reads the URL of an artifact from this list and never composes `/build/` paths itself.
+Entries in listings and pending builds carry `artifacts: [{role, url, mediaType}]`, the build outputs that exist (the roles are listed in [DroneDB Library](/docs/integrations/library#build-manifest)). A client reads the URL of an artifact from this list and never composes `/build/` paths itself. A model lists `model.bm3d` (`bm3d/model.bm3d`, `application/vnd.dronedb.bm3d`); until the background rebuild reaches a model built before DroneDB 2.0, it lists the legacy `model.nexus` (`nxs/model.nxz`) instead, which the library reports with `legacy: true` and `fallbackFor: "model.bm3d"` and lists only while `model.bm3d` is missing. `model.3dtiles` is listed beside either.
 
 ### Build Jobs
 
@@ -176,7 +176,7 @@ For an entry already pending, the build retains its marker through preflight and
 | Invalid input, a dependency path outside the dataset, missing required tools, or an ordinary unexplained nonzero tool exit | Permanent failure; marker consumed and the failed entry job remains visible without an automatic pending retry. |
 | Successful build or already-complete output | Marker consumed. |
 
-An arbitrary fresh build failure does not create a pending marker. A failed per-entry job triggers the pending retry scheduler only if **that job's path and hash** still match a native pending entry; a different pending entry in the dataset is insufficient. Failures confined to optional Model tiles after Nexus succeeds remain best-effort tiles failures.
+An arbitrary fresh build failure does not create a pending marker. A failed per-entry job triggers the pending retry scheduler only if **that job's path and hash** still match a native pending entry; a different pending entry in the dataset is insufficient. Failures confined to optional Model tiles after the bm3d build succeeds remain best-effort tiles failures.
 
 Delayed coordinators keep the existing delays of **1, 2, 5, 10, 20, 40, then 60 minutes**, with a maximum of **12 scheduled retries per recovery epoch**. A live coordinator is preserved. After the chain is missing, terminal, or exhausted, the low-frequency sweep may restart one bounded epoch even when the dataset checksum is unchanged. Observed pending status and checksum updates preserve the live retry budget and coordinator ID; controls clear when native pending work disappears. Missing or malformed state and unavailable stamp data permit a bounded recovery check.
 
@@ -186,7 +186,7 @@ For Gaussian Splat builds, `DDB_BUILDLOD_IDLE_TIMEOUT_SECONDS` sets the build-lo
 
 ### Native build API compatibility
 
-`DDBBuild`, `DDBIsBuildComplete`, and the C/PInvoke build signatures remain unchanged, as do serialized Hangfire wrapper signatures and pending-info JSON keys (`hash`, `path`, `missingDependencies`, `lastAttempt`; DroneDB 2.0 adds `retryAfter`). Completeness checks remain read-only, with the narrow [interrupted Model tiles-swap exception](/docs/features/3d-tiles#output-and-interrupted-build-recovery).
+`DDBBuild`, `DDBIsBuildComplete`, and the C/PInvoke build signatures remain unchanged (DroneDB 2.0 adds `DDBBuildEx`, which takes `{"threads": N}`; see [DroneDB Library](/docs/integrations/library#builds)), as do serialized Hangfire wrapper signatures and pending-info JSON keys (`hash`, `path`, `missingDependencies`, `lastAttempt`; DroneDB 2.0 adds `retryAfter`). Completeness checks remain read-only, with the narrow [interrupted Model tiles-swap exception](/docs/features/3d-tiles#output-and-interrupted-build-recovery).
 
 The DroneDB library 2.0 exports only its C API (`ddb.h`): its C++ classes and functions are internal and not available to consumers. See [DroneDB Library](/docs/integrations/library).
 
@@ -360,7 +360,7 @@ Browse STAC catalogs with tools like [STAC Browser](https://radiantearth.github.
 | POST | `/sys/migratevisibility` | Migrate dataset visibility from legacy format |
 | POST | `/sys/cleanup-jobindices` | Purge old job index records (optional `?retentionDays=N`) |
 | POST | `/sys/cleanup` | Run DroneDB `cleanup` on every dataset *(admin only, async)* |
-| POST | `/sys/check-artifact-completeness` | Scan all datasets and enqueue rebuilds for incomplete build artifacts *(admin only, async)* |
+| POST | `/sys/check-artifact-completeness` | Scan all datasets and enqueue rebuilds for incomplete build artifacts; models of an older build layout go to the one-worker background `rebuilds` queue *(admin only, async)* |
 | POST | `/sys/email/test` | Send a test e-mail with the current SMTP settings, body `{"to": "address"}` *(admin only; see [E-mail](../registry/admin/email#test-the-settings))* |
 | GET | `/sys/update-info` | The last update-check result: installed and latest version, merged release notes, whether they contain security fixes, the licence-request link and the declared use *(admin only; see [Update check](../registry/admin/update-check))* |
 | PUT | `/sys/update-check/settings` | Store the declared use and the opt-in contact, body `{"useDeclaration", "contactEmail", "contactConsent"}`; an address needs `contactConsent: true`, an empty one clears it; returns the update info *(admin only)* |
