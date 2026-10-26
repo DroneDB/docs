@@ -696,7 +696,7 @@ Concurrency and native resources of background jobs. Native builds run on their 
 |-------|---------|-------------|
 | `HeavyWorkers` | derived | Concurrent jobs that run native builds (COG, COPC, Nexus, LOD, raster tools). |
 | `LightWorkers` | derived | Concurrent other jobs (imports, exports, cleanup, thumbnails, scheduling). |
-| `BuildThreads` | derived | Threads one native build may use (`DDB_BUILD_THREADS`). |
+| `BuildThreads` | derived | Threads one native build may use (`DDB_BUILD_THREADS`): GDAL's threads in a raster build, the cores a Nexus (3D model) build keeps busy. |
 | `BuildCacheMb` | derived | GDAL block cache during a raster build, in MB (`DDB_COG_CACHE_MB`). |
 | `BuildWarpMemoryMb` | derived | GDAL warp memory during a raster build, in MB (`DDB_WARP_MEMORY_MB`). |
 
