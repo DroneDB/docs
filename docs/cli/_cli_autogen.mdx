@@ -1,14 +1,40 @@
+### 3dtiles
+
+```
+Generate OGC 3D Tiles (tileset.json + b3dm) from 3D models (OBJ/GLTF/GLB/PLY/STL) using Obj2Tiles.
+Usage:
+  ddb 3dtiles model.obj [output_dir] [args]
+
+  -i, --input arg       Model to process (OBJ/GLTF/GLB/PLY/STL)
+  -o, --output arg      Output 3D Tiles directory (defaults to a 3dtiles/ 
+                        folder next to the input)
+      --lat arg         Latitude of the model origin (WGS84). With --lon, 
+                        forces a georeferenced tileset
+      --lon arg         Longitude of the model origin (WGS84). With --lat, 
+                        forces a georeferenced tileset
+      --alt arg         Altitude of the model origin in meters (used with 
+                        --lat/--lon) (default: 0)
+      --local           Force a non-georeferenced (local) tileset, skipping 
+                        sidecar auto-detection
+      --overwrite       Overwrite the output directory if it exists
+      --force-defaults  Skip face-count heuristic and use default Obj2Tiles 
+                        parameters (divisions=3, lods=3, octree=true) for 
+                        testing
+  -h, --help            Print help
+      --debug           Show debug output
+
+```
+
 ### add
 
 ```
 Add files and directories to an index.
-
 Usage:
   ddb add *.JPG [args] [PATHS]
 
   -w, --working-dir arg  Working directory (default: .)
-  -r, --recursive        Recursively add subdirectories and files
-  -p, --paths arg        Paths to add to index (files or directories)
+  -p, --paths arg        Paths or shell-style glob patterns to add to index 
+                         (e.g. *.JPG, **/*.tif)
   -h, --help             Print help
       --debug            Show debug output
 
@@ -18,14 +44,15 @@ Usage:
 
 ```
 Align a GeoTIFF (ortho or DEM) to a reference GeoTIFF, correcting georeferencing offset.
-
 Usage:
   ddb align -i source.tif -r reference.tif -o aligned.tif
 
   -i, --input arg      Source GeoTIFF to align
   -r, --reference arg  Reference GeoTIFF (ground truth, more accurate)
-  -o, --output arg     Output aligned GeoTIFF (COG, reprojected to EPSG:3857)
-  -m, --mode arg       similarity (default) | translation (default: similarity)
+  -o, --output arg     Output aligned GeoTIFF (COG, reprojected to 
+                       EPSG:3857)
+  -m, --mode arg       similarity (default) | translation (default: 
+                       similarity)
       --validate       Only validate inputs; do not align
       --no-seed        Disable phase-correlation seed (slower NCC search)
   -h, --help           Print help
@@ -36,8 +63,7 @@ Usage:
 ### bm3d
 
 ```
-Generate bm3d (multiresolution 3D model) files from 3D models (OBJ/PLY/STL).
-
+Generate bm3d multiresolution model files from 3D models (OBJ/PLY/STL/GLTF/GLB).
 Usage:
   ddb bm3d model.obj [output.bm3d] [args]
 
@@ -53,7 +79,6 @@ Usage:
 
 ```
 Build DroneDB files for efficient streaming over a network.
-
 Usage:
   ddb build [-p path/to/file.laz] [--output out_dir] [--threads n] [args]
 
@@ -68,18 +93,31 @@ Usage:
 
 ```
 
+### cleanup
+
+```
+Remove DB entries whose files no longer exist and orphaned build artifacts.
+Usage:
+  ddb cleanup [-w working-dir]
+
+  -w, --working-dir arg  Working directory (default: .)
+  -h, --help             Print help
+      --debug            Show debug output
+
+```
+
 ### clone
 
 ```
 Clone a repository into a new directory
 
 Clones a repository into a newly created directory.
-
 Usage:
   ddb clone (tag|url) folder [args]
 
   -t, --target arg  Repository tag or full url
-  -f, --folder arg  Target folder (default: )
+  -f, --folder arg  Target folder (default: "")
+  -k, --insecure    Disable SSL certificate verification
   -h, --help        Print help
       --debug       Show debug output
 
@@ -88,13 +126,52 @@ Usage:
 ### cog
 
 ```
-Build a Cloud Optimized GeoTIFF from an existing GeoTIFF.
-
+Build a Cloud Optimized GeoTIFF from a georeferenced raster (GeoTIFF, JPEG 2000, ...).
 Usage:
   ddb cog cog.tif input.tif [args]
 
   -o, --output arg  Output Cloud Optimized GeoTIFF
-  -i, --input arg   Input GeoTIFF to process
+  -i, --input arg   Input georeferenced raster (GeoTIFF, JPEG 2000, ...) to 
+                    process
+  -h, --help        Print help
+      --debug       Show debug output
+
+```
+
+### contour
+
+```
+Generate contour lines (GeoJSON) from a DEM/DSM/DTM raster.
+Usage:
+  ddb contour [options] input.tif [args]
+
+      --input arg     Input single-band raster (DEM/DSM/DTM)
+  -o, --output arg    Output GeoJSON file (default: stdout)
+  -i, --interval arg  Vertical interval between contour levels (raster 
+                      units) (default: 0)
+  -n, --count arg     Target number of contour levels (used when --interval 
+                      is 0) (default: 0)
+  -b, --base arg      Reference base elevation (default: 0)
+      --min arg       Drop contours below this elevation
+      --max arg       Drop contours above this elevation
+  -s, --simplify arg  Geometry simplification tolerance (raster CRS units) 
+                      (default: 0)
+      --band arg      1-based raster band index (default: 1)
+  -h, --help          Print help
+      --debug         Show debug output
+
+```
+
+### copc
+
+```
+Build a COPC (Cloud Optimized Point Cloud) file from point cloud inputs.
+Usage:
+  ddb copc outdir/ *.las [args]
+
+  -o, --output arg  Output directory where to store the COPC file 
+                    (cloud.copc.laz)
+  -i, --input arg   File(s) to process
   -h, --help        Print help
       --debug       Show debug output
 
@@ -106,7 +183,6 @@ Usage:
 Generate delta between two ddb databases
 
 Outputs the delta that applied to target turns it into source
-
 Usage:
   ddb delta source target [args]
 
@@ -118,62 +194,10 @@ Usage:
 
 ```
 
-### cleanup
-
-```
-Remove stale database entries and orphaned build artifacts from a dataset.
-
-Usage:
-  ddb cleanup [args]
-
-  -w, --working-dir arg  Working directory (default: .)
-  -h, --help             Print help
-      --debug            Show debug output
-
-```
-
-### copc
-
-```
-Build a COPC (Cloud Optimized Point Cloud) file from point cloud files.
-
-Usage:
-  ddb copc outdir/ *.las [args]
-
-  -o, --output arg  Output directory where to store the COPC file (cloud.copc.laz)
-  -i, --input arg   File(s) to process
-  -h, --help        Print help
-      --debug       Show debug output
-
-```
-
-### contour
-
-```
-Generate contour lines (GeoJSON) from a DEM/DSM/DTM raster.
-
-Usage:
-  ddb contour [options] input.tif [args]
-
-      --input arg     Input single-band raster (DEM/DSM/DTM)
-  -o, --output arg    Output GeoJSON file (default: stdout)
-  -i, --interval arg  Vertical interval between contour levels (raster units) (default: 0)
-  -n, --count arg     Target number of contour levels (used when --interval is 0) (default: 0)
-  -b, --base arg      Reference base elevation (default: 0)
-      --min arg       Drop contours below this elevation
-      --max arg       Drop contours above this elevation
-  -s, --simplify arg  Geometry simplification tolerance (raster CRS units) (default: 0)
-      --band arg      1-based raster band index (default: 1)
-  -h, --help          Print help
-      --debug         Show debug output
-
-```
-
 ### geoproj
 
 ```
 Project images to georeferenced rasters
-
 Usage:
   ddb geoproj output/ *.JPG [args]
 
@@ -185,20 +209,31 @@ Usage:
 
 ```
 
+### gsplat
+
+```
+Convert a Gaussian Splat (.ply/.splat/.spz) to the compressed .spz format.
+Usage:
+  ddb gsplat input.{ply|splat|spz} [output.spz] [args]
+
+  -i, --input arg   Gaussian Splat file to convert (.ply, .splat or .spz)
+  -o, --output arg  Output .spz file
+  -h, --help        Print help
+      --debug       Show debug output
+
+```
+
 ### info
 
 ```
 Retrieve information about files and directories
-
 Usage:
   ddb info *.JPG [args]
 
   -i, --input arg     File(s) to examine
   -o, --output arg    Output file to write results to (default: stdout)
   -f, --format arg    Output format (text|json|geojson) (default: text)
-  -r, --recursive     Recursively search in subdirectories
-  -d, --depth arg     Max recursion depth (default: 0)
-      --geometry arg  Geometry to output (for geojson format only)
+      --geometry arg  Geometry to output (for geojson format only) 
                       (auto|point|polygon) (default: auto)
       --with-hash     Compute SHA256 hashes
   -h, --help          Print help
@@ -210,12 +245,11 @@ Usage:
 
 ```
 Initialize an index. If a directory is not specified, initializes the index in the current directory
-
 Usage:
   ddb init [args] [DIRECTORY]
 
   -w, --working-dir arg  Working directory (default: .)
-      --from-scratch     Create the index database from scratch instead of
+      --from-scratch     Create the index database from scratch instead of 
                          using a prebuilt one (slower)
   -h, --help             Print help
       --debug            Show debug output
@@ -226,36 +260,15 @@ Usage:
 
 ```
 List indexed files and directories
-
 Usage:
   ddb list *.JPG [args]
 
   -i, --input arg        File(s) to list
   -o, --output arg       Output file to write results to (default: stdout)
   -w, --working-dir arg  Working directory (default: .)
-  -r, --recursive        Recursively search in subdirectories
-  -d, --depth arg        Max recursion depth (default: 0)
   -f, --format arg       Output format (text|json) (default: text)
   -h, --help             Print help
       --debug            Show debug output
-
-```
-
-### mask
-
-```
-Mask orthophoto borders making them transparent.
-
-Usage:
-  ddb mask input.tif [-o output.tif] [-n 15] [-w] [-c r,g,b]
-
-  -i, --input arg   Input GeoTIFF file
-  -o, --output arg  Output GeoTIFF file (default: <input>_masked.tif)
-  -n, --near arg    Tolerance in grey levels (default: 15)
-  -w, --white       Search for white borders instead of black
-  -c, --color arg   Custom color r,g,b (e.g. 0,0,0)
-  -h, --help        Print help
-      --debug       Show debug output
 
 ```
 
@@ -263,14 +276,14 @@ Usage:
 
 ```
 Authenticate with a registry.
-
 Usage:
   ddb login [args]
 
-      --server arg    Registry server to authenticate to (default:
+      --server arg    Registry server to authenticate to (default: 
                       hub.dronedb.app)
   -u, --username arg  Username
   -p, --password arg  Password
+  -k, --insecure      Disable SSL certificate verification
   -h, --help          Print help
       --debug         Show debug output
 
@@ -280,32 +293,31 @@ Usage:
 
 ```
 Logout from all registries. To logout from a single registry, use the --server option.
-
 Usage:
   ddb logout [args]
 
-      --server arg  Registry server to logout from (default: hub.dronedb.app)
+      --server arg  Registry server to logout from (default: 
+                    hub.dronedb.app)
   -h, --help        Print help
       --debug       Show debug output
 
 ```
 
-### meta
+### mask
 
 ```
-Manage database metadata
-
+Mask orthophoto borders making them transparent.
 Usage:
-  ddb meta [add|set|rm|get|unset|ls|dump|restore] [key|ID] [data] [-p path] [args]
+  ddb mask input.tif [-o output.tif] [-n 15] [-w] [-c r,g,b] [args]
 
-  -c, --command arg      Command
-  -k, --key arg          Metadata key/ID (default: )
-  -p, --path arg         Path to associate metadata with (default: )
-  -d, --data arg         Data string|number|JSON to set (default: )
-  -w, --working-dir arg  Working directory (default: .)
-  -f, --format arg       Output format (text|json) (default: text)
-  -h, --help             Print help
-      --debug            Show debug output
+  -i, --input arg   Input GeoTIFF file
+  -o, --output arg  Output GeoTIFF file (default: <input>_masked.tif) 
+                    (default: "")
+  -n, --near arg    Tolerance in grey levels (default: 15)
+  -w, --white       Search for white borders instead of black
+  -c, --color arg   Custom color r,g,b (e.g. 0,0,0) (default: "")
+  -h, --help        Print help
+      --debug       Show debug output
 
 ```
 
@@ -313,9 +325,8 @@ Usage:
 
 ```
 Merge single-band raster files into a multi-band GeoTIFF.
-
 Usage:
-  ddb merge-multispectral -o output.tif band1.tif band2.tif ...
+  ddb merge-multispectral -o output.tif band1.tif band2.tif ... [args]
 
   -o, --output arg  Output Cloud Optimized GeoTIFF path
       --validate    Only validate inputs, don't merge
@@ -325,17 +336,34 @@ Usage:
 
 ```
 
+### meta
+
+```
+Manage database metadata
+Usage:
+  ddb meta [add|set|rm|get|unset|ls|dump|restore] [key|ID] [data] [-p path] [args]
+
+  -c, --command arg      Command
+  -k, --key arg          Metadata key/ID (default: "")
+  -p, --path arg         Path to associate metadata with (default: "")
+  -d, --data arg         Data string|number|JSON to set (default: "")
+  -w, --working-dir arg  Working directory (default: .)
+  -f, --format arg       Output format (text|json) (default: text)
+  -h, --help             Print help
+      --debug            Show debug output
+
+```
+
 ### password
 
 ```
 Manage database passwords
-
 Usage:
   ddb password [a,append|v,verify|c,clear] [password] [args]
 
   -w, --working-dir arg  Working directory (default: .)
   -c, --command arg      Command to execute
-  -a, --argument arg     Command argument (default: )
+  -a, --argument arg     Command argument (default: "")
   -h, --help             Print help
       --debug            Show debug output
 
@@ -345,14 +373,14 @@ Usage:
 
 ```
 Pulls changes from a remote repository.
-
 Usage:
   ddb pull
 
-  -r, --remote arg   The remote Registry (default: )
-  -t, --keep-theirs  Keep changes from remote registry and override local
+  -r, --remote arg   The remote Registry (default: "")
+  -t, --keep-theirs  Keep changes from remote registry and override local 
                      ones
   -o, --keep-ours    Keep local changes override remote ones
+  -k, --insecure     Disable SSL certificate verification
   -h, --help         Print help
       --debug        Show debug output
 
@@ -362,11 +390,11 @@ Usage:
 
 ```
 Pushes changes to a remote repository.
-
 Usage:
   ddb push [remote] [args]
 
-  -r, --remote arg  The remote Registry (default: )
+  -r, --remote arg  The remote Registry (default: "")
+  -k, --insecure    Disable SSL certificate verification
   -h, --help        Print help
       --debug       Show debug output
 
@@ -376,7 +404,6 @@ Usage:
 
 ```
 Remove files and directories from an index. The filesystem is left unchanged (actual files and directories will not be removed)
-
 Usage:
   ddb rm image1.JPG image2.JPG [...] [args] [PATHS]
 
@@ -390,21 +417,24 @@ Usage:
 ### rescan
 
 ```
-Re-process all indexed files to update metadata.
-Useful when upgrading DroneDB to a version that extracts more metadata
-or supports new file types.
+Re-process all indexed files to update metadata.Useful when upgrading DroneDB to a version that extracts more metadata or supports new file types.
 
+Valid type filters: generic, geoimage, georaster, pointcloud, image, dronedb, markdown, video, geovideo, model, panorama, geopanorama, vector, gaussiansplat, tiles3d
 Usage:
-  ddb rescan [args]
+  ddb rescan
 
-  -w, --working-dir arg  Working directory (default: .)
-  -t, --type arg         Entry types to rescan (comma-separated).
-                         Valid types: generic, geoimage, georaster,
-                         pointcloud, image, dronedb, markdown, video,
-                         geovideo, model, panorama, geopanorama, vector
+  -w, --working-dir arg    Working directory (default: .)
+  -t, --type arg           Entry types to rescan (comma-separated). Valid 
+                           types: generic, geoimage, georaster, pointcloud, 
+                           image, dronedb, markdown, video, geovideo, 
+                           model, panorama, geopanorama, vector (default: 
+                           "")
+  -e, --ext arg            File extensions to rescan (comma-separated, e.g. 
+                           dwg,dxf). Combined with --type, an entry must 
+                           match both (default: "")
       --continue-on-error  Continue processing if an error occurs
-  -h, --help             Print help
-      --debug            Show debug output
+  -h, --help               Print help
+      --debug              Show debug output
 
 ```
 
@@ -412,7 +442,6 @@ Usage:
 
 ```
 Search indexed files and directories
-
 Usage:
   ddb search '*file*' [args]
 
@@ -428,7 +457,6 @@ Usage:
 
 ```
 Modify EXIF values in files.
-
 Usage:
   ddb setexif *.JPG [args]
 
@@ -436,7 +464,7 @@ Usage:
       --gps-alt arg  Set GPS Altitude (decimal degrees)
       --gps-lon arg  Set GPS Longitude (decimal degrees)
       --gps-lat arg  Set GPS Latitude (decimal degrees)
-      --gps arg      Set GPS Latitude,Longitude,Altitude (decimal degrees,
+      --gps arg      Set GPS Latitude,Longitude,Altitude (decimal degrees, 
                      comma separated)
   -h, --help         Print help
       --debug        Show debug output
@@ -447,20 +475,23 @@ Usage:
 
 ```
 Share files and folders to a registry
-
 Usage:
   ddb share *.JPG [args]
 
-  -i, --input arg     Files and directories to share
-  -r, --recursive     Recursively share subdirectories
-  -t, --tag arg       Tag to use (organization/dataset or
-                      server[:port]/organization/dataset) (default: hub.dronedb.app//)
-  -p, --password arg  Optional password to protect dataset (default: )
-  -s, --server arg    Registry server to share dataset with (alias of: -t
-                      <server>//)
-  -q, --quiet         Do not display progress
-  -h, --help          Print help
-      --debug         Show debug output
+  -i, --input arg        Files, directories and glob patterns to share 
+                         (e.g. *.JPG, **/*.tif)
+  -t, --tag arg          Tag to use (organization/dataset or 
+                         server[:port]/organization/dataset) (default: 
+                         hub.dronedb.app//)
+  -p, --password arg     Optional password to protect dataset (default: "")
+  -s, --server arg       Registry server to share dataset with (alias of: 
+                         -t <server>//)
+  -q, --quiet            Do not display progress
+  -k, --insecure         Disable SSL certificate verification
+      --non-interactive  Do not prompt for credentials. Uses DDB_USERNAME 
+                         and DDB_PASSWORD env vars if available.
+  -h, --help             Print help
+      --debug            Show debug output
 
 ```
 
@@ -468,28 +499,27 @@ Usage:
 
 ```
 Generate STAC catalogs
-
 Usage:
   ddb stac
 
   -w, --working-dir arg         Working directory (default: .)
-  -p, --path arg                Entry path to generate a STAC item for (which
-                                must be part of the DroneDB index) (default:
-                                )
-      --stac-catalog-root arg   STAC Catalog absolute URL (default: )
+  -p, --path arg                Entry path to generate a STAC item for 
+                                (which must be part of the DroneDB index) 
+                                (default: "")
+      --stac-catalog-root arg   STAC Catalog absolute URL (default: "")
       --stac-collection-root arg
                                 STAC Collection absolute URL (default: .)
-      --id arg                  Set STAC id explicitely instead of using the
-                                directory name (default: )
+      --id arg                  Set STAC id explicitely instead of using 
+                                the directory name (default: "")
   -h, --help                    Print help
       --debug                   Show debug output
+
 ```
 
 ### stamp
 
 ```
 Generate a stamp of the current index.
-
 Usage:
   ddb stamp
 
@@ -504,7 +534,6 @@ Usage:
 
 ```
 Show files and directories index status compared to the filesystem
-
 Usage:
   ddb status [directory] [args]
 
@@ -518,7 +547,6 @@ Usage:
 
 ```
 Sync files and directories in the index with changes from the filesystem
-
 Usage:
   ddb sync
 
@@ -536,11 +564,10 @@ Manage ddb
 Commands:
 	clean	Cleanup user cache files
 
-
 Usage:
   ddb system COMMAND
 
-  -c, --command arg  Command (default: )
+  -c, --command arg  Command (default: "")
   -h, --help         Print help
       --debug        Show debug output
 
@@ -550,11 +577,10 @@ Usage:
 
 ```
 Gets or sets the dataset tag.
-
 Usage:
   ddb tag [tag] [args]
 
-  -t, --tag arg  New tag (default: )
+  -t, --tag arg  New tag (default: "")
   -h, --help     Print help
       --debug    Show debug output
 
@@ -564,7 +590,6 @@ Usage:
 
 ```
 Generate thumbnails for images and rasters
-
 Usage:
   ddb thumbs [image.tif | *.JPG] -o [thumb.jpg | output/] [args]
 
@@ -580,61 +605,25 @@ Usage:
 ### tile
 
 ```
-Generate tiles for GeoTIFFs, GeoImages and COPC
-
+Generate tiles for GeoTIFFs, GeoImages and COPC point clouds
 Usage:
   ddb tile [geo.tif | image.jpg | cloud.copc.laz | https://host.com/cog.tif | https://host.com/image.jpg | https://host.com/cloud.copc.laz] [output directory] [args]
 
   -i, --input arg   Path or URL to file to tile
-  -o, --output arg  Output directory where to store tiles (default:
+  -o, --output arg  Output directory where to store tiles (default: 
                     {filename}_tiles/)
   -f, --format arg  Output format (text|json) (default: text)
-  -z, arg           Zoom levels, either a single zoom level "N" or a range
-                    "min-max" or "auto" to generate all zoom levels (default:
-                    auto)
-  -x, arg           Generate a single tile with the specified coordinate
-                    (XYZ, unless --tms is used). Must be used with -y (default:
-                    auto)
-  -y, arg           Generate a single tile with the specified coordinate
-                    (XYZ, unless --tms is used). Must be used with -x (default:
-                    auto)
+  -z arg            Zoom levels, either a single zoom level "N" or a range 
+                    "min-max" or "auto" to generate all zoom levels 
+                    (default: auto)
+  -x arg            Generate a single tile with the specified coordinate 
+                    (XYZ, unless --tms is used). Must be used with -y 
+                    (default: auto)
+  -y arg            Generate a single tile with the specified coordinate 
+                    (XYZ, unless --tms is used). Must be used with -x 
+                    (default: auto)
   -s, --size arg    Tile size (default: 256)
       --tms         Generate TMS tiles instead of XYZ
-  -h, --help        Print help
-      --debug       Show debug output
-
-```
-
-### 3dtiles
-
-```
-Generate OGC 3D Tiles (tileset.json + b3dm) from OBJs using Obj2Tiles.
-
-Usage:
-  ddb 3dtiles model.obj [output_dir]
-
-  -i, --input arg    Model to process (OBJ/GLTF/GLB)
-  -o, --output arg   Output 3D Tiles directory (defaults to a 3dtiles/ folder next to the input)
-      --lat arg      Latitude of the model origin (WGS84). With --lon, forces a georeferenced tileset
-      --lon arg      Longitude of the model origin (WGS84). With --lat, forces a georeferenced tileset
-      --alt arg      Altitude of the model origin in meters (used with --lat/--lon) (default: 0)
-      --local        Force a non-georeferenced (local) tileset, skipping sidecar auto-detection (default: false)
-      --overwrite    Overwrite the output directory if it exists (default: false)
-  -h, --help         Print help
-      --debug        Show debug output
-
-```
-
-### gsplat
-
-```
-Convert a Gaussian Splat (.ply/.splat/.spz) to the compressed .spz format.
-
-Usage:
-  ddb gsplat input.{ply|splat|spz} [output.spz]
-
-  -i, --input arg   Gaussian Splat file to convert (.ply, .splat or .spz)
-  -o, --output arg  Output .spz file
   -h, --help        Print help
       --debug       Show debug output
 

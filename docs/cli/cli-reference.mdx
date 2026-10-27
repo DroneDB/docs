@@ -83,7 +83,7 @@ Generate bm3d files, DroneDB's multiresolution 3D model format, for efficient we
 ddb bm3d model.obj output.bm3d
 ```
 
-Supported input formats: OBJ (with its MTL and textures), PLY and STL (ASCII and binary). The `ddb bm3d` command runs the `bm3d` program, which is found as described for `DDB_BM3D_PATH` below.
+Supported input formats: OBJ (with its MTL and textures), PLY, STL (ASCII and binary), glTF and GLB. The `bm3d` program reads OBJ, PLY and STL; DroneDB first converts a glTF or GLB to OBJ (to PLY when it has no texture coordinates), and a textured PLY to OBJ, in a temporary folder. The `ddb bm3d` command runs the `bm3d` program, which is found as described for `DDB_BM3D_PATH` below.
 
 ### Building one file's derivatives
 

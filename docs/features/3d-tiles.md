@@ -23,7 +23,7 @@ DroneDB supports [OGC 3D Tiles](https://www.ogc.org/standard/3dtiles/) for effic
 
 When a `Model` entry is built, DroneDB generates a **bm3d** file (`bm3d/model.bm3d`) as the primary artifact and **co-produces an additive OGC 3D Tiles tileset** in a sibling `3dtiles/` folder as a best-effort artifact for the unified 3D viewer.
 
-bm3d is DroneDB's own multiresolution 3D model format, with its own builder (the `bm3d` program, run by `ddb bm3d`) and web viewer, derived from Nexus. It accepts OBJ, PLY and STL (ASCII and binary); Obj2Tiles reads STL through an OBJ that DroneDB writes for it. Models built before 2.0 have a Nexus file (`nxs/model.nxz`) instead. They keep opening in the previous viewer until Registry's background rebuild reaches them, which writes `bm3d/` and removes `nxs/` only once `bm3d/` is published (a failed rebuild keeps `nxs/`). The previous viewer is removed in the next major release.
+bm3d is DroneDB's own multiresolution 3D model format, with its own builder (the `bm3d` program, run by `ddb bm3d`) and web viewer, derived from Nexus. The `bm3d` program reads OBJ, PLY and STL (ASCII and binary); DroneDB converts a glTF or GLB model to OBJ for it first. Obj2Tiles reads STL through an OBJ that DroneDB writes for it. Models built before 2.0 have a Nexus file (`nxs/model.nxz`) instead. They keep opening in the previous viewer until Registry's background rebuild reaches them, which writes `bm3d/` and removes `nxs/` only once `bm3d/` is published (a failed rebuild keeps `nxs/`). The previous viewer is removed in the next major release.
 
 ## Generating 3D Tiles from the CLI
 

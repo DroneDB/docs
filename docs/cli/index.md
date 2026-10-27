@@ -46,7 +46,7 @@ sidebar_label: CLI Overview
 | `ddb tile` | Generate map tiles for GeoTIFFs, GeoImages, COPC |
 | `ddb cog` | Build a Cloud Optimized GeoTIFF |
 | `ddb copc` | Build a Cloud Optimized Point Cloud |
-| `ddb bm3d` | Generate bm3d (multiresolution 3D model) files from OBJ, PLY or STL models |
+| `ddb bm3d` | Generate bm3d (multiresolution 3D model) files from OBJ, PLY, STL, glTF or GLB models |
 | `ddb 3dtiles` | Generate OGC 3D Tiles (tileset.json + b3dm) from OBJ/glTF/GLB |
 | `ddb gsplat` | Convert Gaussian Splat to compressed SPZ + RAD LOD |
 | `ddb stac` | Generate STAC catalogs |
