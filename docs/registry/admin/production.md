@@ -123,6 +123,8 @@ docker build . -t dronedb/registry
 Registry is written in C# on .NET 10. It is officially shipped and tested for **Linux and Windows** (the Docker image builds on Ubuntu): while the .NET layer itself also runs on macOS, the native DroneDB library (`libddb`) it loads via P/Invoke is only published for Windows and Linux, so macOS builds are unsupported.
 To install the latest .NET SDK see the [official download page](https://dotnet.microsoft.com/en-us/download/dotnet/10.0). Registry needs the DroneDB library (`libddb`) **2.x**: at start-up it checks that the loaded library is 2.x and exports every function Registry calls, and refuses to start otherwise. The exact DroneDB build Registry is tested with is pinned in `Directory.Build.props` (`DdbVersion` and its SHA-256); install that [release](https://github.com/DroneDB/DroneDB/releases) (the `.deb` on Linux; on Windows the build embeds the release zip) so that `libddb` is on the library path.
 
+On Windows, `libddb` builds inside the Registry process, so a dataset in a deep folder (a path of 260 characters or more) builds only when Windows allows long paths: enable `LongPathsEnabled` as described in [Installation](/docs/getting-started/installation) (Windows, *Long paths*). `Registry.Web.exe` declares itself long path aware; when Registry runs through another host (`dotnet Registry.Web.dll`, IIS), that host's manifest decides.
+
 Clone the repository:
 
 ```bash
