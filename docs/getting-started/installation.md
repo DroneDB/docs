@@ -30,6 +30,23 @@ x.x.x (git commit xxxxxxx)
 The version number will vary depending on the release you downloaded.
 :::
 
+:::note Long paths
+Windows refuses a path of 260 characters or more unless it allows long paths. A build writes its
+temporary files about 130 characters below the root of the dataset (the conversion of a point
+cloud, for one), so a dataset in a deep folder fails to build without them. The programs of the
+package (`ddb`, `bm3d`, `metadata-util`, `untwine`) declare themselves long path aware, but Windows
+has to allow it. As an administrator, in PowerShell:
+
+```powershell
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name LongPathsEnabled -PropertyType DWord -Value 1 -Force
+```
+
+(or enable the group policy *Enable Win32 long paths*), then start the programs again. Without it,
+keep the root of a dataset under about 130 characters. A program that loads `ddb.dll` itself takes
+long paths only if its own executable is long path aware too, and code that keeps a path in a fixed
+buffer of 260 characters is not helped by the setting.
+:::
+
   </TabItem>
   <TabItem value="linux" label="Linux (Debian/Ubuntu)">
 
