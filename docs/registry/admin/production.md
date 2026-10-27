@@ -224,15 +224,20 @@ Once the server is upgraded, currently-loaded browser tabs still run the previou
 
 Registry serves any file dropped under `{StoragePath}/branding/` from the URL prefix `/branding/`. This folder is **never touched by the Hub upgrade** - drop your logos, favicons, and `site.webmanifest` there and reference them from `AppSettings:HubOptions` (see [Hub UI Customization](./configuration.md#hub-ui-customization)).
 
+With the default `StoragePath` (`./data`) the folder is `data/branding/` inside the Registry folder:
+
 ```text
 registry-data/
 ├── ClientApp/         # replaced on every Hub upgrade
-├── branding/          # preserved across upgrades
-│   ├── acme-banner.svg
-│   ├── favicon.ico
-│   └── site.webmanifest
+├── data/              # StoragePath
+│   └── branding/      # preserved across upgrades
+│       ├── acme-banner.svg
+│       ├── favicon.ico
+│       └── site.webmanifest
 └── appsettings.json
 ```
+
+Earlier Registry versions also made an empty `branding/` folder next to `appsettings.json`. Registry does not read it: move any files from it to `data/branding/`, then delete it.
 
 ## Project architecture
 

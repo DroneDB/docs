@@ -161,6 +161,8 @@ Every e-mail (the test e-mail, the [update e-mails](./update-check) and the
 
 * The label of a button is white or near-black, whichever reads better on the accent. A light theme colour still
   gives a readable button.
+* Link text must be readable on the white body. When the accent is too light for that (a yellow, for example), links
+  use a darker shade of the same colour. The bar and the buttons keep the accent.
 * "Failed" is always red and "Completed" is always green, whatever the accent.
 * A stock instance shows the DroneDB logo, which the Hub ships as `/images/email-logo.png`. A stock instance has no
   `AppName`, no `AppIcon`, and no `AppLogo` (or the shipped `/images/logo-banner.svg`). An instance with its own name,
@@ -170,7 +172,8 @@ Every e-mail (the test e-mail, the [update e-mails](./update-check) and the
 
 :::tip A Hub with an SVG logo
 The Hub header can keep an SVG `AppLogo`. The e-mails then show the `AppleTouchIcon` beside the name. Put the files
-in `{StoragePath}/branding/` and reference them as `/branding/...`: that folder survives Hub upgrades.
+in `{StoragePath}/branding/` (`data/branding/` with the default `StoragePath`) and reference them as `/branding/...`:
+that folder survives Hub upgrades.
 :::
 
 ## Build notifications
