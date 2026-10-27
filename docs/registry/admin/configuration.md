@@ -584,6 +584,23 @@ See the [E-mail](./email) page for the setup, provider examples, the test e-mail
 }
 ```
 
+### BuildNotifications
+
+How the [build notification e-mails](./email#build-notifications) are grouped. They need [`Smtp`](#smtp): while
+e-mail is off, no build notification is sent.
+
+**Sub-fields:**
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `DigestMinutes` | `int` | `5` | How long Registry waits after the first build of a user ends before it sends one e-mail with every build of that user that ended in the meantime. From `1` to `60`; another value stops Registry at start |
+
+```json
+"BuildNotifications": {
+  "DigestMinutes": 5
+}
+```
+
 ## Update Check
 
 Registry asks dronedb.app once a day for new versions and release notes, and sends the data that the

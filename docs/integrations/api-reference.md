@@ -318,6 +318,14 @@ A key ending in `s` names a list, written with `POST .../meta/{key}` (add); any 
 | GET | `/users/{userName}/meta` | Get user metadata |
 | POST | `/users/{userName}/meta` | Set user metadata (admin) |
 
+### Preferences
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/users/preferences` | Get the Hub preferences of the current user, one property per section |
+| PATCH | `/users/preferences` | Set the sections in the body and keep the others; a section set to `null` is deleted. The `notifications` section is checked: its only field is `builds`, with `none`, `all` or `failed` (see [Build notifications](../registry/admin/email#build-notifications)) |
+| GET | `/users/notifications/status` | Whether the current user can get notification e-mails: `{canReceiveEmail, reason}`, `reason` is `emailDisabled`, `noAddress` or `null` |
+
 ### Organizations
 
 | Method | Endpoint | Description |
@@ -362,6 +370,12 @@ Browse STAC catalogs with tools like [STAC Browser](https://radiantearth.github.
 | POST | `/sys/cleanup` | Run DroneDB `cleanup` on every dataset *(admin only, async)* |
 | POST | `/sys/check-artifact-completeness` | Scan all datasets and enqueue rebuilds for incomplete build artifacts; models of an older build layout go to the one-worker background `rebuilds` queue *(admin only, async)* |
 | POST | `/sys/email/test` | Send a test e-mail with the current SMTP settings, body `{"to": "address"}` *(admin only; see [E-mail](../registry/admin/email#test-the-settings))* |
+| GET | `/sys/email/templates` | List the e-mails whose text an administrator can edit (`name`, `title`, `isDefault`) *(admin only; see [Build notifications](../registry/admin/email#api))* |
+| GET | `/sys/email/templates/{name}` | The current and the built-in subject and body of a template, and its placeholders *(admin only)* |
+| PUT | `/sys/email/templates/{name}` | Check and save the text of a template, body `{"subject", "body"}`; `400` names the problem *(admin only)* |
+| DELETE | `/sys/email/templates/{name}` | Go back to the built-in text *(admin only)* |
+| POST | `/sys/email/templates/{name}/preview` | Render a text that is not saved with sample builds: `{subject, text, html}` *(admin only)* |
+| POST | `/sys/email/templates/{name}/test` | Send a text that is not saved, with sample builds, to the calling administrator *(admin only)* |
 | GET | `/sys/update-info` | The last update-check result: installed and latest version, merged release notes, whether they contain security fixes, the licence-request link and the declared use *(admin only; see [Update check](../registry/admin/update-check))* |
 | PUT | `/sys/update-check/settings` | Store the declared use and the opt-in contact, body `{"useDeclaration", "contactEmail", "contactConsent"}`; an address needs `contactConsent: true`, an empty one clears it; returns the update info *(admin only)* |
 

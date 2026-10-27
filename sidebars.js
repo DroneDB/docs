@@ -40,6 +40,7 @@ const sidebars = {
         'registry/index',
         'registry/getting-started',
         'registry/datasets',
+        'registry/preferences',
         'registry/import-export',
         'registry/data-export-and-deletion',
         {
