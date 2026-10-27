@@ -993,7 +993,7 @@ The default value is `0 2 * * *` (daily at 2:00 AM)
 
 ### JobIndexCleanupCron
 
-Cron expression for the job that purges old terminal records (Succeeded, Failed, Deleted) from the `JobIndices` table. This prevents the table from growing indefinitely.
+Cron expression for the job that purges old terminal records (Succeeded, Failed, Deleted) from the `JobIndices` table. This prevents the table from growing indefinitely. The same job also deletes the sent build notifications older than 30 days and sends the ones that waited for more than one hour (see [Build notifications](./email#when-an-e-mail-is-sent)).
 
 :::info
 The default value is `0 4 * * *` (daily at 4:00 AM)

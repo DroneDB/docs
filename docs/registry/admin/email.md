@@ -204,7 +204,7 @@ Registry e-mails the user who asked for the build:
 * A build of a file that the user uploaded or asked to build again goes to that user.
 * A build of a file that a task made (for example the files extracted from an archive) goes to the user who started
   the task.
-* An automatic retry of a build goes to the user whose build it retries.
+* An automatic retry of a failed build goes to the user whose build it retries.
 
 Other builds that Registry starts by itself, such as a rescan or a check of the built files, send no e-mail.
 
@@ -219,8 +219,9 @@ one e-mail lists every build of that user that ended during it. A build that end
 * Before it sends, Registry reads the setting of the user again. When the user chose **None** in the meantime,
   nothing is sent. When they chose **Only failed builds**, the completed builds are left out.
 * The e-mail goes out through the background job of [Delivery and retries](#delivery-and-retries).
-* When Registry stops before a wait ends, the daily cleanup job ([`CleanupExpiredJobsCron`](./configuration#cleanupexpiredjobscron))
-  sends the builds that wait for more than one hour. It also deletes the record of the sent builds after 30 days.
+* When Registry stops before a wait ends, the daily job history cleanup
+  ([`JobIndexCleanupCron`](./configuration#jobindexcleanupcron)) sends the builds that wait for more than one hour. It
+  also deletes the record of the sent builds after 30 days. When this job is turned off, neither happens.
 * A build ends on the host that runs it. In a deployment with processing nodes, every node needs the same `Smtp`
   settings (see [Turn on e-mail](#turn-on-e-mail)).
 
