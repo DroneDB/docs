@@ -957,10 +957,11 @@ The default value is `* * * * *` (every minute)
 
 ### ProcessPendingBuildsCron
 
-Cron expression for the job that processes pending builds.
+Cron expression for the job that processes pending builds: it starts the automatic retries again for the builds that
+still wait (for example for a missing companion file), also after their retries gave up or were lost in a restart.
 
 :::info
-The default value is `* * * * *` (every minute)
+The default value is `0 */6 * * *` (every 6 hours)
 :::
 
 ### OrphanedDatasetCleanupCron
