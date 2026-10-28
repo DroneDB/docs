@@ -212,14 +212,32 @@ Usage:
 ### gsplat
 
 ```
-Convert a Gaussian Splat (.ply/.splat/.spz) to the compressed .spz format.
+Convert a Gaussian Splat (.ply, .splat or .spz) to the compressed .spz format, or export the training data of a splat from an ODM project.
 Usage:
-  ddb gsplat input.{ply|splat|spz} [output.spz] [args]
+  ddb gsplat input.{ply|splat|spz} [output.spz]
+       gsplat --training-data <output folder> [--max-image-size <pixels>] [--max-points <count>] <ODM project folder> [args]
 
-  -i, --input arg   Gaussian Splat file to convert (.ply, .splat or .spz)
-  -o, --output arg  Output .spz file
-  -h, --help        Print help
-      --debug       Show debug output
+  -i, --input arg           Gaussian Splat file to convert (.ply, .splat or 
+                            .spz), or with --training-data the ODM project 
+                            folder
+  -o, --output arg          Output .spz file (default: the input with the 
+                            .spz extension; a .spz input needs another 
+                            path)
+      --training-data arg   Write the training data of a Gaussian splat 
+                            from the outputs of an ODM project 
+                            (cameras.json, odm_report/shots.geojson, 
+                            images/, odm_georeferencing/coords.txt and its 
+                            point cloud) into this folder, which must be 
+                            new or empty and apart from the project: a 
+                            COLMAP model (sparse/0), the images (images/) 
+                            and georef.json, which makes a splat trained 
+                            from it and put next to it georeferenced
+      --max-image-size arg  With --training-data: longest side in pixels of 
+                            the exported images (default: the originals)
+      --max-points arg      With --training-data: most points of the sparse 
+                            model (at most 10000000) (default: 100000)
+  -h, --help                Print help
+      --debug               Show debug output
 
 ```
 
