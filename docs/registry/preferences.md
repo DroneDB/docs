@@ -11,16 +11,25 @@ settings:
 
 | Tab | Settings |
 |-----|----------|
-| **Units** | Metric or imperial measurement units |
+| **Units** | Metric or imperial measurement units, and the currency of prices |
 | **Map** | The default basemap, the flight path and the direction indicators, and the custom basemap |
 | **Files** | The default view of the files (grid or table) and the sort order |
 | **Lists** | How many datasets and organizations a page shows |
 | **Viewers** | The navigation mode and the quality of Gaussian splats, and the lighting of the 3D viewers |
-| **Stockpiles** | The materials that weigh and price a stockpile, and the currency of the prices |
+| **Stockpiles** | The materials that weigh and price a stockpile |
 | **Notifications** | The e-mails about your builds (only on a server that sends e-mail) |
 
 Your settings belong to your account: they are the same on every device where you sign in. **Reset section** puts
 the settings of the tab back to their defaults.
+
+## Units and currency
+
+| Setting | Values | What it does |
+|---------|--------|--------------|
+| **Measurement units** | **Metric** (default), **Imperial** | The units of lengths, areas, volumes, weights and densities in the Hub |
+| **Currency** | Any ISO 4217 currency (default **USD**) | The currency of the prices in the Hub, for example the cost of a stockpile. The list has a search box, with the common currencies first |
+
+The currency is a label: a change does not convert the prices. For example, a price of 15 USD becomes 15 EUR.
 
 ## Viewers
 
@@ -35,11 +44,10 @@ The quality can also be changed in the view settings of the splat viewer (the ge
 
 ## Stockpiles
 
-The **Stockpiles** tab has the materials of the [stockpile panel](/docs/features/terrain-analytics#weight-and-cost). The panel weighs a pile with the density of its material and prices it with the price per tonne.
+The **Stockpiles** tab has the materials of the [stockpile panel](/docs/features/terrain-analytics#weight-and-cost). The panel weighs a pile with the density of its material and prices it with the price per tonne, in the currency of the [Units](#units-and-currency) tab.
 
 | Setting | What it does |
 |---------|--------------|
-| **Currency** | The currency of the prices. The default is USD. The currency is a label: a change does not convert the prices |
 | **Shown** | Whether the stockpile panel offers the material. Hide the materials you do not use |
 | **Density** | The density of the material, in t/m³ (ST/yd³ with imperial units). It must be more than 0 and at most 30 t/m³ |
 | **Price** | The price of the material per tonne (per short ton with imperial units). It must be 0 or more |

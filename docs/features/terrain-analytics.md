@@ -86,7 +86,7 @@ Select a **Material** in the panel to see the weight and the estimated cost of t
 
 The panel weighs the pile again when you select another material, also after the volume is calculated. A saved pile keeps the material it was weighed with: its name, its density, its price per tonne and the currency, with the weight and the cost.
 
-The materials are yours: **Edit materials…** in the panel opens the **Stockpiles** tab of the [Preferences](/docs/registry/preferences#stockpiles). There you can change the density and the price of each built-in material, hide the materials you do not use, add your own materials, and set the currency. For one pile only, select **+ Custom…** and type a density and a price.
+The materials are yours: **Edit materials…** in the panel opens the **Stockpiles** tab of the [Preferences](/docs/registry/preferences#stockpiles). There you can change the density and the price of each built-in material, hide the materials you do not use, and add your own materials. The prices are in the currency set on the **Units** tab of the [Preferences](/docs/registry/preferences#units-and-currency). For one pile only, select **+ Custom…** and type a density and a price.
 
 The built-in materials have typical values:
 
