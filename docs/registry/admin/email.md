@@ -207,18 +207,19 @@ Registry e-mails the user who asked for the build:
 * A build of a file that the user uploaded or asked to build again goes to that user.
 * A build of a file that a task made (for example the files extracted from an archive) goes to the user who started
   the task.
-* An automatic retry goes to the user whose build it retries: a build that failed, or a build that waits for a
-  missing companion file.
+* An automatic retry goes to the user whose build failed.
 
 Other builds that Registry starts by itself, such as a rescan or a check of the built files, send no e-mail.
 
 A failed build is in an e-mail only when the failure is final. When Registry retries a build automatically (for
-example after a lack of disk space or a tool timeout), nothing is sent until the retries give up. A file that waits
-for a missing companion file is reported as failed when the retries give up, and the line names the missing files.
-When a retry succeeds, a user with **All** gets a "Completed" line. A user with **Only failed builds** gets nothing.
+example after a lack of disk space or a tool timeout), nothing is sent until the retries give up. When a retry
+succeeds, a user with **All** gets a "Completed" line. A user with **Only failed builds** gets nothing.
 After the retries of a failed build give up, the check of pending builds
 ([`ProcessPendingBuildsCron`](./configuration#processpendingbuildscron), every 6 hours) can still build the file later:
 then a user with **All** gets a "Completed" line too.
+
+A file that waits for a missing companion file (an `.obj` without its `.mtl`) has not failed and is not retried: it is
+built at once when the missing file is uploaded. Neither the wait nor that build is in an e-mail.
 
 Builds are grouped. The first build of a user that ends starts a wait of
 [`BuildNotifications.DigestMinutes`](./configuration#buildnotifications) (5 minutes by default). When the wait ends,

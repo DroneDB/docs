@@ -960,7 +960,10 @@ The default value is `* * * * *` (every minute)
 ### ProcessPendingBuildsCron
 
 Cron expression for the job that processes pending builds: it starts the automatic retries again for the builds that
-still wait (for example for a missing companion file), also after their retries gave up or were lost in a restart.
+failed for a temporary reason (for example a lack of disk space or a tool timeout), also after their retries gave up or
+were lost in a restart. A build that waits for a missing companion file is not retried: it runs at once when a file
+with that name is uploaded or moved into the dataset. This job also starts the builds whose missing file arrived in
+another way.
 
 :::info
 The default value is `0 */6 * * *` (every 6 hours)
