@@ -303,9 +303,31 @@ Other keys, when you are not typing in a field and no dialog is open:
 
 The rail on the left edge lists the saved cameras (click one to fly to it), starts or stops an orbit around the scene, and starts or stops the tour. Users who can write to the dataset also have the buttons that save the current view as a camera and save the views file.
 
+### Quality
+
+How much the viewer draws decides how fast it is. The **Quality** setting is one of **Auto** (the default), **Low**, **Medium** and **High**. A preset sets four things:
+
+| | Low | Medium | High |
+|---|-----|--------|------|
+| **Colour detail** (the highest spherical-harmonics degree drawn) | 0: flat colour | 1 | 3: full view-dependent colour |
+| **Level of detail** (how fine the splats picked for the view are) | 0.5x: stops at splats about twice as large | 0.75x | 1x |
+| **Splat budget** (the share of the splats Spark keeps for the view, out of its default for the device: 2.5 million on a desktop, less on a phone) | 25% | 50% | 100% |
+| **Sharpness** (the highest pixel ratio the canvas is drawn at, never above the screen's own) | 1 | 1.5 | 2 |
+
+Lower the quality on a slow device; **High** draws the most the viewer can.
+
+**Auto** starts at High and watches how long the frames take:
+
+- Under **30 frames per second** for about 2 seconds, it goes down one preset.
+- Above **55 frames per second** for about 5 seconds, it goes up one preset. Going up waits longer so a scene that only just fits is not pushed back and forth.
+- If a preset it just went up to proves too slow within 30 seconds, it does not try that preset again while the viewer stays open.
+- A single long frame (a chunk uploading) is smoothed, and a page that is not drawing, such as a hidden tab, measures nothing.
+
+The setting is in the [Preferences](/docs/registry/preferences) (**Viewers**, **Gaussian splats**, **Quality**) and in the view settings of the viewer, which are the same preference. A change takes effect at once on an open scene. In the view settings, and in the [About this splat](#about-this-splat-and-its-downloads) panel, Auto says which preset it draws at.
+
 ### View settings
 
-The gear button opens the view settings:
+The gear button opens the view settings: the up axis, the [quality](#quality), the point size and the ground plane calibration.
 
 - **Up axis**: which way is up in the scene. The first choice, **Auto**, is there when the build estimated an up it is confident of (`upConfidence` of at least 0.6 in `bounds.json`, see [Which way is up](#which-way-is-up)); it is labelled with where the estimate comes from: *Auto (ground plane)*, *Auto (principal axes)* or *Auto (georeferenced)*. The other choices are the six axes of the stored scene. Most 3DGS exports are stored with Y down (`−Y`); photogrammetry exports often use `+Z`. Change the choice when the scene looks upside down or on its side.
 - **Point size**: scales the splats from 0.25x to 3x.
@@ -319,6 +341,30 @@ These settings are remembered on your device for each splat (for the 200 most re
 4. `−Y`, the default.
 
 So a choice of yours or a saved orientation always beats the estimate, and a splat built before the estimate existed, or one whose estimate was not confident, opens as it did before. Auto is only a choice while there is an up to follow, the estimate of the build or the vector the views file saved; without one it is skipped and the next source decides.
+
+### About this splat and its downloads
+
+The (i) button at the right edge opens a panel about the splat:
+
+| Row | What it says |
+|-----|--------------|
+| **Splats** | The number of splats the index holds, or *Unknown* (SOG and RAD files have no count at indexing) |
+| **Colour detail (SH)** | The spherical-harmonics degree, 0 (flat colour) to 3 (full) |
+| **Size** | The extent of the bounding box in `bounds.json`: in metres for a georeferenced splat or one with a scale, otherwise in file units |
+| **Level of detail** | *Streaming* with the number of chunks on the way, *Up to date for this view* with the pages in memory, or *Whole file loaded* for a file that is not a RAD (the levels are then built in the browser) |
+| **Georeferenced** | *No*, or *Yes* with the CRS or the local East-North-Up frame |
+| **Estimated up** | The `up` of `bounds.json` as an axis (`+Z`) or a vector, with its confidence and source, for example `+Z, 85% sure (ground plane)`; *Not estimated* without one |
+| **Quality** | The setting, and for Auto the preset it draws at: *Auto (medium)* |
+
+The panel also has the downloads of the splat. They are in the **Tools** menu of the file browser for a selected splat too:
+
+| Download | What you get | When |
+|----------|--------------|------|
+| **Download original** | The file that was uploaded | Always |
+| **Download level-of-detail (.rad)** | `model.rad`, the streamed container of the build, named after the splat | The build is complete |
+| **Download .spz** | The `model.spz` of a build made before the RAD layout | Only while the splat has no `model.rad` (a rebuild replaces it) |
+
+A splat that is not built, or is being built, offers the original only.
 
 ### Camera views, pins and measurements
 
