@@ -15,7 +15,7 @@ DroneDB uses **vcpkg** for dependency management and **CMake** for building.
 | CMake | 3.21+ |
 | Python | 3.x |
 | Git | any recent version |
-| Rust toolchain (`cargo`) | any recent stable version (required for Gaussian Splat LOD) |
+| Rust toolchain (`cargo`) | any recent stable version (required to build `build-lod`, which Gaussian Splat builds need) |
 | Visual Studio (Windows only) | 2022 or later with "Desktop development with C++" workload |
 
 ## Windows
@@ -62,7 +62,7 @@ cd DroneDB
 | `build/ddbtest.exe` | Integration tests |
 | `build/bm3d.exe` | 3D model builder (`.bm3d` files; see below) |
 | `build/untwine.exe` | COPC accelerator *(optional, see below)* |
-| `build/build-lod.exe` | Gaussian Splat LOD producer *(optional, see below)* |
+| `build/build-lod.exe` | Gaussian Splat LOD producer *(required for Gaussian Splat builds, see below)* |
 | `build/Obj2Tiles.exe` | OGC 3D Tiles generator *(optional, see below)* |
 | `build/dwg2dxf.exe` | DWG to DXF converter *(optional, see below)* |
 
@@ -104,7 +104,7 @@ Accepted values follow CMake conventions: `Release`, `Debug`, `RelWithDebInfo`, 
 | `build/ddbtest` | Integration tests |
 | `build/bm3d` | 3D model builder (`.bm3d` files; see below) |
 | `build/untwine` | COPC accelerator *(optional, see below)* |
-| `build/build-lod` | Gaussian Splat LOD producer *(optional, see below)* |
+| `build/build-lod` | Gaussian Splat LOD producer *(required for Gaussian Splat builds, see below)* |
 | `build/Obj2Tiles` | OGC 3D Tiles generator *(optional, see below)* |
 | `build/dwg2dxf` | DWG to DXF converter *(optional, see below)* |
 
@@ -172,9 +172,9 @@ A Untwine build failure is **non-blocking**: the scripts print a warning and Dro
 
 ---
 
-## Gaussian Splat LOD producer (`build-lod`, optional)
+## Gaussian Splat LOD producer (`build-lod`, required)
 
-If the `vendor/spark` git submodule is initialised, the build script automatically compiles Spark's `build-lod` Rust CLI and places the binary next to `ddbcmd`. This binary is required for Gaussian Splat LOD streaming.
+If the `vendor/spark` git submodule is initialised, the build script automatically compiles Spark's `build-lod` Rust CLI and places the binary next to `ddbcmd`. This binary is required: it produces the streamed `model.rad` of every Gaussian Splat.
 
 > **Prerequisite:** A Rust toolchain (`cargo`) must be installed. Download it from [rustup.rs](https://rustup.rs).
 
@@ -187,7 +187,7 @@ git submodule update --init vendor/spark
 ./full-build-linux.sh              # Linux
 ```
 
-If `build-lod` is missing, DroneDB can still serve Gaussian Splats but without LOD streaming (plain `model.spz`).
+If `build-lod` is missing, a Gaussian Splat build fails (it does not fall back to another format) until the tool is installed: place it next to `ddbcmd` or point `DDB_BUILDLOD_PATH` at it. See [Gaussian Splats](/docs/features/gaussian-splat#build-lod-is-required).
 
 ---
 

@@ -59,7 +59,7 @@ DroneDB supports a wide range of geospatial data formats:
 | **Videos** | MP4, MOV, WEBM, M4V, AVI, MKV |
 | **Point Clouds** | LAS, LAZ, E57, PTS, XYZ, PLY* |
 | **3D Models** | OBJ, GLTF, GLB, STL, PLY*, OGC 3D Tiles (.3tz) |
-| **Gaussian Splats** | PLY*, SPLAT, SPZ, KSPLAT |
+| **Gaussian Splats** | PLY*, SPLAT, SPZ, KSPLAT, SOG |
 | **Vector Data** | GeoJSON, DXF, DWG, SHP, SHZ, FGB, TopoJSON, KML, KMZ, GPKG, GPX |
 | **Other** | Markdown, and generic files (PDF, etc.) |
 
@@ -102,7 +102,7 @@ DroneDB automatically classifies files into the following types based on their c
 | **PointCloud** | Point cloud files (LAS, LAZ, E57, PTS, XYZ, non-mesh PLY) |
 | **Model** | 3D models (OBJ, GLTF, GLB, STL, mesh PLY) |
 | **Tiles3D** | OGC 3D Tiles archives (.3tz) and generated 3D Tiles tilesets |
-| **GaussianSplat** | Gaussian Splat files (PLY splat, SPZ, SPLAT, KSPLAT) |
+| **GaussianSplat** | Gaussian Splat files (PLY splat, SPLAT, SPZ, KSPLAT, SOG) |
 | **Vector** | Vector data (GeoJSON, SHP, KML, DXF, GPKG, etc.) |
 | **Markdown** | Documentation files (.md) |
 | **Directory** | Filesystem directories |

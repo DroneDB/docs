@@ -99,7 +99,7 @@ During build, the `.3tz` archive is extracted into `build/{hash}/3dtiles/` and v
 
 - **Progressive streaming**: Tiles load at multiple levels of detail based on camera distance.
 - **Georeferenced placement**: Georeferenced tilesets are placed on the Earth ellipsoid (ECEF).
-- **Unified viewer**: The same viewer handles 3D Tiles, Gaussian Splats, point clouds, and rasters.
+- **Unified viewer**: The same viewer handles 3D Tiles, point clouds, rasters and vector tiles. Gaussian Splats open in their own [splat viewer](/docs/features/gaussian-splat#in-hub).
 
 ## Build requirements
 

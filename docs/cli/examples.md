@@ -163,17 +163,23 @@ When you `ddb add` a `.3tz` archive (ZIP-packaged OGC 3D Tiles with `tileset.jso
 
 ## Gaussian Splat Workflow
 
-Convert a Gaussian Splat PLY file to streaming-optimized SPZ + RAD format:
+Build a Gaussian Splat into the streaming-optimized RAD format (needs the `build-lod` program):
 
 ```bash
 # 1. Index the Gaussian Splat output
 ddb add model.ply
 
-# 2. Build SPZ + RAD for streaming
-ddb gsplat model.ply
+# 2. Build the streamed RAD (model.rad) and its bounds
+ddb build
 
 # 3. Push to Hub
 ddb push
+```
+
+To hand a splat to a tool that reads SPZ, convert it with `ddb gsplat`; this does not build anything:
+
+```bash
+ddb gsplat model.ply model.spz
 ```
 
 ## Archive Upload and Extraction

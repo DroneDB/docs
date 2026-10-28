@@ -156,8 +156,9 @@ An artifact is `{role, path, kind, mediaType, downloadName?, index?, legacy?, fa
 | `model.bm3d` | bm3d multiresolution 3D model (`bm3d/model.bm3d`) | `application/vnd.dronedb.bm3d` |
 | `model.nexus` | Nexus multiresolution mesh of models built before bm3d (`nxs/model.nxz`; legacy, read only; `fallbackFor: "model.bm3d"`) | `application/octet-stream` |
 | `model.3dtiles` | OGC 3D Tiles (directory; index: `tileset.json`) | `application/json` |
-| `gsplat.lod`, `gsplat.spz` | Level-of-detail and SPZ Gaussian Splats | `application/octet-stream` |
-| `gsplat.bounds`, `gsplat.georef` | Bounding box and georeference of a splat | `application/json` |
+| `gsplat.lod` | Level-of-detail Gaussian Splat (`gsplat/model.rad`, streamed with range requests) | `application/octet-stream` |
+| `gsplat.spz` | SPZ Gaussian Splat of builds before the RAD layout (`gsplat/model.spz`; legacy, read only; `fallbackFor: "gsplat.lod"`) | `application/octet-stream` |
+| `gsplat.bounds` | Bounding box of the splats, to frame the first view (`gsplat/bounds.json`; optional) | `application/json` |
 
 A rebuild of a model writes `bm3d/` and removes `nxs/` only after `bm3d/` is published, and a failed rebuild keeps `nxs/`, so a model stays viewable while it is rebuilt.
 
