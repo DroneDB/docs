@@ -187,7 +187,7 @@ A build that failed for a temporary reason (the rows with a retained marker abov
 
 Retry controls are stored in the configured Hangfire storage, so separate hosts share one coordinator ID and attempt budget even when each uses a local observation cache. Legacy cached controls are imported once; dataset cache invalidation does not erase the shared retry chain.
 
-For Gaussian Splat builds, `DDB_BUILDLOD_IDLE_TIMEOUT_SECONDS` sets the build-lod idle deadline to an integer from **1 to 86400 seconds**. The default remains **3600 seconds**. Invalid values fail before the runner changes its output files.
+For Gaussian Splat builds, the build-lod idle deadline grows with the number of splats: **8 minutes per million splats**, at least **3600 seconds** and at most **86400 seconds** (see [Gaussian Splats](/docs/features/gaussian-splat#build-lod-is-required)). `DDB_BUILDLOD_IDLE_TIMEOUT_SECONDS` replaces it with an integer from **1 to 86400 seconds**. Invalid values fail before the runner changes its output files.
 
 ### Native build API compatibility
 

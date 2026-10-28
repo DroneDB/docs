@@ -104,7 +104,14 @@ DroneDB looks for it, in this order:
 3. The folder of the DroneDB library, then its `../bin` (how programs that load the library, such as the Registry, find the tools packaged with it).
 4. The `PATH`.
 
-`build-lod` is supervised by an idle deadline: a run that prints no output for this long is stopped and the build fails. The default is **3600 seconds**. `DDB_BUILDLOD_IDLE_TIMEOUT_SECONDS` sets it to an integer from 1 to 86400 (24 hours); any other value fails the build before it starts. See [Building from Source](/docs/contributing/building-from-source#gaussian-splat-lod-producer-build-lod-required) for how to build the tool.
+`build-lod` is supervised by an idle deadline: a run that prints no output for this long is stopped and the build fails with `build-lod killed after N s without output`, where N is the deadline. `build-lod` prints nothing while it sorts the splats, builds each level of its tree, prunes and writes the RAD, and these steps take longer as the splat grows, so the deadline grows with the number of splats:
+
+- **8 minutes per million splats**, rounded up to a whole second;
+- at least **3600 seconds** (1 hour) and at most **86400 seconds** (24 hours).
+
+For example, a PLY of 31.6 million splats (7.45 GB) gets about 4.2 hours. The splat count comes from the header of the source (PLY, `.splat`, SPZ, `.ksplat`). For a `.sog`, which has no header DroneDB reads, it is estimated from the file size at 236 bytes per splat (a PLY with SH degree 3), so a compressed `.sog` often gets the minimum.
+
+`DDB_BUILDLOD_IDLE_TIMEOUT_SECONDS` replaces this deadline for every build with an integer from 1 to 86400 (24 hours); any other value fails the build before it starts. See [Building from Source](/docs/contributing/building-from-source#gaussian-splat-lod-producer-build-lod-required) for how to build the tool.
 
 ## Thumbnail
 
