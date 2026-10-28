@@ -16,11 +16,12 @@ DroneDB indexes 3D Gaussian Splatting scenes, builds them into a streamed level-
 | **SPZ** | `.spz` | Its extension | Yes, from the header | Yes (versions 1 to 4) | Yes |
 | **KSPLAT** | `.ksplat` | Its extension | Yes, from the header | Yes | No |
 | **SOG** | `.sog` | Its extension | No: the count is inside the ZIP, which indexing does not open | Yes | No |
+| **RAD** | `.rad` | Its extension | No: the file is chunked and indexing does not read it | Yes, as it is (no `build-lod`) | No |
 
 - **PLY** means the 3DGS layout (`x`, `y`, `z`, `f_dc_0..2`, `opacity`, `scale_0..2`, `rot_0..3` and optional `f_rest_*`) or the SuperSplat compressed layout (a `chunk` element). A PLY with a `face` element is a mesh, not a splat.
 - **SOG** is a single-file bundle (a ZIP with `meta.json` and the WebP images of the splats). A `.sog` upload is indexed as a Gaussian Splat and built like the others.
-- The thumbnail of a built splat is rendered from its `model.rad` (from the old `.spz` for a dataset built before the RAD layout), so it does not depend on the source format.
-- `model.rad` is what a build writes. A `.rad` is not accepted as an upload.
+- **RAD** is the level-of-detail container of Spark, the format a build writes. A trainer can deliver one as it is (a WebODM task makes a `splats.rad`), and a `.rad` added to a dataset is a Gaussian Splat: the build checks it, publishes it as `model.rad` and does not run `build-lod` (see [Uploading a RAD file](#uploading-a-rad-file)).
+- The thumbnail of a built splat is rendered from its `model.rad` (from the old `.spz` for a dataset built before the RAD layout), so it does not depend on the source format. See [Thumbnail](#thumbnail).
 
 :::note
 A splat PLY and a point-cloud PLY have the same extension. DroneDB reads the header to decide: a PLY that looks like a splat is a Gaussian Splat entry, and one that fails the checks below stays a Gaussian Splat entry and its build fails with the reason.
@@ -44,13 +45,47 @@ A splat file whose data is damaged (for example, a position that is not a number
 
 1. The source is indexed as a `GaussianSplat` entry.
 2. `build-lod` converts it into a **RAD** level-of-detail container, `model.rad`. The source is never modified and nothing is written next to it. An SPZ version 4 source (`NGSP`, ZSTD) is first rewritten as version 3 in a temporary folder, because `build-lod` reads versions 1 to 3.
-3. DroneDB computes the bounding box of the splats from `model.rad` and writes it as `bounds.json`, which the viewer uses to frame the first view. If the box cannot be computed the build still delivers `model.rad`.
+3. DroneDB computes the bounding box of the splats from `model.rad` and writes it as `bounds.json`, which the viewer uses to frame the first view. It also estimates which way is up (see [Which way is up](#which-way-is-up)). If the box cannot be computed the build still delivers `model.rad`.
 
 The build artifacts are `model.rad` (role `gsplat.lod`) and `bounds.json` (role `gsplat.bounds`). The RAD format lets the viewer load coarse splats first and refine the scene as the camera moves; the file is read with HTTP range requests.
 
 Datasets built before the RAD layout hold a `model.spz` (role `gsplat.spz`, legacy). The viewer still opens it while there is no `model.rad`, and a rebuild writes `model.rad` and removes the old file. Rebuild those datasets to get streaming.
 
 `ddb gsplat` is not the build: it neither indexes nor produces the RAD (see [Converting to SPZ](#converting-to-spz-for-other-tools)).
+
+### Which way is up
+
+Splats do not say which way is up: a scene from COLMAP or the original 3DGS tools is stored with Y down, one from ODM with Z up. The build looks at the coarse splats of `model.rad` and writes the answer in `bounds.json` next to the bounding box:
+
+```json
+{
+  "min": [-12.4, -0.8, -9.1],
+  "max": [11.9, 6.2, 10.3],
+  "up": [0.01, -0.99, 0.02],
+  "upConfidence": 0.86,
+  "upSource": "ground-plane"
+}
+```
+
+| Field | Meaning |
+|-------|---------|
+| `up` | A unit vector, in the coordinates of `model.rad`, that points to the sky |
+| `upConfidence` | From 0 to 1. Viewers use `up` from **0.6** |
+| `upSource` | `ground-plane`: a plane fitted to the splats is the ground, and `up` is the side that most of the rest of the opacity is on. `pca`: no ground was found, so `up` is the flattest direction of the scene, with the side told by the skew of the splats (its confidence is at most 0.8). `georef`: the splat is georeferenced, `up` is `[0, 0, 1]` and the confidence is 1 without looking at the splats |
+
+The estimate is low in confidence where the splats allow two answers, so that a confident `up` is one to rely on: a scene that is not flat along any direction (a room is as high as it is wide), two grounds that disagree (a wooded slope behind a subject that stands on level ground) and a ground with as much opacity on one side as on the other. The viewer then does not use it. A scene of fewer than 16 splats has an `up` with confidence 0, and one whose splats cannot be read has none; the build still delivers `model.rad` and `bounds.json`.
+
+`up`, `upConfidence` and `upSource` are optional: a `bounds.json` from an earlier build has none of them, and the viewer uses its default (below).
+
+### Uploading a RAD file
+
+A `.rad` added to a dataset is already what a build makes, so the build does not run `build-lod`:
+
+1. DroneDB reads the file with its own RAD reader: the header and the centres of every chunk. A file that cannot be read fails the build with the reason (for example `it is not a RAD file this can read`, or `the RAD file holds no splats`) instead of reaching a viewer that cannot read it.
+2. The file is **copied** into the build as `model.rad`. The dataset file stays as it is, and changing it later does not change the published model until the next build.
+3. `bounds.json` is written with the bounding box and the up vector, as for any other source.
+
+Because there is no `build-lod` run, such a build also works where the program is not installed. A `.rad` has no splat count in the index (the Hub shows it as unknown).
 
 ### `build-lod` is required
 
@@ -70,6 +105,15 @@ DroneDB looks for it, in this order:
 4. The `PATH`.
 
 `build-lod` is supervised by an idle deadline: a run that prints no output for this long is stopped and the build fails. The default is **3600 seconds**. `DDB_BUILDLOD_IDLE_TIMEOUT_SECONDS` sets it to an integer from 1 to 86400 (24 hours); any other value fails the build before it starts. See [Building from Source](/docs/contributing/building-from-source#gaussian-splat-lod-producer-build-lod-required) for how to build the tool.
+
+## Thumbnail
+
+The thumbnail of a built splat is a perspective view of the scene standing upright, painted as the splats really are: every splat is an ellipse with its own size and orientation, and the one in front hides the one behind. It is made from `model.rad` (or the old `.spz`), so it does not depend on the source format, and it is the same at every size up to 4096 px.
+
+- The camera looks down on the scene from 35 degrees above the ground of the `up` of `bounds.json`, turned 35 degrees from the narrowest side of the subject. When `up` is missing or not confident, the thumbnail stands the scene on `−Y`, which is how the viewer opens it.
+- It aims at the densest part of the scene, so floaters and the far background do not decide the framing, and leaves out what stands between the camera and the subject, the sky high above it and what lies under the ground.
+- A **room** (splats on both sides of the flattest direction, a floor and a ceiling) is shown opened from above like a doll's house: seen from 55 degrees with its upper part and its near side cut away.
+- A splat that would cover more than an eighth of the picture is a blur and is not drawn.
 
 ## CLI
 
@@ -142,11 +186,18 @@ The rail on the left edge lists the saved cameras (click one to fly to it), star
 
 The gear button opens the view settings:
 
-- **Up axis**: which axis of the stored scene points up. Most 3DGS exports are stored with Y down (`−Y`, the default); photogrammetry exports often use `+Z`. All six axes can be chosen; change it when the scene looks upside down or on its side.
+- **Up axis**: which way is up in the scene. The first choice, **Auto**, is there when the build estimated an up it is confident of (`upConfidence` of at least 0.6 in `bounds.json`, see [Which way is up](#which-way-is-up)); it is labelled with where the estimate comes from: *Auto (ground plane)*, *Auto (principal axes)* or *Auto (georeferenced)*. The other choices are the six axes of the stored scene. Most 3DGS exports are stored with Y down (`−Y`); photogrammetry exports often use `+Z`. Change the choice when the scene looks upside down or on its side.
 - **Point size**: scales the splats from 0.25x to 3x.
 - **Ground plane calibration**: a roll and a pitch of up to 45 degrees on top of the up axis, to make walls and doors look vertical.
 
-These settings are remembered on your device for each splat (for the 200 most recently changed ones), so a user who cannot write to the dataset keeps their own view. When the views file (below) holds an orientation it replaces what the device remembers.
+These settings are remembered on your device for each splat (for the 200 most recently changed ones), so a user who cannot write to the dataset keeps their own view. A splat opens with the first of these that exists:
+
+1. The orientation in the views file (below).
+2. What you chose on this device.
+3. **Auto**, when the build has a confident estimate.
+4. `−Y`, the default.
+
+So a choice of yours or a saved orientation always beats the estimate, and a splat built before the estimate existed, or one whose estimate was not confident, opens as it did before. Auto is only a choice while there is an up to follow, the estimate of the build or the vector the views file saved; without one it is skipped and the next source decides.
 
 ### Camera views, pins and measurements
 
@@ -168,6 +219,8 @@ Cameras, pins and measurements are stored with the splat in a JSON file next to 
   ]
 }
 ```
+
+When the orientation is Auto, `upAxis` is `"auto"` and the file also holds the vector it was resolved to as `up` (for example `"up": [0.01, -0.99, 0.02]`), and it has no `flipped`. The saved vector is used before the estimate of `bounds.json`, so the saved cameras still match the scene after a rebuild that estimates another up.
 
 All positions are in the coordinates of the splat file, so they stay where they are when you change the up axis or the tilt.
 
