@@ -15,7 +15,7 @@ DroneDB uses **vcpkg** for dependency management and **CMake** for building.
 | CMake | 3.21+ |
 | Python | 3.x |
 | Git | any recent version |
-| Rust toolchain (`cargo`) | any recent stable version (required to build `build-lod`, which Gaussian Splat builds need) |
+| Rust toolchain (`cargo`) | 1.87 or later (required to build `build-lod`, which Gaussian Splat builds need) |
 | Visual Studio (Windows only) | 2022 or later with "Desktop development with C++" workload |
 
 ## Windows

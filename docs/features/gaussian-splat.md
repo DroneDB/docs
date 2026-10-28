@@ -44,7 +44,7 @@ A splat file whose data is damaged (for example, a position that is not a number
 `ddb build` (and the Registry, when a splat is uploaded) turns the source into a streamed file:
 
 1. The source is indexed as a `GaussianSplat` entry.
-2. `build-lod` converts it into a **RAD** level-of-detail container, `model.rad`. The source is never modified and nothing is written next to it. An SPZ version 4 source (`NGSP`, ZSTD) is first rewritten as version 3 in a temporary folder, because `build-lod` reads versions 1 to 3.
+2. `build-lod` converts it into a **RAD** level-of-detail container, `model.rad`. The source is never modified and nothing is written next to it. `build-lod` reads every SPZ version as it is: the gzip-based versions 1 to 3 and version 4 (`NGSP`, ZSTD).
 3. DroneDB computes the bounding box of the splats from `model.rad` and writes it as `bounds.json`, which the viewer uses to frame the first view. It also estimates which way is up (see [Which way is up](#which-way-is-up)). If the box cannot be computed the build still delivers `model.rad`.
 
 The build artifacts are `model.rad` (role `gsplat.lod`) and `bounds.json` (role `gsplat.bounds`). The RAD format lets the viewer load coarse splats first and refine the scene as the camera moves; the file is read with HTTP range requests.
@@ -145,7 +145,7 @@ ddb gsplat scene.ply scene.spz
 
 - Without an output path it uses the input name with the `.spz` extension. For an `.spz` input that is the input itself, so give another path: the command refuses to overwrite the file it converts.
 - The output is written whole or not at all, so a failed conversion leaves no half-written file.
-- A gzip-based SPZ (versions 1 to 3) is copied unchanged; an SPZ version 4 is rewritten as version 3.
+- A gzip-based SPZ (versions 1 to 3) is copied unchanged; an SPZ version 4 is rewritten as version 3, which every SPZ reader opens (a version 4 file needs a reader of version 4).
 - `.ksplat` and `.sog` are not converted (the command says which formats are).
 
 You can tune the spherical-harmonics quantization with the `DDB_GSPLAT_SH_BITS` environment variable:
