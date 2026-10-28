@@ -31,7 +31,7 @@ Every release publishes, next to the `.deb` and the Windows zip:
 | `ddb.symbols` | The list of exported functions |
 | `SHA256SUMS` | The SHA-256 of every asset |
 
-The library exports exactly the functions listed in `ddb.symbols` (107 in 2.0.0) and nothing else; its C++ classes and functions are internal. Pin a release by version and SHA-256, and build against that release's headers.
+The library exports exactly the functions listed in `ddb.symbols` (108 in 2.0.0) and nothing else; its C++ classes and functions are internal. Pin a release by version and SHA-256, and build against that release's headers.
 
 ## Start-up and shutdown
 
@@ -118,11 +118,12 @@ A cancel token stops the work of a call from another thread:
 3. `DDBCancel(token)` from any thread: the call stops at its next checkpoint and returns `DDBERR_CANCELED`;
 4. `DDBFreeCancelToken(token)` when the host no longer needs it.
 
-The `cancellable` list of `DDBGetCapabilities()` names the exports that honour a token. In 2.0.0 there are 27:
+The `cancellable` list of `DDBGetCapabilities()` names the exports that honour a token. In 2.0.0 there are 28:
 
 - tiles, renders and thumbnails: `DDBTile`, `DDBMemoryTile`, `DDBMemoryTileEx`, `DDBMemoryTileFmt`, `DDBRenderRasterRegion`, `DDBRenderRasterRegionEx`, `DDBRenderRasterIndex`, `DDBGenerateThumbnail`, `DDBGenerateMemoryThumbnail`, `DDBGenerateMemoryThumbnailEx`;
 - exports and builds: `DDBExportRaster`, `DDBExportRaster2`, `DDBBuild`, `DDBBuildEx`;
 - raster analysis: `DDBGetRasterMetadata`, `DDBGetRasterValueInfo`, `DDBGetRasterPointValue`, `DDBGetRasterAreaStats`, `DDBGetRasterProfile`, `DDBCalculateVolume`, `DDBDetectStockpile`, `DDBDetectAllStockpiles`, `DDBGenerateContours`, `DDBMaskBorders`;
+- Gaussian splats: `DDBExportSplatTrainingData`;
 - deltas: `DDBComputeDeltaLocals`, `DDBApplyDelta`, `DDBApplyDeltaEx`.
 
 A canceled call leaves no partial output (a canceled `DDBMaskBorders` writes no file). `DDBApplyDelta` and `DDBApplyDeltaEx` are atomic to a cancel: they stop while they read and hash the added files, with the dataset and the source files as they were, and once they start to change the dataset they apply the delta whole and return `DDBERR_NONE`.
@@ -158,11 +159,33 @@ An artifact is `{role, path, kind, mediaType, downloadName?, index?, legacy?, fa
 | `model.3dtiles` | OGC 3D Tiles (directory; index: `tileset.json`) | `application/json` |
 | `gsplat.lod` | Level-of-detail Gaussian Splat (`gsplat/model.rad`, streamed with range requests) | `application/octet-stream` |
 | `gsplat.spz` | SPZ Gaussian Splat of builds before the RAD layout (`gsplat/model.spz`; legacy, read only; `fallbackFor: "gsplat.lod"`) | `application/octet-stream` |
-| `gsplat.bounds` | Bounding box of the splats, to frame the first view (`gsplat/bounds.json`; optional) | `application/json` |
+| `gsplat.bounds` | Bounding box of the splats to frame the first view, with the estimated `up` and, for a georeferenced splat, its `wgs84Footprint` (`gsplat/bounds.json`; optional) | `application/json` |
 
 A rebuild of a model writes `bm3d/` and removes `nxs/` only after `bm3d/` is published, and a failed rebuild keeps `nxs/`, so a model stays viewable while it is rebuilt.
 
 Registry passes these artifacts to clients as `artifacts: [{role, url, mediaType}]` on each entry.
+
+## Training data of a Gaussian splat
+
+`DDBExportSplatTrainingData(ddbPath, folder, outFolder, optionsJson, progress, progressUserData, &output)` is `ddb gsplat --training-data` on a dataset. It reads the ODM project that is in `folder` of the dataset (an entry path; `NULL`, `""` and `"."` are the root) and writes the [training data](/docs/features/gaussian-splat#training-data-from-an-odm-project) into `outFolder`, a folder of the filesystem (UTF-8) that is created if it is missing and must not be the folder of the project: a COLMAP sparse model in `sparse/0`, the images in `images/` and `georef.json`. The project needs `cameras.json`, `odm_report/shots.geojson`, `images/` and `odm_georeferencing/coords.txt`, and has its point cloud in `odm_georeferencing/odm_georeferenced_model.laz` or `odm_filterpoints/point_cloud.ply`. The call only reads the dataset.
+
+| Argument | Meaning |
+|----------|---------|
+| `optionsJson` | `NULL`, `""` or `{}` for the defaults, else an object with `maxImageSize` (the longest side of the images in pixels; 0, the default, exports the originals) and `maxPoints` (the most points of the model; 100000 by default, 0 writes none). Both are whole numbers from 0. A member that is not known, or not a whole number in range, is refused with `DDBERR_INVALIDARGS`. |
+| `progress`, `progressUserData` | Optional (`NULL` for none). Called with the fraction done (0 to 1) and the phase (`cameras`, `points`, `images` or `model`), one call at a time; a non-zero return cancels the call. |
+
+On success `output` is a JSON object, to free with `DDBFree`: `{"warnings": ["..."], "images": 412, "points": 98211}`. The warnings are what a user should know before training: images that were left out, an approximated lens, no point cloud, images that mostly look straight down.
+
+| Return | When |
+|--------|------|
+| `DDBERR_NONE` | Done |
+| `DDBERR_INVALIDARGS` | An argument is `NULL` or empty, or an option is refused |
+| `DDBERR_NOTFOUND` | `folder` is not in the dataset |
+| `DDBERR_EXCEPTION` | A file of the project is missing or unusable (the message names it, `coords.txt` included), or no image can be exported (the message gives the reasons) |
+| `DDBERR_CANCELED` | The cancel token was canceled, or the progress callback returned non-zero |
+| `DDBERR_BUSY` | Database contention |
+
+A failed or canceled call may leave a partial `outFolder`: delete it. The export is in the `cancellable` list of `DDBGetCapabilities()`.
 
 ## Spectral indices of a raster
 

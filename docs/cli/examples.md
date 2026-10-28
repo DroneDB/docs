@@ -182,6 +182,12 @@ To hand a splat to a tool that reads SPZ, convert it with `ddb gsplat`; this doe
 ddb gsplat model.ply model.spz
 ```
 
+To train a georeferenced splat from an ODM project, write its training data, train on the output folder with a 3DGS trainer that reads COLMAP, and add the result next to `georef.json` (see [Georeferencing](/docs/features/gaussian-splat#georeferencing)):
+
+```bash
+ddb gsplat --training-data ./training --max-image-size 2000 ./odm_project
+```
+
 ## Archive Upload and Extraction
 
 Upload a ZIP archive and extract it into a dataset:

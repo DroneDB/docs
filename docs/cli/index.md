@@ -48,7 +48,7 @@ sidebar_label: CLI Overview
 | `ddb copc` | Build a Cloud Optimized Point Cloud |
 | `ddb bm3d` | Generate bm3d (multiresolution 3D model) files from OBJ, PLY, STL, glTF or GLB models |
 | `ddb 3dtiles` | Generate OGC 3D Tiles (tileset.json + b3dm) from OBJ/glTF/GLB |
-| `ddb gsplat` | Convert a Gaussian Splat (PLY, SPLAT, SPZ) to a compressed SPZ file for other tools (`ddb build` makes the streamed RAD) |
+| `ddb gsplat` | Convert a Gaussian Splat (PLY, SPLAT, SPZ) to a compressed SPZ file for other tools (`ddb build` makes the streamed RAD), or with `--training-data` write the training data of a splat (a COLMAP model, the images and `georef.json`) from an ODM project |
 | `ddb stac` | Generate STAC catalogs |
 | `ddb contour` | Generate contour lines from DEMs |
 | `ddb mask` | Mask orthophoto borders |

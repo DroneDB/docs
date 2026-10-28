@@ -71,7 +71,7 @@ Splats do not say which way is up: a scene from COLMAP or the original 3DGS tool
 |-------|---------|
 | `up` | A unit vector, in the coordinates of `model.rad`, that points to the sky |
 | `upConfidence` | From 0 to 1. Viewers use `up` from **0.6** |
-| `upSource` | `ground-plane`: a plane fitted to the splats is the ground, and `up` is the side that most of the rest of the opacity is on. `pca`: no ground was found, so `up` is the flattest direction of the scene, with the side told by the skew of the splats (its confidence is at most 0.8). `georef`: the splat is georeferenced, `up` is `[0, 0, 1]` and the confidence is 1 without looking at the splats |
+| `upSource` | `ground-plane`: a plane fitted to the splats is the ground, and `up` is the side that most of the rest of the opacity is on. `pca`: no ground was found, so `up` is the flattest direction of the scene, with the side told by the skew of the splats (its confidence is at most 0.8). `georef`: the splat is [georeferenced](#georeferencing), `up` is `[0, 0, 1]` and the confidence is 1 without looking at the splats |
 
 The estimate is low in confidence where the splats allow two answers, so that a confident `up` is one to rely on: a scene that is not flat along any direction (a room is as high as it is wide), two grounds that disagree (a wooded slope behind a subject that stands on level ground) and a ground with as much opacity on one side as on the other. The viewer then does not use it. A scene of fewer than 16 splats has an `up` with confidence 0, and one whose splats cannot be read has none; the build still delivers `model.rad` and `bounds.json`.
 
@@ -149,6 +149,127 @@ DDB_GSPLAT_SH_BITS=5 ddb gsplat scene.ply scene.spz
 
 # Control first-band and remaining-bands bit depth independently
 DDB_GSPLAT_SH_BITS=5,4 ddb gsplat scene.ply scene.spz
+```
+
+## Georeferencing
+
+A splat is stored in the coordinates of the program that trained it, which say nothing about where on the Earth the scene is. A **georeferenced** splat has a local frame with a known place: its X axis points East, Y North and Z up, in metres. DroneDB then knows the position of the scene, so the Hub draws it on the map of the dataset, stands it upright without an estimate, and gives its measurements and the coordinates of a point in metres and on the Earth.
+
+DroneDB does not georeference a splat by what it looks like: a **sidecar** file next to it says where the frame is.
+
+### Sidecar files
+
+When a splat is indexed, DroneDB looks for these files, in this order, and takes the first one that holds a usable georeference. `<stem>` is the name of the splat without its extension.
+
+| File | Where |
+|------|-------|
+| `<stem>.geo.json` | The folder of the splat |
+| `georef.json` | The folder of the splat (it georeferences every splat in that folder) |
+| `reference_lla.json` | The folder of the splat |
+| `coords.txt` | The folder of the splat (ODM's file) |
+| `odm_georeferencing/coords.txt` | The folder of the splat (a splat at the root of an ODM project) |
+| `reference_lla.json`, `opensfm/reference_lla.json` | The folder above the splat |
+| `odm_georeferencing/coords.txt` | The folder above the splat |
+
+A sidecar says where the frame is in one of two ways.
+
+**A projected CRS and an offset** (`<stem>.geo.json` or `georef.json` with `crs` and `offset`, or ODM's `coords.txt`). A point of the scene is the coordinates of the splat plus the offset, in that CRS, which must be a projected one. `crs` is an EPSG code, a PROJ string or WKT. The offset is `[x, y]` or `[x, y, z]` (`z` is 0 when it is left out):
+
+```json
+{
+  "crs": "EPSG:32632",
+  "offset": [683240.5, 5047920.25, 0]
+}
+```
+
+`coords.txt` is the file ODM writes in `odm_georeferencing/`: the CRS on the first line (`WGS84 UTM 32N`, or an EPSG code, a PROJ string or WKT) and the easting and northing of the offset on the second:
+
+```text
+WGS84 UTM 32N
+683240.5 5047920.25
+```
+
+**A point of the Earth** (`<stem>.geo.json`, `georef.json` or `reference_lla.json` with a latitude and a longitude). The frame is the local East-North-Up plane at that point. `latitude` may also be written `lat`, `longitude` `lon` or `lng`, and `altitude` `alt` or `elevation` (0 when it is left out):
+
+```json
+{
+  "latitude": 45.4642,
+  "longitude": 9.19,
+  "altitude": 120.0
+}
+```
+
+The sidecar is read when the splat is indexed. Add it together with the splat, or before it: a splat that was indexed before its sidecar existed is not georeferenced until it is indexed again. The same sidecars georeference 3D models.
+
+### What a georeferenced splat gets
+
+- **The dataset map** draws the splat. At first it is a point, the position of the origin of its frame. Once the splat is built the point becomes the footprint of its bounding box, a polygon, read from the `wgs84Footprint` of `bounds.json`. Double-click the splat on the map to open it in the viewer; a splat with no georeference is not on the map.
+- **Up is `+Z`** exactly, whatever the splats look like: `bounds.json` has `"up": [0, 0, 1]`, `"upConfidence": 1` and `"upSource": "georef"`, the thumbnail stands the scene on it and the viewer opens it with *Auto (georeferenced)* unless a views file or your device says otherwise.
+- **The viewer works in metres**: distances, heights and areas are in metres, and the scale does not need to be set (the button is not offered).
+- **Coordinates** of a measured point are shown in the CRS of the splat or in WGS84, with a button to change (see [Camera views, pins and measurements](#camera-views-pins-and-measurements)).
+
+`bounds.json` of a georeferenced splat then looks like this (`wgs84Footprint` is a GeoJSON polygon of longitude and latitude, a closed ring):
+
+```json
+{
+  "min": [-85.2, -61.4, -3.1],
+  "max": [92.7, 70.3, 41.8],
+  "up": [0, 0, 1],
+  "upConfidence": 1,
+  "upSource": "georef",
+  "wgs84Footprint": {
+    "type": "Polygon",
+    "coordinates": [[[9.1888, 45.4637], [9.1912, 45.4637], [9.1912, 45.4648], [9.1888, 45.4648], [9.1888, 45.4637]]]
+  }
+}
+```
+
+With a projected CRS the footprint is the exact conversion of the four corners of the bounding box. With a point of the Earth it is the box laid on the local plane, which is accurate for the size of a scene.
+
+### Training data from an ODM project
+
+A splat trained from drone images is georeferenced if it is trained in the coordinates of the photogrammetry. `ddb gsplat --training-data` makes the input of a trainer from the outputs of an ODM project, in those coordinates:
+
+```bash
+ddb gsplat --training-data <output folder> [--max-image-size <pixels>] [--max-points <count>] <ODM project folder>
+```
+
+It reads the project and writes, in the output folder (created if it is missing; it cannot be the project folder):
+
+| Output | What it is |
+|--------|------------|
+| `sparse/0/cameras.bin`, `images.bin`, `points3D.bin` | A COLMAP sparse model (binary, little-endian) in the CRS of `coords.txt` minus its offset, so in **metres with the axes East, North and Up** |
+| `images/` | The images the model names: the originals linked from the project (copied where a link is not possible), or resized with `--max-image-size` |
+| `georef.json` | `{"crs": ..., "offset": [easting, northing, 0]}` from `coords.txt`: the sidecar for the splat you train |
+
+What the project must have:
+
+- `cameras.json`, `odm_report/shots.geojson` (the poses of the images), the `images/` folder and `odm_georeferencing/coords.txt`. A missing one stops the export with an error that names the file.
+- The point cloud, `odm_georeferencing/odm_georeferenced_model.laz` or else `odm_filterpoints/point_cloud.ply`. It gives the points of the model; without it `points3D.bin` is empty (a warning says so) and the trainer starts from random points.
+
+| Option | Meaning |
+|--------|---------|
+| `--max-image-size <pixels>` | The longest side of the exported images. A smaller image keeps its size. The images are written as JPEG at quality 95, and the cameras are recomputed for their size. Without it the originals are used. |
+| `--max-points <count>` | The most points of the model, thinned evenly on a 3D grid. 100000 by default; 0 writes none. |
+
+The command prints the output folder on the standard output. On the standard error it prints the warnings (`Warning: ...`) and the number of images and points. Read them before you train:
+
+- **Images that look straight down.** When more than 98% of the images are within 12 degrees of nadir the export says so: a splat trained from them is sharp from above and poor from any other angle. Images taken at an angle, or around the subject, are needed to look at it from the side.
+- **The lens.** Brown cameras (ODM's default) become COLMAP's `OPENCV` model, which has no third radial term (`k3`). It is folded into `k1` and `k2` by a fit over the radius of the image, and a warning gives the distance in pixels it moves the lens when that is more than 0.05. Perspective cameras become `RADIAL` and `fisheye_opencv` ones `OPENCV_FISHEYE`.
+- **Images that are left out**, with the reason and the first names: an image of a camera model COLMAP has none for (only `brown`, `perspective` and `fisheye_opencv` are exported, so not a spherical camera), one whose camera is not in `cameras.json`, one whose file is not in `images/` or whose size is not its camera's, or one whose file name another shot has. If no image can be exported the command fails and gives the reasons.
+- **The point cloud**: missing, empty, or lying away from the cameras (probably not in the coordinates of the project).
+
+Then:
+
+1. **Train the splat outside DroneDB**, with any 3DGS trainer that reads a COLMAP model (a folder with `images/` and `sparse/0/`). DroneDB does not train.
+2. **Keep the coordinates.** The splat is georeferenced only if it is in the coordinates of the model it was trained from; a trainer or an editor that recentres, rotates or rescales the scene when it saves it breaks the georeference, and nothing in the file says so.
+3. **Upload the splat next to `georef.json`**, in the same folder of the dataset (or give it its own `<stem>.geo.json` with the same content). The splat is indexed as georeferenced, and `ddb build` or the Registry builds it as any other.
+
+```bash
+ddb gsplat --training-data ./training --max-image-size 2000 ./odm_project
+# ... train on ./training, which gives scene.ply ...
+cp scene.ply ./training/georef.json my-dataset/
+cd my-dataset && ddb add scene.ply georef.json && ddb build
 ```
 
 ## In Hub
