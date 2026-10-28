@@ -234,7 +234,13 @@ A splat trained from drone images is georeferenced if it is trained in the coord
 ddb gsplat --training-data <output folder> [--max-image-size <pixels>] [--max-points <count>] <ODM project folder>
 ```
 
-It reads the project and writes, in the output folder (created if it is missing; it cannot be the project folder):
+It reads the project and writes, in the output folder. The export never replaces a file it did not make, so the output folder:
+
+- must be missing (it is created) or empty, so a second export needs a new or emptied folder;
+- must be neither the ODM project folder, a folder that holds it nor a folder inside it (links are resolved), because the export writes `georef.json` and replaces an image of the same name in `images/`;
+- must not be inside a DroneDB dataset when the export is asked of the library (`DDBExportSplatTrainingData`), because a `georef.json` in a dataset becomes the georeference of every model and splat beside it at the next index. The command applies the first two rules alone, so do not run it with a dataset as the output folder.
+
+It writes:
 
 | Output | What it is |
 |--------|------------|
@@ -250,7 +256,7 @@ What the project must have:
 | Option | Meaning |
 |--------|---------|
 | `--max-image-size <pixels>` | The longest side of the exported images. A smaller image keeps its size. The images are written as JPEG at quality 95, and the cameras are recomputed for their size. Without it the originals are used. |
-| `--max-points <count>` | The most points of the model, thinned evenly on a 3D grid. 100000 by default; 0 writes none. |
+| `--max-points <count>` | The most points of the model, thinned evenly on a 3D grid. 100000 by default; 0 writes none; at most 10000000 (a larger value is refused, because the grid holds every point it keeps). |
 
 The command prints the output folder on the standard output. On the standard error it prints the warnings (`Warning: ...`) and the number of images and points. Read them before you train:
 
@@ -271,6 +277,22 @@ ddb gsplat --training-data ./training --max-image-size 2000 ./odm_project
 cp scene.ply ./training/georef.json my-dataset/
 cd my-dataset && ddb add scene.ply georef.json && ddb build
 ```
+
+### Exporting the training data from Hub
+
+When the ODM project is uploaded to a dataset, Hub makes the same export without a command line. Select the folder of the project in the file browser (or the dataset itself, when the project is at its root), open the **Tools** menu and choose **Export splat training data**. The item is shown for one selected folder when the server offers the `splat-training-export` task, and it needs read access only.
+
+The dialog warns when the folder does not look like an ODM project (neither `cameras.json` nor `odm_georeferencing/coords.txt`); the export then fails if a project file is missing. It asks for:
+
+| Field | Meaning | Range | Default |
+|-------|---------|-------|---------|
+| **Largest image side (pixels)** | The longest side of the exported images (`--max-image-size`); 0 keeps the originals | whole number, 0 to 16384 | 1600 |
+| **Most points** | The most points of the sparse model (`--max-points`); 0 writes none | whole number, 0 to 10000000 | 100000 |
+| **File name** | The name of the ZIP | no folders, at most 150 characters | `<folder>-training-data.zip` (`dataset-training-data.zip` for the root) |
+
+**Export** starts a background task and the dialog shows its progress by phase (cameras, points, images, model). When it is done the dialog offers **Download**. The ZIP holds what `ddb gsplat --training-data` writes, at its root: `sparse/0/cameras.bin`, `images.bin` and `points3D.bin`, `images/` and `georef.json`. With a largest side the images are JPEGs at that size; with 0 the original files are archived unchanged, so the ZIP can be large.
+
+The warnings of the export (images that look straight down, an approximated lens, images left out, the point cloud) are listed in the dialog as soon as the task writes them, and stay in the log of the task. Read them before you train; the rest of the workflow (training outside DroneDB, keeping the coordinates, uploading the splat next to `georef.json`) is the one described above, with `georef.json` taken from the ZIP.
 
 ## In Hub
 
@@ -361,10 +383,21 @@ The panel also has the downloads of the splat. They are in the **Tools** menu of
 | Download | What you get | When |
 |----------|--------------|------|
 | **Download original** | The file that was uploaded | Always |
-| **Download level-of-detail (.rad)** | `model.rad`, the streamed container of the build, named after the splat | The build is complete |
+| **Download level-of-detail (.rad)** | `model.rad`, the streamed container of the build | The build is complete |
 | **Download .spz** | The `model.spz` of a build made before the RAD layout | Only while the splat has no `model.rad` (a rebuild replaces it) |
+| **Download .spz (for other tools)** | A `.spz` converted from the file that was uploaded, for an editor or a viewer that reads SPZ | The build is complete, the file is a PLY, SPLAT or SPZ, and the server offers the `splat-spz-export` task |
+
+The artifacts are downloaded by role from the Registry and saved named after the splat (`scene.rad`, `scene.spz`); the library's own names for them, which a client that downloads a build without asking for a role gets, are `model.rad`, `model.spz` and `export.spz`.
 
 A splat that is not built, or is being built, offers the original only.
+
+#### The .spz for other tools
+
+The first request for **Download .spz (for other tools)** runs the `splat-spz-export` task of the [Processing Platform](/docs/registry/admin/processing-platform#splat-spz-export) and shows a notice that the file is being prepared; the browser downloads it when the task is done. The conversion decodes the whole file in memory, so a large splat takes a while and runs in the queue of builds. While the splat is being built, or another export of it is running, the task waits for the entry and tries again.
+
+- The file is kept in the build of the splat as `gsplat/export.spz` (the artifact role `gsplat.export`, listed only while the file exists), so a second request downloads it at once. It is made again when the uploaded file is newer than it, and a forced rebuild of the splat removes it with the rest of `gsplat/`, so it is converted again on the next request. It never replaces `model.rad`, and it does not make a build complete.
+- Only a PLY, a SPLAT or an SPZ is converted. A `.ksplat`, `.sog` or `.rad` source has no item, and the library refuses it.
+- The same conversion from a shell is [`ddb gsplat`](#converting-to-spz-for-other-tools), which does not need a build.
 
 ### Camera views, pins and measurements
 
