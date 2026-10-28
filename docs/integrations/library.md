@@ -31,7 +31,7 @@ Every release publishes, next to the `.deb` and the Windows zip:
 | `ddb.symbols` | The list of exported functions |
 | `SHA256SUMS` | The SHA-256 of every asset |
 
-The library exports exactly the functions listed in `ddb.symbols` (108 in 2.0.0) and nothing else; its C++ classes and functions are internal. Pin a release by version and SHA-256, and build against that release's headers.
+The library exports exactly the functions listed in `ddb.symbols` (109 in 2.0.0) and nothing else; its C++ classes and functions are internal. Pin a release by version and SHA-256, and build against that release's headers.
 
 ## Start-up and shutdown
 
@@ -118,12 +118,12 @@ A cancel token stops the work of a call from another thread:
 3. `DDBCancel(token)` from any thread: the call stops at its next checkpoint and returns `DDBERR_CANCELED`;
 4. `DDBFreeCancelToken(token)` when the host no longer needs it.
 
-The `cancellable` list of `DDBGetCapabilities()` names the exports that honour a token. In 2.0.0 there are 28:
+The `cancellable` list of `DDBGetCapabilities()` names the exports that honour a token. In 2.0.0 there are 29:
 
 - tiles, renders and thumbnails: `DDBTile`, `DDBMemoryTile`, `DDBMemoryTileEx`, `DDBMemoryTileFmt`, `DDBRenderRasterRegion`, `DDBRenderRasterRegionEx`, `DDBRenderRasterIndex`, `DDBGenerateThumbnail`, `DDBGenerateMemoryThumbnail`, `DDBGenerateMemoryThumbnailEx`;
 - exports and builds: `DDBExportRaster`, `DDBExportRaster2`, `DDBBuild`, `DDBBuildEx`;
 - raster analysis: `DDBGetRasterMetadata`, `DDBGetRasterValueInfo`, `DDBGetRasterPointValue`, `DDBGetRasterAreaStats`, `DDBGetRasterProfile`, `DDBCalculateVolume`, `DDBDetectStockpile`, `DDBDetectAllStockpiles`, `DDBGenerateContours`, `DDBMaskBorders`;
-- Gaussian splats: `DDBExportSplatTrainingData`;
+- Gaussian splats: `DDBExportSplatSpz`, `DDBExportSplatTrainingData`;
 - deltas: `DDBComputeDeltaLocals`, `DDBApplyDelta`, `DDBApplyDeltaEx`.
 
 A canceled call leaves no partial output (a canceled `DDBMaskBorders` writes no file). `DDBApplyDelta` and `DDBApplyDeltaEx` are atomic to a cancel: they stop while they read and hash the added files, with the dataset and the source files as they were, and once they start to change the dataset they apply the delta whole and return `DDBERR_NONE`.
@@ -141,7 +141,7 @@ The library owns the layout of build outputs, the build state and the rules of e
 | `DDBGetEntryTypes` | Every entry type: `id`, `name`, `buildable`, `thumbnail` (`none`, `file`: rendered from the file, `build`: from an artifact once built), `sidecarExtensions`, `roles` |
 | `DDBGetBuildArtifacts` | For many entries with one index open: `buildable`, `state` (`none`, `pending`, `building`, `complete`), `missingDependencies`, `lastAttempt`, `retryAfter` (Unix seconds from which a pending build is retried), `root` and the artifacts that exist |
 | `DDBListEntriesEx` | A listing with the same build object per entry (option `withBuild`) |
-| `DDBResolveBuildFile` | The checked absolute path of a file of a build (`.../build/{hash}/{path}`, tiles included) |
+| `DDBResolveBuildFile` | A file of a build, checked (`.../build/{hash}/{path}`, tiles included), as `{"path": "<absolute path>", "mediaType": "<type>"}`; `mediaType` is the artifact's when the file is the one a client opens (a file artifact or the index of a directory artifact) and is absent for any other file, such as a tile |
 | `DDBCopyBuildArtifacts` | Copies an entry's build, with its pending marker, to another dataset |
 
 An artifact is `{role, path, kind, mediaType, downloadName?, index?, legacy?, fallbackFor?}`: `path` is relative to the build root, `kind` is `file` or `dir` (`index` names the descriptor of a directory), `downloadName` is set for downloadable artifacts. A `legacy: true` artifact is the output of an older build layout. Its `fallbackFor` names the role it stands in for, and the artifact is listed only while that role is missing, so a client that reads the roles in its order of preference shows the old output until a rebuild writes the new one. Roles say what an artifact is for, never where it is, and are only ever added: pass an unknown role through.
@@ -160,18 +160,41 @@ An artifact is `{role, path, kind, mediaType, downloadName?, index?, legacy?, fa
 | `gsplat.lod` | Level-of-detail Gaussian Splat (`gsplat/model.rad`, streamed with range requests) | `application/octet-stream` |
 | `gsplat.spz` | SPZ Gaussian Splat of builds before the RAD layout (`gsplat/model.spz`; legacy, read only; `fallbackFor: "gsplat.lod"`) | `application/octet-stream` |
 | `gsplat.bounds` | Bounding box of the splats to frame the first view, with the estimated `up` and, for a georeferenced splat, its `wgs84Footprint` (`gsplat/bounds.json`; optional) | `application/json` |
+| `gsplat.export` | `.spz` of a splat for other tools, made on demand by `DDBExportSplatSpz` (`gsplat/export.spz`; listed only while it exists, not legacy, not part of a complete build, removed by a rebuild) | `application/octet-stream` |
 
 A rebuild of a model writes `bm3d/` and removes `nxs/` only after `bm3d/` is published, and a failed rebuild keeps `nxs/`, so a model stays viewable while it is rebuilt.
 
 Registry passes these artifacts to clients as `artifacts: [{role, url, mediaType}]` on each entry.
 
+## The .spz of a Gaussian splat
+
+`DDBExportSplatSpz(ddbPath, entryPath, &output)` converts the dataset file of a built Gaussian splat to one `.spz` for other tools and keeps it in the build folder of the entry as the artifact `gsplat.export` (`gsplat/export.spz`, download name `export.spz`). `output` is a JSON object, to free with `DDBFree`: `{"path": "<absolute path of the .spz>", "role": "gsplat.export", "cached": true}`. `cached` is true when the file already existed, was not empty and was not older than the dataset file, and it is then returned as it is; otherwise it is converted again.
+
+- The entry must be a Gaussian splat in a format that is converted (PLY, SPLAT or SPZ) and must have been built (`model.rad` exists). The file is made on demand and never by a build.
+- The call takes the build lock of the entry: it returns `DDBERR_BUILDINPROGRESS` while a build of the entry, or another export of it, runs.
+- The conversion reads the whole file and decodes all the splats in memory, so count a few times its size for the peak and call it as a heavy task. No size is refused.
+- The file is written atomically. A forced rebuild of the entry removes it with the rest of `gsplat/`, so call the export again when it is needed.
+
+| Return | When |
+|--------|------|
+| `DDBERR_NONE` | Done |
+| `DDBERR_INVALIDARGS` | An argument is `NULL` or empty, the entry is not a Gaussian splat, or its format is not converted (`.ksplat`, `.sog`, `.rad`) |
+| `DDBERR_NOTFOUND` | The entry is not in the dataset or has no `model.rad` yet |
+| `DDBERR_BUILDINPROGRESS` | A build or another export of the entry holds its lock |
+| `DDBERR_EXCEPTION` | The dataset file is missing or cannot be decoded |
+| `DDBERR_RETRYABLE` | The disk is (nearly) full (`DDBGetLastErrorReason`) |
+| `DDBERR_CANCELED` | The cancel token was canceled; nothing is written |
+| `DDBERR_BUSY` | Database contention |
+
+The export is in the `cancellable` list of `DDBGetCapabilities()`.
+
 ## Training data of a Gaussian splat
 
-`DDBExportSplatTrainingData(ddbPath, folder, outFolder, optionsJson, progress, progressUserData, &output)` is `ddb gsplat --training-data` on a dataset. It reads the ODM project that is in `folder` of the dataset (an entry path; `NULL`, `""` and `"."` are the root) and writes the [training data](/docs/features/gaussian-splat#training-data-from-an-odm-project) into `outFolder`, a folder of the filesystem (UTF-8) that is created if it is missing and must not be the folder of the project: a COLMAP sparse model in `sparse/0`, the images in `images/` and `georef.json`. The project needs `cameras.json`, `odm_report/shots.geojson`, `images/` and `odm_georeferencing/coords.txt`, and has its point cloud in `odm_georeferencing/odm_georeferenced_model.laz` or `odm_filterpoints/point_cloud.ply`. The call only reads the dataset.
+`DDBExportSplatTrainingData(ddbPath, folder, outFolder, optionsJson, progress, progressUserData, &output)` is `ddb gsplat --training-data` on a dataset. It reads the ODM project that is in `folder` of the dataset (an entry path; `NULL`, `""` and `"."` are the root) and writes the [training data](/docs/features/gaussian-splat#training-data-from-an-odm-project) into `outFolder`, a folder of the filesystem (UTF-8) that is created if it is missing. It must be missing or empty, outside the dataset and neither the folder of the project, a folder that holds it nor a folder inside it (links are resolved), so that no file the export did not make is replaced: a COLMAP sparse model in `sparse/0`, the images in `images/` and `georef.json`. The project needs `cameras.json`, `odm_report/shots.geojson`, `images/` and `odm_georeferencing/coords.txt`, and has its point cloud in `odm_georeferencing/odm_georeferenced_model.laz` or `odm_filterpoints/point_cloud.ply`. The call only reads the dataset.
 
 | Argument | Meaning |
 |----------|---------|
-| `optionsJson` | `NULL`, `""` or `{}` for the defaults, else an object with `maxImageSize` (the longest side of the images in pixels; 0, the default, exports the originals) and `maxPoints` (the most points of the model; 100000 by default, 0 writes none). Both are whole numbers from 0. A member that is not known, or not a whole number in range, is refused with `DDBERR_INVALIDARGS`. |
+| `optionsJson` | `NULL`, `""` or `{}` for the defaults, else an object with `maxImageSize` (the longest side of the images in pixels; 0, the default, exports the originals) and `maxPoints` (the most points of the model; 100000 by default, 0 writes none). Both are whole numbers from 0, and `maxPoints` is at most 10000000. A member that is not known, or not a whole number in range, is refused with `DDBERR_INVALIDARGS`. |
 | `progress`, `progressUserData` | Optional (`NULL` for none). Called with the fraction done (0 to 1) and the phase (`cameras`, `points`, `images` or `model`), one call at a time; a non-zero return cancels the call. |
 
 On success `output` is a JSON object, to free with `DDBFree`: `{"warnings": ["..."], "images": 412, "points": 98211}`. The warnings are what a user should know before training: images that were left out, an approximated lens, no point cloud, images that mostly look straight down.
@@ -179,7 +202,7 @@ On success `output` is a JSON object, to free with `DDBFree`: `{"warnings": ["..
 | Return | When |
 |--------|------|
 | `DDBERR_NONE` | Done |
-| `DDBERR_INVALIDARGS` | An argument is `NULL` or empty, or an option is refused |
+| `DDBERR_INVALIDARGS` | An argument is `NULL` or empty, an option is refused, or `outFolder` is a file, is not empty, is in the dataset or is the project folder, holds it or is inside it |
 | `DDBERR_NOTFOUND` | `folder` is not in the dataset |
 | `DDBERR_EXCEPTION` | A file of the project is missing or unusable (the message names it, `coords.txt` included), or no image can be exported (the message gives the reasons) |
 | `DDBERR_CANCELED` | The cancel token was canceled, or the progress callback returned non-zero |

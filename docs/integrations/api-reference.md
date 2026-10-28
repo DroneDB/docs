@@ -150,6 +150,7 @@ after 24 hours.
 | GET | `.../thumb?path=` | Generate thumbnail (WebP). `404` when the entry's type has no thumbnail (`entryTypes[].thumbnail` is `none` in `GET /sys/features`) |
 | GET | `.../tiles/{tz}/{tx}/{ty}.{png\|webp\|jpg}` | Map tile in the format of the extension (`image/png`, `image/webp`, `image/jpeg`); `{ty}@2x` for retina tiles |
 | GET, HEAD | `.../build/{hash}/*` | Build files (COG, COPC, bm3d, MVT, 3D Tiles, RAD). `HEAD` sends the headers of `GET` without the body. Downloads carry the DroneDB library's media types: COG `image/tiff; application=geotiff; profile=cloud-optimized`, COPC `application/vnd.laszip+copc`, GeoPackage `application/geopackage+sqlite3` |
+| GET | `.../build-artifact?path=&role=` | Download the build artifact of an entry named after it: without `role` the one of its type (COG, COPC, GeoPackage); with `role` the artifact of that role that has a download name (`gsplat.lod` as `<stem>.rad`, `gsplat.spz` and `gsplat.export` as `<stem>.spz`). Range requests are supported. `400` for an entry without a downloadable artifact, `404` for an entry that is not built or, with `role`, has no such artifact: the `gsplat.export` file exists only after the `splat-spz-export` [task](/docs/registry/admin/processing-platform#splat-spz-export) has made it |
 
 Entries in listings and pending builds carry `artifacts: [{role, url, mediaType}]`, the build outputs that exist (the roles are listed in [DroneDB Library](/docs/integrations/library#build-manifest)). A client reads the URL of an artifact from this list and never composes `/build/` paths itself. A model lists `model.bm3d` (`bm3d/model.bm3d`, `application/vnd.dronedb.bm3d`); until the background rebuild reaches a model built before DroneDB 2.0, it lists the legacy `model.nexus` (`nxs/model.nxz`) instead, which the library reports with `legacy: true` and `fallbackFor: "model.bm3d"` and lists only while `model.bm3d` is missing. `model.3dtiles` is listed beside either.
 
@@ -213,6 +214,15 @@ See the [Processing Platform](/docs/registry/admin/processing-platform) page for
 | GET | `.../tasks/{id}/log` | Incremental log (`?since={cursor}`) |
 | GET | `.../tasks/{id}/result` | Download task artifact (range requests supported) |
 | DELETE | `.../tasks/{id}` | Cancel or mark task as Deleted |
+
+A submit body is `{"toolId", "path", "params", "force"}`; the response is `202` with `{taskId, statusUrl, resultUrl}`. The Gaussian splat tools take their entry in `path`:
+
+| Tool | `path` | `params` | Result |
+|------|--------|----------|--------|
+| `splat-spz-export` | The built splat (required) | none | No file of its own; when the task has succeeded, `GET .../build-artifact?path=<splat>&role=gsplat.export` |
+| `splat-training-export` | The folder of an ODM project (empty for the root) | `maxImageSize` (0 to 1048576), `maxPoints` (0 to 10000000), `fileName`, all optional | `GET .../tasks/{id}/result`, a ZIP; the warnings are `Warning: ...` lines of the log |
+
+Both need read access and are listed in `taskTools` of `GET /sys/features`; see [Processing Platform](/docs/registry/admin/processing-platform#splat-spz-export).
 
 ## Share
 

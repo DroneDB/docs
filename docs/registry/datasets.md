@@ -37,6 +37,8 @@ Registry's Processing Platform exposes the following tools as background tasks:
 | **merge-multispectral** | Merge single-band rasters into a multi-band COG |
 | **photogrammetry** | Send images to a remote NodeODX/ODX processing node |
 | **bulk-download** | Package dataset entries into a downloadable ZIP archive |
+| **splat-spz-export** | Make the `.spz` of a built Gaussian splat for other tools, kept in its build |
+| **splat-training-export** | Export an ODM project as the training data of a Gaussian splat (COLMAP model, images, georeference) in a ZIP |
 | **rescan-index** | Re-process all indexed files to update metadata and rebuild derivatives |
 | **import-file** | Download a single file from an http/https URL into the dataset |
 | **import-dataset** | Populate a new dataset from another Registry instance or a downloadable archive |

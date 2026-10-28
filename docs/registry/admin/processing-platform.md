@@ -456,6 +456,70 @@ Populates a freshly created (empty) dataset from a remote source. Supported sour
 
 `sourceType` and `params` are required. The contents of `params` are source-specific.
 
+---
+
+### `splat-spz-export`
+
+Makes the `.spz` of a built Gaussian splat for other tools (see [Gaussian Splats](/docs/features/gaussian-splat#the-spz-for-other-tools)). The task has no file of its own: DroneDB keeps the `.spz` in the build of the entry, and the client downloads it from the build-artifact endpoint when the task has succeeded.
+
+| Field | Value |
+|-------|-------|
+| Required access | Read |
+| Produces artifact | No (the file is the build artifact `gsplat.export`) |
+
+**Request:**
+```json
+{
+  "toolId": "splat-spz-export",
+  "path": "scenes/site.ply",
+  "params": {},
+  "force": true
+}
+```
+
+`path` is required: the entry path of a Gaussian splat whose build is complete. The tool takes no parameters. A path that is not in the dataset or is not built yet is rejected with `404`, and an entry that is not a Gaussian splat with `400`. A `.ksplat`, `.sog` or `.rad` source is accepted by the request and fails in the task, because the library does not convert it. Send `force: true` to run the export again instead of getting the earlier task back; DroneDB itself returns the file it has when it is not older than the dataset file, and the log says `The .spz file was already exported`.
+
+The task runs in the queue of builds and holds the build lock of the entry, so it waits and tries again while a build of the entry (or another export of it) runs. When `state` is `Succeeded`, download the file:
+
+```
+GET /orgs/{orgSlug}/ds/{dsSlug}/build-artifact?path=scenes/site.ply&role=gsplat.export
+```
+
+The response is the `.spz` (`application/octet-stream`, range requests supported) named after the entry: `site.spz`. Without a `role`, the same endpoint serves the artifact of the entry's type (COG, COPC, GeoPackage). The `role` must be an artifact of the entry that has a download name; `404` says to run the export first when the entry is built and has no `gsplat.export` yet. The same query downloads `gsplat.lod` (`site.rad`) and the legacy `gsplat.spz` (`site.spz`). A rebuild of the splat removes the exported file, so run the task again.
+
+---
+
+### `splat-training-export`
+
+Exports the ODM project in a folder of the dataset as the training data of a Gaussian splat (see [Training data from an ODM project](/docs/features/gaussian-splat#training-data-from-an-odm-project)): a COLMAP sparse model in metres, the images and the georeference, in one ZIP.
+
+| Field | Value |
+|-------|-------|
+| Required access | Read |
+| Produces artifact | Yes (`.zip`) |
+
+**Request:**
+```json
+{
+  "toolId": "splat-training-export",
+  "path": "odm_project",
+  "params": { "maxImageSize": 1600, "maxPoints": 100000, "fileName": "site-training-data.zip" },
+  "force": true
+}
+```
+
+`path` is the folder of the project (`cameras.json`, `odm_report/shots.geojson`, `images/`, `odm_georeferencing/coords.txt` and its point cloud); empty or absent for the root of the dataset. A folder that is not in the dataset is `404` and a path that is a file is `400`. All the parameters are optional:
+
+| Parameter | Meaning |
+|-----------|---------|
+| `maxImageSize` | The longest side in pixels of the exported images; 0 or absent exports the originals. A whole number from 0 to 1048576. |
+| `maxPoints` | The most points of the sparse model; 100000 when absent, 0 writes none. A whole number from 0 to 10000000. |
+| `fileName` | The name of the ZIP (`<folder>-training-data.zip`, or `<dataset>-training-data.zip` for the root, when absent; `.zip` is added when missing). |
+
+A negative value, or one above its limit, is rejected with `400` before the task is queued (a value that is not a whole number is read as absent). The task reports the phases `cameras`, `points`, `images` and `model` in `progress.phase`, then `archiving`. `GET .../tasks/{id}/result` downloads the ZIP, which holds at its root `sparse/0/cameras.bin`, `images.bin` and `points3D.bin`, `images/` and `georef.json`.
+
+What a user should know before training (images left out and why, an approximated lens, no point cloud, images that mostly look straight down) is written to the log of the task, one line each, as `Warning: ...`; a client lists them from `logTail` of the task status or from the log endpoint. A missing or unusable file of the project fails the task with a message that names it.
+
 ## Admin Dashboard
 
 Administrators can view tasks across all users and datasets:
