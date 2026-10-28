@@ -186,7 +186,7 @@ the tiles of an orthophoto, a point cloud or a 3D model. Each user chooses in th
 |---------|-----------------------------|
 | **None** (default) | Nothing |
 | **All** | Completed and failed builds, and builds that wait for files |
-| **Only failed builds** | Failed builds, and builds that wait for files |
+| **Failed or waiting for files** | Failed builds, and builds that wait for files |
 
 The default is **None**: a user gets no e-mail until they choose a setting.
 
@@ -215,7 +215,7 @@ Other builds that Registry starts by itself, such as a rescan or a check of the 
 
 A failed build is in an e-mail only when the failure is final. When Registry retries a build automatically (for
 example after a lack of disk space or a tool timeout), nothing is sent until the retries give up. When a retry
-succeeds, a user with **All** gets a "Completed" line. A user with **Only failed builds** gets nothing.
+succeeds, a user with **All** gets a "Completed" line. A user with **Failed or waiting for files** gets nothing.
 After the retries of a failed build give up, the check of pending builds
 ([`ProcessPendingBuildsCron`](./configuration#processpendingbuildscron), every 6 hours) can still build the file later:
 then a user with **All** gets a "Completed" line too.
@@ -225,7 +225,7 @@ Builds are grouped. The first build of a user that ends starts a wait of
 one e-mail lists every build of that user that ended during it. A build that ends later goes into the next e-mail.
 
 * Before it sends, Registry reads the setting of the user again. When the user chose **None** in the meantime,
-  nothing is sent. When they chose **Only failed builds**, the completed builds are left out.
+  nothing is sent. When they chose **Failed or waiting for files**, the completed builds are left out.
 * The e-mail goes out through the background job of [Delivery and retries](#delivery-and-retries).
 * When Registry stops before a wait ends, the daily job history cleanup
   ([`JobIndexCleanupCron`](./configuration#jobindexcleanupcron)) sends the builds that wait for more than one hour. It
@@ -243,12 +243,12 @@ or the files of a task).
 
 * The first time a build of a file finds files missing, the user who asked for it gets a "Waiting for files" line with
   the missing names, relative to the dataset (for example `Missing: flight-3/model.mtl, flight-3/texture.png`). Users
-  with **All** or **Only failed builds** get it.
+  with **All** or **Failed or waiting for files** get it.
 * It is sent once for the same content of the file. Later builds of it that find files missing (a rebuild, the build
   that the upload of only some of the missing files starts, a build that another user asks for) send nothing. Every
   host shares this record in the Registry database, so a restart or a second host does not send it again.
 * When the files arrive, Registry builds the file as the build service. The end of that build goes to the user whose
-  build waited: "Completed" for a user with **All**, "Failed" for a user with **All** or **Only failed builds**. The
+  build waited: "Completed" for a user with **All**, "Failed" for a user with **All** or **Failed or waiting for files**. The
   user's setting at the end of that build decides, also when they had **None** while the build waited.
 * When the files arrive before the e-mail of the wait is sent, the e-mail tells only how the build ended.
 * After the build has ended, a new wait of the same content (for example after a missing file is deleted and the file

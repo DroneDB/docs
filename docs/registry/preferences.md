@@ -70,13 +70,13 @@ Choose **Send build notifications**:
 |-------|-----------------------|
 | **None** (default) | Nothing |
 | **All** | Builds that completed, builds that failed and builds that wait for files |
-| **Only failed builds** | Builds that failed, with the reason, and builds that wait for files, with the names of the files |
+| **Failed or waiting for files** | Builds that failed, with the reason, and builds that wait for files, with the names of the files |
 
 A build waits for files when a file it needs is not in the dataset, for example the `.mtl` of an `.obj` or the `.shx`
 of a `.shp`. You get one e-mail that names the missing files. Upload them and the file is built at once; with **All**
 you then get a "Completed" line, with either setting a "Failed" line when that build fails.
 
-The default is **None**. You get no e-mail until you choose **All** or **Only failed builds**.
+The default is **None**. You get no e-mail until you choose **All** or **Failed or waiting for files**.
 
 Builds that end close together share one e-mail. [When an e-mail is sent](./admin/email.md#when-an-e-mail-is-sent)
 says which builds count and how they are grouped.

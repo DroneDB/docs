@@ -168,6 +168,8 @@ Missing companion files (an `.obj` without its `.mtl` or a texture, a `.shp` wit
 
 `GET .../builds/pending` lists the pending builds of a dataset. `awaitingFiles` is `true` for a build that waits for the files in its `missingDependencies`, and `false` for a build that Registry retries.
 
+In a file listing, an entry whose build is pending has `buildStatus: "pending"`, `buildMissingDependencies` and `buildAwaitingFiles`, the same flag as `awaitingFiles`, which the DroneDB library reports. A client reads the flag and does not derive it from the missing files.
+
 Registry's pending coordinator enqueues an indexed entry job for each pending build that does not wait for files, when the `retryAfter` time the DroneDB library reports for the entry has passed (its last attempt + **60 seconds**; a released build is due at once; Registry keeps no copy of the backoff), provided that path has no active build job. The coordinator reports enqueue/skip counts and the builds that wait for files; the pending tool's `Pending build check complete` message also covers fallback and no-op checks.
 
 The native build lock remains authoritative for output ownership. Coordinators for the same organization and dataset use shared coordination in the configured Hangfire storage, acquiring it before reading pending entries and active jobs and holding it through synchronous enqueue and JobIndex publication. Retry scheduling and sweep state updates use the same coordination. Other datasets proceed independently. A failed enqueue or index publication remains an explicit storage failure and can weaken duplicate suppression.

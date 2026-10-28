@@ -141,7 +141,7 @@ The library owns the layout of build outputs, the build state and the rules of e
 | Export | Returns |
 |--------|---------|
 | `DDBGetEntryTypes` | Every entry type: `id`, `name`, `buildable`, `thumbnail` (`none`, `file`: rendered from the file, `build`: from an artifact once built), `sidecarExtensions`, `roles` |
-| `DDBGetBuildArtifacts` | For many entries with one index open: `buildable`, `state` (`none`, `pending`, `building`, `complete`), `missingDependencies`, `lastAttempt`, `retryAfter` (Unix seconds from which a pending build that waits for no file is retried), `root` and the artifacts that exist |
+| `DDBGetBuildArtifacts` | For many entries with one index open: `buildable`, `state` (`none`, `pending`, `building`, `complete`), `missingDependencies`, `awaitingFiles` (the pending build waits for those files, as in `DDBGetPendingBuildInfo`), `lastAttempt`, `retryAfter` (Unix seconds from which a pending build that waits for no file is retried), `root` and the artifacts that exist |
 | `DDBListEntriesEx` | A listing with the same build object per entry (option `withBuild`) |
 | `DDBResolveBuildFile` | A file of a build, checked (`.../build/{hash}/{path}`, tiles included), as `{"path": "<absolute path>", "mediaType": "<type>"}`; `mediaType` is the artifact's when the file is the one a client opens (a file artifact or the index of a directory artifact) and is absent for any other file, such as a tile |
 | `DDBCopyBuildArtifacts` | Copies an entry's build, with its pending marker, to another dataset |
