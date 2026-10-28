@@ -163,7 +163,7 @@ Every e-mail (the test e-mail, the [update e-mails](./update-check) and the
   gives a readable button.
 * Link text must be readable on the white body. When the accent is too light for that (a yellow, for example), links
   use a darker shade of the same colour. The bar and the buttons keep the accent.
-* "Failed" is always red and "Completed" is always green, whatever the accent.
+* "Failed" is always red, "Waiting for files" is always amber and "Completed" is always green, whatever the accent.
 * A stock instance shows the DroneDB logo, which the Hub ships as `/images/email-logo.png`. A stock instance has no
   `AppName`, no `AppIcon`, and no `AppLogo` (or the shipped `/images/logo-banner.svg`). An instance with its own name,
   icon or logo never shows the DroneDB logo. When it has no usable logo or icon, it shows its name as text.
@@ -185,8 +185,8 @@ the tiles of an orthophoto, a point cloud or a 3D model. Each user chooses in th
 | Setting | The user gets an e-mail for |
 |---------|-----------------------------|
 | **None** (default) | Nothing |
-| **All** | Completed and failed builds |
-| **Only failed builds** | Failed builds |
+| **All** | Completed and failed builds, and builds that wait for files |
+| **Only failed builds** | Failed builds, and builds that wait for files |
 
 The default is **None**: a user gets no e-mail until they choose a setting.
 
@@ -208,6 +208,8 @@ Registry e-mails the user who asked for the build:
 * A build of a file that a task made (for example the files extracted from an archive) goes to the user who started
   the task.
 * An automatic retry goes to the user whose build failed.
+* The build that runs when the missing files of a build arrive goes to the user whose build waited for them (see
+  [Builds that wait for files](#builds-that-wait-for-files)).
 
 Other builds that Registry starts by itself, such as a rescan or a check of the built files, send no e-mail.
 
@@ -218,9 +220,6 @@ After the retries of a failed build give up, the check of pending builds
 ([`ProcessPendingBuildsCron`](./configuration#processpendingbuildscron), every 6 hours) can still build the file later:
 then a user with **All** gets a "Completed" line too.
 
-A file that waits for a missing companion file (an `.obj` without its `.mtl`) has not failed and is not retried: it is
-built at once when the missing file is uploaded. Neither the wait nor that build is in an e-mail.
-
 Builds are grouped. The first build of a user that ends starts a wait of
 [`BuildNotifications.DigestMinutes`](./configuration#buildnotifications) (5 minutes by default). When the wait ends,
 one e-mail lists every build of that user that ended during it. A build that ends later goes into the next e-mail.
@@ -230,9 +229,30 @@ one e-mail lists every build of that user that ended during it. A build that end
 * The e-mail goes out through the background job of [Delivery and retries](#delivery-and-retries).
 * When Registry stops before a wait ends, the daily job history cleanup
   ([`JobIndexCleanupCron`](./configuration#jobindexcleanupcron)) sends the builds that wait for more than one hour. It
-  also deletes the record of the sent builds after 30 days. When this job is turned off, neither happens.
+  also deletes the record of the sent builds after 30 days. The record of a build that still waits for files is kept
+  until that build ends or its dataset is deleted. When this job is turned off, none of this happens.
 * A build ends on the host that runs it. In a deployment with processing nodes, every node needs the same `Smtp`
   settings (see [Turn on e-mail](#turn-on-e-mail)).
+
+### Builds that wait for files
+
+A build waits for files when a file it needs is not in the dataset, for example the `.mtl` of an `.obj`, a texture of
+the `.mtl`, or the `.shx` or `.dbf` of a `.shp`. The build has not failed and is not retried on a timer: it runs at
+once when a file with one of the missing names is added to the dataset (an upload, a push, a move, a copy, a transfer,
+or the files of a task).
+
+* The first time a build of a file finds files missing, the user who asked for it gets a "Waiting for files" line with
+  the missing names, relative to the dataset (for example `Missing: flight-3/model.mtl, flight-3/texture.png`). Users
+  with **All** or **Only failed builds** get it.
+* It is sent once for the same content of the file. Later builds of it that find files missing (a rebuild, the build
+  that the upload of only some of the missing files starts, a build that another user asks for) send nothing. Every
+  host shares this record in the Registry database, so a restart or a second host does not send it again.
+* When the files arrive, Registry builds the file as the build service. The end of that build goes to the user whose
+  build waited: "Completed" for a user with **All**, "Failed" for a user with **All** or **Only failed builds**. The
+  user's setting at the end of that build decides, also when they had **None** while the build waited.
+* When the files arrive before the e-mail of the wait is sent, the e-mail tells only how the build ended.
+* After the build has ended, a new wait of the same content (for example after a missing file is deleted and the file
+  is built again) is news again.
 
 ### Edit the e-mail
 
@@ -241,7 +261,8 @@ In the Hub, open **Admin → Configuration**. The **E-mail templates** card is t
 
 * Click a placeholder to insert it at the cursor of the field you were in. The placeholders that only the body can use
   are disabled while the cursor is in the subject.
-* **Preview** shows the text that is not saved yet with two sample builds, one completed and one failed. It uses the
+* **Preview** shows the text that is not saved yet with three sample builds: one completed, one failed and one that
+  waits for files. It uses the
   real layout and [branding](#branding), so it shows what a user gets: the subject, the HTML and the plain text.
 * **Send me a test** sends the same sample to the e-mail address of your account, at once. Your account needs an
   address.
@@ -275,11 +296,12 @@ To change which build e-mails you get, open your notification settings: {{prefer
 |-------------|-------|----------------|
 | `{{appName}}` | The application name (see [Branding](#branding)) | Yes |
 | `{{user}}` | The name of the user | Yes |
-| `{{summary}}` | The counts in words, for example `2 builds failed, 3 completed` | Yes |
+| `{{summary}}` | The counts in words, for example `2 builds failed, 1 waiting for files, 3 completed` | Yes |
 | `{{failedCount}}` | The number of failed builds | Yes |
+| `{{waitingCount}}` | The number of builds that wait for files | Yes |
 | `{{completedCount}}` | The number of completed builds | Yes |
 | `{{datasets}}` | The datasets of the builds, as `organization/dataset`, separated by commas | Yes |
-| `{{builds}}` | The list of the builds, with the reason of each failure | No |
+| `{{builds}}` | The list of the builds, with the reason of each failure and the missing files of each build that waits | No |
 | `{{link}}` | A link to the dataset, or to the Hub when the builds are in more than one dataset | No |
 | `{{preferencesLink}}` | A link to the notification settings of the user, to change or stop these e-mails | No |
 
@@ -295,9 +317,10 @@ Registry makes an HTML part and a plain-text part from the same text.
 * Registry escapes every value and every word of the text in the HTML part. The text cannot add HTML, styles or
   scripts: `<b>` shows as `<b>`.
 * `{{builds}}` is a block of its own and ends the paragraph around it. In HTML it is a table with the dataset (a link
-  to it), the file with the reason of a failure under it, and the result. In plain text it is a list, for example
-  `- Failed: flight-2/cloud.laz (demo/survey-2026)` with `Reason: …` on the next line. Failed builds come first, then
-  the others in the order they ended.
+  to it), the file with the reason of a failure or the missing files under it, and the result. In plain text it is a
+  list, for example `- Failed: flight-2/cloud.laz (demo/survey-2026)` with `Reason: …` on the next line, or
+  `- Waiting for files: flight-3/model.obj (demo/survey-2026)` with `Missing: …` on the next line. Failed builds come
+  first, then the builds that wait for files, then the completed builds, each in the order they ended.
 * `{{link}}` alone in its paragraph is a button: **Open the dataset**, or **Open** and the application name when the
   builds are in more than one dataset. In a sentence, `{{link}}` and `{{preferencesLink}}` are links that show the
   address. In plain text, they are the address.
