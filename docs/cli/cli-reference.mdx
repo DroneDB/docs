@@ -164,6 +164,15 @@ Integer variables accept digits only: a value such as `1024MB` is ignored and th
 |----------|-------------|
 | `DDB_BM3D_PATH` | Absolute path to the `bm3d` program that builds `.bm3d` models. When it is not set, the program is looked for next to the `ddb` executable, next to `libddb`, in `../bin` and on `PATH`. |
 
+### Raster helper (gdal-util)
+
+DroneDB reads the rasters, vectors and photos that users supply in a separate program, `gdal-util`, so that a damaged or hostile file can end a worker of that program and nothing else. The worker runs with the confinement the host offers (on Linux: resource limits, a file system and network lockdown, a filter on system calls).
+
+| Variable | Description |
+|----------|-------------|
+| `DDB_GDAL_UTIL_PATH` | Absolute path to the `gdal-util` program. When it is not set, the program is looked for next to the `ddb` executable, next to `libddb`, in `../bin` and on `PATH`. A program is accepted when its protocol major version is the one the library speaks. |
+| `DDB_GDAL_SANDBOX` | How the workers of `gdal-util` are confined: `best-effort` (default, also for an unknown value) applies the layers the host has and logs the ones it lacks once, `strict` refuses to start when a layer is missing, `off` applies none (for tests and debugging only). `gdal-util --sandbox-report` lists the layers of the host. |
+
 ### COG Build (GDAL config)
 
 These variables control `ddb build` and `ddb cog` for GeoRaster entries. They are read via `CPLGetConfigOption` and can also be passed as standard environment variables.

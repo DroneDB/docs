@@ -61,6 +61,8 @@ cd DroneDB
 | `build/ddb_unit_tests.exe` | Unit tests (offline) |
 | `build/ddbtest.exe` | Integration tests |
 | `build/bm3d.exe` | 3D model builder (`.bm3d` files; see below) |
+| `build/gdal-util.exe` | Helper that reads the files of users with GDAL (see below) |
+| `build/metadata-util.exe` | Helper that reads and writes image metadata (EXIF, XMP) |
 | `build/untwine.exe` | COPC accelerator *(optional, see below)* |
 | `build/build-lod.exe` | Gaussian Splat LOD producer *(required for Gaussian Splat builds, see below)* |
 | `build/Obj2Tiles.exe` | OGC 3D Tiles generator *(optional, see below)* |
@@ -103,6 +105,8 @@ Accepted values follow CMake conventions: `Release`, `Debug`, `RelWithDebInfo`, 
 | `build/ddb_unit_tests` | Unit tests (offline) |
 | `build/ddbtest` | Integration tests |
 | `build/bm3d` | 3D model builder (`.bm3d` files; see below) |
+| `build/gdal-util` | Helper that reads the files of users with GDAL (see below) |
+| `build/metadata-util` | Helper that reads and writes image metadata (EXIF, XMP) |
 | `build/untwine` | COPC accelerator *(optional, see below)* |
 | `build/build-lod` | Gaussian Splat LOD producer *(required for Gaussian Splat builds, see below)* |
 | `build/Obj2Tiles` | OGC 3D Tiles generator *(optional, see below)* |
@@ -138,6 +142,19 @@ git submodule update --init vendor/bm3d
 `ddb` looks for `bm3d` next to its own executable, next to `libddb`, in `../bin` and on `PATH`; set `DDB_BM3D_PATH` to use a program in another location.
 
 bm3d is GPL-3.0 (its web viewer is MIT). DroneDB ships the program with the licence texts of bm3d and of the code it comes from (Nexus, VCGLib, corto, meshoptimizer), and the source offer for the binary is the bm3d release at the tag that `vendor/bm3d` points to.
+
+---
+
+## gdal-util helper
+
+[gdal-util](https://github.com/DroneDB/gdal-util) (MPL-2.0) reads the files that users supply (rasters, vectors, photos) with GDAL, in a process of its own, so that a damaged or hostile file cannot take the application that loads libddb down with it. It is the git submodule `apps/gdal-util`, built with DroneDB (it contains libddb and does not load `libddb`), and it is required.
+
+```bash
+# After a checkout that did not use --recurse-submodules
+git submodule update --init apps/gdal-util
+```
+
+`ddb` looks for `gdal-util` next to its own executable, next to `libddb`, in `../bin` and on `PATH`; set `DDB_GDAL_UTIL_PATH` to use a program in another location. `DDB_GDAL_SANDBOX=strict|best-effort|off` chooses how its workers are confined (see the [environment variables](/docs/cli/cli-reference)); `gdal-util --sandbox-report` prints the layers the host offers, which is worth running in the container that serves production.
 
 ---
 

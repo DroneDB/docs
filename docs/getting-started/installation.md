@@ -34,7 +34,7 @@ The version number will vary depending on the release you downloaded.
 Windows refuses a path of 260 characters or more unless it allows long paths. A build writes its
 temporary files about 130 characters below the root of the dataset (the conversion of a point
 cloud, for one), so a dataset in a deep folder fails to build without them. The programs of the
-package (`ddb`, `bm3d`, `metadata-util`, `untwine`) declare themselves long path aware, but Windows
+package (`ddb`, `bm3d`, `gdal-util`, `metadata-util`, `untwine`) declare themselves long path aware, but Windows
 has to allow it. As an administrator, in PowerShell:
 
 ```powershell
