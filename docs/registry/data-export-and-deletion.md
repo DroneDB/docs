@@ -16,6 +16,20 @@ You can download any file or dataset that you have access to at any time:
 3. Right-click and select **Download**, or click the download icon in the toolbar.
 4. For multiple files, you can select several items and download them as a ZIP archive.
 
+### Downloading Built Files
+
+When DroneDB builds a file, it converts it to formats that other tools open directly. Once the build is complete, right-click the file and open **Tools** to download them:
+
+| File | Menu item | You get | Opens in |
+|------|-----------|---------|----------|
+| GeoTIFF, JPEG 2000 and other rasters | **Download COG** | `<name>.tif`, a Cloud Optimized GeoTIFF | QGIS, ArcGIS, GDAL, any GeoTIFF reader |
+| LAS, LAZ, E57 and other point clouds | **Download COPC** | `<name>.copc.laz`, a Cloud Optimized Point Cloud | QGIS, PDAL, CloudCompare, Potree, any LAZ reader |
+| GeoJSON, Shapefile, KML, GPX and other vectors | **Download GPKG** | `<name>.gpkg`, a GeoPackage | QGIS, ArcGIS, GDAL |
+| OBJ, PLY, STL, glTF and GLB models | **Download 3D Tiles (.zip)** | `<name>.3dtiles.zip`, OGC 3D Tiles with `tileset.json` at its root | CesiumJS, Cesium ion, QGIS, ArcGIS |
+| Gaussian splats | See [splat downloads](/docs/features/gaussian-splat#about-this-splat-and-its-downloads) | `.rad`, `.spz` | |
+
+The files are named after the original file. Anyone who can download the original can download the built files. An uploaded `.3tz` archive offers no 3D Tiles download, because the `.3tz` is that archive already.
+
 ### Bulk Export
 
 For exporting an entire organization's data:

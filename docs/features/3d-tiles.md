@@ -100,6 +100,7 @@ During build, the `.3tz` archive is extracted into `build/{hash}/3dtiles/` and v
 - **Progressive streaming**: Tiles load at multiple levels of detail based on camera distance.
 - **Georeferenced placement**: Georeferenced tilesets are placed on the Earth ellipsoid (ECEF).
 - **Unified viewer**: The same viewer handles 3D Tiles, point clouds, rasters and vector tiles. Gaussian Splats open in their own [splat viewer](/docs/features/gaussian-splat#in-hub).
+- **Download**: The 3D Tiles built from a model can be downloaded as a ZIP archive (**Tools** → **Download 3D Tiles (.zip)**) for CesiumJS, QGIS or ArcGIS. See [Downloading built files](/docs/registry/data-export-and-deletion#downloading-built-files).
 
 ## Build requirements
 
