@@ -6,10 +6,15 @@ on:
       - master
     # Review gh actions docs if you want to further define triggers, paths, etc
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
+  # The showcase datasets on hub.dronedb.app can change without a docs change: check the links weekly
+  schedule:
+    - cron: '17 5 * * 1'
+  workflow_dispatch:
 
 jobs:
   test-deploy:
     name: Test deployment
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,5 +25,26 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+      - name: Check the shot definitions and src/data/media.json
+        run: node media-capture/build-media-index.mjs --check
+      - name: Check the Hub links (syntax only)
+        run: node scripts/check-links.mjs --offline
       - name: Test build website
         run: yarn build
+
+  hub-links:
+    name: Hub links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      # Every dataset, file, live embed and YouTube video the pages link to, on hub.dronedb.app
+      # (two requests at a time)
+      - name: Check the Hub links
+        run: node scripts/check-links.mjs
