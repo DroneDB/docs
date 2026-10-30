@@ -1,10 +1,165 @@
 ---
 title: "Processing nodes & features"
-description: "Connect processing nodes and turn features on or off."
+description: "Scale Registry out with processing nodes and a thumbnail generator, connect NodeODX for photogrammetry, and turn tools on or off for roles and organizations."
 ---
 
-:::info
+This page covers three things: extra Registry processes that run the background work, NodeODX
+nodes for photogrammetry, and tool gating (which tools users see). The task API is on
+[Processing platform API](/docs/developers/processing-api). How users run tasks in the Hub is on
+[Tasks](/docs/hub-guide/processing/tasks).
 
-This page is being written.
+## Registry processing nodes
 
-:::
+A Registry process with [instance type](./index.mdx#instance-types) `1` (processing node) runs only
+background jobs: builds, imports, exports, clean-ups and e-mails. It has no HTTP server. Add nodes
+when the builds of one server are too slow, and run the web server with instance type `2`.
+
+Rules for a deployment with nodes:
+
+- All processes share the same **storage folder** and **`appsettings.json`**.
+- The job store must be **MySQL or MariaDB** (`HangfireProvider: Mysql`). A node refuses to start
+  with `InMemory`.
+- Share the **data protection keys**: Redis, or a shared
+  [`DataProtectionKeysPath`](./configuration.mdx#dataprotectionkeyspath).
+- Give each node container a fixed **`hostname`**: its log file is `registry-node-<host name>*.txt`.
+- **Declare the processes** of each machine in [`HostBudget`](./configuration.mdx#hostbudget).
+- Give each node the same **e-mail** settings as the web server: nodes send the queued e-mails.
+- Only the web server migrates the databases and extracts the Hub. Start it first; the Compose file
+  starts the nodes when the web server is healthy.
+
+The [Docker Compose setup](./install.mdx#docker-compose-production) has a web server and two nodes.
+To add a node, copy a node service, give it a new `hostname`, and raise
+`AppSettings__HostBudget__ProcessingNodes` on every service.
+
+### Queues
+
+Each process that runs jobs has three Hangfire servers:
+
+| Queue | Workers | Runs |
+|-------|---------|------|
+| `builds` | [`ProcessingBudget:HeavyWorkers`](./configuration.mdx#processingbudget) | Native builds (COG, COPC, bm3d, LOD, raster exports and tools) |
+| `rebuilds` | 1 | Background rebuilds of entries built with an older layout (see [Upgrading](./upgrading.mdx#3d-models-nexus-to-bm3d)) |
+| `tasks`, `default` | [`ProcessingBudget:LightWorkers`](./configuration.mdx#processingbudget) | Other tasks, imports, clean-ups, thumbnails, e-mails |
+
+The [Hangfire dashboard](./admin-pages.mdx#hangfire) shows the servers of every process and the jobs
+of each queue.
+
+## Thumbnail generator
+
+A Registry process with instance type `3` makes thumbnails for a web server. Set
+[`RemoteThumbnailGeneratorUrl`](./configuration.mdx#remotethumbnailgeneratorurl) on the web server
+to its address. Both read the same `appsettings.json`, so they share the
+[`ThumbnailGeneratorToken`](./configuration.mdx#thumbnailgeneratortoken). The generator refuses
+to start without the token.
+
+## NodeODX nodes for photogrammetry
+
+The `photogrammetry` tool sends the images of a dataset to a NodeODX (OpenDroneMap) node, follows
+its progress and log, downloads the result (`all.zip`) and extracts it into the dataset or into a
+new dataset. Registry then indexes the files and builds them. Canceling the task cancels the task on
+the node.
+
+List the nodes in `AppSettings:ProcessingPlatform:NodeOdx`:
+
+```json
+"ProcessingPlatform": {
+  "NodeOdx": [
+    {
+      "Id": "default",
+      "Url": "http://nodeodx:3000",
+      "Token": "optional-access-token",
+      "Title": "Local NodeODX"
+    }
+  ]
+}
+```
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `Id` | `default` | Stable id that a task names to use this node |
+| `Url` | — | Base URL of the NodeODX node |
+| `Token` | — | Optional access token (sent as the `token` query parameter) |
+| `Title` | — | Optional name shown to users |
+
+Signed-in users read the list, the processing options and the status of each node through
+`GET /sys/processingNodes`, `GET /sys/processingNodes/{nodeId}/options` and
+`GET /sys/processingNodes/{nodeId}/status`. The polling of remote nodes is tuned with the
+`RemoteNode…` keys of [`ProcessingPlatform`](./configuration.mdx#processingplatform). Users start
+photogrammetry from the Hub: see [Photogrammetry](/docs/hub-guide/processing/photogrammetry).
+
+## Tool gating
+
+Tool gating chooses which tools users can use, and on which organizations, without a new release.
+It only narrows access: it never gives more than the access that each tool needs (read or write on
+the dataset).
+
+### Configuration
+
+Add an entry for each tool you want to restrict in `AppSettings:ProcessingPlatform:Tools`, keyed by
+tool id. A tool that is not listed is enabled for everyone.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `Availability` | `Enabled`, `Disabled` or `Hidden` | `Enabled` | The switch of the tool |
+| `DisabledMessage` | `string` | `null` | Tooltip of a disabled tool, and the body of the `403` of a refused submit. Ignored when `Hidden`. |
+| `AllowedRoles` | `string[]` | `[]` (everyone) | Roles that may use the tool. `admin` is the administrator role; other values are [roles you created](./users.mdx#roles). |
+| `AllowedOrgs` | `string[]` | `[]` (all) | Organization slugs where the tool may be used |
+| `HideWhenNotAllowed` | `bool` | `true` | A user outside `AllowedRoles` or `AllowedOrgs` gets the tool hidden (`true`) or disabled with `DisabledMessage` (`false`) |
+
+```json
+"ProcessingPlatform": {
+  "Tools": {
+    "photogrammetry": {
+      "Availability": "Disabled",
+      "DisabledMessage": "Photogrammetry is turned off for maintenance."
+    },
+    "import-dataset": {
+      "AllowedRoles": [ "admin" ]
+    },
+    "bulk-download": {
+      "AllowedOrgs": [ "acme-surveys", "trusted-partner" ],
+      "HideWhenNotAllowed": false,
+      "DisabledMessage": "Bulk download is for approved organizations only."
+    }
+  }
+}
+```
+
+Tool ids: `build`, `raster-export`, `bulk-download`, `align-raster`, `archive-extract`,
+`merge-multispectral`, `rescan-index`, `import-file`, `import-dataset`, `splat-spz-export`,
+`splat-training-export`, `photogrammetry`.
+
+### States
+
+- **Enabled**: the tool works (the role and organization lists still apply).
+- **Disabled**: the Hub shows the tool greyed out with `DisabledMessage` as a tooltip. A submit
+  gets `403`.
+- **Hidden**: the Hub does not show the tool. A submit gets `403`.
+
+For each request, the first rule that matches decides:
+
+1. `Availability` is `Hidden`: hidden.
+2. `Availability` is `Disabled`: disabled, with `DisabledMessage`.
+3. `AllowedRoles` is not empty and the user has none of the roles: not allowed.
+4. `AllowedOrgs` is not empty, the request is in an organization, and the organization is not in
+   the list: not allowed.
+5. Otherwise: enabled.
+
+"Not allowed" becomes hidden or disabled by `HideWhenNotAllowed`. The organization list is checked
+only where there is an organization: the global `GET /sys/features` skips it, and the tool list of
+a dataset (`GET /orgs/{org}/ds/{ds}/tasks/tools`) checks it. Registry checks the rules again when a
+task is submitted, so a client cannot get around them by calling the API.
+
+### In the Hub
+
+**Admin → Configuration** has a **Tool Gating** section that shows the current `Tools` value as
+JSON. See [Admin pages](./admin-pages.mdx#configuration).
+
+<Screenshot id="self-hosting/processing-nodes--tool-gating" />
+
+## Limits of tasks
+
+The number of tasks per user, organization and server, the daily output budget of each
+organization and the size limits of archives and exports are keys of
+[`ProcessingPlatform`](./configuration.mdx#processingplatform). These limits count only the tasks
+that users start: dataset builds have their own queues and never count.

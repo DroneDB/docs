@@ -1,10 +1,265 @@
 ---
 title: "Production checklist"
-description: "What to set up before you run Registry in production."
+description: "What to set up before you run Registry in production: secrets, database, reverse proxy, disks, processing nodes, monitoring and logs."
 ---
 
-:::info
+Do these steps before users depend on your Registry. The [Docker Compose setup](./install.mdx#docker-compose-production)
+already does some of them; the list says which.
 
-This page is being written.
+## Checklist
+
+| # | Step | Compose setup |
+|---|------|---------------|
+| 1 | [Change every default secret and password](#secrets-and-passwords) | From `.env` |
+| 2 | [Use MySQL or MariaDB](#database) | Done |
+| 3 | [Set the public URL](#public-url) | From `EXTERNAL_URL` |
+| 4 | [Put a reverse proxy with TLS in front](#reverse-proxy) | You do it |
+| 5 | [Keep temporary files and Docker data on the large disk](#disks-and-temporary-files) | Partly done |
+| 6 | [Share the data protection keys between processes](#data-protection-keys) | You do it |
+| 7 | [Declare the processes of the host](#cpu-and-memory) | Done |
+| 8 | [Monitor health and read the logs](#health-checks-and-monitoring) | Health checks done |
+| 9 | [Turn on e-mail](#e-mail-and-update-check) | You do it |
+| 10 | [Restrict access](#access-and-limits) | You do it |
+| 11 | [Plan backups](./backup-restore.mdx) | You do it |
+
+After each change of `appsettings.json`, run `Registry.Web <storage folder> --check` (or the image
+with `--check`) and restart the Registry services.
+
+## Secrets and passwords
+
+- **Administrator password.** Sign in and change it in **My Account**. The `DefaultAdmin` setting
+  only creates the first administrator.
+- **`Secret`.** It signs the sign-in tokens. Registry generates it on the first start when it is
+  empty. With Docker Compose it comes from `REGISTRY_SECRET`: use a long value from a
+  cryptographic random generator, and a different one for each deployment. A change signs out
+  every user.
+- **Database passwords.** Set `MYSQL_ROOT_PASSWORD` and `MYSQL_PASSWORD` in `.env`. The defaults of
+  `run.sh` are public.
+- **phpMyAdmin.** The Compose file publishes phpMyAdmin on port `8010`. Remove the service, or do
+  not expose the port to the internet.
+- **Other secrets** (SMTP and LDAP passwords): set them as environment variables
+  (`AppSettings__Smtp__Password`, `AppSettings__LdapSettings__BindPassword`), not in the file.
+
+## Database
+
+SQLite and the in-memory job queue are the defaults. For production use MySQL or MariaDB for all
+three stores; processing nodes require it. See [Configuration → Database](./configuration.mdx#database).
+The Compose setup uses MariaDB 10.6 with InnoDB settings that keep the shared tablespace from
+growing; they take effect only on a new data folder of the database.
+
+## Public URL
+
+Set [`ExternalUrlOverride`](./configuration.mdx#externalurloverride) to the address users open,
+for example `https://registry.example.com`. E-mails, share links and the update check use it.
+Without it, e-mails have no links and no logo.
+
+## Reverse proxy
+
+Registry listens on plain HTTP. Put a reverse proxy (nginx, Apache, Caddy, Traefik) in front of
+it to terminate TLS. The proxy must:
+
+- send `X-Forwarded-For` and `X-Forwarded-Proto`, and pass the original `Host` header
+  (`proxy_set_header Host $host;` in nginx). Registry takes the client address from the first (rate
+  limits, download limits, logs) and the scheme from the second (`Secure` cookies, HSTS). It does
+  not read `X-Forwarded-Host`.
+- connect from an address that Registry trusts. Registry applies the forwarded headers only when the
+  peer is in [`KnownProxies`](./configuration.mdx#knownproxies) (IP addresses, default `127.0.0.1`
+  and `::1`) or inside [`KnownNetworks`](./configuration.mdx#knownnetworks) (CIDR). From any other
+  peer they are ignored, so a client cannot fake its address.
+
+```json
+"AppSettings": {
+  "KnownProxies": [ "127.0.0.1", "::1" ],
+  "KnownNetworks": [ "172.16.0.0/12" ]
+}
+```
+
+With nginx on the host in front of a port that Docker publishes (the Compose setup), the peer that
+Registry sees is the Docker bridge gateway (`172.x.0.1`), not loopback. The production template
+therefore sets `KnownNetworks` to Docker's default bridge pool, `172.16.0.0/12`. Change it if your
+Docker networks use another range (`docker network inspect <project>_default`). An address or
+network that is not valid stops the start with a message that names the key.
+
+A minimal nginx site:
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name registry.example.com;
+
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        client_max_body_size 0;
+    }
+}
+```
+
+Large uploads need more proxy settings (request buffering, the HTTP/2 window, timeouts). See
+[Tuning the reverse proxy for large uploads](./troubleshooting.mdx#tuning-the-reverse-proxy-for-large-uploads).
+
+## Disks and temporary files
+
+The builds (Cloud Optimized GeoTIFF, point clouds, 3D models) write large temporary files: several
+GB for each build on a busy server. Do not let them reach the root file system of the host. A
+full root partition stops the whole stack.
+
+### Keep temporary files on the data volume
+
+Set the temporary folder of every Registry service (web server, processing nodes, thumbnail
+generator) to a folder on the data volume:
+
+```yaml
+    environment:
+      - CPL_TMPDIR=/data/temp
+      - TMPDIR=/data/temp
+      - TEMP=/data/temp
+```
+
+The `dronedb/registry` image and the Compose file already set these values. Change them only if
+your temporary folder is somewhere else. Each build also uses a temporary folder of its own under
+the `.ddb/build` folder of its dataset and deletes it at the end; a daily clean-up job removes what
+a crashed build leaves.
+
+### Mount the whole `/data`
+
+Bind-mount the whole `/data` folder, or back it with a named volume on the large partition:
+
+```yaml
+    volumes:
+      - ./data:/data
+      - ./appsettings.json:/data/appsettings.json
+```
+
+:::warning Do not mount only sub-folders of `/data`
+
+If you mount only some sub-folders (for example `/data/datasets` and `/data/cache`), what the
+container writes to the rest of `/data` goes to the writable layer of the container, or, with older
+images that declared `VOLUME /data`, to an anonymous Docker volume on the root file system.
+`docker compose down` and `up` never remove those volumes. Current images do not declare
+`VOLUME /data`.
 
 :::
+
+On macOS, use a named volume, not a host folder: see
+[macOS: use a named volume](./install.mdx#macos-use-a-named-volume).
+
+If datasets are on a volume mounted outside `/data`, list it in `REGISTRY_EXTRA_OWNED_PATHS`
+(paths separated by spaces), so the container gives it to the `registry` user at start.
+
+### Move Docker's data root to the large partition
+
+Store all Docker data (images, containers, volumes) on the large partition. In
+`/etc/docker/daemon.json`:
+
+```json
+{
+  "data-root": "/data/docker"
+}
+```
+
+Then restart Docker. No container can then fill the root file system.
+
+### Limit the size of container logs
+
+In `/etc/docker/daemon.json`:
+
+```json
+{
+  "log-driver": "json-file",
+  "log-opts": { "max-size": "50m", "max-file": "5" }
+}
+```
+
+## Data protection keys
+
+Registry encrypts some values, for example the password of a source Registry in an import, with
+ASP.NET Core Data Protection keys. When a web server and processing nodes run as separate
+processes, they must share the keys, or a node cannot read what the web server encrypted. Do one
+of these:
+
+- use Redis as [`CacheProvider`](./configuration.mdx#cacheprovider): the keys are then kept in Redis;
+- set [`DataProtectionKeysPath`](./configuration.mdx#dataprotectionkeyspath) to a folder that all
+  processes share, for example `./data/protection-keys`.
+
+The Compose setup sets neither. Add one of them when you use processing nodes.
+
+## CPU and memory
+
+A web server and processing nodes on one machine must not each plan the whole machine. Declare
+them in [`HostBudget`](./configuration.mdx#hostbudget). The Compose file sets
+`AppSettings__HostBudget__WebServers=1` and `AppSettings__HostBudget__ProcessingNodes=2` on every
+Registry service: keep these numbers equal to the services you run. **Admin → Configuration**
+shows the effective budget.
+
+If a build can take longer than 4 hours (a very large point cloud, mesh or orthophoto), raise
+[`HangfireInvisibilityTimeoutHours`](./configuration.mdx#hangfireinvisibilitytimeouthours). A job
+that runs longer can start a second time on another worker.
+
+## Health checks and monitoring
+
+| Endpoint | Access | Use |
+|----------|--------|-----|
+| `GET /health/live` | Anonymous | Liveness: the process serves HTTP. The image's `/healthcheck.sh` calls it (a processing node has no HTTP server: the script checks the process). |
+| `GET /quickhealth` | Administrator or `MonitorToken` | Quick check |
+| `GET /health` | Administrator or `MonitorToken` | Full report: databases, DroneDB, storage, Hangfire, and SMTP and LDAP when they are on |
+
+Set [`MonitorToken`](./configuration.mdx#monitortoken) and send it as
+`Authorization: Bearer <token>` or as `?token=<token>`. Do not use `/quickhealth` as a container
+health check: without the token it never passes.
+
+Docker must wait for a graceful stop: the Compose file sets `stop_grace_period: 40s` (Hangfire
+drains its workers, libddb saves its indexes).
+
+## Logs
+
+Each instance type writes its own log file in `logs/` of the storage folder: `registry*.txt` for
+the default instance, `registry-web*.txt`, `registry-node-<host name>*.txt` and
+`registry-thumbs*.txt`. Files roll daily and the last 14 are kept (100 MB at most per file). Give
+each processing node container a fixed `hostname`, so its log file keeps its name.
+
+To change the level, edit the level switch in the `Serilog` section of `appsettings.json` and
+restart the services:
+
+```json
+"Serilog": {
+  "LevelSwitches": {
+    "$controlSwitch": "Warning"
+  }
+}
+```
+
+Levels: `Verbose`, `Debug`, `Information`, `Warning`, `Error`, `Fatal`. A new storage folder starts
+at `Warning`; the Compose template starts at `Information`.
+
+## E-mail and update check
+
+- Turn on e-mail to send build notifications and update notices: see
+  [E-mail (SMTP) & templates](./email.mdx). Every Registry service needs the same SMTP settings.
+- Registry checks once a day for new versions and sends data about the deployment to dronedb.app.
+  Read [Update check](./update-check.mdx), declare your use, or switch the check off.
+
+## Access and limits
+
+Review these settings (all in the [Configuration reference](./configuration.mdx)):
+
+- [`AllowedOrigins`](./configuration.mdx#allowedorigins): CORS is open to all origins by default.
+- [`PasswordPolicy`](./configuration.mdx#passwordpolicy): at least 8 characters and one digit by
+  default.
+- [`DisableAnonymousBulkDownloads`](./configuration.mdx#disableanonymousbulkdownloads) and
+  [`MaxConcurrentDownloadsPerUser`](./configuration.mdx#maxconcurrentdownloadsperuser).
+- [`MaxRequestBodySize`](./configuration.mdx#maxrequestbodysize): uploads have no size limit by
+  default.
+- [`EnableStorageLimiter`](./configuration.mdx#enablestoragelimiter) to set storage quotas per user.
+- [`HubOptions`](./configuration.mdx#huboptions), for example `ShowRegistrationLink`.
+
+## Altitude estimation
+
+DroneDB can estimate the relative altitude of photos that have none in their EXIF from a world
+elevation model (OpenTopography). DroneDB 2.0 has no built-in key: set `DDB_OPENTOPOGRAPHY_KEY` in
+the environment of every Registry process. The Compose file passes it from `.env`. Without it, the
+relative altitude falls back to the GPS altitude.

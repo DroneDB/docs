@@ -1,10 +1,293 @@
 ---
 title: "Install"
-description: "Install Registry with Docker, docker-compose or natively."
+description: "Install Registry with Docker, Docker Compose or the native binaries, on Linux, Windows and macOS."
 ---
 
-:::info
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-This page is being written.
+Registry runs in Docker (recommended) or as a native program. This page is the only install page
+for Registry. To install only the `ddb` command line, see
+[DroneDB CLI → Install](/docs/developers/cli/install).
+
+## Requirements
+
+- A 64-bit Intel/AMD (`x86_64`) computer. The Docker image is published for `linux/amd64` only.
+  On ARM, see [Apple Silicon and other ARM computers](#apple-silicon-and-other-arm-computers).
+- Docker with Docker Compose, or the native binaries for Linux or Windows.
+- Disk space for the datasets plus their builds. A build writes large temporary files (several GB
+  for a large orthophoto or point cloud): put the whole storage folder on a large partition.
+
+## Docker
+
+Run one container. It uses SQLite and keeps all its data in the `/data` volume:
+
+```bash
+docker run -it --rm -p 5000:5000 -v ${PWD}/registry-data:/data dronedb/registry
+```
+
+Open [http://localhost:5000](http://localhost:5000) and sign in with the default administrator:
+
+| User name | Password |
+|-----------|----------|
+| `admin` | `password123` |
+
+:::warning Change the default password
+
+Change it at once in the Hub: open the user menu, then **My Account**
+([/account](http://localhost:5000/account)). The `DefaultAdmin` setting creates the administrator
+on the first start only; a later change of the setting does not change the password. To recover a
+lost password, see [Reset the administrator password](./troubleshooting.mdx#reset-the-administrator-password).
 
 :::
+
+The data is in the folder `registry-data`. The log is in `registry-data/logs/`.
+
+To keep Registry running after a restart of the host, use a named container:
+
+```bash
+docker run -d --name registry --restart unless-stopped \
+  -p 5000:5000 \
+  -v registry-data:/data \
+  dronedb/registry
+```
+
+To use another port on the host, change only the first number: `-p 5010:5000` opens Registry
+at `http://localhost:5010`.
+
+The container starts as root, gives `/data` to the user `registry` (uid/gid `1654`) and then runs
+Registry as that user. The first start on a large existing volume can take time. The image runs in
+UTC: set the `TZ` variable (for example `-e TZ=Europe/Rome`) for another time zone.
+
+### macOS: use a named volume
+
+On macOS, do not bind-mount a host folder to `/data`. Docker Desktop shares host folders through
+a virtual file system (virtiofs), and DroneDB cannot create dataset indexes on it. Registry starts,
+but it cannot initialize datasets, and the log shows errors such as:
+
+```text
+filesystem error: cannot copy: Permission denied [/root/.ddb/templates/empty-dbase-<rev>.sqlite] [./datasets/.../.ddb/dbase.sqlite]
+Table 'entries' not found (not a valid database: /data/./datasets/.../.ddb/dbase.sqlite)
+```
+
+Use a Docker named volume. It is kept inside the Docker Desktop Linux VM:
+
+```bash
+docker volume create registry-data
+docker run -d --name registry --restart unless-stopped \
+  --platform linux/amd64 \
+  -p 5000:5000 \
+  -v registry-data:/data \
+  dronedb/registry
+```
+
+The files of a named volume are not in a folder on your Mac. To read them:
+
+```bash
+# Follow the log
+docker logs -f registry
+
+# Copy the whole data folder to the Mac
+docker cp registry:/data ./registry-data-copy
+```
+
+To recover an instance that you started with a host folder, see
+[Dataset initialization fails on macOS](./troubleshooting.mdx#dataset-initialization-fails-on-macos).
+
+### Apple Silicon and other ARM computers
+
+The image is published for `linux/amd64` only. On an Apple Silicon Mac (M1 to M4) or another ARM
+computer, `docker run` stops with:
+
+```text
+docker: no matching manifest for linux/arm64/v8 in the manifest list entries
+```
+
+Add `--platform linux/amd64` to the command, as in the example above. Docker then runs the image
+through emulation.
+
+- Emulation is slower than a native image. Large datasets take longer to process.
+- In Docker Desktop, open **Settings → General** and turn on **Use Rosetta for x86_64/amd64
+  emulation on Apple Silicon**. Without it, Docker uses a slower emulator.
+- On macOS, keep the named volume of the previous section.
+
+A native `linux/arm64` image is not available.
+
+## Docker Compose (production)
+
+The Registry repository has a Compose setup for production in `docker/production`. It runs:
+
+| Service | What it is |
+|---------|------------|
+| `db` | MariaDB 10.6, tuned so that the InnoDB files do not grow without limit |
+| `phpmyadmin` | phpMyAdmin on port `8010` |
+| `registry_webserver` | Registry as a web server (instance type `2`) on port `5000` |
+| `registry_node_1`, `registry_node_2` | Two processing nodes (instance type `1`), host names `node-a` and `node-b` |
+
+All Registry services share `./data` (mounted at `/data`) and `./appsettings.json`.
+
+1. Install [Git](https://git-scm.com/downloads) and clone the repository:
+
+   ```bash
+   git clone https://github.com/DroneDB/Registry
+   cd Registry/docker/production
+   ```
+
+2. Create a file `.env` in `docker/production` with your own values. Without it, the script uses
+   default passwords that are not safe for production.
+
+   <Tabs>
+     <TabItem value="linux" label="Linux" default>
+
+   ```bash
+   MYSQL_ROOT_PASSWORD="a-long-random-root-password"
+   MYSQL_PASSWORD="a-long-random-password"
+   REGISTRY_ADMIN_MAIL="admin@example.com"
+   REGISTRY_ADMIN_PASSWORD="a-strong-admin-password"
+   REGISTRY_SECRET="a-long-random-secret-from-a-cryptographic-generator"
+   EXTERNAL_URL="https://registry.example.com"
+   CONTROL_SWITCH='$controlSwitch'
+   ```
+
+   Keep the quotes.
+
+     </TabItem>
+     <TabItem value="windows" label="Windows">
+
+   ```batch
+   MYSQL_ROOT_PASSWORD=a-long-random-root-password
+   MYSQL_PASSWORD=a-long-random-password
+   REGISTRY_ADMIN_MAIL=admin@example.com
+   REGISTRY_ADMIN_PASSWORD=a-strong-admin-password
+   REGISTRY_SECRET=a-long-random-secret-from-a-cryptographic-generator
+   EXTERNAL_URL=https://registry.example.com
+   CONTROL_SWITCH=$controlSwitch
+   ```
+
+   Write the values without quotes.
+
+     </TabItem>
+   </Tabs>
+
+3. Run the start script:
+
+   <Tabs>
+     <TabItem value="linux" label="Linux" default>
+
+   ```bash
+   chmod +x run.sh
+   ./run.sh
+   ```
+
+     </TabItem>
+     <TabItem value="windows" label="Windows">
+
+   ```batch
+   run.bat
+   ```
+
+     </TabItem>
+   </Tabs>
+
+   The script writes `appsettings.json` from `appsettings-template.json` and `initialize.sql` from
+   `initialize-template.sql` with the values of `.env`, creates `data/`, and runs
+   `docker-compose up -d`. Add `--dry` to print the files and the Compose configuration without
+   starting anything.
+
+4. Check the services:
+
+   ```bash
+   docker compose ps
+   docker compose logs -f
+   ```
+
+5. Open [http://localhost:5000](http://localhost:5000) and sign in as `admin` with
+   `REGISTRY_ADMIN_PASSWORD`. Without `.env`, the password is `password`.
+
+:::warning The script re-creates the settings file
+
+Each run of `run.sh` or `run.bat` deletes `appsettings.json` and `initialize.sql` and writes them
+again from the templates. Put your changes in `appsettings-template.json` (or in `.env`), or
+start the services later with `docker compose up -d` instead of the script.
+
+:::
+
+To stop the services, run `docker compose down`. A change of `appsettings.json` takes effect
+after a restart of the Registry services (`docker compose restart`).
+
+Then go through the [Production checklist](./production.mdx).
+
+The repository also has `docker/testing`: MariaDB 11, phpMyAdmin on port `8080` and one Registry
+container with the `dronedb/registry:dev` image. It is for testing changes, not for production.
+
+## Native
+
+Native binaries exist for Linux and Windows. macOS is not supported: the DroneDB library is
+published for Linux and Windows only.
+
+1. Install the [DroneDB release](https://github.com/DroneDB/DroneDB/releases) that your Registry
+   version needs (Registry 3.0 needs DroneDB **2.x**): the `.deb` package on Debian or Ubuntu, the
+   ZIP on Windows (add its folder to `PATH`). The package includes `libddb` and its helper
+   programs. At start, Registry checks that it loaded libddb 2.x with every function it calls,
+   and stops otherwise.
+2. Download the [Registry release](https://github.com/DroneDB/Registry/releases/latest) for your
+   platform and extract it.
+3. Start Registry with a storage folder:
+
+   ```bash
+   ./Registry.Web ./registry-data
+   ```
+
+The first start creates `registry-data/appsettings.json` with the defaults, a SQLite database and
+the default administrator (`admin` / `password123`). Registry listens on `localhost:5000`.
+
+### Command-line options
+
+```text
+Registry.Web [options] <storage folder>
+```
+
+| Option | What it does |
+|--------|--------------|
+| `<storage folder>` | Required. The folder where Registry keeps its settings and data. |
+| `-a`, `--address` | Address to listen on. Default `localhost:5000`. Use `0.0.0.0:5000` to accept connections from other computers. |
+| `-t`, `--instance-type` | `0` default (web server and jobs), `1` processing node, `2` web server, `3` thumbnail generator. See [Instance types](./index.mdx#instance-types). |
+| `-c`, `--check` | Checks `appsettings.json` and the environment with the rules of a start, writes nothing and exits: `0` when the settings are valid. |
+| `--reset-admin-password` | Sets a new password for the configured default administrator and exits. The password comes from the `REGISTRY_ADMIN_PASSWORD` variable or from standard input, never from the command line. |
+| `-r`, `--reset-hub` | Deletes the Hub folder (`ClientApp`) and extracts it again. |
+| `-d`, `--reset-ddb` | Deletes the DroneDB folder of the storage folder and creates it again. |
+| `--help`, `--version` | Shows the help or the version. |
+
+Exit codes: `0` success, `1` an invalid setting or another start failure (the message names the
+cause), `2` an invalid command line.
+
+To use MySQL or MariaDB instead of SQLite, see
+[Configuration → Database](./configuration.mdx#database).
+
+### Windows: long paths
+
+Windows refuses a path of 260 characters or more unless long paths are turned on. A build writes
+its temporary files about 130 characters below the root of the dataset, so a dataset in a deep
+folder fails to build. On Windows, libddb builds inside the Registry process: `Registry.Web.exe`
+and the DroneDB programs (`ddb`, `bm3d`, `gdal-util`, `metadata-util`, `untwine`) declare
+themselves long path aware, but Windows must allow it. As an administrator, in PowerShell:
+
+```powershell
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name LongPathsEnabled -PropertyType DWord -Value 1 -Force
+```
+
+You can also turn on the group policy *Enable Win32 long paths*. Then start Registry again.
+Without this setting, keep the storage folder short (the root of each dataset under about 130
+characters). When Registry runs through another host (`dotnet Registry.Web.dll`, IIS), the
+manifest of that host decides.
+
+## Build from source
+
+To build the Registry image or the binaries yourself, see
+[Building from source](/docs/developers/building-from-source).
+
+## Next steps
+
+- [Production checklist](./production.mdx)
+- [Configuration reference](./configuration.mdx)
+- [Users, organizations & roles](./users.mdx)

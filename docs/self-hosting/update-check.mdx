@@ -1,10 +1,249 @@
 ---
 title: "Update check"
-description: "What the daily update check sends and how to turn it off."
+description: "What Registry sends to dronedb.app once a day, what comes back, the update e-mails, the usage declaration, and how to switch the check off."
 ---
 
-:::info
+Registry asks dronedb.app once a day whether a newer version exists. The answer holds the release notes of every
+version you have not installed yet. The Hub shows them to administrators, and Registry can send them by e-mail.
 
-This page is being written.
+The request also tells dronedb.app which deployment is asking. This page lists everything that leaves your server,
+what dronedb.app does to check it, and how to switch the check off.
 
-:::
+For the purposes, the legal bases, how long the data is kept and your rights, read the
+[privacy notice for self-hosted Registry](https://dronedb.app/legal/privacy-notice-registry).
+
+## What the check does
+
+* **Once a day**, the node that runs the scheduled jobs sends one HTTPS `POST` with a small JSON body to
+  `https://dronedb.app/wp-json/dronedb/v1/update-check`. The time of day depends on the instance ID, so
+  deployments do not all ask in the same minute. Your browser does not connect to dronedb.app for this.
+* dronedb.app answers with public release data only. It never sends data about other deployments.
+* The check **never changes how Registry works**. It does not block, slow down or limit any feature, and it shows no
+  licence banners.
+* The purposes are update notices, release notes and license-compliance verification: dronedb.app uses the data to
+  see whether production use of Registry has a licence. A person reviews every case.
+
+## What Registry says about it
+
+Registry logs this text at each start (Info level), and the **Update check** section of **Admin → Configuration**
+shows it:
+
+```text
+Update check: enabled (daily). This deployment sends its instance ID ({instanceId}), Registry/DroneDB versions, platform, public URL, host name, network domain and declared use to dronedb.app, and a contact email only if an admin opted in; dronedb.app also records the source IP address and checks the public URL. Purposes: update notices, release notes and license-compliance verification. Docs: docs.dronedb.app/docs/registry/admin/update-check  ·  Opt out: UpdateCheckCron="disabled"
+```
+
+`{instanceId}` is replaced by the ID of your deployment. When the check is off, the log says
+`Update check: disabled`.
+
+## What Registry sends
+
+The body is one JSON object. Fields that Registry does not know are sent as `null`. Three fields are left out
+instead: `os` and `arch` when the platform of the node is not one of their values, and `contactEmail` unless an
+administrator agreed to be contacted. Registry sends nothing else: no dataset names, organization names,
+file names, user names, e-mail addresses of users, logs, counts of users or files, machine IDs or time zone.
+
+| Field | Type and limits | Purpose |
+|-------|-----------------|---------|
+| `schemaVersion` | Always `1` | Version of this contract. A change that breaks it ships a new version. |
+| `instanceId` | Random UUID, created at the first start | Identifies the deployment: all updates of one deployment go to one record. The value to quote in a deletion request. |
+| `installedAt` | UTC time (ISO 8601) or `null` | When the instance ID was created, which is when the deployment was first started. |
+| `version` | `major.minor.patch` | Registry version. Builds the release notes of the versions you miss. |
+| `ddbVersion` | `major.minor[.patch]` or `null` | Version of the native DroneDB library. Support matrix. |
+| `os` | `windows` or `linux`. **Absent** on another operating system | Operating system family of the node. Support matrix. |
+| `osCaption` | Text, at most 32 characters, or `null` | Operating system description of the node, for example the Linux release. Support matrix. |
+| `arch` | `x64`, `arm64`, `x86` or `arm`. **Absent** on another architecture | CPU architecture. Support matrix. |
+| `runtime` | Text, at most 32 characters | Name and version of the .NET runtime. Support matrix. |
+| `env` | `docker` or `native` | Whether the node runs in a container (Docker, Kubernetes or containerd). Support matrix. |
+| `instanceType` | `default`, `processingNode`, `webServer` or `thumbnailGenerator` | Role of the node that sends the check, from the `InstanceType` key. Support matrix. |
+| `db` | `sqlite` or `mysql` | Database provider. Support matrix. |
+| `baseUrl` | `http` or `https` URL, at most 512 characters, or `null` | Public address of the deployment. It is [`ExternalUrlOverride`](./configuration.mdx#externalurloverride) if set, otherwise the address Registry saw in a request it served. dronedb.app [checks it](#the-url-check). Identifies who runs the deployment. |
+| `hostname` | Text, at most 64 characters, or `null` | Host name of the node that sends the check. Identifies who runs the deployment. |
+| `domain` | Letters, digits, `.`, `_`, `-`; at most 253 characters; or `null` | Network or directory domain of the node (for example an Active Directory domain). Usually `null` on Linux and in containers. Identifies who runs the deployment. |
+| `licenseRef` | Text, at most 64 characters, or `null` | Reference of a licence. Reserved for a later release: Registry always sends `null`. |
+| `useDeclaration` | `personal`, `nonprofit`, `evaluation`, `commercial_licensed`, `commercial_needs_license` or `null` | What an administrator said about the use, set in [Admin → Configuration](#declare-how-you-use-registry). It states the use, not the licence that applies. |
+| `contactEmail` | E-mail address, at most 254 characters. **Absent** unless an administrator entered it and agreed | Security and release news from DroneDB. See [the contact address](#the-contact-address). |
+
+In a deployment with several nodes, one node sends the check: the node that runs the scheduled jobs. `os`,
+`osCaption`, `arch`, `runtime`, `env`, `instanceType`, `hostname` and `domain` describe that node. The instance ID
+and the settings are kept in the shared storage folder, so all nodes agree.
+
+The full definition is in two JSON Schema files in the Registry repository:
+[the request](https://github.com/DroneDB/Registry/blob/master/Registry.Web/Contracts/update-check-payload.v1.schema.json) and
+[the response](https://github.com/DroneDB/Registry/blob/master/Registry.Web/Contracts/update-check-response.v1.schema.json).
+
+## What dronedb.app records itself
+
+Besides the body, dronedb.app notes things it sees by itself:
+
+* **The source IP address** of the request.
+* **Country and network owner** of that address: the country code, the AS number and the AS organization name. dronedb.app
+  reads them from an offline database (MaxMind GeoLite2 Country and ASN) on its own server. It sends the address to
+  no other service, and does not use a city-level database.
+* **The reverse DNS name** of the address, looked up later by a background job.
+* When the deployment was first and last seen, and how many checks it sent.
+
+dronedb.app reads the address from the connection, never from a header such as `X-Forwarded-For`.
+
+## The URL check
+
+A client can send any `baseUrl`, so dronedb.app checks it. A background job fetches the features endpoint of the
+public address you reported and looks at what it answers:
+
+* **Request**: `GET {baseUrl}/sys/features`, with no sign-in. The endpoint is public and shows only the features and
+  the branding of the Hub. It has an `instanceHash`, which proves that the address serves your instance and does not
+  reveal the instance ID.
+* **User-Agent**: `DroneDB-UrlCheck/1 (+https://docs.dronedb.app/docs/registry/admin/update-check)`
+* **At most one request per host per day**. A new or changed address is checked first. After that, an address is
+  checked again every 30 days.
+* **No redirects**. A `3xx` answer is recorded as such, with the host name of the target, and not followed.
+* **Only public addresses**. The check accepts `http` and `https` only. It resolves the host name, refuses loopback,
+  private, link-local, shared (CGNAT), multicast and reserved addresses, and connects to the address it resolved. It
+  gives up after 5 seconds and reads at most 256 KB.
+* **What it keeps**: whether the answer is a Registry that matches your instance ID, the Registry version, the
+  application name from the Hub branding, and the organization name in the TLS certificate of the address (the check
+  verifies the certificate).
+
+A deployment on a private network or behind a firewall cannot be reached, and that is not a problem: the check
+records "unreachable" and nothing else happens.
+
+## Discovery of public deployments
+
+Apart from the checks that deployments send, dronedb.app looks for Registry servers that are open to the internet. It
+finds candidates in search services for internet-connected devices (Shodan) and in certificate-transparency logs,
+which list the host names of public TLS certificates. For each candidate it makes the same request as the
+[URL check](#the-url-check): an anonymous `GET /sys/features`, with the same User-Agent and the same limits. It keeps
+the candidate only if the answer is the features data of a Registry.
+
+A server that is not reachable from the internet is not found this way.
+
+## The answer and what the Hub shows
+
+The answer is a JSON object with the highest published version (`latestVersion`), its date and release page, the
+releases between your version and that one (at most 30, newest first, with their notes), a link that compares the
+two versions, and the address of the licence request form. It holds public data only. If a check fails (no
+connection, a timeout, a redirect, an error answer, a malformed or too large answer), Registry keeps the last good
+answer and tries again the next day.
+
+When a newer version exists:
+
+* **Administrators** see an icon in the top bar of the Hub. It opens one dialog with the release notes of all the
+  versions you miss, merged: security fixes first, then breaking changes, highlights, changes and fixes. The dialog
+  has a link to all changes on GitHub. Users who are not administrators see nothing.
+* The release notes come from outside your server, so the Hub shows them without images and removes any active
+  content.
+
+<Screenshot id="self-hosting/update-check--notes" />
+
+The Hub does not show the icon when the check is off, when there is no answer yet, or when Registry is up to date.
+
+## Update e-mails
+
+When a new version is published, Registry can e-mail the administrators of **your** deployment. The e-mail is sent by
+**your own Registry**, through **your own SMTP server** (see [E-mail](./email.mdx)), to the users with the administrator
+role that have an e-mail address. No address goes to dronedb.app for this, and dronedb.app does not send or see these
+e-mails.
+
+The key [`UpdateCheckEmail`](./configuration.mdx#updatecheckemail) chooses which versions are e-mailed:
+
+| Value | E-mail is sent for |
+|-------|--------------------|
+| `security` (default) | A new version whose release notes have a **Security** section. |
+| `all` | Every new version. |
+| `off` | Never. |
+
+Registry sends one e-mail per version. If e-mail is off (`AppSettings:Smtp` is not enabled), nothing is sent, and
+the **Update check** section of **Admin → Configuration** says so.
+
+## Declare how you use Registry
+
+In the Hub, open the user menu, then **Configuration**. The **Usage and contact** card has the question **How is this
+deployment used?** with these answers:
+
+* Personal or homelab use
+* Non-profit organisation
+* Evaluation or trial
+* Commercial use, licensed
+* Commercial use, I need a licence
+* Not stated (the default)
+
+<Screenshot id="self-hosting/update-check--usage-card" />
+
+The declaration is a statement, not a licence. It changes nothing in the software, and a wrong declaration does not
+change the licence terms. It helps dronedb.app understand how Registry is used. **Get a licence** opens the licence
+request form with your instance ID, address and version filled in, so the request is linked to your deployment.
+
+Choose **Not stated** to clear the declaration. A change is sent soon after you save it (at most one extra check
+every 10 minutes) and is otherwise sent with the next daily check.
+
+## The contact address
+
+The same card has the field **Security and release news from DroneDB**. It is optional. Registry sends the address
+only if you enter it and tick the box:
+
+> Send security notices, release news and offers for self-hosted Registry from DroneDB to this address. You can
+> unsubscribe at any time.
+
+Registry refuses to save an address without the consent. dronedb.app then sends a confirmation e-mail to the
+address (**double opt-in**), and adds it to its mailing list only after someone confirms. Every e-mail has an
+unsubscribe link.
+
+To withdraw, either use the unsubscribe link in any e-mail, or **clear the field and save**. The next check carries
+no address, and dronedb.app removes the contact from its list.
+
+dronedb.app does not keep the address in the record of the deployment. It keeps only whether a contact exists.
+
+## Find the instance ID
+
+The instance ID is needed to ask for the data of a deployment to be deleted. You find it:
+
+* in **Admin → Configuration**, in the **Update check** section, under **Instance ID**;
+* in the start-up log, in the text of [What Registry says about it](#what-registry-says-about-it);
+* in the file `.instance-id` in the storage folder.
+
+The ID is created at the first start. If you delete the file, Registry creates a new ID. Do not delete it, so
+that a deployment with several nodes keeps one identity.
+
+To ask for access, correction or deletion of the data held about your deployment, or to object to it, follow the
+instructions in the [privacy notice](https://dronedb.app/legal/privacy-notice-registry). It links the request form
+and explains your rights.
+
+## Configuration
+
+Three keys of the `AppSettings` section control the check: `UpdateCheckCron`, `UpdateCheckEndpoint`
+and `UpdateCheckEmail`. See [Configuration → Update check](./configuration.mdx#update-check).
+
+## Turn the check off
+
+Set `UpdateCheckCron` to `disabled` in `appsettings.json`:
+
+```json
+{
+  "AppSettings": {
+    "UpdateCheckCron": "disabled"
+  }
+}
+```
+
+Or use the environment variable `AppSettings__UpdateCheckCron=disabled`, and restart Registry.
+
+Then:
+
+* Registry sends nothing to dronedb.app. This includes a check queued by a change of the settings.
+* dronedb.app stops collecting. The record it already has is not deleted at once: it ages out under the retention
+  rules of the privacy notice. To have it deleted sooner, send a deletion request with your
+  [instance ID](#find-the-instance-id).
+* Registry shows no update icon, no release notes and sends no update e-mail. The declaration and the contact
+  address cannot be changed (the card says so), and a stored contact address is not sent any more.
+* The Hub knows the state from `GET /sys/features` (`updateCheckEnabled`). It does not ask the server for update
+  data.
+
+## Servers without internet access
+
+The check is built to fail quietly:
+
+* A failed check is not an error. Registry logs it at debug level, keeps the last good answer and tries again the
+  next day. There are no retries and no queue of failed checks.
+* No other part of Registry waits for the check.
+* Without an answer there is no icon and no release notes. Everything else works.
+* A firewall that blocks `dronedb.app` is enough. You do not need to change any setting. If you want to avoid the
+  daily attempt, [turn the check off](#turn-the-check-off).

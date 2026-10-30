@@ -1,10 +1,100 @@
 ---
 title: "Admin pages"
-description: "The Configuration, Tasks and Hangfire pages for administrators."
+description: "The Configuration, Tasks and Hangfire pages that Registry administrators open from the Hub user menu."
+hub_feature: [route:AdminTasks, route:AdminConfig]
 ---
 
-:::info
+Administrators have more entries in the Hub user menu (click your user name, top right):
 
-This page is being written.
+| Entry | Opens |
+|-------|-------|
+| **Manage Users** | [User Management](./users.mdx) (`/admin/users`). Only with local accounts. |
+| **Tasks** | The [Tasks](#tasks) page (`/admin/tasks`) |
+| **Configuration** | The [Configuration](#configuration) page (`/admin/config`) |
+| **Hangfire** | The [Hangfire dashboard](#hangfire) (`/hangfire`), in a new tab |
+| **API Docs** | The interactive API reference (`/scalar/v1`), in a new tab |
 
-:::
+<Screenshot id="self-hosting/admin-pages--menu" />
+
+Users who are not administrators do not see these entries, and the pages refuse them.
+
+## Configuration
+
+The **Configuration** page shows the settings that this Registry runs with, grouped in sections. It
+does not change them: Registry reads its settings from `appsettings.json` and the environment
+when it starts. Use the page to read the effective values and to prepare a change.
+
+<Screenshot id="self-hosting/admin-pages--config" />
+
+At the top are two cards:
+
+- **Usage and contact**: how this deployment is used and an optional contact address for the
+  [update check](./update-check.mdx#declare-how-you-use-registry). **Save** stores them.
+- **E-mail templates**: the build notification e-mail. Shown only when e-mail is on. See
+  [Edit the build notification template](./email.mdx#edit-the-build-notification-template).
+  **Save** stores the text.
+
+Below the cards, each section has a **Custom** tag when a value differs from the default, or a
+**Default** tag. Each field shows its description and a tag: **Default**, **Modified** (you
+changed it on the page), **Set (masked)** or **Not set** for secrets, and **Read-only** for
+information such as the instance ID or the effective host budget. Secrets are never shown: click
+**Change** to type a new value.
+
+The sections, in order: Auth & Security, Default Admin, Database & Cache Providers, Storage Paths,
+Upload Settings, Download Settings, Cache Expiration, Redis Configuration (with Redis only), Cron
+Jobs, Password Policy, Hub Options, Organization Management, Thumbnails, Export & Zip, LDAP /
+Active Directory, E-mail (SMTP), Build notifications, Update check, Processing Platform, Tool
+Gating, Processing Budget, Host Budget, Import Dataset, Connection Strings, Serilog Logging,
+Miscellaneous. Each setting is described in the [Configuration reference](./configuration.mdx).
+
+To change a setting:
+
+1. Edit the values on the page.
+2. Click **Copy AppSettings JSON**. The clipboard gets an `AppSettings` object with the current
+   values and your changes. A secret that is set and that you did not change is written as
+   `<CHANGE-ME>`.
+3. Put the keys you changed in `appsettings.json` (or set them as environment variables). Keys
+   of nested sections (`Smtp`, `HubOptions`, `ProcessingPlatform` …) are already in their section.
+   Keys that belong directly in `AppSettings` are grouped under the name of their page section in
+   the copied JSON (for example `UpdateCheck`): move them up one level.
+4. Run `Registry.Web <storage folder> --check`, then restart Registry.
+
+**Reset Section** and **Reset to Defaults** undo your edits on the page; they do not change the
+server.
+
+## Tasks
+
+The **Tasks** page lists the tasks of every user and dataset: exports, imports, archive
+extractions, photogrammetry and the other [tools](./processing-nodes.mdx#tool-gating). Filter by
+user (**All users**), by tool (**All tools**) and by state (**All States**). Click **Refresh** to
+load the list again.
+
+<Screenshot id="self-hosting/admin-pages--tasks" />
+
+Each row has the owner and the dataset of the task, and the same actions as the Tasks panel of a
+dataset (see [Tasks](/docs/hub-guide/processing/tasks)): open the log, download the result, retry,
+**Cancel Task** for a task that runs, and **Delete Task** for a finished task. Deleting a task also
+deletes its downloadable result.
+
+Dataset builds are not tasks: they are in Hangfire.
+
+## Hangfire
+
+The Hangfire dashboard (`/hangfire`) shows the background jobs of every Registry process: the
+queues (`builds`, `rebuilds`, `tasks`, `default`), the servers, the jobs that run, wait, failed or
+succeeded, the retries and the recurring jobs with their schedule. Only administrators can open it.
+
+<Screenshot id="self-hosting/admin-pages--hangfire" />
+
+Use it to:
+
+- see why a build or an e-mail failed (open the job in **Failed**);
+- requeue a failed job after you fix its cause;
+- run a recurring job now (**Recurring jobs**, then **Trigger now**), for example the
+  [artifact completeness check](./configuration.mdx#artifactcompletenesscheckercron) after an
+  upgrade.
+
+The schedules come from the [cron keys](./configuration.mdx#scheduled-jobs) of `appsettings.json`.
+A job that you turn off (`disabled`) is not in the list.
+
+{/* TODO verify: the Hangfire dashboard labels "Failed", "Recurring jobs" and "Trigger now" come from the Hangfire version that Registry ships; check them on the local capture. */}

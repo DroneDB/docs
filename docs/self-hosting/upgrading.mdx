@@ -1,10 +1,183 @@
 ---
 title: "Upgrading"
-description: "Upgrade Registry and the data it holds."
+description: "Update Registry, upgrade to Registry 3.0 with DroneDB 2.0, and move old datasets to COPC point clouds and bm3d 3D models."
 ---
 
-:::info
+## Update Registry
 
-This page is being written.
+Registry migrates its databases when the web server starts. To update:
 
-:::
+1. [Back up](./backup-restore.mdx) the databases, `appsettings.json` and the `data/` folder.
+2. Check the new version against your settings: run the new image (or binary) with `--check`.
+3. Replace Registry and start it.
+
+With Docker Compose:
+
+```bash
+docker compose down
+docker compose pull
+docker compose up -d
+```
+
+Native: replace the files of the release and, if the new version needs it, the DroneDB package.
+Then start Registry again.
+
+Read the [release notes](https://github.com/DroneDB/Registry/releases) of every version you skip.
+Administrators also see them in the Hub, from the [update check](./update-check.mdx#the-answer-and-what-the-hub-shows).
+
+### The Hub updates itself
+
+Registry embeds the Hub as a versioned ZIP and extracts it to `ClientApp/` in the storage folder.
+At each start, the web server compares the version of the embedded Hub with the one on disk. On
+any difference (upgrade or downgrade) it deletes the folder and extracts the embedded Hub again.
+The log shows:
+
+```text
+ -> Upgrading Hub: 2.0.0 -> 2.1.0
+ ?> Hub folder is ok (v2.1.0)
+```
+
+To extract it again by hand (for example after you edited files in `ClientApp/` to debug), start
+Registry once with `--reset-hub`.
+
+Browser tabs that are open during the upgrade still run the old Hub. When the Hub sees the new
+server version, it reloads the page and shows the dialog **DroneDB Hub has been updated**, with
+links to the release pages on GitHub. Embedded views (`?embed=1`) skip the check.
+
+Branding files in `data/branding/` are never touched by the upgrade (see
+[Hub UI customization](./configuration.mdx#hub-ui-customization)).
+
+## Upgrade to Registry 3.0 (DroneDB 2.0)
+
+Registry 3.0 runs on DroneDB 2.0 and changes the deployment in a few places.
+
+### Before the upgrade
+
+1. **Back up** the databases and `appsettings.json`.
+2. **Check the settings** with the new version: `Registry.Web <storage folder> --check` (with
+   Docker: the new image with `--check` and `appsettings.json` mounted at
+   `/data/appsettings.json`). An invalid setting now stops the start (exit code `1`) with every
+   failure listed, and Registry no longer rewrites the settings file at each start.
+3. **Give the data to the container user.** The image runs Registry as the user `registry`
+   (uid/gid `1654`), no longer as root. The first start gives `/data`, `/data/temp`,
+   `appsettings.json` and the paths of `REGISTRY_EXTRA_OWNED_PATHS` to that user, recursively,
+   which takes long on a large volume. Do it first, with the containers stopped:
+
+   ```bash
+   sudo chown -R 1654:1654 ./data ./appsettings.json
+   ```
+
+4. **Reverse proxy.** Set `KnownProxies` and `KnownNetworks` (see
+   [Reverse proxy](./production.mdx#reverse-proxy)). Without them, Registry ignores the forwarded
+   headers of a proxy on the Docker bridge.
+5. **Count duplicate dataset slugs.** A migration adds a unique index on the organization and the
+   slug of datasets. Two datasets of one organization with the same slug (left by a race in older
+   versions) are repaired first: the dataset with the lowest id keeps the slug, the others become
+   `<slug>_<id>`. Nothing is deleted and no folder moves, but a renamed dataset has a new URL. Count
+   them before the upgrade:
+
+   ```sql
+   SELECT OrganizationSlug, Slug, COUNT(*) AS copies, GROUP_CONCAT(Id ORDER BY Id) AS ids
+   FROM Datasets GROUP BY OrganizationSlug, Slug HAVING COUNT(*) > 1;
+   ```
+
+   On SQLite, write `group_concat(Id)`.
+
+### After the upgrade
+
+- **Repair slugs.** Run the slug repair as a dry run first, then for real (administrator token):
+
+  ```bash
+  curl -X POST -H "Authorization: Bearer <admin token>" "https://registry.example.com/sys/fix-invalid-slugs?dryRun=true"
+  curl -X POST -H "Authorization: Bearer <admin token>" "https://registry.example.com/sys/fix-invalid-slugs?dryRun=false"
+  ```
+
+  It renames organizations and datasets whose slug breaks the slug rules (2 to 128 characters;
+  lowercase letters, digits, `_` and `-`; starts with a letter or a digit; no `--`), moves their
+  folders, and skips entries with active jobs.
+- **Health checks.** Use `GET /health/live` (anonymous) or the image's `/healthcheck.sh` for
+  container health checks. `/quickhealth` and `/health` need the `MonitorToken` or an
+  administrator.
+- **Time zone.** The image runs in UTC. Set `TZ` in your Compose file if you relied on another time
+  zone.
+- **Administrator password.** `DefaultAdmin.Password` only creates a new administrator. To recover
+  a password, use `--reset-admin-password` (see
+  [Troubleshooting](./troubleshooting.mdx#reset-the-administrator-password)).
+- **Logs.** Log files are named per instance type (`registry-web*.txt`,
+  `registry-node-<host name>*.txt`, `registry-thumbs*.txt`) and roll daily (14 kept). Give each
+  processing node container a fixed `hostname`.
+- **Altitude key.** DroneDB 2.0 has no built-in OpenTopography key. Set `DDB_OPENTOPOGRAPHY_KEY` in
+  the environment of every Registry process if relative altitudes should come from the world
+  elevation model.
+- **3D models** are rebuilt in the background: see [the next section](#3d-models-nexus-to-bm3d).
+
+API clients other than the Hub and `ddb` must handle the new error format (RFC 9457
+`ProblemDetails`, and `403` for a signed-in user without permission) and the asynchronous import.
+See the [REST API](/docs/developers/api/workflows).
+
+## 3D models: Nexus to bm3d
+
+DroneDB 2.0 builds 3D models (OBJ, PLY, STL and others) in the **bm3d** format, with the `bm3d`
+program, instead of the Nexus format. Models built before the upgrade have only the Nexus file
+(`nxs/model.nxz`).
+
+You do not need to do anything:
+
+- The nightly [artifact completeness check](./configuration.mdx#artifactcompletenesscheckercron)
+  (`0 2 * * *`) finds these models and queues a rebuild for each.
+- The rebuilds run on the background `rebuilds` queue, **one at a time** on each process, with at
+  most [`ProcessingBudget:BackgroundRebuildThreads`](./configuration.mdx#processingbudget) threads
+  (default 2). They do not slow down the builds that users wait for. An entry that already has a
+  build job is skipped.
+- Until its rebuild is done, a model opens in the previous (Nexus) viewer. When the rebuild writes
+  `bm3d/`, it opens in the bm3d viewer. A failed rebuild keeps the Nexus file; a temporary failure
+  is retried and stays a background rebuild.
+
+To start the check at once instead of waiting for the night, trigger the recurring job in the
+[Hangfire dashboard](./admin-pages.mdx#hangfire), or call (administrator):
+
+```bash
+curl -X POST -H "Authorization: Bearer <admin token>" https://registry.example.com/sys/check-artifact-completeness
+```
+
+On a server with many models the first pass takes a long time. Watch the `rebuilds` queue in
+Hangfire.
+
+## Point clouds: EPT to COPC
+
+Since Registry 2.3.0, point clouds stream in the **COPC** format (`build/<hash>/copc/cloud.copc.laz`)
+instead of the **EPT** layout (`build/<hash>/ept/ept.json`). Registry does not read EPT builds:
+point clouds built before 2.3.0 are not viewable until they are migrated. If you upgrade from a
+version before 2.3.0, choose one way:
+
+1. **Run the migration script** (recommended). `scripts/migrate-to-copc.py` of the Registry
+   repository converts the EPT builds to COPC in place with PDAL. It does not touch the database.
+
+   ```bash
+   pip install psutil
+   python scripts/migrate-to-copc.py /path/to/registry-data/datasets
+   ```
+
+   It needs PDAL on the `PATH`, or `--docker` to run PDAL in the `pdal/pdal` image. Other options:
+   `--parallel N` (conversions at the same time, default 1), `--min-free-ram PCT` (default 20),
+   `--max-points N` (skip larger point clouds) and `--keep-ept` (keep the EPT folders; by default
+   they are removed after the conversion).
+
+2. **Build again.** The [artifact completeness check](#3d-models-nexus-to-bm3d) queues a build for
+   each entry whose built files are missing. A user can also build a file again with **Build** in
+   its context menu. This builds every output of the file, so it is slower than the script.
+
+After the migration, run a clean-up to delete EPT folders that are left (administrator):
+
+```bash
+curl -X POST -H "Authorization: Bearer <admin token>" -H "Content-Type: application/json" -d '{}' \
+  https://registry.example.com/sys/cleanup
+```
+
+The nightly [`DatasetCleanupCron`](./configuration.mdx#datasetcleanupcron) job does the same.
+
+## Branding folder
+
+Older versions made an empty `branding/` folder next to `appsettings.json`. Registry reads only
+`{StoragePath}/branding/` (`data/branding/` by default). Move any files to `data/branding/`, then
+delete the old folder.

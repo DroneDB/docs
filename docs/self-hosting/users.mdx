@@ -1,10 +1,147 @@
 ---
 title: "Users, organizations & roles"
-description: "Manage users, organizations and roles from the admin pages."
+description: "Manage the users, roles and organizations of your Registry in the Hub admin pages, and set storage quotas."
+hub_feature: [route:Users]
 ---
 
-:::info
+Administrators manage the accounts of a Registry in the Hub, on the **User Management** page. To do
+the same through the REST API, see [Users & organizations API](/docs/developers/users-api).
 
-This page is being written.
+<Screenshot id="self-hosting/users--list" />
+
+## Open the page
+
+1. Sign in as an administrator.
+2. Open the user menu (your user name, top right), then click **Manage Users**.
+
+<Screenshot id="self-hosting/admin-pages--menu" />
+
+The page shows every user with the **Username**, **Email**, **Roles**, **Organizations**,
+**Datasets**, **Storage** (used and quota) and **Created** columns. On a narrow screen some columns
+are hidden. Type in **Search users** to filter the list; click **Refresh** to load it again.
+
+:::note When the page is missing
+
+**Manage Users** is shown only when Registry manages the accounts itself. With
+[LDAP](./ldap.mdx) or an external authentication service (`ExternalAuthUrl`), the directory
+manages users, passwords and the admin role, and the Hub hides the page.
 
 :::
+
+## The first administrator
+
+The first start creates the administrator of the [`DefaultAdmin`](./configuration.mdx#defaultadmin)
+setting: `admin` / `password123` (a Docker Compose install takes the password from
+`REGISTRY_ADMIN_PASSWORD`). Change the password at once in **My Account**. The **Delete User**
+button is always disabled for the user `admin`.
+
+## Add a user
+
+<Steps>
+
+1. Click **New User**.
+
+   <Screenshot id="self-hosting/users--add" />
+
+2. Enter the **Username**, the **Email** and the **Password**. The dialog shows the rules of the
+   [password policy](./configuration.mdx#passwordpolicy) under the password field.
+3. Optional: choose one or more **Roles**.
+4. Click **Add User**.
+
+</Steps>
+
+When [`EnableDefaultUserOrganization`](./configuration.mdx#enabledefaultuserorganization) is on
+(the default), the new user also gets a personal organization with the user name as slug.
+
+## Edit a user
+
+In the **Actions** column:
+
+- **Edit User** (pencil): change the **Email** and the **Roles**, then click **Update User**. The
+  user name cannot change. Users cannot change their own e-mail address in the Hub: an
+  administrator sets it here. Build notification e-mails need a valid address.
+- **Change Password** (key): enter the **New Password** twice and click **Change Password**. Leave
+  **Current Password** empty to set a password without knowing the old one.
+
+## Delete a user
+
+1. Click **Delete User** (trash can).
+2. Optional: in **Transfer data to successor**, choose the user who gets the organizations and
+   datasets. Without a successor, every organization, dataset and file of the user is deleted.
+3. With a successor, choose what happens when a dataset name already exists in the successor's
+   organizations: **Rename conflicting datasets**, **Overwrite existing datasets** or **Stop if
+   conflict detected**.
+4. Click **Delete**.
+
+<Screenshot id="self-hosting/users--delete" />
+
+The **User Deleted Successfully** window lists the organizations and datasets that were
+transferred or deleted, and the share batches that were deleted.
+
+## Roles
+
+Click **Manage Roles** to open **Role Management**. Enter a **Role Name** and click **Add Role**, or
+click **Delete** next to a role.
+
+<Screenshot id="self-hosting/users--roles" />
+
+| Role | Meaning |
+|------|---------|
+| `admin` | Instance administrator: every organization and dataset, the admin pages, Hangfire. It cannot be deleted. |
+| Other roles | Labels you create. They give no rights by themselves. Use them in [tool gating](./processing-nodes.mdx#tool-gating) (`AllowedRoles`) to allow a tool for some users only. |
+
+Assign roles to a user with **Edit User**. Remove a role from every user before you delete it.
+
+## Organizations of a user
+
+Click the number in the **Organizations** column of a user to open **Manage User Organizations**.
+
+<Screenshot id="self-hosting/users--organizations" />
+
+- To add the user to an organization, choose the **Organization** and the **Permissions**, then
+  click **Add**.
+- To change the permissions in an organization, choose another value in its row. The change is
+  saved at once.
+- To remove the user from an organization, click **Remove**.
+
+| Permissions | The member can |
+|-------------|----------------|
+| **Read Only** | Read the datasets of the organization |
+| **Read/Write** | Also write: upload, change and build files (the default) |
+| **Read/Write/Delete** | Also delete |
+| **Admin** | Also manage the members of the organization |
+
+## All organizations
+
+Click **Manage Organizations** to open **Organization Management**. It lists every organization of
+the Registry.
+
+- To create an organization, enter the **Organization Name** (the **Organization Slug** is
+  suggested from it) and an optional **Description**, then click **Create Organization**.
+- To delete an organization, click **Delete** in its row and confirm. **Every dataset of the
+  organization is deleted.** The `public` organization cannot be deleted.
+
+Owners and members manage their own organizations on the Organizations page of the Hub: see
+[Dataset members & organizations](/docs/hub-guide/datasets/members). By default only
+administrators add and remove members; with
+[`EnableOrganizationMemberManagement`](./configuration.mdx#enableorganizationmembermanagement),
+owners can do it too (**Manage Members**).
+
+## Storage quotas
+
+1. Turn on [`EnableStorageLimiter`](./configuration.mdx#enablestoragelimiter) and restart
+   Registry.
+2. Give each user a quota in MB with the `maxStorageMB` key of the user's metadata. The Hub has no
+   field for it: use the API (`POST /users/{userName}/meta`, see
+   [Users & organizations API](/docs/developers/users-api)).
+
+The **Storage** column then shows the use, the quota and a bar. A user without `maxStorageMB` has
+no limit. When a user is at the quota, new uploads are refused.
+
+## Common problems
+
+| Problem | What to check |
+|---------|---------------|
+| No **Manage Users** in the user menu | You are not an administrator, or LDAP or external authentication is on. |
+| A quota has no effect | `EnableStorageLimiter` is `true`, the user has `maxStorageMB`, and the value is a number. |
+| A role cannot be deleted | `admin` is protected. |
