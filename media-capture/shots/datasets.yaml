@@ -149,7 +149,7 @@
 
 - id: datasets/members--add
   type: screenshot
-  alt: The permission levels of a new member in the Manage Members window
+  alt: A typed user name and the permission levels of a new member in the Manage Members window
   page: hub-guide/datasets/members
   url: /r/acme-surveys
   base: local
@@ -160,6 +160,7 @@
   actions:
     - click: "role=button[name='Members']"
     - wait: "text=Add Member"
+    - fill: { selector: "role=textbox[name='User name']", value: jdoe }   # a made-up name; Add is not clicked
     - click: "[aria-labelledby='organization-members-dialog-permissions-label']"
     - wait: "text=Read/Write/Delete"
   highlight: "[aria-labelledby='organization-members-dialog-permissions-label']"

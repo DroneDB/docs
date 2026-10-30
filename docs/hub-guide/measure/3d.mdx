@@ -84,6 +84,12 @@ any data it shows, for the session only.
 | **Measure area** | A polygon and its area. |
 | **Clear measurements** | Removes all measurements. |
 
+The 3D viewer writes lengths and areas in the units of your
+[preferences](/hub-guide/account/preferences.mdx), on the same scale as the
+[map](/hub-guide/measure/map.mdx#units): areas in m², ha and km², or ft² and acres; imperial lengths in
+feet. Very small values are in cm, mm, cm², mm², inches or in². When you change the units, the labels
+change at once.
+
 ## Limits & requirements
 
 - **Save Measurements** shows only for users with write access to the dataset.
@@ -91,7 +97,7 @@ any data it shows, for the session only.
 - The point cloud viewer saves next to the point cloud, with `_measurements.geojson` in place of
   the extension. The [map](/hub-guide/measure/map.mdx) uses the same file when it shows the point cloud. Each
   view saves and deletes only its own measurements; the other view's stay in the file.
-- The 3D viewer does not save its measurements, and it shows them in metres only.
+- The 3D viewer does not save its measurements.
 - The 3D viewer is experimental.
 
 ## Related

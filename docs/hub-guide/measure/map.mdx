@@ -1,6 +1,6 @@
 ---
 title: "Measurements on the map"
-description: "Measure lengths, areas and points on the map, put them in groups, save them in the dataset and export them as GeoJSON."
+description: "Measure lengths, areas and points on the map, put them in groups, save them in the dataset and export them as GeoJSON or CSV."
 hub_feature: [map:measure, map:measurement-list, map:measurement-groups, map:measurement-units]
 datasets: [odm/brighton-beach]
 requires: { access: read }
@@ -49,6 +49,11 @@ save the measurements in the dataset, so the next visitor sees them too.
 
 6. Click **Save Measurements** to save them in the dataset.
 
+7. To use the measurements in another program, click **Export Measurements as GeoJSON** or
+   **Export Measurements as CSV**. The CSV opens in Excel or any spreadsheet.
+
+   <Screenshot id="measure/map--export" />
+
 </Steps>
 
 ## Options
@@ -67,7 +72,8 @@ measurements.
 | **Measurement List** | Opens the list of measurements and groups. |
 | **Save Measurements** | Makes the saved file the same as the map. With nothing left on the map, it removes the saved measurements. |
 | **Clear All Measurements** | Removes all measurements from the map. The saved file does not change until you save again. |
-| **Export Measurements** | Downloads the measurements as a GeoJSON file. |
+| **Export Measurements as GeoJSON** | Downloads the measurements, with their groups, as a GeoJSON file. |
+| **Export Measurements as CSV** | Downloads one row per measurement as a CSV table. See [CSV columns](#csv-columns). |
 | **Delete Saved Measurements** | Deletes the saved measurements from the dataset. |
 
 ### Units
@@ -79,9 +85,23 @@ measurements.
 
 To change the units, click **Map Settings** on the map and select **Measurement Units**:
 **Metric** or **Imperial**. If there are measurements on the map, the **Change Units** dialog asks
-first. Click **Convert** to show all measurements in the new units; Hub then saves them. The units
+first. Click **Convert** to show all measurements in the new units. If you can write the dataset,
+Hub then saves them in the new units; if you can only read it, nothing is saved. The units
 are the same setting as the **Units** tab of the [preferences](/docs/hub-guide/account/preferences),
 so they follow your account. Saved lengths and areas show in your current units when they load.
+
+### CSV columns
+
+| Column | Content |
+|---|---|
+| `group` | The name of the group of the measurement, or empty |
+| `name`, `description` | The name and the description from the properties |
+| `type` | The kind of measurement: `length`, `area`, `point`, `stockpile` … |
+| `value`, `unit` | The length or the area in the units the map shows. A stockpile has its net volume in m³ or yd³; a point has no value |
+| `longitude`, `latitude` | The position of a point, in WGS84 |
+| `wkt` | The shape of the measurement as WKT, in WGS84 |
+
+Other properties of the measurements follow in more columns.
 
 ### Coordinates of a point
 

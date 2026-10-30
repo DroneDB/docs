@@ -143,7 +143,8 @@ unlisted datasets from those callers.
 
 The owner, a member with the `Admin` permission, or a system administrator manages the members.
 These endpoints work when organization member management is on
-(`organizationMemberManagement` in `GET /sys/features`).
+(`organizationMemberManagement` in `GET /sys/features`). When it is off, they answer `403` to
+everyone, system administrators included.
 
 | Request | What it does |
 |---|---|
@@ -151,6 +152,18 @@ These endpoints work when organization member management is on
 | `POST /orgs/{orgSlug}/members` | Add a member: JSON `{ "userName": "jdoe", "permissions": 1 }` |
 | `PUT /orgs/{orgSlug}/members/{userName}` | Change the permission: JSON `{ "permissions": 2 }` |
 | `DELETE /orgs/{orgSlug}/members/{userName}` | Remove a member |
+
+`POST /orgs/{orgSlug}/members` takes the exact user name: the list of users (`GET /users`) is for
+administrators only, so an owner does not need it. It answers:
+
+| Status | When |
+|---|---|
+| `204` | The user is now a member |
+| `400` | The `userName` is empty |
+| `401` | The caller is not signed in |
+| `403` | The caller cannot manage the members (a member without `Admin`, an outsider), or member management is off |
+| `404` | No user has that name; the message names it |
+| `409` | The user is already a member |
 
 | `permissions` | Name | Can |
 |---|---|---|

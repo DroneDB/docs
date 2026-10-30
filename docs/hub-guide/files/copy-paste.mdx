@@ -1,7 +1,7 @@
 ---
 title: "Copy, cut, paste & transfer"
 description: "Copy or move files within a dataset and to another dataset, and what happens when names are the same."
-hub_feature: [menu:copy, menu:cut, menu:paste, menu:transfer]
+hub_feature: [menu:copy, menu:cut, menu:paste, menu:transfer, menu:copy-to-another-dataset]
 datasets: [odm/brighton-beach]
 requires: { access: write }
 ---
@@ -48,15 +48,19 @@ A copy stays on the clipboard, so you can paste it again. A cut is used once.
 
 ## Transfer to another dataset
 
-**Transfer** moves files to another dataset without the clipboard.
+**Transfer** moves files to another dataset without the clipboard. If you can only read the
+source dataset, the menu shows **Copy to another dataset...** instead: it copies the files, and they
+stay in the source.
 
-1. Select the files, right-click and click **Tools** › **Transfer**.
+1. Select the files, right-click and click **Tools** › **Transfer** (or **Tools** › **Copy to another
+   dataset...**).
 2. Select the **Destination Organization** and the **Destination Dataset**.
 3. Type a **Destination Path (optional)**, for example `folder/subfolder`, or leave it empty for the
    root folder. Select **Overwrite existing files** if necessary.
-4. Click **Transfer**.
+4. Click **Transfer** (or **Copy**). A note above the destination says if the files move or are copied.
 
 <Screenshot id="files/copy-paste--transfer" />
+<Screenshot id="files/copy-paste--copy-to-dataset" />
 
 ## What happens
 
@@ -65,17 +69,21 @@ A copy stays on the clipboard, so you can paste it again. A cut is used once.
 | Copy, then paste | A copy in the new folder | A copy; the source stays |
 | Cut, then paste | A move | A move; the files leave the source |
 | Transfer | — | A move; the files leave the source |
+| Copy to another dataset | — | A copy; the source stays |
 
 A copied or moved file keeps its builds, so Hub does not build it again. Files that a
 build waits for (for example the `.mtl` of a model) start that build when they arrive.
 
 ## Limits & requirements
 
-- Paste and **Transfer** need write access to the destination dataset. Cut needs write access to the
-  source.
+- Paste, **Transfer** and **Copy to another dataset...** need write access to the destination
+  dataset.
+- A move (Cut or **Transfer**) needs write access to the source dataset. With read access only,
+  **Cut** does not show and the server refuses a move.
 - You cannot paste into the folder that the items come from.
 - The clipboard is kept in the browser tab. It stays after a reload, and it is empty in a new tab.
-- **Transfer** is not available while a file of the selection is building.
+- **Transfer** and **Copy to another dataset...** are not available while a file of the selection is
+  building.
 - A paste where some items fail shows a summary window with the moved, skipped and failed items.
 
 ## Related

@@ -3,7 +3,7 @@
 # Demo inputs that reset-demo.mjs must create in the organization acme-surveys (private, owner docsdemo):
 #   share-demo      (dataset, visibility PRIVATE)  orthophoto.tif   a copy of odm/brighton-beach
 #                                                                   odm_orthophoto/odm_orthophoto.tif (built)
-#   The visibility shots must never click "Allow access to anyone with the link" or change the visibility:
+#   The visibility shots must never click "Make Unlisted" (the confirmation) or change the visibility:
 #   reset-demo.mjs sets share-demo back to PRIVATE before each run anyway.
 #
 # The QGIS shots marked `desktop: qgis` show the QGIS desktop program, not a Hub page: the Playwright runner
@@ -33,9 +33,9 @@
   crop: "#settings"
   blocked: null
 
-- id: sharing/visibility--allow-access
+- id: sharing/visibility--make-unlisted
   type: screenshot
-  alt: The Share window of a file in a private dataset, with Allow access to anyone with the link
+  alt: The Share window of a file in a private dataset, which says the dataset is Private and offers Make the dataset Unlisted...
   page: hub-guide/sharing/visibility
   url: /r/acme-surveys/share-demo
   base: hub
@@ -46,9 +46,28 @@
   actions:
     - click: { selector: "text=orthophoto.tif", button: right }
     - click: "role=menuitem[name='Share/Embed']"
-    - wait: "role=button[name='Allow access to anyone with the link']"   # do NOT click it
-  highlight: "role=button[name='Allow access to anyone with the link']"
+    - wait: "role=button[name='Make the dataset Unlisted...']"
+  highlight: "role=button[name='Make the dataset Unlisted...']"
   crop: "#share-embed"
+  blocked: null
+
+- id: sharing/visibility--make-unlisted-confirm
+  type: screenshot
+  alt: The question before a private dataset becomes Unlisted, which names the dataset and says that anyone with a link can open every file in it
+  page: hub-guide/sharing/visibility
+  url: /r/acme-surveys/share-demo
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "text=orthophoto.tif"
+    networkIdle: true
+  actions:
+    - click: { selector: "text=orthophoto.tif", button: right }
+    - click: "role=menuitem[name='Share/Embed']"
+    - click: "role=button[name='Make the dataset Unlisted...']"   # opens the question only
+    - wait: "role=button[name='Make Unlisted']"                    # do NOT click it
+  highlight: null
+  crop: "#confirmDialog"
   blocked: null
 
 # ---- Share links & embeds -----------------------------------------------------------------------------------

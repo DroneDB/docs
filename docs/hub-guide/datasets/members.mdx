@@ -31,7 +31,9 @@ organization.
    on the card of the organization, or next to its name on its datasets page.
 3. To manage the members, open the datasets page of the organization and click **Members**.
    On the **Organizations** page, the people button (**Manage members**) on the card does the same.
-4. Under **Add Member**, select the **User** and the **Permissions**. Click **Add**.
+4. Under **Add Member**, type the exact **User name** and select the **Permissions**. Click **Add**,
+   or press Enter. If the server refuses the name (no such user, or already a member), the window
+   shows its message.
 
    <Screenshot id="datasets/members--add" />
 
@@ -52,15 +54,15 @@ organization.
 
 The role tag shows on the datasets page of the organization, next to the number of datasets.
 
-The owner of the organization and the administrators of the server always have all the rights.
+The owner of the organization and the administrators of the server always have all the rights on
+its datasets.
 
 ## Limits & requirements
 
-- The server administrator turns member management on or off. When it is off, the **Members**
-  and **Manage members** buttons do not show.
-- To add a member, Hub reads the list of the users of the server. In this version only a server
-  administrator can read that list. Other owners see an error, and can only change or remove
-  existing members. {/* TODO verify: the Members dialog loads GET /users (admin only) to fill the User list */}
+- The owner and the members with the **Admin** permission manage the members, when the server
+  administrator turns member management on. When it is off, nobody can manage the members, server
+  administrators included, and the **Members** and **Manage members** buttons do not show.
+- Hub does not list the users of the server. Ask the person for their exact user name.
 - A slug is made from the organization name. It cannot change after creation.
 - **Public** applies to the organization only. Each dataset keeps its own
   [visibility](/hub-guide/sharing/visibility.mdx).

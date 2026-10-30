@@ -85,6 +85,10 @@ band whatever the band order of the camera.
   footprint. A raster with one band per file needs
   [Merge multispectral bands](/hub-guide/processing/merge-multispectral.mdx) first.
 - **Export** is not available when the result is larger than the export limit of the Hub.
+- The **Histogram** shows the range the index can have (NDVI: -1 to 1), around the 2nd to 98th
+  percentiles of the values. When some values are far outside it (outliers), a note under the
+  histogram gives the real lowest and highest values. If too few bars fit in that range, the
+  histogram has no bars, but the handles still set the range.
 - When the map shows two or more rasters, each raster with bands has its own leaf button in the
   layer opacity panel.
 

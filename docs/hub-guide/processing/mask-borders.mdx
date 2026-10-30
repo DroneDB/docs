@@ -55,10 +55,8 @@ To mask a white border or a border of another colour, or to change the tolerance
 - You need write access to the dataset.
 - The file must be a georaster: a GeoTIFF with a coordinate system.
 - The new file counts toward your storage.
+- Hub masks black border pixels only. A white border stays: use the CLI for it.
 - An orthophoto that already has a transparent border (an alpha band) does not need this tool.
-
-{/* TODO verify: the Mask Borders window says "black or white border pixels", but the Hub always sends
-    white=false, so only black borders are masked from the Hub. */}
 
 ## Related
 

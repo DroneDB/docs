@@ -53,6 +53,20 @@
   crop: null
   blocked: null
 
+- id: measure/map--export
+  type: screenshot
+  alt: The second row of the measure toolbar with Export Measurements as GeoJSON and Export Measurements as CSV
+  page: hub-guide/measure/map
+  open: { org: odm, ds: brighton-beach, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Export Measurements as CSV']", networkIdle: true, extraMs: 1500 }   # shows once the saved measurements are on the map
+  actions:
+    - hover: "[aria-label='Export Measurements as CSV']"   # its tooltip names the CSV
+  highlight: "[aria-label='Export Measurements as CSV']"
+  crop: null
+  blocked: null
+
 - id: measure/map--area
   type: screenshot
   alt: An area drawn on an orthophoto, with its size in the polygon

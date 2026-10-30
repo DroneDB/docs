@@ -83,9 +83,22 @@ function menuItems() {
   for (const part of parts) {
     // The label of the object the factory returns (a factory may compute things before it)
     const m = /^function (\w+)\(ctx\)\s*\{[\s\S]*?\n {4}return\s*\{\s*label:\s*'([^']+)'/.exec(part);
-    if (!m) continue;
-    if (/\n\s*items:\s*\[/.test(part)) continue; // a submenu (Tools, Experimental), not an action
-    items.push({label: m[2], what: `menu ${m[1]}`});
+    if (m) {
+      if (/\n\s*items:\s*\[/.test(part)) continue; // a submenu (Tools, Experimental), not an action
+      items.push({label: m[2], what: `menu ${m[1]}`});
+      continue;
+    }
+    // A label that depends on the user (Transfer for a writer, Copy to another dataset... for a
+    // reader): get label() { return modeFor(ctx.canWrite).menuLabel; } — each menuLabel of the
+    // module that exports modeFor is an action
+    const g = /^function (\w+)\(ctx\)\s*\{[\s\S]*?\n {4}return\s*\{\s*get label\(\)\s*\{\s*return\s+(\w+)\([^)]*\)\.menuLabel/.exec(part);
+    if (!g) continue;
+    const from = new RegExp(`import\\s*\\{[^}]*\\b${g[2]}\\b[^}]*\\}\\s*from\\s*'@/([^']+)'`).exec(src);
+    if (!from) throw new Error(`${file}: where ${g[2]} (the label of ${g[1]}) comes from is not found`);
+    const rel = from[1].endsWith('.js') ? from[1] : `${from[1]}.js`;
+    const labels = [...read(rel).matchAll(/menuLabel:\s*'([^']+)'/g)].map(r => r[1]);
+    if (!labels.length) throw new Error(`${rel}: no menuLabel for ${g[1]}`);
+    for (const label of labels) items.push({label, what: `menu ${g[1]} (${rel})`});
   }
   // The download rows that the menu turns into one item each
   for (const [rel, marker] of [['libs/build/buildDownloads.js', 'BUILD_DOWNLOADS = '],

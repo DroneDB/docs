@@ -58,7 +58,11 @@ saves it with the other [measurements on the map](/hub-guide/measure/map.mdx).
 - The profile works on a raster with one band. **Raster Analysis** shows when the map has exactly
   one such raster.
 - Hub samples the line at 256 evenly spaced points.
-- The distances on the chart are in metres and kilometres, also with imperial units.
+- The distances on the chart follow the units of your [preferences](/hub-guide/account/preferences.mdx),
+  as the measurements on the map: m up to 100 m, then km, or ft. The values stay in the **Unit** of
+  the raster.
+- The CSV always has the distances in metres (`distance_m`), with the columns `index`, `distance_m`,
+  `value`, `unit`, `lon` and `lat`. It opens in Excel or any spreadsheet.
 
 ## Related
 

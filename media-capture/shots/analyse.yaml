@@ -556,7 +556,7 @@
 
 - id: analyse/area-statistics--value-range
   type: screenshot
-  alt: The value range of a DSM and the value of a point read with Inspect
+  alt: The value range of a DSM and the value of a point read with Inspect, kept in the panel with its latitude and longitude
   page: hub-guide/analyse/area-statistics
   open: { org: odx, ds: micasense, path: odm_dem/dsm.tif, view: map }
   base: hub
@@ -567,7 +567,28 @@
     - wait: "text=Value Range"
     - click: "text=Inspect"
     - mouse: { click: [700, 460] }
-    - wait: 1500
-  highlight: "text=Value Range"
+    - wait: "[data-testid='raster-spot-value']"
+    - wait: 1000
+  highlight: "[data-testid='raster-spot-value']"
+  crop: null
+  blocked: null
+
+- id: analyse/area-statistics--area
+  type: screenshot
+  alt: A rectangle drawn on a DSM with Area, and its minimum, maximum, mean, median, standard deviation and pixel count in the Raster Analysis panel
+  page: hub-guide/analyse/area-statistics
+  open: { org: odx, ds: micasense, path: odm_dem/dsm.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Raster Analysis']"
+    - wait: "text=Value Range"
+    - click: "[data-testid='raster-area-stats-btn']"   # Area (its name is also in Measure Area)
+    - mouse: { click: [600, 380] }                     # one corner of the rectangle
+    - mouse: { click: [820, 540] }                     # the opposite corner: the statistics are asked
+    - wait: "text=Median:"
+    - wait: 1000
+  highlight: "[data-testid='raster-area-stats']"
   crop: null
   blocked: null

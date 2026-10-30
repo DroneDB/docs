@@ -50,13 +50,14 @@ Miscellaneous. Each setting is described in the [Configuration reference](/self-
 To change a setting:
 
 1. Edit the values on the page.
-2. Click **Copy AppSettings JSON**. The clipboard gets an `AppSettings` object with the current
-   values and your changes. A secret that is set and that you did not change is written as
-   `<CHANGE-ME>`.
-3. Put the keys you changed in `appsettings.json` (or set them as environment variables). Keys
-   of nested sections (`Smtp`, `HubOptions`, `ProcessingPlatform` …) are already in their section.
-   Keys that belong directly in `AppSettings` are grouped under the name of their page section in
-   the copied JSON (for example `UpdateCheck`): move them up one level.
+2. Click **Copy AppSettings JSON**. The clipboard gets the JSON in the shape of
+   `appsettings.json`, with the current values and your changes. A secret that is set and that you
+   did not change is written as `<CHANGE-ME>`.
+3. Put the keys you changed in `appsettings.json` (or set them as environment variables). The copied
+   JSON has the shape that Registry reads: keys that the page only groups (**Update check**, **Cron
+   Jobs**, **Cache Expiration** …) are direct keys of `AppSettings`, the nested sections (`Smtp`, `HubOptions`,
+   `ProcessingPlatform` …) keep their object, and `ConnectionStrings` and `Serilog` are next to
+   `AppSettings`, not inside it.
 4. Run `Registry.Web <storage folder> --check`, then restart Registry.
 
 **Reset Section** and **Reset to Defaults** undo your edits on the page; they do not change the
