@@ -58,7 +58,9 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ddb-reset-demo-'));
 try {
   await main();
 } catch (e) {
-  fail(e.cause ? `${e.message} (${e.cause.code || e.cause.message})` : e.message);
+  // Not fail(): process.exit would skip the clean-up below
+  console.error(`reset-demo: ${e.cause ? `${e.message} (${e.cause.code || e.cause.message})` : e.message}`);
+  process.exitCode = 1;
 } finally {
   fs.rmSync(tmp, {recursive: true, force: true});
 }
