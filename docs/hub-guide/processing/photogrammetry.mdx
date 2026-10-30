@@ -1,10 +1,107 @@
 ---
-title: "Photogrammetry"
-description: "Process drone images into orthophotos, elevation models, point clouds and 3D models."
+title: Photogrammetry
+description: Process drone images into an orthophoto, elevation models, a point cloud and a 3D model on a processing node.
+hub_feature: [task:photogrammetry]
+datasets: [odm/brighton-beach]
+requires: { access: write, node: true, data: Drone images with GPS positions }
 ---
 
-:::info
+<Clip id="processing/photogrammetry--run" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="brighton-beach"
+         hint="The images folder has the 18 photos. The odm_* folders are what processing makes from them." />
+
+## When to use it
+
+You have the photos of a drone flight and you want an orthophoto, a DSM or DTM, a point cloud or a textured
+3D model. Hub sends the images to a processing node (NodeODX, the engine of OpenDroneMap) and puts the results
+back into a dataset.
+
+## Steps
+
+<Steps>
+
+1. [Upload the images](/docs/get-started/upload) into a folder of a dataset, for example `images`.
+
+2. Open the **Tasks** tab of the dataset. Click **Run Photogrammetry**.
+
+   <Screenshot id="processing/photogrammetry--tasks-button" />
+
+3. In **Image folder**, type the folder or click the folder button to find it. Leave it empty to use
+   every image of the dataset. All images under the folder are processed.
+
+4. If the server has more than one node, select the **Processing node**. Click **Check Node** to see if
+   the node answers and how many tasks wait on it.
+
+5. Select a **Processing profile** (see the table below). The line under the list says what the profile
+   makes.
+
+   <Screenshot id="processing/photogrammetry--dialog" />
+
+6. Optional: change single options in the options editor under the profile (see **Options**).
+
+7. Select where the results go:
+   - **Output folder**: a folder of this dataset (default `photogrammetry_output`).
+   - **Create new dataset for results**: type a **New dataset name** (lowercase letters, digits and
+     hyphens) and select its **Visibility** (default **Private**).
+
+8. Click **Start**. If the node does not answer, Hub asks before it starts the task.
+
+9. Follow the task in the **Tasks** tab. Click **View log** (the terminal button) to read what the node does.
+
+   <Screenshot id="processing/photogrammetry--progress" />
+
+10. When the task ends, the results are in the output folder. Hub then [builds](./builds.mdx) them, so
+    they open on the map and in the viewers.
+
+    <Screenshot id="processing/photogrammetry--results" />
+
+</Steps>
+
+## Processing profiles
+
+| Profile | What it makes |
+|---|---|
+| **3D Model (mesh)** | A high-quality 3D mesh and a dense point cloud. Best for structures and buildings |
+| **Custom (JSON array)** | What you type: the options as a JSON array |
+| **Default - Orthophoto + DSM** | An orthophoto and a Digital Surface Model (the default) |
+| **DSM + DTM (terrain)** | A DSM and a Digital Terrain Model, for topography and volumes |
+| **Fast Orthophoto** | An orthophoto only. Faster, lower quality, no 3D products |
+| **High Resolution (1 cm/px)** | An orthophoto and a DSM at 1 cm per pixel. Much slower |
+| **Multispectral** | Radiometric calibration of a multispectral camera, and a DSM |
+| **Volume Analysis** | A DSM with a dense point cloud, for [stockpile volumes](../analyse/stockpile.mdx) |
+
+## Options
+
+The options editor lists every option of the node, in groups.
+
+| Control | What it does |
+|---|---|
+| **Search** | Finds an option by its name |
+| **Flat View** / **Grouped View** | Shows the options in one list or in groups |
+| **Expand All** / **Collapse All** | Opens or closes every group |
+| **… changed** | The number of options you changed |
+| **Customized options** | One button per changed option. Click it to go to that option |
+
+An option you change replaces the value of the profile. The other options of the profile stay.
+
+## Limits & requirements
+
+- You need write access to the dataset.
+- The server needs a processing node. Without one, the **Run Photogrammetry** button is not shown. When
+  your account or organization cannot use processing, the button is grey and its tooltip says why.
+- On DroneDB Hub, every [plan](../account/plans.mdx) includes processing. The plan sets the priority.
+- The results count toward your storage.
+- Processing time depends on the number of images, the profile and the node. A small flight takes minutes; a
+  large one can take hours.
+
+## Related
+
+- [Tasks panel & logs](./tasks.mdx)
+- [Builds](./builds.mdx)
+- [Merge multispectral bands](./merge-multispectral.mdx)
+- [Processing nodes (self-hosting)](/docs/self-hosting/processing-nodes)
+
+<ForDevelopers api="/docs/developers/processing-api" apiLabel="Processing platform REST API" />

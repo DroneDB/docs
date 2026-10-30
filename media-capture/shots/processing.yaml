@@ -1,0 +1,412 @@
+# Shots of the Hub guide → Processing pages (docs/hub-guide/processing/*.mdx).
+#
+# Demo inputs that reset-demo.mjs must create in the organization acme-surveys (private, owner docs-demo):
+#   builds          (dataset)  orthophoto.tif           a copy of odm/brighton-beach odm_orthophoto/odm_orthophoto.tif (built)
+#                              house.obj                an OBJ uploaded WITHOUT its house.mtl (build "Waiting for files")
+#                              broken.laz               a few bytes that are not a LAZ file (build "Failed")
+#   photogrammetry  (dataset)  images/*.JPG             the 18 images of odm/brighton-beach images/
+#   multispectral   (dataset)  bands/IMG_0180_1.tif … bands/IMG_0180_5.tif
+#                                                       the five band files of one capture of odx/micasense images/
+#   align           (dataset)  orthos/sheffield-park-1.tif, orthos/sheffield-park-2.tif
+#                                                       odm_orthophoto/odm_orthophoto.tif of odm/sheffield-park-1 and -2
+#   mask-borders    (dataset)  ortho-black-border.tif   an orthophoto with a black (no-data) border — source not chosen yet
+#
+# The Photogrammetry shots need a processing node. On the local Registry of media-capture/local there is none
+# yet: start.sh must add a NodeODX container (for example opendronemap/nodeodm) and set
+# AppSettings__ProcessingPlatform__NodeOdx__0__* for it; without a node the "Run Photogrammetry" button is hidden.
+# The photogrammetry clip uses processing quota on a real node: capture it only when it changes.
+#
+# Right-click: `click: { selector, button: right }` opens the context menu of the file browser (the capture
+# runner must support the button key). Context menu entries are PrimeVue menu items: select them by role+name.
+
+# ---- Builds -------------------------------------------------------------------------------------------------
+
+- id: processing/builds--badges
+  type: screenshot
+  alt: File browser with a queued, a waiting and a failed build badge
+  page: hub-guide/processing/builds
+  url: /r/acme-surveys/builds
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "text=house.obj"
+    networkIdle: true
+    extraMs: 1500
+  actions:
+    - hover: "text=house.obj"           # shows the "Waiting for files: …" tooltip of the badge
+    - wait: 800
+  highlight: "text=house.obj"
+  crop: null
+  blocked: null
+
+- id: processing/builds--details-panel
+  type: screenshot
+  alt: Details panel of an OBJ whose build waits for its .mtl file
+  page: hub-guide/processing/builds
+  url: /r/acme-surveys/builds
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "text=house.obj"
+    networkIdle: true
+  actions:
+    - click: "text=house.obj"           # file browser items have no aria-label: visible text
+    - wait: "text=Waiting for files"
+  highlight: "text=Waiting for files"
+  crop: ".detail-panel"                 # needs aria-label: the details panel has no label, only a class
+  blocked: null
+
+- id: processing/builds--rebuild
+  type: screenshot
+  alt: The Rebuild File window with the Rebuild Anyway button
+  page: hub-guide/processing/builds
+  url: /r/acme-surveys/builds
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "text=orthophoto.tif"
+    networkIdle: true
+  actions:
+    - click: "text=orthophoto.tif"
+    - click: "role=button[name='Build']"
+    - wait: "role=dialog[name='Rebuild File']"
+  highlight: "role=button[name='Rebuild Anyway']"
+  crop: "role=dialog[name='Rebuild File']"
+  blocked: null
+
+- id: processing/builds--download-menu
+  type: screenshot
+  alt: The Tools menu of an orthophoto with Download COG
+  page: hub-guide/processing/builds
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: none
+  waitFor:
+    selector: "text=odm_orthophoto"
+    networkIdle: true
+  actions:
+    - click: "text=odm_orthophoto"      # open the folder
+    - wait: "text=odm_orthophoto.tif"
+    - click: { selector: "text=odm_orthophoto.tif", button: right }
+    - hover: "role=menuitem[name='Tools']"
+    - wait: "role=menuitem[name='Download COG']"
+  highlight: "role=menuitem[name='Download COG']"
+  crop: null
+  blocked: null
+
+# ---- Photogrammetry -----------------------------------------------------------------------------------------
+
+- id: processing/photogrammetry--run
+  type: clip
+  alt: Start photogrammetry on 18 images, follow the task, open the orthophoto
+  page: hub-guide/processing/photogrammetry
+  url: /r/acme-surveys/photogrammetry
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "role=tab[name='Tasks']"
+    networkIdle: true
+  actions:
+    - click: "role=tab[name='Tasks']"
+    - click: "role=button[name='Run Photogrammetry']"
+    - fill: { selector: "#task-history-image-folder", value: images }
+    - click: "[aria-labelledby='task-history-processing-profile-label']"
+    - click: "role=option[name='Fast Orthophoto']"
+    - click: "role=button[name='Start']"
+    - wait: "text=Photogrammetry (NodeODX)"
+    - wait: 15000                        # the recording is trimmed by encode.sh; the run itself takes minutes
+  highlight: "role=button[name='Run Photogrammetry']"
+  maxSeconds: 40
+  blocked: null
+  youtubeId: null
+
+- id: processing/photogrammetry--tasks-button
+  type: screenshot
+  alt: The Tasks tab of a dataset with the Run Photogrammetry button
+  page: hub-guide/processing/photogrammetry
+  url: /r/acme-surveys/photogrammetry
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "role=tab[name='Tasks']"
+    networkIdle: true
+  actions:
+    - click: "role=tab[name='Tasks']"
+    - wait: "role=button[name='Run Photogrammetry']"
+  highlight: "role=button[name='Run Photogrammetry']"
+  crop: null
+  blocked: null
+
+- id: processing/photogrammetry--dialog
+  type: screenshot
+  alt: The Run Photogrammetry window with the processing profile list open
+  page: hub-guide/processing/photogrammetry
+  url: /r/acme-surveys/photogrammetry
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "role=tab[name='Tasks']"
+    networkIdle: true
+  actions:
+    - click: "role=tab[name='Tasks']"
+    - click: "role=button[name='Run Photogrammetry']"
+    - wait: "#photogrammetry"
+    - fill: { selector: "#task-history-image-folder", value: images }
+    - click: "[aria-labelledby='task-history-processing-profile-label']"
+    - wait: "role=option[name='DSM + DTM (terrain)']"
+  highlight: "[aria-labelledby='task-history-processing-profile-label']"
+  crop: "#photogrammetry"
+  blocked: null
+
+- id: processing/photogrammetry--progress
+  type: screenshot
+  alt: A running photogrammetry task with its progress bar in the Tasks tab
+  page: hub-guide/processing/photogrammetry
+  url: /r/acme-surveys/photogrammetry
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "text=Photogrammetry (NodeODX)"   # needs a task started by processing/photogrammetry--run
+    networkIdle: true
+  actions:
+    - click: "role=tab[name='Tasks']"
+    - wait: "role=progressbar"
+  highlight: "role=progressbar"
+  crop: null
+  blocked: null
+
+- id: processing/photogrammetry--results
+  type: screenshot
+  alt: The photogrammetry_output folder with the orthophoto and the other results
+  page: hub-guide/processing/photogrammetry
+  url: /r/acme-surveys/photogrammetry
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "text=photogrammetry_output"      # after processing/photogrammetry--run has finished
+    networkIdle: true
+  actions:
+    - click: "text=photogrammetry_output"
+    - wait: "text=odm_orthophoto"
+  highlight: null
+  crop: null
+  blocked: null
+
+# ---- Merge multispectral ------------------------------------------------------------------------------------
+
+- id: processing/merge-multispectral--menu
+  type: screenshot
+  alt: Five band files selected, with Tools → Merge Multispectral Bands
+  page: hub-guide/processing/merge-multispectral
+  url: /r/acme-surveys/multispectral
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "text=bands"
+    networkIdle: true
+  actions:
+    - click: "text=bands"
+    - wait: "text=IMG_0180_1.tif"
+    - press: Control+a                   # Select All/None
+    - click: { selector: "text=IMG_0180_1.tif", button: right }
+    - hover: "role=menuitem[name='Tools']"
+    - wait: "role=menuitem[name='Merge Multispectral Bands']"
+  highlight: "role=menuitem[name='Merge Multispectral Bands']"
+  crop: null
+  blocked: null
+
+- id: processing/merge-multispectral--dialog
+  type: screenshot
+  alt: The Merge Multispectral Bands window with the band order, the check and the preview
+  page: hub-guide/processing/merge-multispectral
+  url: /r/acme-surveys/multispectral
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "text=bands"
+    networkIdle: true
+  actions:
+    - click: "text=bands"
+    - wait: "text=IMG_0180_1.tif"
+    - press: Control+a
+    - click: { selector: "text=IMG_0180_1.tif", button: right }
+    - hover: "role=menuitem[name='Tools']"
+    - click: "role=menuitem[name='Merge Multispectral Bands']"
+    - wait: "img[alt='Merge preview']"
+  highlight: null
+  crop: "#merge-multispectral"
+  blocked: null
+
+# ---- Mask borders -------------------------------------------------------------------------------------------
+
+- id: processing/mask-borders--dialog
+  type: screenshot
+  alt: The Mask Borders window with the source file
+  page: hub-guide/processing/mask-borders
+  url: /r/acme-surveys/mask-borders
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "text=ortho-black-border.tif"
+    networkIdle: true
+  actions:
+    - click: { selector: "text=ortho-black-border.tif", button: right }
+    - hover: "role=menuitem[name='Tools']"
+    - click: "role=menuitem[name='Mask Borders']"
+    - wait: "#mask-borders-dialog"
+  highlight: "role=button[name='Mask Borders']"
+  crop: "#mask-borders-dialog"
+  blocked: data                          # no orthophoto with a black border is chosen yet
+
+- id: processing/mask-borders--before-after
+  type: screenshot
+  alt: An orthophoto with a black border next to its masked copy on the map
+  page: hub-guide/processing/mask-borders
+  open:
+    org: acme-surveys
+    ds: mask-borders
+    path: ortho-black-border_masked.tif
+    view: map
+  base: hub
+  auth: demo
+  waitFor:
+    selector: ".ol-layer canvas"
+    networkIdle: true
+    extraMs: 2000
+  actions: []
+  highlight: null
+  crop: null
+  blocked: data                          # same input as processing/mask-borders--dialog
+
+# ---- Align a raster -----------------------------------------------------------------------------------------
+
+- id: processing/align-raster--dialog
+  type: screenshot
+  alt: The Align GeoTIFF to Reference window with a reference selected
+  page: hub-guide/processing/align-raster
+  url: /r/acme-surveys/align
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "text=orthos"
+    networkIdle: true
+  actions:
+    - click: "text=orthos"
+    - wait: "text=sheffield-park-2.tif"
+    - click: { selector: "text=sheffield-park-2.tif", button: right }
+    - hover: "role=menuitem[name='Tools']"
+    - click: "role=menuitem[name='Align to Reference...']"
+    - wait: "#align-georaster"
+    - click: "[aria-labelledby='align-dialog-reference-geotiff-label']"
+    - click: "role=option[name='orthos/sheffield-park-1.tif']"
+  highlight: "[aria-labelledby='align-dialog-reference-geotiff-label']"
+  crop: "#align-georaster"
+  blocked: null
+
+- id: processing/align-raster--validated
+  type: screenshot
+  alt: The alignment check says Compatible with the overlap and the ground resolution
+  page: hub-guide/processing/align-raster
+  url: /r/acme-surveys/align
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "text=orthos"
+    networkIdle: true
+  actions:
+    - click: "text=orthos"
+    - wait: "text=sheffield-park-2.tif"
+    - click: { selector: "text=sheffield-park-2.tif", button: right }
+    - hover: "role=menuitem[name='Tools']"
+    - click: "role=menuitem[name='Align to Reference...']"
+    - click: "[aria-labelledby='align-dialog-reference-geotiff-label']"
+    - click: "role=option[name='orthos/sheffield-park-1.tif']"
+    - click: "role=button[name='Validate']"
+    - wait: "text=Compatible"
+  highlight: "role=button[name='Align']"
+  crop: "#align-georaster"
+  blocked: null
+
+# ---- Export a raster ----------------------------------------------------------------------------------------
+
+- id: processing/export-raster--panel
+  type: screenshot
+  alt: The Plant Health panel with its Export button
+  page: hub-guide/processing/export-raster
+  open:
+    org: odx
+    ds: micasense
+    path: odm_orthophoto/odm_orthophoto.tif
+    view: map
+  base: hub
+  auth: none
+  waitFor:
+    selector: ".ol-layer canvas"
+    networkIdle: true
+    extraMs: 1500
+  actions:
+    - click: "[aria-label='Plant Health']"
+    - wait: "text=Export"
+  highlight: "[title='Export the current view as a GeoTIFF file']"
+  crop: null
+  blocked: null
+
+- id: processing/export-raster--formula
+  type: screenshot
+  alt: NDVI with a colormap in the Plant Health panel, ready to export
+  page: hub-guide/processing/export-raster
+  open:
+    org: odx
+    ds: micasense
+    path: odm_orthophoto/odm_orthophoto.tif
+    view: map
+  base: hub
+  auth: none
+  waitFor:
+    selector: ".ol-layer canvas"
+    networkIdle: true
+    extraMs: 1500
+  actions:
+    - click: "[aria-label='Plant Health']"
+    - select: { selector: "#plant-health-panel-formula", value: NDVI }   # the option value is the formula id
+    - wait: 2500
+  highlight: "#plant-health-panel-formula"
+  crop: null
+  blocked: null
+
+# ---- Tasks panel --------------------------------------------------------------------------------------------
+
+- id: processing/tasks--table
+  type: screenshot
+  alt: The Tasks tab with builds, a merge and an export, their state, progress and actions
+  page: hub-guide/processing/tasks
+  url: /r/acme-surveys/multispectral
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "role=tab[name='Tasks']"
+    networkIdle: true
+  actions:
+    - click: "role=tab[name='Tasks']"
+    - wait: "role=button[name='View log']"
+  highlight: "[aria-label='Filter by state']"
+  crop: null
+  blocked: null
+
+- id: processing/tasks--log
+  type: screenshot
+  alt: The log window of a task with Auto-refresh and Auto-scroll
+  page: hub-guide/processing/tasks
+  url: /r/acme-surveys/multispectral
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "role=tab[name='Tasks']"
+    networkIdle: true
+  actions:
+    - click: "role=tab[name='Tasks']"
+    - click: "role=button[name='View log'] >> nth=0"
+    - wait: "#task-log"
+  highlight: null
+  crop: "#task-log"
+  blocked: null

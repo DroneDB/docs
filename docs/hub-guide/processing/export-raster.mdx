@@ -1,10 +1,69 @@
 ---
-title: "Export a raster (GeoTIFF)"
-description: "Export a raster as a GeoTIFF."
+title: Export a raster (GeoTIFF)
+description: Download what the Plant Health panel shows (bands, a vegetation index, a colormap) as a GeoTIFF.
+hub_feature: [task:raster-export]
+datasets: [odx/micasense]
+requires: { access: read, data: A georaster with two bands or more }
 ---
 
-:::info
+<Screenshot id="processing/export-raster--panel" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odx" ds="micasense" path="odm_orthophoto/odm_orthophoto.tif" view="map"
+         hint="Click Plant Health, select the NDVI formula, then click Export." />
+
+## When to use it
+
+You styled a raster in the Plant Health panel, for example an NDVI map with a colormap or a false-colour band
+combination. You want that result as a file for a report or for a GIS program. Export writes it as a GeoTIFF
+and your browser downloads it.
+
+## Steps
+
+<Steps>
+
+1. Open the raster on the map.
+
+2. Click **Plant Health** in the layer controls.
+
+3. Set the view: a **Preset**, a **Formula**, the **Bands (R,G,B)**, the **Colormap**, the **Stretch** or the
+   **Rescale** range. See [Plant health](../analyse/plant-health.mdx) for each control.
+
+   <Screenshot id="processing/export-raster--formula" />
+
+4. Click **Export**. The button turns into a spinner while Hub makes the file.
+
+5. Your browser downloads `<name>_export.tif`.
+
+</Steps>
+
+## What the file holds
+
+| Your settings | The exported GeoTIFF |
+|---|---|
+| A **Preset** | The bands of the preset |
+| **Bands (R,G,B)**, no formula | The three bands you selected |
+| A **Formula** | The index, with the **Colormap** and the **Rescale** range you set |
+
+The export runs as a task on the server: **Export raster (GeoTIFF)** in the [Tasks tab](./tasks.mdx). There
+you can download the result again until it expires.
+
+## Limits & requirements
+
+- Read access is enough: you can export from any public dataset.
+- Plant Health, and so Export, is available for rasters with two data bands or more. Single-band rasters
+  (DEMs, thermal mosaics) do not offer Export.
+- The server limits the size of an export. When the estimated file is too large, **Export** is grey and its
+  tooltip gives the limit.
+
+{/* TODO verify: the old docs offered Export for thermal rasters; the Hub has the Export button only in the
+    Plant Health panel, which needs two data bands or more. */}
+
+## Related
+
+- [Plant health](../analyse/plant-health.mdx)
+- [Colormaps, bands & histogram](../analyse/colormaps.mdx)
+- [Builds](./builds.mdx): download the full raster as a Cloud Optimized GeoTIFF
+
+<ForDevelopers api="/docs/developers/processing-api" apiLabel="Processing platform REST API" />

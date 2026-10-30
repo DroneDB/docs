@@ -1,10 +1,71 @@
 ---
-title: "Mask orthophoto borders"
-description: "Make the empty borders of an orthophoto transparent."
+title: Mask orthophoto borders
+description: Make the black border of an orthophoto transparent, in a new file next to the original.
+hub_feature: [menu:Mask Borders]
+datasets: []
+requires: { access: write, data: A georaster (GeoTIFF) with a black border }
 ---
 
-:::info
+<Screenshot id="processing/mask-borders--before-after" />
 
-This page is being written.
+<Requires />
 
-:::
+## When to use it
+
+Some orthophotos have a black border around the survey area: pixels with no data that are stored as black.
+On the map, the border hides the basemap and the layers below. Mask Borders makes these pixels transparent.
+Hub writes a new file. The original file does not change.
+
+## Steps
+
+<Steps>
+
+1. Right-click the orthophoto in the file browser.
+
+2. Click **Tools** → **Mask Borders**. The **Mask Borders** window shows the **Source file**.
+
+   <Screenshot id="processing/mask-borders--dialog" />
+
+3. Click **Mask Borders**.
+
+4. If the masked file exists already, Hub asks you. Click **Overwrite** to replace it, or **Cancel**.
+
+5. Wait. Hub shows **Masking started**. The new file `<name>_masked.tif` appears next to the original,
+   and Hub [builds](./builds.mdx) it.
+
+6. Open the new file on the map. The border is transparent.
+
+</Steps>
+
+## Options
+
+The Hub has no options for this tool. It uses these values:
+
+| Setting | Value |
+|---|---|
+| Border colour | Black |
+| Tolerance | 15 grey levels: pixels close to black count as border too |
+| Output | `<name>_masked.tif`, a Cloud Optimized GeoTIFF in the same folder |
+
+To mask a white border or a border of another colour, or to change the tolerance, use the DroneDB CLI (see
+**For developers** below).
+
+## Limits & requirements
+
+- You need write access to the dataset.
+- The file must be a georaster: a GeoTIFF with a coordinate system.
+- The new file counts toward your storage.
+- An orthophoto that already has a transparent border (an alpha band) does not need this tool.
+
+{/* TODO verify: the Mask Borders window says "black or white border pixels", but the Hub always sends
+    white=false, so only black borders are masked from the Hub. */}
+
+## Related
+
+- [Map viewer](../viewing/map.mdx)
+- [Align a raster to a reference](./align-raster.mdx)
+- [Builds](./builds.mdx)
+
+<ForDevelopers cli={`ddb mask orthophoto.tif                 # black border, writes orthophoto_masked.tif
+ddb mask orthophoto.tif -w              # white border
+ddb mask orthophoto.tif -c 0,0,128 -n 20  # a custom colour and tolerance`} />

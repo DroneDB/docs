@@ -1,10 +1,80 @@
 ---
-title: "Merge multispectral bands"
-description: "Merge single-band rasters into one multispectral raster."
+title: Merge multispectral bands
+description: Merge single-band rasters, one per band, into one multispectral GeoTIFF that Plant Health can read.
+hub_feature: [menu:Merge Multispectral Bands, task:merge-multispectral]
+datasets: [odx/micasense]
+requires: { access: write, data: Two or more single-band GeoTIFFs of the same area }
 ---
 
-:::info
+<Screenshot id="processing/merge-multispectral--dialog" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odx" ds="micasense"
+         hint="The images folder has the five band files of each capture, for example IMG_0180_1.tif to IMG_0180_5.tif." />
+
+## When to use it
+
+Many multispectral cameras save one file per band. Plant Health needs all the bands in one raster to compute
+an index such as NDVI. Merge the band files into one GeoTIFF first. When you open a single-band raster in
+Plant Health, the panel tells you to do this.
+
+## Steps
+
+<Steps>
+
+1. Select the band files in the file browser. Hold **Ctrl** (**Cmd** on a Mac) and click each file. Select
+   two files or more, all GeoTIFFs (`.tif` or `.tiff`).
+
+2. Right-click the selection and click **Tools** → **Merge Multispectral Bands**.
+
+   <Screenshot id="processing/merge-multispectral--menu" />
+
+3. Put the bands in order under **Band Order**. Drag a band, or use its up and down arrows. The first band
+   of the list is band 1 of the new file.
+
+4. Wait for the check. Hub shows the coordinate system, the size, the number of bands and their data type,
+   and an estimate of the file size. Errors and warnings show in the same place.
+
+5. Look at the preview. It shows bands 1, 2 and 3 as red, green and blue.
+
+6. Check the **Output path**. Hub proposes a name from the common start of the file names, with
+   `_merged.tif` at the end, in the folder of the bands.
+
+7. Optional: select **Delete source files after merge** to remove the band files when the merge ends.
+
+8. Click **Merge**. The button is active only when the check found no error.
+
+</Steps>
+
+The merge runs as a task. Follow it in the [Tasks tab](./tasks.mdx). The new file appears in the file
+browser and is [built](./builds.mdx) like any other raster. Open it in
+[Plant Health](../analyse/plant-health.mdx).
+
+## Options
+
+| Option | What it does | Default |
+|---|---|---|
+| **Band Order** | The order of the bands in the new file | The order of the files in the file browser |
+| **Output path** | The path of the new file in the dataset. Must be relative and not contain `..` | `<common name>_merged.tif` |
+| **Delete source files after merge** | Deletes the band files after the merge | Off |
+
+## Limits & requirements
+
+- You need write access to the dataset.
+- Hub checks that the files fit together: coordinate system, data type and alignment. It reprojects and
+  resamples them to one grid.
+- When a camera has several lenses, the bands can be shifted. If the shift is more than 2 pixels, Hub shows
+  **Band misalignment detected** and applies an approximate correction. For an exact result, process the
+  images with photogrammetry, for example with the **Multispectral** profile of
+  [Photogrammetry](./photogrammetry.mdx).
+- **Delete source files after merge** cannot be undone.
+
+## Related
+
+- [Plant health](../analyse/plant-health.mdx)
+- [Photogrammetry](./photogrammetry.mdx)
+- [Tasks panel & logs](./tasks.mdx)
+
+<ForDevelopers cli="ddb merge-multispectral -o merged.tif blue.tif green.tif red.tif nir.tif rededge.tif"
+               api="/docs/developers/processing-api" apiLabel="Processing platform REST API" />

@@ -1,10 +1,77 @@
 ---
-title: "Align a raster to a reference"
-description: "Align a raster to a reference raster."
+title: Align a raster to a reference
+description: Move an orthophoto or a DEM onto a reference raster of the same area, to correct GPS drift between two surveys.
+hub_feature: [menu:Align to Reference..., task:align-raster]
+datasets: [odm/sheffield-park-1, odm/sheffield-park-2]
+requires: { access: write, data: Two GeoTIFFs of the same area in one folder }
 ---
 
-:::info
+<Screenshot id="processing/align-raster--dialog" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="sheffield-park-1" path="odm_orthophoto/odm_orthophoto.tif" view="map"
+         hint="Two flights of the same park: copy this orthophoto and the one of sheffield-park-2 into a folder of your own dataset to try the tool." />
+
+## When to use it
+
+Two surveys of the same site rarely line up exactly: GPS drift moves one of them by some metres. Before you
+compare them, measure a change or compute a volume difference, align the less accurate raster (the
+**source**) to the more accurate one (the **reference**). Hub writes a new, aligned file. The source does not
+change.
+
+## Steps
+
+<Steps>
+
+1. Put the source and the reference GeoTIFF in the same folder of the dataset.
+
+2. Right-click the source and click **Tools** → **Align to Reference...**. The **Align GeoTIFF to
+   Reference** window opens.
+
+3. Select the **Reference GeoTIFF**. The list shows the other GeoTIFFs of the folder.
+
+4. Select the **Alignment mode** (see **Options**).
+
+5. Check the **Output file name**. The default is the source name with `_aligned.tif` at the end.
+
+6. Click **Validate**. Hub checks that the two rasters can be aligned. It shows **Compatible** with the
+   overlap in percent and the ground resolution, or the reason why not.
+
+   <Screenshot id="processing/align-raster--validated" />
+
+7. Click **Align**. The window shows the progress of the alignment, then of the build of the new file.
+
+8. Read the result: the shift along x (tx) and y (ty) in metres, the rotation (θ), the scale (s) and the
+   confidence (conf). Click **Close**.
+
+</Steps>
+
+The new file appears in the folder. Compare it with the reference in the
+[compare view](../analyse/compare-view.mdx) or with [split and swipe](../analyse/compare-layers.mdx).
+
+## Options
+
+| Option | What it does | Default |
+|---|---|---|
+| **Alignment mode: Similarity** | Corrects the position, the rotation and the scale | Yes |
+| **Alignment mode: Translation only** | Corrects the position only. Faster, for small offsets | |
+| **Output file name** | The new file. It must end in `.tif` and be a relative path | `<source>_aligned.tif` |
+
+## Limits & requirements
+
+- You need write access to the dataset.
+- Both files must be georasters in GeoTIFF format (`.tif` or `.tiff`) in the same folder.
+- The rasters must overlap and have compatible coordinate systems. **Validate** tells you what is wrong.
+- **Align** is active only after a validation without errors.
+- The new file counts toward your storage.
+
+## Related
+
+- [Compare view & saved comparisons](../analyse/compare-view.mdx)
+- [Compare layers (split / swipe)](../analyse/compare-layers.mdx)
+- [Stockpile volume](../analyse/stockpile.mdx)
+- [Tasks panel & logs](./tasks.mdx)
+
+<ForDevelopers cli={`ddb align -i source.tif -r reference.tif --validate
+ddb align -i source.tif -r reference.tif -o aligned.tif -m translation`} />

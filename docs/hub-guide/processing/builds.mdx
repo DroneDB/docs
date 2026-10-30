@@ -1,10 +1,115 @@
 ---
-title: "Builds"
-description: "What Hub builds from your files, build status and rebuilds."
+title: Builds
+description: What Hub builds from your files, what the build badges mean, how to rebuild a file and how to download a built file.
+hub_feature: [menu:Build, menu:Download COG, menu:Download COPC, menu:Download GPKG, menu:Download 3D Tiles (.zip)]
+datasets: [odm/brighton-beach]
+requires: { access: read }
 ---
 
-:::info
+<Screenshot id="processing/builds--badges" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="brighton-beach"
+         hint="Right-click odm_orthophoto/odm_orthophoto.tif and open Tools: Download COG gives the built file." />
+
+## When to use it
+
+When you upload a file, Hub makes the files that its viewers need. This is a **build**. Builds start by
+themselves. Read this page when a file shows a badge, does not open, or when you want the built file for
+another program.
+
+## What Hub builds
+
+| Your file | Hub builds | Used by |
+|---|---|---|
+| GeoTIFF, JPEG 2000 and other georasters | A Cloud Optimized GeoTIFF (COG) | The map, the raster tools |
+| LAS, LAZ, E57 and other point clouds | A Cloud Optimized Point Cloud (COPC) | The point cloud viewer |
+| OBJ, PLY, STL, glTF and GLB models | A 3D model for the web, and 3D Tiles | The 3D model viewer, the 3D viewer |
+| GeoJSON, Shapefile, KML, GPX and other vectors | A GeoPackage and vector tiles | The map, WFS |
+| Gaussian splats | A level-of-detail file | The splat viewer |
+
+The [formats reference](/docs/reference/formats) lists every file type.
+
+## Build badges
+
+A file without a badge is ready. The file browser, the table view and the details panel show these states:
+
+| Badge | Status | What to do |
+|---|---|---|
+| Spinning circle | The build runs | Wait. The **Tasks** tab shows the progress |
+| Clock | **Queued**: the build waits for its turn | Wait |
+| Triangle | **Waiting for files**: a file that the build needs is not in the dataset | Upload the missing file (see below) |
+| Triangle | **On Hold**: a temporary error | Nothing. Hub tries again by itself |
+| Red cross | **Failed** | Read the log in the [Tasks tab](./tasks.mdx), then build the file again |
+
+Point at a badge to see the reason. When you open a file that is not ready, a window tells you why. It
+offers **Start Processing**, **Wait and Open** or **Retry Processing**, as the case needs.
+
+## Steps: build a file again
+
+<Steps>
+
+1. Select the file. The details panel shows its build status.
+
+   <Screenshot id="processing/builds--details-panel" />
+
+2. Click **Build** in the details panel. You can also right-click the file and click **Tools** → **Build**.
+
+3. If the file is already built, the **Rebuild File** window opens. Click **Rebuild Anyway**. The file
+   cannot be viewed until the new build ends.
+
+   <Screenshot id="processing/builds--rebuild" />
+
+4. Follow the build in the **Tasks** tab.
+
+</Steps>
+
+## Builds that wait for a missing file
+
+Some files need companion files with the same name:
+
+- An `.obj` model needs its `.mtl` file and the textures that the `.mtl` names.
+- A Shapefile (`.shp`) needs its `.shx` and `.dbf` files.
+
+When a companion file is missing, the build does not fail. It waits, and the badge shows **Waiting for
+files** with the missing names. Upload the missing files to the folder that the message names. The build
+starts at once, with no timer. If you turned on [build notification e-mails](../account/build-notifications.mdx),
+you get one e-mail that names the missing files.
+
+## Download a built file
+
+<Steps>
+
+1. Right-click a file whose build is complete.
+
+2. Click **Tools**, then the download:
+
+   <Screenshot id="processing/builds--download-menu" />
+
+</Steps>
+
+| Menu item | You get |
+|---|---|
+| **Download COG** | `<name>.tif`, a Cloud Optimized GeoTIFF |
+| **Download COPC** | `<name>.copc.laz`, a Cloud Optimized Point Cloud |
+| **Download GPKG** | `<name>.gpkg`, a GeoPackage |
+| **Download 3D Tiles (.zip)** | `<name>.3dtiles.zip`, OGC 3D Tiles with `tileset.json` at its root |
+
+The files take the name of your file. An uploaded `.3tz` archive has no 3D Tiles download, because it is a
+3D Tiles archive already. Splats have [their own downloads](../viewing/splat-downloads.mdx).
+
+## Limits & requirements
+
+- Anyone who can download a file can download its built files.
+- **Build** needs write access to the dataset.
+- A large file can take a long time to build. Other files of the dataset stay usable meanwhile.
+
+## Related
+
+- [Tasks panel & logs](./tasks.mdx)
+- [Open Hub data in QGIS](../sharing/qgis.mdx)
+- [Build notification e-mails](../account/build-notifications.mdx)
+- [Upload your data](/docs/get-started/upload)
+
+<ForDevelopers cli="ddb build --force odm_orthophoto/odm_orthophoto.tif" api="/docs/developers/api/workflows" />
