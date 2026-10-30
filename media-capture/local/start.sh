@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # Local Registry 3.0 (with its Hub) for the documentation screenshots.
 #
-#   start.sh build [REF]   build the image from a Registry worktree at REF (default: fixes-and-optimizations)
-#   start.sh start         start Registry, NodeODX and MailHog, wait until Registry answers, set up the accounts
+#   start.sh build [REF [HUB_REF]]
+#                          build the image from a Registry worktree at REF (default: fixes-and-optimizations),
+#                          with its Hub at HUB_REF (default: the Hub commit that REF pins)
+#   start.sh start         start Registry, NodeODX and MailHog, wait until Registry answers, create the users
 #   start.sh stop          stop and remove the containers (the data stays)
 #   start.sh restart       stop + start
 #   start.sh status        show the containers and the health of Registry
@@ -18,9 +20,11 @@
 #   DDB_DOCS_HOME        working folder (default /mnt/data/docs-capture)
 #   DDB_DOCS_PORT        HTTP port of Registry on the host (default 5180)
 #   DDB_DOCS_MAIL_PORT   web UI port of MailHog on the host (default 5181)
-#   DDB_DOCS_QUOTA_MB    storage quota of the demo user in MB (default 20480)
 #   REGISTRY_REPO        local clone of DroneDB/Registry used by `build` (default /mnt/data/repos/Registry);
 #                        `build` adds a detached worktree, it never touches the clone's working tree
+#   HUB_REF              Hub commit, branch or tag for `build` when no HUB_REF argument is given
+#   HUB_REPO             Hub repository that HUB_REF is read from (default: the Hub submodule of REGISTRY_REPO,
+#                        so a local commit that is not pushed yet can be built)
 #   DRONEDB_ARTIFACT_TOKEN  token that can read the Actions artifacts of DroneDB/DroneDB (the image installs
 #                        the libddb build that Registry pins); defaults to `gh auth token`
 set -euo pipefail
@@ -29,6 +33,8 @@ HOME_DIR="${DDB_DOCS_HOME:-/mnt/data/docs-capture}"
 PORT="${DDB_DOCS_PORT:-5180}"
 MAIL_PORT="${DDB_DOCS_MAIL_PORT:-5181}"
 REGISTRY_REPO="${REGISTRY_REPO:-/mnt/data/repos/Registry}"
+HUB_PATH=Registry.Web/ClientApp
+HUB_REPO="${HUB_REPO:-$REGISTRY_REPO/$HUB_PATH}"
 SRC="$HOME_DIR/registry-src"
 DATA="$HOME_DIR/registry-data"
 CREDS="$HOME_DIR/credentials.env"
@@ -39,7 +45,6 @@ MAIL_CTR=ddb-docs-mailhog
 MAILHOG_IMAGE=mailhog/mailhog:v1.0.1
 NODE_CTR=ddb-docs-nodeodx
 NODEODX_IMAGE=webodm/nodeodx:2.4.0
-QUOTA_MB="${DDB_DOCS_QUOTA_MB:-20480}"
 BASE_URL="http://localhost:$PORT"
 
 log() { printf '%s\n' "$*" >&2; }
@@ -71,7 +76,7 @@ load_credentials() {
 }
 
 cmd_build() {
-    local ref="${1:-fixes-and-optimizations}" commit tag
+    local ref="${1:-fixes-and-optimizations}" hub_ref="${2:-${HUB_REF:-}}" commit hub_commit tag
     commit="$(git -C "$REGISTRY_REPO" rev-parse --verify "$ref^{commit}")"
     if [[ ! -e "$SRC/.git" ]]; then
         mkdir -p "$HOME_DIR"
@@ -80,13 +85,21 @@ cmd_build() {
         git -C "$SRC" checkout --detach "$commit"
     fi
     git -C "$SRC" submodule update --init
-    tag="ddb-docs-registry:${commit:0:8}"
+    if [[ -n "$hub_ref" ]]; then
+        # Another Hub than the pinned one: fetched from HUB_REPO, so it may be a local commit
+        hub_commit="$(git -C "$HUB_REPO" rev-parse --verify "$hub_ref^{commit}")"
+        git -C "$SRC/$HUB_PATH" fetch --quiet "$HUB_REPO" "$hub_commit"
+        git -C "$SRC/$HUB_PATH" checkout --quiet --detach "$hub_commit"
+    fi
+    hub_commit="$(git -C "$SRC/$HUB_PATH" rev-parse HEAD)"
+    tag="ddb-docs-registry:${commit:0:8}-hub-${hub_commit:0:7}"
     DRONEDB_ARTIFACT_TOKEN="${DRONEDB_ARTIFACT_TOKEN:-$(gh auth token)}" \
         DOCKER_BUILDKIT=1 docker build \
         --secret id=dronedb_artifact_token,env=DRONEDB_ARTIFACT_TOKEN \
         -t "$tag" "$SRC"
     printf '%s\n' "$tag" > "$IMAGE_FILE"
-    log "Built $tag (Registry $commit, Hub $(git -C "$SRC" rev-parse --short HEAD:Registry.Web/ClientApp))"
+    log "Built $tag (Registry $commit, Hub $hub_commit)"
+    log "Run '$0 restart' to use it (start alone keeps a running container on its image)."
     log "Clean up the build cache with: docker builder prune -f"
 }
 
@@ -122,33 +135,13 @@ ensure_user() { # ADMIN_TOKEN USER PASSWORD
     fi
 }
 
-# Sets maxStorageMB in the user meta. Registry replaces the whole meta (which holds other keys too),
-# so the current meta is read and merged first.
-ensure_quota() { # ADMIN_TOKEN USER MB
-    local meta
-    meta="$(curl -fsS -H "Authorization: Bearer $1" "$BASE_URL/users/$2/meta")"
-    [[ "$(jq -r '.maxStorageMB // empty' <<< "$meta")" == "$3" ]] && return 0
-    curl -fsS -o /dev/null -X POST "$BASE_URL/users/$2/meta" -H "Authorization: Bearer $1" \
-        -H 'Content-Type: application/json' -d "$(jq -c --argjson mb "$3" '(. // {}) + {maxStorageMB: $mb}' <<< "$meta")"
-    log "Storage quota of $2: $3 MB"
-}
-
+# The users only: the demo organization, its datasets and the account metadata (storage quota)
+# are the demo inputs of reset-demo (media-capture/demo-inputs.yaml)
 ensure_accounts() {
-    local admin user code
+    local admin
     admin="$(token "$DDB_DOCS_ADMIN_USER" "$DDB_DOCS_ADMIN_PASSWORD")" || die "cannot log in as $DDB_DOCS_ADMIN_USER"
     ensure_user "$admin" "$DDB_DOCS_USER" "$DDB_DOCS_PASSWORD"
     ensure_user "$admin" "$DDB_DOCS_MEMBER_USER" "$DDB_DOCS_MEMBER_PASSWORD"
-    ensure_quota "$admin" "$DDB_DOCS_USER" "$QUOTA_MB"
-
-    user="$(token "$DDB_DOCS_USER" "$DDB_DOCS_PASSWORD")" || die "cannot log in as $DDB_DOCS_USER"
-    code="$(curl -sS -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $user" "$BASE_URL/orgs/acme-surveys")"
-    if [[ "$code" != 200 ]]; then
-        curl -fsS -o /dev/null -X POST "$BASE_URL/orgs" -H "Authorization: Bearer $user" \
-            --data-urlencode slug=acme-surveys --data-urlencode 'name=Acme Surveys' \
-            --data-urlencode 'description=Demo organization for the documentation' \
-            --data-urlencode isPublic=false
-        log "Created organization acme-surveys (private, owner $DDB_DOCS_USER)"
-    fi
 }
 
 # Creates the container the first time, then starts it
@@ -177,7 +170,10 @@ cmd_start() {
     #  - the update check is off: a local capture instance must not report to dronedb.app;
     #  - e-mail goes to MailHog, and the build notification digest is sent after 1 minute, not 5;
     #  - organization member management and the storage limiter are on;
-    #  - the NodeODX container is the processing node of the photogrammetry task.
+    #  - the NodeODX container is the processing node of the photogrammetry task;
+    #  - --reset-hub: Registry installs its Hub into registry-data/ClientApp, and again only when the Hub
+    #    version number grows, so an image built with another Hub commit of the same version would serve
+    #    the old files; the Hub is installed from the image on every start instead.
     run_once "$REGISTRY_CTR" --network "$NET" --restart unless-stopped \
         --user "$(id -u):$(id -g)" \
         -p "127.0.0.1:$PORT:5000" \
@@ -200,10 +196,11 @@ cmd_start() {
         -e AppSettings__ProcessingPlatform__NodeOdx__0__Id=local \
         -e AppSettings__ProcessingPlatform__NodeOdx__0__Url="http://$NODE_CTR:3000" \
         -e AppSettings__ProcessingPlatform__NodeOdx__0__Title="Local NodeODX" \
-        "$image"
+        "$image" --reset-hub
     wait_healthy
     ensure_accounts
     log "Registry: $BASE_URL   MailHog: http://localhost:$MAIL_PORT   credentials: $CREDS"
+    log "The demo organization and its data: npm run reset-demo"
     log "A setting changed in this script applies after: $0 restart"
 }
 
@@ -228,5 +225,5 @@ case "${1:-start}" in
     restart) cmd_stop; cmd_start ;;
     status) cmd_status ;;
     logs) docker logs -f --tail 200 "$REGISTRY_CTR" ;;
-    *) sed -n '2,10p' "$0"; exit 2 ;;
+    *) sed -n '2,12p' "$0"; exit 2 ;;
 esac

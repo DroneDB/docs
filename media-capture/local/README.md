@@ -1,6 +1,6 @@
 # Local Registry for the documentation screenshots
 
-A local Registry with its Hub, built from a pinned Registry commit, that holds copies of the public
+A local Registry with its Hub, built from a pinned Registry commit (and, if needed, another Hub commit), that holds copies of the public
 showcase datasets of hub.dronedb.app. The copies use the **same organization and dataset slugs and
 the same file paths** as production, so a capture URL such as
 
@@ -37,6 +37,7 @@ Settings that differ from a default install (all set in `start.sh`; a change app
 | `BuildNotifications:DigestMinutes` | `1` (default 5) | the notification e-mail arrives 1 minute after the build |
 | `EnableOrganizationMemberManagement` | `true` (production: false) | organization member screens |
 | `EnableStorageLimiter` | `true` | storage quota of the demo user (same as production) |
+| `--reset-hub` (command line) | on | the Hub is installed from the image on every start (see [Run it](#run-it)) |
 | `ProcessingPlatform:NodeOdx` | one node, `local`, "Local NodeODX" | Run Photogrammetry |
 
 ## Accounts
@@ -48,7 +49,7 @@ passwords. It is never in this repository.
 |---|---|
 | `DDB_DOCS_BASE_URL` | `http://localhost:5180` |
 | `DDB_DOCS_ADMIN_USER`, `DDB_DOCS_ADMIN_PASSWORD` | instance administrator (`admin`) |
-| `DDB_DOCS_USER`, `DDB_DOCS_PASSWORD` | demo user `docsdemo` (not an administrator), owner of the private organization `acme-surveys`, storage quota 20 GB (`DDB_DOCS_QUOTA_MB`) |
+| `DDB_DOCS_USER`, `DDB_DOCS_PASSWORD` | demo user `docsdemo` (not an administrator); `npm run reset-demo` creates its private organization `acme-surveys` and sets its storage quota (`account.meta` in [`../demo-inputs.yaml`](../demo-inputs.yaml), the only place that sets them) |
 | `DDB_DOCS_MEMBER_USER`, `DDB_DOCS_MEMBER_PASSWORD` | second user `docsmember`, member of nothing: add it to `acme-surveys` in the member screens |
 
 Registry accepts user names made of `a-z` and `0-9` only, so the demo user is `docsdemo`, not
@@ -59,18 +60,31 @@ missing account; it does not change an existing password.
 
 ```bash
 cd media-capture/local
-./start.sh build            # once, or to move to another Registry commit: ./start.sh build <ref>
-./start.sh start            # starts Registry and MailHog, creates the accounts
+./start.sh build            # once, or another Registry commit: ./start.sh build <ref>
+                            # or another Hub commit too: ./start.sh build <ref> <hub-ref>
+./start.sh start            # starts Registry and MailHog, creates the users
 ./mirror-datasets.sh        # copies the datasets, then waits for every build
+npm run reset-demo          # the demo organization acme-surveys and the account settings
 ./start.sh status | stop | restart | logs
 ```
 
 `build` adds a detached `git worktree` of the local Registry clone (`REGISTRY_REPO`, default
 `/mnt/data/repos/Registry`) at `$DDB_DOCS_HOME/registry-src`, checks out its Hub submodule at the
 pinned commit and runs the repository Dockerfile. It never changes the clone's own working tree.
+With a Hub ref (second argument, or `HUB_REF`), it fetches that commit from `HUB_REPO` (default: the
+Hub submodule of `REGISTRY_REPO`, so a Hub commit that is not pushed yet works) and checks it out in
+the worktree before the build. The image tag names both commits, e.g.
+`ddb-docs-registry:66ab9889-hub-0362914`, and the build prints the full hashes.
+
 The Dockerfile downloads the pinned DroneDB CI build, which needs a token with Actions read access
 to DroneDB/DroneDB: `DRONEDB_ARTIFACT_TOKEN`, or `gh auth token` when it is not set. After a build,
-`docker builder prune -f` frees the build cache.
+`docker builder prune -f` frees the build cache (of every build on the machine, not only this one).
+
+A new image is used after `./start.sh restart`: `start` alone keeps a running container on its
+image. Registry installs its Hub into `registry-data/ClientApp` and, by default, installs it again
+only when the Hub version number grows, so an image with another Hub commit of the same version
+would serve the old files; the container runs with `--reset-hub`, which installs the Hub from the
+image on every start. The datasets, accounts and settings in `registry-data` stay.
 
 The containers restart with Docker (`--restart unless-stopped`). `stop` removes them and keeps the
 data; the next `start` uses the same data and accounts.
