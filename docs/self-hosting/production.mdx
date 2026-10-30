@@ -186,7 +186,9 @@ of these:
 - set [`DataProtectionKeysPath`](/self-hosting/configuration.mdx#dataprotectionkeyspath) to a folder that all
   processes share, for example `./data/protection-keys`.
 
-The Compose setup sets neither. Add one of them when you use processing nodes.
+The Compose setup sets `AppSettings__DataProtectionKeysPath=/data/data-protection-keys` on the web
+server and on every processing node. All of them mount the same `./data` folder as `/data`, so they
+share the keys. Keep this setting on every service you add.
 
 ## CPU and memory
 

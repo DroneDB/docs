@@ -805,23 +805,25 @@ Every cron key follows the same rules:
 - **`disabled`, `off` or `none`** (any case): the job is removed from Hangfire.
 - **Any other value**: a cron expression, used as written.
 
-A new `appsettings.json` writes some crons with values that differ from the built-in schedule. The
-table lists both; the value in your file wins.
+The default schedules:
 
-| Key | In a new file | Built in (empty key) |
-|-----|---------------|----------------------|
-| [`CleanupExpiredJobsCron`](#cleanupexpiredjobscron) | `0 * * * *` (hourly) | daily |
-| [`SyncJobIndexStatesCron`](#syncjobindexstatescron) | `*/5 * * * *` | `0 * * * *` (hourly) |
-| [`RecoverIndexedJobPublicationsCron`](#recoverindexedjobpublicationscron) | `* * * * *` | `* * * * *` |
-| [`ProcessPendingBuildsCron`](#processpendingbuildscron) | `* * * * *` | `0 */6 * * *` |
-| [`DatasetCleanupCron`](#datasetcleanupcron) | `0 0 * * *` | `0 0 * * *` |
-| [`ArtifactCompletenessCheckerCron`](#artifactcompletenesscheckercron) | `0 2 * * *` | `0 2 * * *` |
-| [`OrphanedDatasetCleanupCron`](#orphaneddatasetcleanupcron) | `0 3 * * *` | `0 3 * * *` |
-| [`JobIndexCleanupCron`](#jobindexcleanupcron) | `0 4 * * *` | `0 4 * * *` |
-| [`IndexReconciliationCron`](#indexreconciliationcron) | `0 * * * *` | `0 * * * *` |
-| [`UpdateCheckCron`](#updatecheckcron) | empty | once a day, at a time that depends on the instance |
+| Key | Default |
+|-----|---------|
+| [`CleanupExpiredJobsCron`](#cleanupexpiredjobscron) | `0 0 * * *` (daily, at midnight) |
+| [`SyncJobIndexStatesCron`](#syncjobindexstatescron) | `0 * * * *` (hourly) |
+| [`RecoverIndexedJobPublicationsCron`](#recoverindexedjobpublicationscron) | `* * * * *` (every minute) |
+| [`ProcessPendingBuildsCron`](#processpendingbuildscron) | `0 */6 * * *` (every 6 hours) |
+| [`DatasetCleanupCron`](#datasetcleanupcron) | `0 0 * * *` |
+| [`ArtifactCompletenessCheckerCron`](#artifactcompletenesscheckercron) | `0 2 * * *` |
+| [`OrphanedDatasetCleanupCron`](#orphaneddatasetcleanupcron) | `0 3 * * *` |
+| [`JobIndexCleanupCron`](#jobindexcleanupcron) | `0 4 * * *` |
+| [`IndexReconciliationCron`](#indexreconciliationcron) | `0 * * * *` (hourly) |
+| [`UpdateCheckCron`](#updatecheckcron) | once a day, at a time that depends on the instance |
 
-{/* TODO verify: the new-file values of ProcessPendingBuildsCron (every minute) and CleanupExpiredJobsCron (hourly) differ from the built-in schedules (every 6 hours, daily): confirm which one is intended. */}
+A new `appsettings.json` leaves out `CleanupExpiredJobsCron`, `SyncJobIndexStatesCron` and
+`ProcessPendingBuildsCron`, so their defaults apply. An `appsettings.json` from an earlier version
+can still set them (`0 * * * *`, `*/5 * * * *` and `* * * * *`): the value in the file wins.
+Remove those keys to use the defaults.
 
 ### CleanupExpiredJobsCron
 

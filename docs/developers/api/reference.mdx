@@ -62,10 +62,10 @@ Errors are RFC 9457 `ProblemDetails` with the media type `application/problem+js
 
 | Status | Meaning |
 |---|---|
-| `400` | Invalid parameters |
+| `400` | Invalid parameters, or an uploaded file that cannot be read as its file type (for example a `.laz` that is not LAZ; `noRetry: true`, the detail names the file) |
 | `401` | Not signed in, or the token is no longer valid |
 | `403` | Signed in without permission (a `401` before Registry 3.0). Admin-only endpoints say "Only administrators can perform this operation". |
-| `404` | Not found |
+| `404` | Not found, also for a request other than `GET` or `HEAD` to a path that no endpoint answers |
 | `409` | Conflict |
 | `413` | Too large (`noRetry: true`) |
 | `429` | Too many requests: the concurrent download limit or a rate limit. Read `Retry-After`. |
