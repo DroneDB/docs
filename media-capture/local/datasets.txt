@@ -1,0 +1,24 @@
+# Showcase datasets copied from hub.dronedb.app into the local Registry, under the same organization
+# and dataset slugs, with the same file paths.
+#
+#   <org>/<dataset> [<glob> ...]
+#
+# Without globs the whole dataset is copied. With globs only the files whose path matches one of
+# them (shell pattern, matched on the whole path) are copied.
+
+odm/brighton-beach
+odm/zoo
+odm/aukerman
+odm/waterbury
+odm/wietrznia
+odm/copr
+odm/langley
+odm/sheffield-park-1
+odm/sheffield-park-2
+odm/caliterra
+odm/vector
+odx/micasense
+odx/sequoia
+odx/hat-creek
+# The other scenes of odx/splats are several GB each; the documentation uses train.ply only.
+odx/splats train.ply train_cameras.json LICENSE.md README.md thumbnail.webp
