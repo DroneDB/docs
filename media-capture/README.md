@@ -132,6 +132,8 @@ or `prefs:` id that the Hub does not have fails the report.
 
 ## Maintenance on each Registry release
 
+The docs owner (HeDo) does these steps.
+
 1. `npm run coverage` on the release tag of the Hub, and pages for what is new.
 2. `npm run reset-demo && npm run media`.
 3. Review the changed images (`git diff --stat static/media`, then look at each one) and commit them
