@@ -46,3 +46,8 @@ export function listApiUrl({org, ds, path, base = HUB_URL}) {
   const q = path ? `?path=${encodeURIComponent(path)}` : '';
   return `${base}/orgs/${encodeURIComponent(org)}/ds/${encodeURIComponent(ds)}/list${q}`;
 }
+
+/** API URL that lists the datasets of an organization (the link checker uses it for /r/<org>). */
+export function datasetsApiUrl({org, base = HUB_URL}) {
+  return `${base}/orgs/${encodeURIComponent(org)}/ds`;
+}
