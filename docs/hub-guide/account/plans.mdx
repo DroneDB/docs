@@ -1,10 +1,53 @@
 ---
-title: "Plans & limits"
-description: "What the Hub plans include and what happens at a limit."
+title: Plans & limits
+description: What the DroneDB Hub plans include, and what happens when you reach a limit.
+hub_feature: []
+datasets: []
+requires: { access: none }
 ---
 
-:::info
+<Screenshot id="account/plans--storage-info" />
 
-This page is being written.
+## When to use it
 
-:::
+Read this page to choose a plan for hub.dronedb.app, or to understand a message about a limit. The prices
+and the current amounts are on the [plans page](https://dronedb.app/plans).
+
+## What a plan includes
+
+Every plan has every Hub feature: the viewers, the measurement and analysis tools, sharing, OGC and STAC
+services, and photogrammetry processing. Every plan has unlimited organizations and datasets. The plans differ
+in:
+
+| | What changes |
+|---|---|
+| **Storage space** | How much data your organizations can hold |
+| **Processing priority** | The priority of your processing tasks: best-effort, priority or highest priority |
+| **Support** | Community support or priority support |
+
+Each plan starts with a free trial. For more storage or a server of your own, contact
+[support@dronedb.app](mailto:support@dronedb.app).
+
+## What happens at a limit
+
+| Limit | What you see | What to do |
+|---|---|---|
+| **Storage** | The user menu shows your use in percent. **Storage Info** shows **No storage left!**. New uploads and imports fail with **Storage quota exceeded** | Delete files you no longer need, or move to a larger plan |
+| **Tasks at the same time** | A new task is refused: **You have too many queued or running tasks; wait for some to finish.** Your organization and the whole server have limits too | Wait for a task to end, then try again |
+| **Size of one task** | A task whose result would be too large is refused before it starts | Process a smaller area or fewer files |
+| **ZIP downloads** | **You already have an active download archive being prepared.** | Wait for the archive to finish |
+| **Raster export size** | **Export** is grey in the Plant Health panel, with the limit in its tooltip | Export a smaller raster, or download the full COG |
+| **A tool that is not in your plan** | The button is grey, or hidden. Its tooltip says why | Contact support |
+
+Your storage counts the datasets of the organizations that you own. See [Account & storage](./account.mdx).
+
+## Limits & requirements
+
+- Limits apply to hub.dronedb.app. On a server of your own, its administrator sets them.
+
+## Related
+
+- [Account & storage](./account.mdx)
+- [Tasks panel & logs](../processing/tasks.mdx)
+- [Export your data & delete your account](./export-delete.mdx)
+- [Self-hosting](/docs/self-hosting)

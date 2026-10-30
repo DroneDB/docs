@@ -1,10 +1,80 @@
 ---
-title: "Export your data & delete your account"
-description: "Download all your data and delete your account."
+title: Export your data & delete your account
+description: Download all your data from DroneDB Hub, and ask for your account to be deleted.
+hub_feature: []
+datasets: []
+requires: { access: none }
 ---
 
-:::info
+<Screenshot id="account/export-delete--download-dataset" />
 
-This page is being written.
+## When to use it
 
-:::
+You want a copy of everything you stored on DroneDB Hub, for example before you leave the service or for an
+archive. Or you want your account and your data removed.
+
+## Steps: export your data
+
+<Steps>
+
+1. Open a dataset. Do not select a file.
+
+2. Click the download button in the header. Confirm with **Download**. The Hub makes a ZIP of the whole
+   dataset. A large dataset becomes a task: the ZIP is ready to download in the
+   [Tasks tab](../processing/tasks.mdx) when the task ends.
+
+3. Do the same for each dataset that you want to keep.
+
+</Steps>
+
+The ZIP holds your files as you uploaded them. To get the files that Hub built (Cloud Optimized GeoTIFF, COPC,
+GeoPackage, 3D Tiles), right-click a file and use the downloads under **Tools** (see
+[Builds](../processing/builds.mdx)). [Download files & ZIP export](../files/download.mdx) explains the other
+ways to download.
+
+For a large export, for example a whole organization, write to
+[support@dronedb.app](mailto:support@dronedb.app). Say which datasets you want. You get a download link that
+works for 30 days.
+
+## Steps: delete files and datasets
+
+- To delete files, see [Folders, rename, delete](../files/folders.mdx).
+- To delete a dataset or an organization, see [Delete a dataset / organization](../datasets/delete.mdx). This
+  also deletes the files that Hub built from it.
+
+Deleted data stays in the backups of DroneDB Hub for up to 30 days. Then it is removed from every system.
+
+## Steps: delete your account
+
+<Steps>
+
+1. Write to [support@dronedb.app](mailto:support@dronedb.app) with the subject **Account Deletion Request**.
+
+2. Give the e-mail address of your account and confirm that you want to delete it.
+
+3. For 30 days after the request, you can still sign in and download your data.
+
+4. After 30 days, your account, your files and their metadata are deleted for good.
+
+</Steps>
+
+## What happens after the deletion
+
+| What | What happens |
+|---|---|
+| Your data | All your files, datasets and metadata are deleted. Copies in backups are removed within 30 days |
+| Organizations you are a member of | Your membership ends. The data of the other members does not change |
+| Your subscription | It ends at once. The rest of the billing period is not refunded |
+| Recovery | Not possible after the 30 days |
+
+## Limits & requirements
+
+- This page is about hub.dronedb.app. On another server, ask its administrator.
+- A server can stop anonymous users from downloading a whole dataset or several files at once. Sign in first.
+
+## Related
+
+- [Download files & ZIP export](../files/download.mdx)
+- [Delete a dataset / organization](../datasets/delete.mdx)
+- [Account & storage](./account.mdx)
+- [Plans & limits](./plans.mdx)

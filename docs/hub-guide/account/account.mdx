@@ -1,10 +1,97 @@
 ---
-title: "Account & storage"
-description: "Your account page, password and storage use."
+title: Account & storage
+description: Your account page, your storage use, the upload connection test, and how to change your password.
+hub_feature: [route:Account]
+datasets: []
+requires: { access: none }
 ---
 
-:::info
+<Screenshot id="account/account--page" />
 
-This page is being written.
+## When to use it
 
-:::
+The **Account** page shows who you are signed in as, how much storage you use, and how fast you can upload to
+the server. From it you change your password and sign out.
+
+## Steps: open your account
+
+<Steps>
+
+1. Click the user button at the top right of the Hub.
+
+2. Click **My Account**. The **Account** page opens.
+
+</Steps>
+
+The page has these cards:
+
+| Card | What it shows |
+|---|---|
+| **User Information** | Your **Username**, your **Email** (or **Not set**), the number of **Organizations**, and **Administrator** when you are one |
+| **Storage** | The space you use, of the space your plan gives (or **Unlimited**), and an **Upload Files** button |
+| **Upload diagnostics** | A test of your connection to the server (see below) |
+| **Security** | **Change Password** |
+| **Session** | **Logout** |
+
+You cannot change your user name or your e-mail address yourself. Ask an administrator.
+
+## Storage
+
+Your storage is the size of all the datasets of the organizations that you own. Datasets of organizations
+that you are only a member of count for their owner. The user menu shows the same use as a percentage. Click
+it to open **Storage Info** with the total, the used and the free space.
+
+When no space is left, **Storage Info** shows **No storage left!** and the server refuses new uploads and
+imports with **Storage quota exceeded**. Delete files you no longer need, or change your
+[plan](./plans.mdx).
+
+## Steps: test the upload connection
+
+If uploads are slow, test the connection to the server. The upload window has the link **Uploads slower than
+expected? Test the connection**, which opens this card.
+
+<Steps>
+
+1. On the **Account** page, find **Upload diagnostics**. Click **Run test**.
+
+   <Screenshot id="account/account--upload-diagnostics" />
+
+2. Wait. The Hub sends 8 MB of random data to the server, first on one connection, then on six at once. The
+   server throws the data away.
+
+3. Read the result: the **Protocol**, the **Round trip** time, **One upload** and **Six uploads at once**,
+   in MB/s and Mbit/s. Click **Run again** to repeat the test.
+
+</Steps>
+
+If the server's proxy limits the speed of one upload, a yellow message says so, with a link for the
+administrator of the server. If you run the test too often, wait a minute and try again.
+
+## Steps: change your password
+
+<Steps>
+
+1. On the **Account** page, click **Change Password**.
+
+2. Type the **Old Password**, the **New Password** and **Confirm New Password**. When the server has password
+   rules, the window lists them and ticks each rule that the new password meets.
+
+   <Screenshot id="account/account--change-password" />
+
+3. Click **Change Password**.
+
+</Steps>
+
+## Limits & requirements
+
+- You must be signed in.
+- **Security** and **My Account** are not shown when the server takes accounts from another system (for
+  example LDAP). Then change your password in that system.
+- Administrators have no storage limit.
+
+## Related
+
+- [Preferences](./preferences.mdx)
+- [Plans & limits](./plans.mdx)
+- [Export your data & delete your account](./export-delete.mdx)
+- [Upload your data](/docs/get-started/upload)

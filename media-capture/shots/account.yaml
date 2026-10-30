@@ -1,0 +1,252 @@
+# Shots of the Hub guide → Organizations & account pages (docs/hub-guide/account/*.mdx).
+#
+# Demo inputs that reset-demo.mjs must create or set:
+#   - the account docs-demo with its e-mail address (docs-demo@example.com) and a storage quota (user metadata
+#     maxStorageMB, for example 10240) so the Account page and Storage Info show a used / total bar;
+#   - the Preferences of docs-demo reset to the defaults before each run (the shots open the window as it is);
+#   - acme-surveys/share-demo (see sharing.yaml) for the dataset download shot.
+#
+# Build notification shots use the local Registry with MailHog (media-capture/local/start.sh): Smtp points at
+# MailHog, so the Notifications tab is there. The e-mail shot needs one finished digest in MailHog: before it,
+# set docs-demo's "Send build notifications" to All, upload a file to a dataset of docs-demo on the local
+# Registry, and wait for the digest (BuildNotifications.DigestMinutes, 5 minutes by default; lower it locally).
+# The MailHog web UI is http://localhost:5181 (DDB_DOCS_MAIL_PORT), not a Registry page: the runner must accept
+# an absolute `url`.
+
+# ---- Account ------------------------------------------------------------------------------------------------
+
+- id: account/account--page
+  type: screenshot
+  alt: The Account page with the user information, the storage and the upload diagnostics
+  page: hub-guide/account/account
+  url: /account
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "text=User Information"
+    networkIdle: true
+  actions: []
+  highlight: null
+  crop: null
+  blocked: null
+
+- id: account/account--upload-diagnostics
+  type: screenshot
+  alt: The Upload diagnostics card after a test, with the protocol, round trip and speeds
+  page: hub-guide/account/account
+  url: /account#upload-diagnostics
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "#upload-diagnostics"
+    networkIdle: true
+  actions:
+    - click: "role=button[name='Run test']"
+    - wait: "text=Six uploads at once"
+  highlight: "role=button[name='Run again']"
+  crop: "#upload-diagnostics"
+  blocked: null
+
+- id: account/account--change-password
+  type: screenshot
+  alt: The Change Password window with the password rules
+  page: hub-guide/account/account
+  url: /account
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "text=User Information"
+    networkIdle: true
+  actions:
+    - click: "role=button[name='Change Password']"
+    - wait: "#changePwdDialog"
+    - fill: { selector: "#change-pwd-dialog-new-password", value: "Example1" }   # shows the rules; never confirm
+  highlight: null
+  crop: "#changePwdDialog"
+  blocked: null
+
+# ---- Preferences (one shot per tab) -------------------------------------------------------------------------
+
+- id: account/preferences--units
+  type: screenshot
+  alt: The User preferences window on the Units tab
+  page: hub-guide/account/preferences
+  url: /r?preferences=units
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "#preferencesDialog"
+    networkIdle: true
+  actions: []
+  highlight: "role=tab[name='Units']"
+  crop: "#preferencesDialog"
+  blocked: null
+
+- id: account/preferences--map
+  type: screenshot
+  alt: The Map tab of the User preferences
+  page: hub-guide/account/preferences
+  url: /r?preferences=map
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "#preferencesDialog"
+    networkIdle: true
+  actions: []
+  highlight: "role=tab[name='Map']"
+  crop: "#preferencesDialog"
+  blocked: null
+
+- id: account/preferences--custom-basemap
+  type: screenshot
+  alt: The Custom basemap fields with Source type, URL and Apply
+  page: hub-guide/account/preferences
+  url: /r?preferences=map
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "#preferencesDialog"
+    networkIdle: true
+  actions:
+    - click: "[aria-labelledby='pref-basemap-label']"
+    - click: "role=option[name='Custom']"
+    - wait: "text=Custom basemap"
+    - fill: { selector: "#pref-custom-basemap-url", value: "https://tile.openstreetmap.org/{z}/{x}/{y}.png" }   # never click Apply
+  highlight: "text=Custom basemap"
+  crop: "#preferencesDialog"
+  blocked: null
+
+- id: account/preferences--files
+  type: screenshot
+  alt: The Files tab of the User preferences
+  page: hub-guide/account/preferences
+  url: /r?preferences=files
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "#preferencesDialog"
+    networkIdle: true
+  actions: []
+  highlight: "role=tab[name='Files']"
+  crop: "#preferencesDialog"
+  blocked: null
+
+- id: account/preferences--lists
+  type: screenshot
+  alt: The Lists tab of the User preferences with the Datasets and Organizations groups
+  page: hub-guide/account/preferences
+  url: /r?preferences=lists
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "#preferencesDialog"
+    networkIdle: true
+  actions: []
+  highlight: "role=tab[name='Lists']"
+  crop: "#preferencesDialog"
+  blocked: null
+
+- id: account/preferences--viewers
+  type: screenshot
+  alt: The Viewers tab with the splat settings and the lighting of the 3D viewers
+  page: hub-guide/account/preferences
+  url: /r?preferences=viewers
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "#preferencesDialog"
+    networkIdle: true
+  actions: []
+  highlight: "role=tab[name='Viewers']"
+  crop: "#preferencesDialog"
+  blocked: null
+
+- id: account/preferences--stockpiles
+  type: screenshot
+  alt: The Stockpiles tab with the materials, their density and price
+  page: hub-guide/account/preferences
+  url: /r?preferences=stockpiles
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "#preferencesDialog"
+    networkIdle: true
+  actions: []
+  highlight: "role=tab[name='Stockpiles']"
+  crop: "#preferencesDialog"
+  blocked: null
+
+# ---- Build notifications ------------------------------------------------------------------------------------
+
+- id: account/build-notifications--setting
+  type: screenshot
+  alt: The Notifications tab with Send build notifications open
+  page: hub-guide/account/build-notifications
+  url: /r?preferences=notifications
+  base: local
+  auth: demo
+  waitFor:
+    selector: "#preferencesDialog"
+    networkIdle: true
+  actions:
+    - click: "[aria-labelledby='pref-build-notifications-label']"
+    - wait: "role=option[name='Failed or waiting for files']"
+  highlight: "[aria-labelledby='pref-build-notifications-label']"
+  crop: "#preferencesDialog"
+  blocked: null
+
+- id: account/build-notifications--email
+  type: screenshot
+  alt: A build notification e-mail with a failed, a waiting and a completed build
+  page: hub-guide/account/build-notifications
+  url: http://localhost:5181/         # MailHog web UI of the local Registry (see the top of this file)
+  base: local
+  auth: none
+  waitFor:
+    selector: "text=docs-demo@example.com"
+    networkIdle: true
+  actions:
+    - click: "text=docs-demo@example.com >> nth=0"   # the newest message
+    - wait: 1500
+  highlight: null
+  crop: null
+  blocked: null
+
+# ---- Plans & limits -----------------------------------------------------------------------------------------
+
+- id: account/plans--storage-info
+  type: screenshot
+  alt: The Storage Info window with the total, used and free space
+  page: hub-guide/account/plans
+  url: /r
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "[aria-controls='user_menu']"
+    networkIdle: true
+  actions:
+    - click: "[aria-controls='user_menu']"
+    - click: "role=menuitem >> text=%"     # the storage row shows the used percentage; needs aria-label
+    - wait: "role=dialog[name='Storage Info']"
+  highlight: null
+  crop: "role=dialog[name='Storage Info']"
+  blocked: null
+
+# ---- Export & delete ----------------------------------------------------------------------------------------
+
+- id: account/export-delete--download-dataset
+  type: screenshot
+  alt: The download button of a dataset with its confirmation window
+  page: hub-guide/account/export-delete
+  url: /r/acme-surveys/share-demo
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "[title='Download']"
+    networkIdle: true
+  actions:
+    - click: "[title='Download']"
+    - wait: "role=dialog[name='Download']"   # never confirm
+  highlight: "role=button[name='Download']"
+  crop: null
+  blocked: null

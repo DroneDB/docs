@@ -1,10 +1,134 @@
 ---
-title: "Preferences"
-description: "Units, map, files, lists, viewers, stockpiles and notifications."
+title: Preferences
+description: The User preferences window — units and currency, map, files, lists, viewers and stockpile materials — saved to your account.
+hub_feature: [prefs:units, prefs:map, prefs:files, prefs:lists, prefs:viewers, prefs:stockpiles]
+datasets: []
+requires: { access: none }
 ---
 
-:::info
+<Screenshot id="account/preferences--units" />
 
-This page is being written.
+## When to use it
 
-:::
+Set how the Hub shows things to you: metric or imperial units, the default basemap, the default file view,
+the quality of splats and more. Your preferences belong to your account. They are the same on every device and
+browser where you sign in.
+
+## Steps
+
+<Steps>
+
+1. Click the user button at the top right of the Hub, then **Preferences**. The **User preferences** window
+   opens.
+
+2. Click a tab and change a setting. The change applies at once, also to the views that are open.
+
+3. Check the line at the bottom: **Saved to your account**. If a save fails, it shows **Not saved,
+   retried on the next change**.
+
+4. Click **Close**.
+
+</Steps>
+
+**Reset section** puts the settings of the open tab back to their defaults. **Reset all** puts every setting
+back, after you confirm.
+
+A link to any Hub page with `?preferences=<tab>` at the end opens the window on that tab, for example
+`?preferences=map`. The tab names are `units`, `map`, `files`, `lists`, `viewers`, `stockpiles` and
+`notifications`.
+
+## Units
+
+| Setting | Values | Default |
+|---|---|---|
+| **Measurement units** | **Metric**, **Imperial**: lengths, areas, volumes, weights | **Metric** |
+| **Currency** | Any currency, with a search box. Prices, for example the cost of a stockpile | USD |
+
+A change of currency does not convert prices: 15 USD becomes 15 EUR.
+
+## Map
+
+<Screenshot id="account/preferences--map" />
+
+| Setting | Default |
+|---|---|
+| **Default basemap**: **Satellite**, **Hybrid**, **OpenStreetMap** or **Custom** | **Satellite** |
+| **Show flight path** | On |
+| **Show direction indicators** | Off |
+| **Show dataset names on the datasets map** (the Map view of the Organizations and Datasets pages) | Off |
+
+### Custom basemap
+
+Select **Custom** in **Default basemap**. The **Custom basemap** fields open:
+
+1. Select the **Source type**: **XYZ tiles** or **WMS**.
+2. Type the **URL**. It starts with `http://` or `https://`. An XYZ URL has the `{z}`, `{x}` and `{y}`
+   placeholders, for example `https://tiles.example.com/{z}/{x}/{y}.png`.
+3. For WMS, click **Fetch layers** (the refresh button next to **Layer**), select the **Layer** and the
+   **Tile size**.
+4. Click **Apply**. The Hub loads one tile to check the source. If the tile loads, every map changes to the
+   source. If not, an error shows and nothing changes.
+
+**Clear** removes the source. The gear button of a map has the same fields.
+
+<Screenshot id="account/preferences--custom-basemap" />
+
+## Files
+
+<Screenshot id="account/preferences--files" />
+
+| Setting | Default |
+|---|---|
+| **Default view**: **Grid** or **Table** | **Grid** |
+| **Expanded grid in the table view** | On |
+| **Sort descending** | Off |
+
+## Lists
+
+<Screenshot id="account/preferences--lists" />
+
+| Group | Setting | Default |
+|---|---|---|
+| Datasets | **Datasets per page** (5 to 100) | 10 |
+| Datasets | **Open a dataset after creating it** | Off |
+| Organizations | **Organizations per page** (5 to 100) | 10 |
+| Organizations | **Sort organizations by**: **Name**, **Creation date**, **Last modified**, **Number of datasets** | **Name** |
+| Organizations | **Organizations order**: **Ascending**, **Descending** | **Ascending** |
+| Organizations | **Show only the organizations I own** | On |
+
+## Viewers
+
+<Screenshot id="account/preferences--viewers" />
+
+| Group | Setting | Default |
+|---|---|---|
+| Gaussian splats | **Navigation mode**: **Fly**, **Earth** | **Fly** |
+| Gaussian splats | **Quality**: **Auto**, **Low**, **Medium**, **High**. Auto lowers the detail on a slow device | **Auto** |
+| 3D models lighting | **Ambient**, **Directional**, **Shininess** | 0.4, 0.7, 25 |
+| 3D viewer lighting | **Ambient**, **Directional**, **Sky / ground fill** | 3, 1.8, 3 |
+
+See [Gaussian splats](../viewing/splats.mdx) for navigation and quality.
+
+## Stockpiles
+
+The **Materials** that the [stockpile panel](../analyse/stockpile.mdx) uses to weigh and price a pile: for each
+material, whether it is shown, its density and its price per tonne. **Add material** adds one of your own.
+**Edit materials…** in the stockpile panel opens this tab.
+
+<Screenshot id="account/preferences--stockpiles" />
+
+## Notifications
+
+The e-mails about your builds. See [Build notification e-mails](./build-notifications.mdx). The tab is there
+only when the server sends e-mail.
+
+## Limits & requirements
+
+- You must be signed in. **Preferences** is in the user menu only then.
+
+## Related
+
+- [Build notification e-mails](./build-notifications.mdx)
+- [Account & storage](./account.mdx)
+- [Map viewer](../viewing/map.mdx)
+- [Stockpile volume](../analyse/stockpile.mdx)

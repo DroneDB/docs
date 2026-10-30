@@ -1,10 +1,75 @@
 ---
-title: "Build notification e-mails"
-description: "Get an e-mail when a build fails or waits for files."
+title: Build notification e-mails
+description: Get an e-mail when the builds of your files end, fail or wait for a missing file.
+hub_feature: [prefs:notifications]
+datasets: []
+requires: { access: none }
 ---
 
-:::info
+<Screenshot id="account/build-notifications--setting" />
 
-This page is being written.
+## When to use it
 
-:::
+Builds of large files can take a long time. Instead of watching the Hub, let it e-mail you when your builds
+end. A build makes what the Hub shows of a file, for example the tiles of an orthophoto, a point cloud or a 3D
+model (see [Builds](../processing/builds.mdx)).
+
+## Steps
+
+<Steps>
+
+1. Click the user button at the top right, then **Preferences**. Click the **Notifications** tab.
+
+2. Select **Send build notifications**:
+
+   | Value | You get an e-mail for |
+   |---|---|
+   | **None** (default) | Nothing |
+   | **All** | Builds that completed, builds that failed, and builds that wait for files |
+   | **Failed or waiting for files** | Builds that failed, with the reason, and builds that wait for files, with the missing names |
+
+3. Click **Close**. The setting is saved to your account.
+
+</Steps>
+
+To stop the e-mails, select **None**. Each e-mail has a link to this setting.
+
+## Which builds you hear about
+
+You get e-mails for the builds that you asked for: the files that you uploaded or built again, and the files
+that your tasks made (for example the files of an archive that you extracted). Builds that the server starts by
+itself, such as a rescan, send nothing.
+
+- A build that fails and that the server retries by itself is in an e-mail only when the retries give up.
+- Builds that end close together share one e-mail. The first build that ends starts a short wait; one e-mail
+  then lists all the builds that ended meanwhile.
+- When a build waits for files, for example the `.mtl` of an `.obj` or the `.shx` of a `.shp`, you get one
+  **Waiting for files** line with the missing names. You get it once, also when the file is built again
+  while the files are still missing. Upload the files: the build runs at once, and its result comes in a later
+  e-mail.
+
+## What the e-mail contains
+
+<Screenshot id="account/build-notifications--email" />
+
+- A subject with the counts, for example `2 builds failed, 1 waiting for files, 3 completed`.
+- A table of the builds: the dataset, the file, and the result. A failed build shows the reason. A build that
+  waits for files shows the line **Missing:** with the names. Failed builds come first, then the builds that
+  wait, then the completed builds.
+- A button that opens the dataset (or the Hub, when the builds are in several datasets).
+- A link to your notification settings.
+
+The administrator of the server can change the text of the e-mail, so it can look different on your server.
+
+## Limits & requirements
+
+- The **Notifications** tab is there only when the server sends e-mail.
+- Your account needs an e-mail address. Without one, the setting is disabled and the window says
+  **Your account has no e-mail address. Ask an administrator to add one.**
+- The e-mail goes to the address of your account. You cannot change it in the Hub.
+
+## Related
+
+- [Builds](../processing/builds.mdx)
+- [Preferences](./preferences.mdx)
+- [E-mail (SMTP) & templates (self-hosting)](/docs/self-hosting/email)
