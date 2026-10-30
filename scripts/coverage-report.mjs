@@ -81,7 +81,8 @@ function menuItems() {
   // Each item factory: function fooItem(ctx) { return { label: '…', … } }, up to the next function
   const parts = src.split(/\n(?=function \w+\(ctx\))/);
   for (const part of parts) {
-    const m = /^function (\w+)\(ctx\)\s*\{\s*return\s*\{\s*label:\s*'([^']+)'/.exec(part);
+    // The label of the object the factory returns (a factory may compute things before it)
+    const m = /^function (\w+)\(ctx\)\s*\{[\s\S]*?\n {4}return\s*\{\s*label:\s*'([^']+)'/.exec(part);
     if (!m) continue;
     if (/\n\s*items:\s*\[/.test(part)) continue; // a submenu (Tools, Experimental), not an action
     items.push({label: m[2], what: `menu ${m[1]}`});
