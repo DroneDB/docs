@@ -93,14 +93,16 @@ if (args.only && !selected.length) {
   process.exit(1);
 }
 const blocked = selected.filter(s => s.blocked);
-const todo = selected.filter(s => !s.blocked);
+const manual = selected.filter(s => !s.blocked && s.desktop);
+const todo = selected.filter(s => !s.blocked && !s.desktop);
 
 if (args.list) {
   for (const s of selected) {
     console.log([s.id.padEnd(48), s.type.padEnd(10), `${s.base}/${s.auth}`.padEnd(11),
-      s.blocked ? `blocked: ${s.blocked}` : (fs.existsSync(mediaPath(s.id, OUT_DIR)) ? 'captured' : 'missing')].join(' '));
+      s.blocked ? `blocked: ${s.blocked}` : (fs.existsSync(mediaPath(s.id, OUT_DIR)) ? 'captured' : 'missing'),
+      s.desktop ? `(by hand: ${s.desktop})` : ''].join(' ').trimEnd());
   }
-  console.log(`${selected.length} shot(s), ${blocked.length} blocked`);
+  console.log(`${selected.length} shot(s), ${blocked.length} blocked, ${manual.length} made by hand`);
   process.exit(0);
 }
 
@@ -127,9 +129,17 @@ if (!todo.length) {
 await main();
 
 function reportBlocked() {
-  if (!blocked.length) return;
-  console.log(`Skipped ${blocked.length} blocked shot(s):`);
-  for (const s of blocked) console.log(`  ${s.id} (blocked: ${s.blocked})`);
+  if (blocked.length) {
+    console.log(`Skipped ${blocked.length} blocked shot(s):`);
+    for (const s of blocked) console.log(`  ${s.id} (blocked: ${s.blocked})`);
+  }
+  if (manual.length) {
+    console.log(`Skipped ${manual.length} shot(s) of desktop programs, made by hand:`);
+    for (const s of manual) {
+      const there = fs.existsSync(mediaPath(s.id, OUT_DIR)) ? 'image present' : 'IMAGE MISSING';
+      console.log(`  ${s.id} (${s.desktop}: ${there} at ${show(mediaPath(s.id, OUT_DIR))})`);
+    }
+  }
 }
 
 async function main() {

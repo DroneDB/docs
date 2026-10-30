@@ -14,7 +14,7 @@ export const MEDIA_DIR = path.join(REPO_ROOT, 'static', 'media');
 export const SECTIONS = ['get-started', 'datasets', 'files', 'viewing', 'measure', 'analyse',
   'processing', 'sharing', 'account', 'self-hosting'];
 export const TYPES = ['screenshot', 'clip'];
-export const BASES = ['hub', 'local', 'mail'];
+export const BASES = ['hub', 'local'];
 export const AUTHS = ['none', 'demo', 'admin'];
 export const BLOCKED = ['data', 'release'];
 export const DEFAULT_VIEWPORT = Object.freeze({width: 1440, height: 900});
@@ -26,7 +26,7 @@ export const MAX_CLIP_SECONDS = 60;
 const ID_RE = /^([a-z0-9]+(?:-[a-z0-9]+)*)\/([a-z0-9]+(?:-[a-z0-9]+)*)--([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 const YOUTUBE_RE = /^[A-Za-z0-9_-]{11}$/;
 const KEYS = ['id', 'type', 'alt', 'page', 'open', 'url', 'base', 'auth', 'viewport', 'waitFor', 'actions',
-  'highlight', 'crop', 'maxSeconds', 'blocked', 'youtubeId'];
+  'highlight', 'crop', 'maxSeconds', 'blocked', 'youtubeId', 'desktop'];
 const OPEN_KEYS = ['org', 'ds', 'path', 'view', 'compare'];
 const WAIT_KEYS = ['selector', 'networkIdle', 'extraMs', 'stable', 'timeout'];
 
@@ -83,7 +83,13 @@ export function checkShot(raw) {
   if (!isStr(raw.alt)) err('alt: the alt text is required');
   if (!isStr(raw.page)) err('page: the docs page that shows the shot is required (for example hub-guide/analyse/plant-health)');
 
-  if ((raw.open === undefined) === (raw.url === undefined)) err('either `open` or `url`, not both and not neither');
+  // A shot of a desktop program (desktop: qgis) is made by hand: it has no Hub page to open
+  const desktop = raw.desktop ?? null;
+  if (desktop !== null && !isStr(desktop)) err('desktop: the name of the desktop program (the shot is made by hand)');
+  const url = raw.url ?? undefined;
+  if (desktop) {
+    if (raw.open !== undefined || url !== undefined) err('desktop: a shot made by hand has no `open` or `url`');
+  } else if ((raw.open === undefined) === (url === undefined)) err('either `open` or `url`, not both and not neither');
   if (raw.open !== undefined) {
     const o = raw.open;
     if (!isObj(o)) err('open: { org, ds, path, view }');
@@ -100,13 +106,14 @@ export function checkShot(raw) {
       }
     }
   }
-  if (raw.url !== undefined && !(isStr(raw.url) && raw.url.startsWith('/'))) err('url: a Hub path that starts with "/"');
+  if (url !== undefined && !(isStr(url) && (url.startsWith('/') || /^https?:\/\//.test(url)))) {
+    err('url: a Hub path that starts with "/", or an absolute http(s) URL (not a Hub: --base does not change it)');
+  }
 
   const base = raw.base ?? 'hub';
   if (!BASES.includes(base)) err(`base: one of ${BASES.join(' | ')}`);
   const auth = raw.auth ?? 'none';
   if (!AUTHS.includes(auth)) err(`auth: one of ${AUTHS.join(' | ')}`);
-  if (base === 'mail' && (auth !== 'none' || raw.open !== undefined)) err('base: mail takes a `url` and auth: none (MailHog is not a Hub)');
 
   let viewport = raw.type === 'clip' ? CLIP_VIEWPORT : DEFAULT_VIEWPORT;
   if (raw.viewport !== undefined && raw.viewport !== null) {
@@ -168,7 +175,7 @@ export function checkShot(raw) {
   if (errors.length) return [errors, null];
   return [[], {
     id: raw.id, section: m[1], type: raw.type, alt: raw.alt.trim(), page: raw.page,
-    open: raw.open ?? null, url: raw.url ?? null, base, auth, viewport,
+    open: raw.open ?? null, url: url ?? null, desktop, base, auth, viewport,
     waitFor: {...waitFor}, actions, highlight: raw.highlight ?? null, crop,
     maxSeconds: isClip ? raw.maxSeconds ?? DEFAULT_CLIP_SECONDS : null,
     blocked: raw.blocked ?? null, youtubeId: isClip ? raw.youtubeId ?? null : null
@@ -234,7 +241,9 @@ export function docPageExists(page) {
 
 /** URL of the Hub page a shot opens, on the given base URL. */
 export function shotUrl(shot, base) {
-  return shot.open ? hubUrl({...shot.open, base}) : base + shot.url;
+  if (shot.desktop) return null;
+  if (shot.open) return hubUrl({...shot.open, base});
+  return /^https?:\/\//.test(shot.url) ? shot.url : base + shot.url;
 }
 
 /** Image of a shot (screenshot, or poster of a clip). */

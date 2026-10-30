@@ -50,12 +50,8 @@ const trimSlash = url => url.replace(/\/+$/, '');
 /**
  * Base URL of a shot. `hub`: --base, else DDB_DOCS_BASE_URL, else hub.dronedb.app.
  * `local`: always the throwaway local Registry (DDB_DOCS_LOCAL_URL, else localhost:DDB_DOCS_PORT).
- * `mail`: the MailHog web UI next to the local Registry (DDB_DOCS_MAIL_URL, else localhost:DDB_DOCS_MAIL_PORT).
  */
 export function resolveBase(kind, cliBase) {
-  if (kind === 'mail') {
-    return trimSlash(process.env.DDB_DOCS_MAIL_URL || `http://localhost:${process.env.DDB_DOCS_MAIL_PORT || 5181}`);
-  }
   if (kind === 'local') {
     return trimSlash(process.env.DDB_DOCS_LOCAL_URL || `http://localhost:${process.env.DDB_DOCS_PORT || 5180}`);
   }

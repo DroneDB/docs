@@ -18,8 +18,11 @@ Every screenshot and clip of the documentation is defined here, one YAML file pe
     path: odm_orthophoto/odm_orthophoto.tif
     view: map                        # map | pointcloud | model | unified | splat | panorama | markdown
     # compare: [a.tif, b.tif]        # instead of path and view: the compare view of 2+ rasters
-  # url: /r/odm                      # any other Hub path (dataset list, /account, /admin/users …)
-  base: hub                          # hub | local (always the throwaway local Registry) | mail (its MailHog web UI, with `url`)
+  # url: /r/odm                      # any other Hub path (dataset list, /account, /admin/users …),
+                                     # or an absolute URL that is not a Hub (http://localhost:5181/, the
+                                     # MailHog of the local Registry): --base and base do not change it
+  # desktop: qgis                    # instead of open/url: a desktop program, made by hand (see below)
+  base: hub                          # hub | local (local = always the throwaway local Registry)
   auth: none                         # none | demo | admin
   viewport: { width: 1440, height: 900 }   # optional; screenshots 1440×900 at device pixel ratio 2, clips 1920×1200 at 1
   waitFor:                           # the page is ready when all of these hold
@@ -66,6 +69,14 @@ Every screenshot and clip of the documentation is defined here, one YAML file pe
 - A screenshot is at most 250 KB: the WebP quality goes down from 85 to 60, then the image is
   scaled down (full-screen aerial imagery). The capture prints when it scaled an image; crop the
   shot to the panel that matters to keep the full resolution.
+
+## Shots made by hand
+
+A shot of a desktop program (QGIS) cannot be captured in the browser. Its entry has
+`desktop: <program>` and no `open` or `url`; the other keys are the same. The capture skips it
+and reports whether its image is there. Its image (screenshot, or clip poster) is made by hand at
+`static/media/<id>.webp`, as a WebP of at most 250 KB, at device pixel ratio 2 for a screenshot;
+`npm run media:index` lists it like a captured one.
 
 ## Rules
 
