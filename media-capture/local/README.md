@@ -121,17 +121,54 @@ any of them goes to production, confirm its licence and add the licence to the d
 | `odx/3d-tiles` (new) | `sample_geo.3tz` | `/mnt/data/datasets/3dtiles/sample_geo.3tz` | **not confirmed** |
 | `odm/vector` | `gpx/OldOrchard_2017-07-22.gpx` | sUAS Photogrammetry Suite Test Data (GPS log of the Old Orchard flight, 2017-07-22) | The Unlicense |
 | `odx/video` (new) | `DJI_20250214223919_0002_T.MP4` + `.SRT` | DJI Mavic 3T thermal clip, zenodo.org/records/17311189 | CC-BY-4.0 (attribution needed) |
+| `odm/caliterra` | `odm_dem/dsm.tif`, `odm_dem/dtm.tif`, `odm_dem/README.md` | `generate-data.sh caliterra-dem` | CC0 1.0, as odm/caliterra |
+| `odx/splats-geo` (new) | `brighton-beach.ply`, `georef.json`, `README.md`, `LICENSE` | `generate-data.sh splats-geo` | BSD 2-Clause, as odm/brighton-beach |
+
+The demo organization also uses generated data: the Mask borders dataset of
+[`../demo-inputs.yaml`](../demo-inputs.yaml) reads `ortho-black-border.tif` and its masked copy
+from `generate-data.sh mask-borders` (BSD 2-Clause, as odm/brighton-beach).
 
 A screenshot of one of these shows data that production does not have: re-capturing it from
 production gives a different picture or fails until the data is published there.
 
+### Generated data
+
+`generate-data.sh` makes the data that no showcase dataset has, from the open ODM datasets of the
+local Registry, into `/mnt/data/datasets/docs-generated/<name>/` (`DDB_DOCS_GENERATED`). Each folder
+has a `README.md` with the source, the steps and the licence (the licence of the ODM dataset it comes
+from); the README goes into the dataset with the data. Run it after the first `mirror-datasets.sh`
+and before the next one, which uploads the results.
+
+```bash
+./generate-data.sh                  # all three, or name some:
+./generate-data.sh caliterra-dem    # ODX run of the 78 Caliterra images on the local NodeODX (DSM + DTM,
+                                    # 5 cm), moved onto the published outputs; about 10 minutes
+./generate-data.sh mask-borders     # the Brighton Beach orthophoto without its alpha band, and `ddb mask`
+./generate-data.sh splats-geo       # `ddb gsplat --training-data` of Brighton Beach, trained with Brush
+                                    # v0.3.0 (Vulkan, 20 000 steps, 1 000 000 splats); about 5 minutes
+```
+
+`splats-geo` downloads the Brush release from GitHub (checked with its SHA-256) into
+`$DDB_DOCS_HOME/brush-v0.3.0`. It needs a GPU with Vulkan; it uses about 1.5 GB of GPU memory.
+
 ## Known gaps
 
 - No 360° panorama with GPS EXIF (georeferenced panorama) is available locally.
-- No DSM for odm/caliterra: its local ODM output has an empty `odm_dem/`. The stockpile pages need
-  one (an ODM run with `--dsm`).
-- No georeferenced splat (a splat with its georef sidecar).
-- No orthophoto with borders for the Mask borders page.
+- The two Hat Creek mosaics of odx/hat-creek are not detected as thermal (`raster-value-info` says
+  `isThermal: false`, as production 2.7.1 does): libddb reads a raster as thermal only when it has
+  one band and its metadata names a temperature, and these have a grey band, an alpha band and no
+  such metadata. The Thermal panel shows the Raster Analysis panel for them.
+- The Map tab of odx/splats-geo shows no splat: the Hub draws a georeferenced splat only when its
+  `point_geom` is a bare GeoJSON Point (`isGeoreferencedSplat`, `libs/map/splatFootprints.js`), and
+  the Registry sends a GeoJSON Feature with that Point in `geometry`. The splat itself is
+  georeferenced (`georeferenced: true`, EPSG:32615 in the viewer, `wgs84Footprint` in its bounds).
+- odm/caliterra has no earth stockpile in the open: Stockpile Volume detects the two tree clumps at
+  the south edge (about 2 700 m³ each), the slope on the west side, and a debris pile near the
+  excavator (30.17072, -98.09070: about 5 m², 9 m³). The sand pile next to the culverts is too low
+  on its slope to be detected. A click that finds nothing answers HTTP 500.
+- WMS of odx/micasense: GetCapabilities answers OGC XML, but GetMap of the six-band Float32
+  orthophoto gives a transparent image (`Cannot encode the render of …/cog.tif` in the log); its DSM
+  and DTM render.
 - The textured models of odx/micasense and odx/sequoia (5 + 6 OBJ files with 16-bit multispectral
   TIFF textures) fail to build: bm3d cannot read those textures. The 3D model view of these two
   datasets shows a failed build.

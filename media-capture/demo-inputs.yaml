@@ -148,12 +148,20 @@ datasets:
       - dest: orthos/sheffield-park-2.tif
         from: odm/sheffield-park-2/odm_orthophoto/odm_orthophoto.tif
 
-  # Processing: Mask borders needs an orthophoto with a black (no-data) border; the source is not
-  # chosen yet, so the dataset is empty and its shots are blocked
+  # Processing: Mask borders needs an orthophoto with a black border made of real pixels (no alpha,
+  # no no-data value): the Brighton Beach orthophoto with its alpha band removed, and its masked
+  # copy (`ddb mask`, the file the tool writes) for the before/after shot. Made by
+  # local/generate-data.sh mask-borders (BSD 2-Clause, as odm/brighton-beach; README.md says so).
   - slug: mask-borders
     name: Mask borders
     visibility: private
-    files: []
+    files:
+      - dest: ortho-black-border.tif
+        file: docs-generated/mask-borders/ortho-black-border.tif
+      - dest: ortho-black-border_masked.tif
+        file: docs-generated/mask-borders/ortho-black-border_masked.tif
+      - dest: README.md
+        file: docs-generated/mask-borders/README.md
 
   # Sharing pages and the dataset download shot (the visibility shots never change it)
   - slug: share-demo

@@ -15,3 +15,18 @@ odm/vector | gpx/OldOrchard_2017-07-22.gpx | source-images/sUAS_Photogrammetry_S
 # DJI Mavic 3T thermal video with its SRT telemetry (zenodo.org/records/17311189, CC-BY-4.0)
 odx/video | DJI_20250214223919_0002_T.MP4 | source-images/dji-video-samples/full/DJI_20250214223919_0002_T.MP4 | Video
 odx/video | DJI_20250214223919_0002_T.SRT | source-images/dji-video-samples/full/DJI_20250214223919_0002_T.SRT |
+
+# Made by generate-data.sh from open ODM sample data (each folder has a README.md with the source and
+# the licence, the licence of the ODM dataset it comes from). Run generate-data.sh before this script.
+
+# DSM and DTM of odm/caliterra for the Stockpile Volume pages (new ODX run of its images, CC0 1.0)
+odm/caliterra | odm_dem/README.md | docs-generated/caliterra-dem/README.md |
+odm/caliterra | odm_dem/dsm.tif | docs-generated/caliterra-dem/dsm.tif |
+odm/caliterra | odm_dem/dtm.tif | docs-generated/caliterra-dem/dtm.tif |
+
+# Georeferenced Gaussian splat (Brush, from the training data of odm/brighton-beach, BSD 2-Clause);
+# georef.json goes first, so the splat is georeferenced when it is indexed
+odx/splats-geo | georef.json | docs-generated/splats-geo/georef.json | Georeferenced splats
+odx/splats-geo | brighton-beach.ply | docs-generated/splats-geo/brighton-beach.ply |
+odx/splats-geo | README.md | docs-generated/splats-geo/README.md |
+odx/splats-geo | LICENSE | docs-generated/splats-geo/LICENSE |
