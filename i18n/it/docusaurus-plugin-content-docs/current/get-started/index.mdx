@@ -1,0 +1,67 @@
+---
+title: "Che cos'è DroneDB Hub"
+description: "DroneDB Hub archivia, mostra e condivide i dati da drone nel browser: ortofoto, modelli di elevazione, nuvole di punti, modelli 3D, splat e foto."
+slug: /get-started
+datasets: [odm/brighton-beach]
+requires: { access: none }
+---
+
+<Clip id="get-started/tour--overview" caption="Un tour di 30 secondi di un dataset pubblico su DroneDB Hub" />
+
+DroneDB Hub è un'applicazione web per i dati da drone. Carichi i tuoi file e Hub li mostra su
+una mappa o in 3D, direttamente nel browser. Poi puoi misurarli, analizzarli e condividerli con
+un link. Non devi installare nulla.
+
+<TryLive org="odm" ds="brighton-beach" label="Esplora un dataset su Hub"
+         hint="Un rilievo pubblico di Brighton Beach. Non ti serve un account." />
+
+## Cosa fa Hub con i tuoi dati
+
+- **Archivia** il tuo rilievo: foto, ortofoto, modelli di elevazione, nuvole di punti, modelli
+  3D, splat gaussiani, file vettoriali, video, panorami e documenti, nelle cartelle che scegli
+  tu.
+- **Mostra** ogni file nel visualizzatore giusto: una mappa, un visualizzatore di nuvole di
+  punti, di modelli 3D o di splat, oppure un panorama a 360°. Anche i file grandi si aprono in
+  fretta, perché dopo il caricamento Hub ne prepara una copia adatta allo streaming.
+- **Misura e analizza**: distanze, aree e volumi, profili altimetrici, curve di livello, indici
+  di salute delle piante e valori termici.
+- **Condivide**: decidi tu chi vede un dataset. Invia un link, incorpora una mappa nella tua
+  pagina web o apri i dati in QGIS.
+
+Un normale spazio di archiviazione cloud conserva i tuoi file, ma non sa mostrare un'ortofoto su
+una mappa o una nuvola di punti in 3D. Hub sì.
+
+Hub non crea da solo le ortofoto dalle tue foto. Per farlo, usa la
+[fotogrammetria](/hub-guide/processing/photogrammetry.mdx) su Hub, oppure elabora le foto in
+[WebODM](https://docs.webodm.org) e carica i risultati.
+
+## Chi lo usa
+
+Geometri e topografi, agronomi e agricoltori, ispettori, analisti GIS e piloti di droni che
+vogliono controllare un rilievo, tenerlo in un unico posto e mostrarlo a un cliente o a un
+collega.
+
+## Inizia da qui
+
+1. [Fai il tour di 5 minuti](./tour.mdx). Non ti serve un account.
+2. [Crea un account e il tuo primo dataset](./first-dataset.mdx).
+3. [Carica i tuoi dati](./upload.mdx).
+4. [Condividi la tua prima mappa](./share-first-map.mdx).
+
+Leggi [Concetti chiave](./key-concepts.mdx) per conoscere le parole che usa Hub. La
+[Guida di Hub](/hub-guide/index.mdx) ha una pagina per ogni attività.
+
+:::tip Usa un Hub tutto tuo
+
+DroneDB Hub è disponibile su [hub.dronedb.app](https://hub.dronedb.app). Puoi anche installare
+lo stesso software su un tuo server: vedi [Self-hosting](/docs/self-hosting). Piani e prezzi
+sono su [dronedb.app](https://dronedb.app/plans).
+
+:::
+
+<ForDevelopers>
+
+DroneDB ha anche uno strumento a riga di comando (`ddb`), una libreria C e un'API REST. Vedi
+[Sviluppatori](/docs/developers).
+
+</ForDevelopers>

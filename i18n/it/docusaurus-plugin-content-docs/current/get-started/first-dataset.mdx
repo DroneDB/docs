@@ -1,0 +1,84 @@
+---
+title: "Crea un account e il primo dataset"
+description: "Registrati su DroneDB Hub, accedi e crea il tuo primo dataset."
+hub_feature: [route:Login, route:LoginHome]
+---
+
+<Screenshot id="get-started/first-dataset--create-dialog" />
+
+Per caricare dati ti serve un account. Con l'account ricevi una tua organizzazione, dove crei i
+dataset. Questa pagina richiede circa 3 minuti.
+
+## Passaggi
+
+<Steps>
+
+1. **Registrati.** Vai su [dronedb.app/register](https://dronedb.app/register/). Inserisci uno
+   **Username** (nome utente), la tua **E-mail** e una **Password**. Il nome utente può contenere
+   lettere minuscole, numeri, trattini e trattini bassi. Accetta i termini e fai clic su
+   **Register** (Registrati).
+
+   Piani, prova gratuita e prezzi sono su [dronedb.app/plans](https://dronedb.app/plans).
+
+2. **Accedi a Hub.** Vai su [hub.dronedb.app](https://hub.dronedb.app). Inserisci lo stesso nome
+   utente e la stessa password e fai clic su **Login** (Accedi). Hub apre la pagina
+   **Organizations** (Organizzazioni).
+
+   <Screenshot id="get-started/first-dataset--sign-in" />
+
+3. **Apri la tua organizzazione.** Fai clic sull'icona utente in alto a destra, poi su
+   **My Datasets** (I miei dataset). Questa è la pagina della tua organizzazione personale. Ha lo
+   stesso nome del tuo nome utente e solo tu puoi vederla.
+
+   <Screenshot id="get-started/first-dataset--my-datasets" />
+
+4. **Crea un dataset.** Fai clic su **Create Dataset** (Crea dataset). Nella finestra
+   **Create new dataset**:
+
+   - Inserisci un **Dataset Name** (nome del dataset), per esempio `Rilievo cava 2026`. Hub
+     ricava dal nome lo **Dataset Slug**. Lo slug è la parte dell'indirizzo del dataset che viene
+     dopo la tua organizzazione, per esempio `/r/<username>/rilievo-cava-2026`. Se in seguito
+     rinomini il dataset, cambia anche lo slug e i link al vecchio indirizzo smettono di
+     funzionare.
+   - Per ora lascia **Visibility** (visibilità) su **Private** (privato). Puoi cambiarla in
+     qualsiasi momento.
+   - Se vuoi, inserisci una **Tagline**: una breve descrizione che compare nell'elenco dei
+     dataset.
+   - Lascia selezionato **Open dataset after creation** (apri il dataset dopo la creazione).
+
+   Fai clic su **Create**.
+
+5. **Il tuo dataset è aperto.** È vuoto. Continua con [Carica i tuoi dati](./upload.mdx).
+
+   <Screenshot id="get-started/first-dataset--empty-dataset" />
+
+</Steps>
+
+:::tip Caricamento rapido senza dataset
+
+**Upload Files** (Carica file) nel menu utente crea un nuovo dataset per te. Hub mette il dataset
+nella tua organizzazione personale, ci carica i file e lo apre.
+
+:::
+
+## Limiti e requisiti
+
+- Lo spazio di archiviazione del tuo account dipende dal tuo piano. Il menu utente mostra quanto
+  spazio usi. Vedi [Piani e limiti](/hub-guide/account/plans.mdx).
+- Il nome di un dataset deve generare uno slug che nessun altro dataset dell'organizzazione
+  usa già. Se lo slug è già usato, la finestra mostra un errore e **Create** resta disattivato.
+
+## Pagine correlate
+
+- [Crea e configura un dataset](/hub-guide/datasets/create.mdx): tagline, immagine di
+  copertina, README e impostazioni
+- [Sfoglia organizzazioni e dataset](/hub-guide/datasets/browse.mdx)
+- [Account e spazio di archiviazione](/hub-guide/account/account.mdx)
+- [Concetti chiave](./key-concepts.mdx)
+
+<ForDevelopers>
+
+Puoi anche creare un dataset da una cartella del tuo computer con lo strumento a riga di comando
+`ddb` e inviarlo a Hub. Vedi la [guida rapida della CLI](/docs/developers/cli/quick-start).
+
+</ForDevelopers>

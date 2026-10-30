@@ -1,0 +1,83 @@
+---
+title: "Tour di 5 minuti"
+description: "Esplora un dataset pubblico senza account: file, mappa, nuvola di punti, modello 3D e condivisione."
+datasets: [odm/brighton-beach]
+requires: { access: none }
+---
+
+<LiveEmbed org="odm" ds="brighton-beach" path="odm_orthophoto/odm_orthophoto.tif" view="map"
+           poster="get-started/tour--ortho-map" title="Ortofoto di Brighton Beach su DroneDB Hub" />
+
+<Requires />
+
+Questo tour usa **Brighton Beach**, un dataset pubblico dell'organizzazione `odm`. È un piccolo
+rilievo con drone di una spiaggia sul Lago Superiore: 18 foto da drone e l'ortofoto, la nuvola di
+punti e il modello 3D texturizzato ricavati da queste foto. Non ti serve un account. Apri Hub in
+una seconda scheda del browser e segui i passaggi.
+
+<TryLive org="odm" ds="brighton-beach" label="Apri Brighton Beach su Hub"
+         hint="Tieni aperta questa pagina accanto a Hub." />
+
+## Passaggi
+
+<Steps>
+
+1. **Guarda i file.** Il dataset si apre sulla scheda **Files** (File). L'albero **Folders**
+   (Cartelle) è a sinistra e i file della cartella aperta sono al centro. Fai clic su un file per
+   vederne le proprietà nel pannello a destra: tipo, dimensione, posizione e altro.
+
+   <Screenshot id="get-started/tour--files" />
+
+2. **Guarda il dataset su una mappa.** Fai clic sulla scheda **Map** (Mappa). Hub mette sulla
+   mappa ogni file che ha una posizione: l'ortofoto e le posizioni delle 18 foto da drone. Fai
+   clic sull'indicatore di una foto per vederne l'anteprima.
+
+   <Screenshot id="get-started/tour--dataset-map" />
+
+3. **Apri l'ortofoto.** Torna alla scheda **Files**. Fai doppio clic sulla cartella
+   `odm_orthophoto`, poi fai doppio clic su `odm_orthophoto.tif`. L'ortofoto si apre su una mappa
+   tutta sua. Ingrandisci per vedere i dettagli. Sull'ortofoto compaiono le misure salvate
+   insieme a essa.
+
+   <Screenshot id="get-started/tour--ortho-map" />
+
+4. **Apri la nuvola di punti.** Nella cartella `odm_georeferencing`, fai doppio clic su
+   `odm_georeferenced_model.laz`. Si apre il visualizzatore di nuvole di punti. Trascina per
+   ruotare la vista e usa la rotellina del mouse per ingrandire.
+
+   <Screenshot id="get-started/tour--point-cloud" />
+
+5. **Apri il modello 3D.** Nella cartella `odm_texturing`, fai doppio clic su
+   `odm_textured_model_geo.obj`. Il visualizzatore di modelli 3D apre il modello texturizzato.
+   Trascina per ruotarlo.
+
+   <Screenshot id="get-started/tour--model" />
+
+6. **Condividi quello che vedi.** Torna a `odm_orthophoto.tif` e fai clic una volta per
+   selezionarlo. Fai clic con il tasto destro e poi su **Share/Embed** (Condividi/Incorpora).
+   Copia lo **Share link** (link di condivisione) e aprilo in una nuova scheda: si apre la stessa
+   mappa. Nell'elenco **Share**, seleziona **Embed** per ottenere il codice che inserisce la
+   mappa in una pagina web. La mappa in cima a questa pagina è proprio una mappa incorporata in
+   questo modo.
+
+   <Screenshot id="get-started/tour--share" />
+
+</Steps>
+
+## Cosa hai visto
+
+- Un **dataset** contiene i file di un rilievo, organizzati in cartelle.
+- Hub riconosce il **tipo** di ogni file e lo apre nel visualizzatore giusto.
+- Un dataset **pubblico** è aperto a tutti. I tuoi dataset restano privati finché non li
+  condividi.
+
+[Concetti chiave](./key-concepts.mdx) spiega queste parole.
+
+## Prossimi passi
+
+- [Crea un account e il tuo primo dataset](./first-dataset.mdx)
+- [Visualizzatore mappa](/hub-guide/viewing/map.mdx),
+  [visualizzatore di nuvole di punti](/hub-guide/viewing/point-cloud.mdx),
+  [visualizzatore di modelli 3D](/hub-guide/viewing/3d-model.mdx)
+- [Misure sulla mappa](/hub-guide/measure/map.mdx)
+- [Link di condivisione e mappe incorporate](/hub-guide/sharing/links-embeds.mdx)

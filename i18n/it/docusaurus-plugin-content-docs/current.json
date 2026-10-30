@@ -1,0 +1,50 @@
+{
+  "version.label": {
+    "message": "Prossima",
+    "description": "The label for version current"
+  },
+  "sidebar.hubGuide.category.Organizations & datasets": {
+    "message": "Organizzazioni e dataset",
+    "description": "The label for category 'Organizations & datasets' in sidebar 'hubGuide'"
+  },
+  "sidebar.hubGuide.category.Managing files": {
+    "message": "Gestione dei file",
+    "description": "The label for category 'Managing files' in sidebar 'hubGuide'"
+  },
+  "sidebar.hubGuide.category.Viewing data": {
+    "message": "Visualizzazione dei dati",
+    "description": "The label for category 'Viewing data' in sidebar 'hubGuide'"
+  },
+  "sidebar.hubGuide.category.Measure & annotate": {
+    "message": "Misure e annotazioni",
+    "description": "The label for category 'Measure & annotate' in sidebar 'hubGuide'"
+  },
+  "sidebar.hubGuide.category.Analyse rasters": {
+    "message": "Analisi dei raster",
+    "description": "The label for category 'Analyse rasters' in sidebar 'hubGuide'"
+  },
+  "sidebar.hubGuide.category.Processing": {
+    "message": "Elaborazione",
+    "description": "The label for category 'Processing' in sidebar 'hubGuide'"
+  },
+  "sidebar.hubGuide.category.Sharing & integration": {
+    "message": "Condivisione e integrazione",
+    "description": "The label for category 'Sharing & integration' in sidebar 'hubGuide'"
+  },
+  "sidebar.hubGuide.category.Organizations & account": {
+    "message": "Organizzazioni e account",
+    "description": "The label for category 'Organizations & account' in sidebar 'hubGuide'"
+  },
+  "sidebar.developers.category.DroneDB CLI": {
+    "message": "Riga di comando DroneDB (CLI)",
+    "description": "The label for category 'DroneDB CLI' in sidebar 'developers'"
+  },
+  "sidebar.developers.category.REST API": {
+    "message": "API REST",
+    "description": "The label for category 'REST API' in sidebar 'developers'"
+  },
+  "sidebar.reference.link.Release notes": {
+    "message": "Note di rilascio",
+    "description": "The label for link 'Release notes' in sidebar 'reference', linking to 'https://github.com/DroneDB/Registry/releases'"
+  }
+}

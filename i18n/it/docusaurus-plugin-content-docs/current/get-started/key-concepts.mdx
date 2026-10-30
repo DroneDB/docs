@@ -1,0 +1,98 @@
+---
+title: "Concetti chiave"
+description: "Organizzazioni, dataset, elementi, tipi di elemento, generazioni, visibilità e attività."
+datasets: [odm/brighton-beach]
+---
+
+<Screenshot id="get-started/key-concepts--dataset-page" />
+
+Hub usa poche parole per descrivere come conserva i tuoi dati. Questa pagina le spiega. Gli altri
+termini sono nel [Glossario](/reference/glossary.mdx).
+
+L'interfaccia di Hub è in inglese. In questa guida i nomi di pulsanti, schede e finestre di Hub
+restano in inglese e in **grassetto**, a volte con la traduzione tra parentesi.
+
+## Organizzazione
+
+Un'**organizzazione** (in Hub: *organization*) contiene dataset. Appartiene al suo proprietario
+e altri utenti possono esserne membri. Quando ti registri, Hub crea un'**organizzazione
+personale** con lo stesso nome del tuo nome utente. Usa altre organizzazioni per tenere separato
+il lavoro di squadre o clienti diversi.
+
+L'indirizzo di un'organizzazione è `/r/<organizzazione>`, per esempio
+[hub.dronedb.app/r/odm](https://hub.dronedb.app/r/odm).
+
+## Dataset
+
+Un **dataset** contiene i file di un progetto o di un rilievo, in cartelle, come una cartella sul
+tuo computer. Un dataset ha un nome, una breve descrizione (**tagline**), un'immagine di
+copertina facoltativa e un file `README.md` facoltativo che lo descrive. Il suo indirizzo è
+`/r/<organizzazione>/<dataset>`, per esempio
+[hub.dronedb.app/r/odm/brighton-beach](https://hub.dronedb.app/r/odm/brighton-beach). L'ultima
+parte dell'indirizzo è lo **slug**: Hub lo ricava dal nome del dataset.
+
+## Elemento
+
+Ogni file e cartella di un dataset è un **elemento** (in Hub: *entry*). Quando arriva un file,
+Hub lo legge: la sua posizione, la dimensione, la fotocamera e la data di una foto, le bande di
+un raster e altro ancora. Fai clic su un file per vedere queste **proprietà**.
+
+## Tipo di elemento
+
+Hub assegna a ogni elemento un **tipo** in base al contenuto, non solo in base all'estensione
+del file. Il tipo decide quale visualizzatore apre il file e cosa Hub può farci.
+
+| Tipo | Che cos'è | Si apre in |
+|---|---|---|
+| GeoImage | Una foto con posizione GPS | Anteprima foto e indicatore sulla mappa |
+| Image | Una foto senza posizione | Anteprima foto |
+| GeoRaster | Un raster con sistema di coordinate: ortofoto, modello di elevazione, mappa multispettrale o termica | Mappa |
+| PointCloud | Un insieme di punti 3D (LAS, LAZ e altri) | Visualizzatore di nuvole di punti |
+| Model | Una mesh 3D texturizzata (OBJ, PLY, STL e altri) | Visualizzatore di modelli 3D |
+| GaussianSplat | Una scena 3D fotorealistica fatta di tante piccole macchie colorate | Visualizzatore di splat |
+| Tiles3D | Un modello 3D grande già suddiviso in OGC 3D Tiles | Visualizzatore 3D |
+| Vector | Punti, linee e poligoni (GeoJSON, KML, Shapefile, GPX, DXF e altri) | Mappa |
+| Panorama, GeoPanorama | Una foto a 360°, senza o con posizione | Visualizzatore di panorami |
+| Video, GeoVideo | Un video, senza o con posizione | Lettore video |
+| Markdown | Un documento di testo in Markdown | Visualizzatore Markdown |
+| Generic | Un file che Hub conserva ma non legge, per esempio un PDF | Download; i PDF e i file di testo si aprono anche in Hub |
+| Directory | Una cartella | Esplora file |
+
+L'elenco completo dei formati di file è in
+[Formati supportati e tipi di elemento](/reference/formats.mdx). Se Hub legge un file con il
+tipo sbagliato, puoi cambiarlo: vedi
+[Proprietà dei file e tipi di elemento](/hub-guide/files/properties.mdx).
+
+## Generazione
+
+Una **generazione** (in Hub: *build*) è una copia di un file che Hub crea perché i
+visualizzatori possano trasmetterlo in streaming. In questa guida "generazione" indica sia la
+copia sia il lavoro che la produce. Dopo il caricamento, Hub esegue la generazione di ortofoto e
+altri raster, nuvole di punti, modelli 3D, file vettoriali e splat gaussiani. Il tuo file
+originale non cambia e puoi scaricarlo in qualsiasi momento. Vedi
+[Generazioni (build)](/hub-guide/processing/builds.mdx).
+
+## Visibilità
+
+La **visibilità** di un dataset decide chi può vederlo:
+
+- **Private** (privato): solo tu e le persone della tua organizzazione. È l'impostazione
+  predefinita.
+- **Unlisted** (non in elenco): chiunque abbia il link.
+- **Public** (pubblico): tutti, e le persone possono trovarlo anche senza il link.
+
+Vedi [Visibilità](/hub-guide/sharing/visibility.mdx).
+
+## Attività
+
+Un'**attività** (in Hub: *task*) è un lavoro che Hub svolge in background: una generazione,
+un'elaborazione di [fotogrammetria](/hub-guide/processing/photogrammetry.mdx),
+un'esportazione di raster, un download ZIP, l'estrazione di un archivio o un'importazione. La
+scheda **Tasks** di un dataset mostra le sue attività, il loro avanzamento e i loro log. Vedi
+[Pannello delle attività e log](/hub-guide/processing/tasks.mdx).
+
+## Hub e Registry
+
+**DroneDB Registry** è il software del server. **DroneDB Hub** è la sua interfaccia web, e anche
+il nome del servizio su [hub.dronedb.app](https://hub.dronedb.app). Puoi installare Registry su
+un tuo server: vedi [Self-hosting](/docs/self-hosting).

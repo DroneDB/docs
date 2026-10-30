@@ -1,0 +1,38 @@
+{
+  "title": {
+    "message": "DroneDB",
+    "description": "The title in the navbar"
+  },
+  "logo.alt": {
+    "message": "DroneDB",
+    "description": "The alt text of navbar logo"
+  },
+  "item.label.Get started": {
+    "message": "Per iniziare",
+    "description": "Navbar item with label Get started"
+  },
+  "item.label.Hub guide": {
+    "message": "Guida di Hub",
+    "description": "Navbar item with label Hub guide"
+  },
+  "item.label.Self-hosting": {
+    "message": "Self-hosting",
+    "description": "Navbar item with label Self-hosting"
+  },
+  "item.label.Developers": {
+    "message": "Sviluppatori",
+    "description": "Navbar item with label Developers"
+  },
+  "item.label.FAQ": {
+    "message": "FAQ",
+    "description": "Navbar item with label FAQ"
+  },
+  "item.label.GitHub": {
+    "message": "GitHub",
+    "description": "Navbar item with label GitHub"
+  },
+  "item.label.Open Hub": {
+    "message": "Apri Hub",
+    "description": "Navbar item with label Open Hub"
+  }
+}

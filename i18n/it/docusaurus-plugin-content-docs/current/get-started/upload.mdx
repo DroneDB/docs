@@ -1,0 +1,101 @@
+---
+title: "Carica i tuoi dati"
+description: "Carica file e cartelle, gestisci i caricamenti grandi e scopri cosa genera Hub dopo un caricamento."
+hub_feature: [route:Upload]
+requires: { access: write }
+---
+
+<Clip id="get-started/upload--drag-drop" caption="Trascina una cartella in un dataset e segui il caricamento" />
+
+<Requires />
+
+## Quando usarlo
+
+Carica in un dataset i risultati di un rilievo: foto, ortofoto, modelli di elevazione, nuvole di
+punti, modelli 3D, splat, file vettoriali e relazioni. Prima ti serve un dataset: vedi
+[Crea un account e il primo dataset](./first-dataset.mdx). Tutti i tipi di file supportati sono
+in [Formati supportati](/reference/formats.mdx).
+
+## Passaggi
+
+<Steps>
+
+1. Apri il tuo dataset sulla scheda **Files** (File). Se i file devono andare in una cartella,
+   fai doppio clic su quella cartella. Il caricamento va nella cartella aperta.
+
+2. Trascina file o cartelle dal tuo computer nell'area dei file. Quando trascini una cartella,
+   Hub mantiene la sua struttura di sottocartelle.
+
+   Oppure fai clic su **Upload** (Carica, il pulsante **+**) nella barra degli strumenti. Nella
+   finestra **Upload**, fai clic su **Select Files** (Seleziona file) o **Select Folder**
+   (Seleziona cartella).
+
+   <Screenshot id="get-started/upload--dialog" />
+
+3. La finestra **Upload Progress** (Avanzamento caricamento) mostra ogni file, la velocità e il
+   tempo rimanente. Fai clic su **In Progress** (In corso), **Done** (Completati) o **Errors**
+   (Errori) per vedere solo quei file. Quando tutti i file sono stati inviati, la finestra mostra
+   **Processing on server...** mentre Hub li aggiunge al dataset.
+
+   <Screenshot id="get-started/upload--progress" />
+
+4. Quando il caricamento è completo, fai clic su **Close** (Chiudi). Se alcuni file non sono
+   stati caricati, fai prima clic su **Retry Failed** (Riprova i non riusciti).
+
+5. I nuovi file compaiono nel dataset. Un'icona che gira su un file significa che Hub ne sta
+   ancora facendo la generazione (vedi sotto). Quando l'icona sparisce, il file è pronto.
+
+   <Screenshot id="get-started/upload--building" />
+
+</Steps>
+
+Puoi anche incollare file con **Ctrl+V** (**Cmd+V** su Mac) nella pagina del dataset, oppure
+aggiungere un file da un indirizzo web con **Import from URL** (Importa da URL). **Upload Files**
+nel menu utente (l'icona utente in alto a destra) apre una pagina di caricamento: trascina lì i
+file e Hub li mette in un nuovo dataset della tua organizzazione personale e lo apre.
+
+## Caricamenti grandi
+
+- Tieni aperta la scheda del browser finché il caricamento non è completo. Se chiudi la scheda,
+  il caricamento si ferma.
+- Hub invia un file grande a pezzi. Dopo un errore di rete, invia di nuovo solo il pezzo non
+  riuscito, non l'intero file. Dopo brevi problemi di rete riprova da solo.
+- **Cancel Upload** (Annulla caricamento) ferma i file non ancora inviati. I file che il server
+  ha già ricevuto vengono comunque aggiunti al dataset.
+- Se i caricamenti sono più lenti del previsto, fai clic su **Uploads slower than expected? Test
+  the connection** alla fine di un caricamento. Si apre un test della connessione nella pagina del
+  tuo account.
+
+## Cosa succede dopo il caricamento: la generazione
+
+I file grandi non possono arrivare al browser così come sono. Dopo il caricamento, Hub crea una
+copia di ogni ortofoto, modello di elevazione, nuvola di punti, modello 3D, file vettoriale e
+splat gaussiano in un formato che i visualizzatori possono trasmettere in streaming. Questa copia
+si chiama **generazione** (in Hub: *build*). Le generazioni piccole richiedono pochi secondi.
+Nuvole di punti e modelli 3D grandi possono richiedere molti minuti.
+
+- Puoi continuare a lavorare durante la generazione. Segui le generazioni nella scheda **Tasks**
+  (Attività) del dataset.
+- Se apri un file prima che la sua generazione sia completa, Hub ti avvisa che il file è in
+  elaborazione. Fai clic su **Wait and Open** (Attendi e apri): il visualizzatore si apre quando
+  la generazione è completa.
+- Alcuni file hanno bisogno di altri file. Per esempio, un modello 3D (`.obj`) ha bisogno del
+  suo file `.mtl` e delle sue texture, e uno shapefile ha bisogno dei suoi file `.shx` e `.dbf`.
+  Se ne manca uno, il file mostra **Waiting for files** (In attesa di file) e i nomi dei file
+  mancanti. Caricali nella stessa cartella e la generazione parte da sola. Per evitare questa
+  attesa, carica questi file tutti insieme.
+
+## Pagine correlate
+
+- [Generazioni (build)](/hub-guide/processing/builds.mdx): stato della generazione,
+  generazioni non riuscite e nuove generazioni
+- [Importa da un URL o da un altro Registry](/hub-guide/files/import.mdx)
+- [Cartelle, rinomina ed elimina](/hub-guide/files/folders.mdx)
+- [Condividi la tua prima mappa](./share-first-map.mdx)
+
+<ForDevelopers api="/docs/developers/api/workflows" apiLabel="Carica con l'API REST">
+
+Lo strumento a riga di comando `ddb` carica una cartella da uno script: vedi la
+[guida rapida della CLI](/docs/developers/cli/quick-start).
+
+</ForDevelopers>

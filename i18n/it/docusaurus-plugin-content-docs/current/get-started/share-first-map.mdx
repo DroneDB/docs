@@ -1,0 +1,90 @@
+---
+title: "Condividi la tua prima mappa"
+description: "Rendi visibile un dataset, poi condividi il link a una mappa o incorpora la mappa in una pagina web."
+datasets: [odm/brighton-beach]
+requires: { access: write, data: Un'ortofoto nel tuo dataset }
+---
+
+<Screenshot id="get-started/share-first-map--embed" />
+
+<Requires />
+
+## Quando usarlo
+
+Hai caricato un'ortofoto e vuoi che un cliente o un collega la veda. Non serve che abbia un
+account. Gli invii un link, oppure inserisci la mappa nella tua pagina web.
+
+## Chi può vedere un dataset
+
+Ogni dataset ha una **visibilità**:
+
+| Visibilità | Chi può vedere e scaricare i dati |
+|---|---|
+| **Private** (privato, l'impostazione predefinita) | Solo tu e le persone della tua organizzazione. |
+| **Unlisted** (non in elenco) | Chiunque abbia il link. Il dataset non compare negli elenchi né nelle ricerche. |
+| **Public** (pubblico) | Tutti. Le persone possono trovare il dataset anche senza il link. |
+
+Per condividere una mappa con persone esterne alla tua organizzazione, il dataset deve essere
+**Unlisted** o **Public**. Per un cliente, di solito **Unlisted** è la scelta giusta.
+
+## Passaggi
+
+<Steps>
+
+1. Apri il tuo dataset sulla scheda **Files** (File) e fai clic una volta sull'ortofoto per
+   selezionarla.
+
+2. Fai clic con il tasto destro sull'ortofoto e poi su **Share/Embed** (Condividi/Incorpora).
+   Puoi anche fare clic sul pulsante di condivisione in alto a destra nella pagina.
+
+3. Se il dataset è privato, la finestra **Share / Embed** mostra
+   **Allow access to anyone with the link** (consenti l'accesso a chiunque abbia il link). Fai
+   clic su questa voce. Il dataset diventa **Unlisted**.
+
+   <Screenshot id="get-started/share-first-map--private" />
+
+4. Nell'elenco **Share**, lascia **Link**. Fai clic su **Copy to clipboard** (Copia negli
+   appunti) accanto a **Share link** e invia il link. Il link apre l'ortofoto sulla mappa.
+
+   <Screenshot id="get-started/share-first-map--link" />
+
+5. Per mostrare la mappa in una pagina web, seleziona **Embed** (Incorpora) nell'elenco
+   **Share**. Copia il codice e incollalo nell'HTML della tua pagina. Il codice è un `iframe` di
+   600 × 400 pixel: per cambiarne la dimensione, modifica `width` e `height` nel codice.
+
+   La mappa incorporata mostra l'ortofoto senza l'intestazione di Hub. I visitatori possono
+   ingrandire e spostarsi sulla mappa.
+
+</Steps>
+
+## Cambia la visibilità in seguito
+
+<Steps>
+
+1. Apri il dataset e fai clic su **Settings** (Impostazioni, la chiave inglese in alto a
+   destra).
+
+2. In **Sharing** (Condivisione), seleziona **Private**, **Unlisted** o **Public** in
+   **Visibility**. Hub salva subito la modifica.
+
+   <Screenshot id="get-started/share-first-map--settings" />
+
+</Steps>
+
+Quando rendi di nuovo privato un dataset, i link e le mappe incorporate smettono di funzionare
+per le persone esterne alla tua organizzazione.
+
+## Prova su un dataset pubblico
+
+L'ortofoto di Brighton Beach è pubblica. Aprila, fai clic con il tasto destro su
+`odm_orthophoto.tif` e poi su **Share/Embed** per vedere la finestra senza cambiare nulla.
+
+<TryLive org="odm" ds="brighton-beach" path="odm_orthophoto/odm_orthophoto.tif" view="map" />
+
+## Pagine correlate
+
+- [Visibilità: pubblico, non in elenco, privato](/hub-guide/sharing/visibility.mdx)
+- [Link di condivisione e mappe incorporate](/hub-guide/sharing/links-embeds.mdx): link ad
+  altre viste, a nuvole di punti e a modelli 3D
+- [Apri i dati di Hub in QGIS](/hub-guide/sharing/qgis.mdx)
+- [Servizi OGC dalla finestra Share](/hub-guide/sharing/ogc.mdx)
