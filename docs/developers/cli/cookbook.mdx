@@ -1,10 +1,747 @@
 ---
 title: "CLI cookbook"
-description: "Recipes for common ddb tasks."
+description: "Recipes for ddb: sharing and syncing, metadata, multispectral and terrain tools, 3D models and 3D Tiles, vectors and CAD drawings, Gaussian splats with their georeference and training data."
 ---
 
-:::info
+Recipes for the `ddb` command line, by task. Each recipe shows the commands, then the rules
+that a script or an integration must know. For every option of a command, see the
+[command reference](./reference.mdx).
 
-This page is being written.
+## Paths and glob patterns
 
-:::
+`ddb` accepts shell-style glob patterns wherever it takes a path or a list of paths:
+
+| Pattern | Matches |
+|---|---|
+| `*.JPG` | All `.JPG` files in the current folder |
+| `images/*.tif` | All `.tif` files directly in `images/` |
+| `**/*.las` | All `.las` files, recursively |
+| `images/**/*` | All files in `images/`, recursively |
+| `images/` | The folder itself and everything in it |
+
+POSIX shells and PowerShell expand globs before `ddb` gets them. Quote a pattern
+(`'**/*.JPG'`) to let `ddb` expand it.
+
+Commands that look up entries in the index (`ddb search`, `ddb list`, `ddb rm`) match a path
+without `*` exactly, letter case included: `ddb rm IMG_0001.JPG` does not remove
+`img_0001.jpg`. A path with `*` is a pattern and ignores letter case: `ddb search '*.jpg'` also
+lists `.JPG` files.
+
+## Share, sync and automate
+
+### Share files
+
+```bash
+ddb share *.JPG                                  # a new dataset on Hub
+ddb share *.JPG -s http://localhost:5000         # a new dataset on a self-hosted Registry
+ddb share *.JPG -t my-org/my-dataset             # this dataset (created when missing)
+ddb share *.JPG -t my-org/my-dataset -p secret   # protect the dataset with a password
+```
+
+A tag is `[server/]organization/dataset`. Without a tag, `ddb share` creates a dataset with a
+random name in your personal organization. It prints the URL of the dataset on stdout.
+
+### Share from a script
+
+`--non-interactive` never prompts. It uses the saved credentials (from `ddb login`), else
+`DDB_USERNAME` and `DDB_PASSWORD`, and fails when they are refused.
+
+```bash
+export DDB_USERNAME=survey-bot
+export DDB_PASSWORD='…'
+url=$(ddb share --non-interactive -q -t my-org/daily *.tif)
+echo "Shared to $url"
+```
+
+### Clone, change offline, push
+
+```bash
+ddb clone odm/brighton-beach        # public datasets need no login
+cd brighton-beach
+ddb add README.md new_photos/*.JPG
+ddb tag my-org/brighton-copy        # push to another dataset (optional)
+ddb push
+```
+
+`ddb push` sends only the files that the server does not have. The server checks the hash of
+each uploaded file before it changes the dataset. When the dataset changed on the server since
+your last sync, the push stops: run `ddb pull` first.
+
+### Log in and out
+
+```bash
+ddb login                                  # Hub
+ddb login --server http://localhost:5000   # a self-hosted Registry
+ddb logout                                 # every server
+ddb logout --server http://localhost:5000  # one server
+```
+
+Credentials are saved in the DroneDB home folder (`~/.ddb`, or `DDB_HOME`).
+
+## Metadata
+
+Store JSON metadata on the dataset or on a file. Metadata is synced by `ddb push` and
+`ddb pull`.
+
+```bash
+# Dataset metadata
+ddb meta set pilot '{"name": "John Smith"}'
+ddb meta get pilot --format json
+
+# File metadata
+ddb meta add comments '{"text": "Nice one!", "author": "John S."}' -p photo.JPG
+ddb meta get comments -p photo.JPG --format json
+```
+
+A key that ends in `s` is a list: write it with `ddb meta add`. Any other key holds one value:
+write it with `ddb meta set`.
+
+### Visibility
+
+Registry reads the visibility of a dataset from the `visibility` metadata:
+`0` private, `1` unlisted, `2` public.
+
+```bash
+ddb meta set visibility 2   # public
+ddb push
+```
+
+In Hub, see [Visibility](/docs/hub-guide/sharing/visibility).
+
+## Inspect and export metadata
+
+```bash
+# GPS positions of the photos as GeoJSON points
+ddb info *.JPG -f geojson -o gps.geojson
+
+# Footprints of the photos (polygons)
+ddb info *.JPG -f geojson --geometry polygon -o footprints.geojson
+
+# Hashes too
+ddb info odm_orthophoto.tif -f json --with-hash
+```
+
+## Keep an index healthy
+
+| Command | What it does |
+|---|---|
+| `ddb status` | Compares the index with the disk: `?` new, `!` deleted, `M` modified. |
+| `ddb sync` | Updates the index for deleted and modified files. |
+| `ddb rescan` | Reads the metadata of every indexed file again. Use it after an upgrade that reads more metadata or new formats. |
+| `ddb cleanup` | Removes entries whose files are gone and their orphaned build files, then shrinks the database. |
+| `ddb delta a.ddb b.ddb` | Lists the add and remove actions between two indexes, with paths and hashes. Push and pull use the same comparison. |
+| `ddb system clean` | Removes the user cache (thumbnails, downloaded tiles). |
+
+Rescan only some entries with a type (`-t`), an extension (`-e`) or both. An entry must match
+both filters. Extensions ignore case and an optional leading dot, and compound extensions such
+as `copc.laz` are allowed.
+
+```bash
+ddb rescan -t georaster,pointcloud
+ddb rescan -e dwg,dxf
+ddb rescan --continue-on-error
+```
+
+The type names are in the [command reference](./reference.mdx#rescan).
+
+## Build streaming files
+
+```bash
+ddb build                                  # every file that can be built
+ddb build -p odm_orthophoto.tif            # one file
+ddb build -p odm_orthophoto.tif --threads 2
+ddb build -f                               # build again, also complete builds
+```
+
+The products go to `.ddb/build/<hash>/`. `--threads N` (1 to 4096) caps the threads of the
+build. It lowers the `DDB_BUILD_THREADS` budget and never raises it. Untwine and `build-lod`
+run as separate programs and are not bounded by it.
+
+A build that misses a companion file (an `.obj` without its `.mtl`, a `.shp` without its
+`.shx`) does not fail: it waits. Add the missing file and it is due at once. A build that failed
+for a temporary reason (low disk space, a tool that stopped printing) is retried later.
+
+One-file conversions that do not need an index:
+
+```bash
+ddb cog input.tif output.tif               # Cloud Optimized GeoTIFF
+ddb copc output/ point_cloud.laz           # Cloud Optimized Point Cloud (LAS, LAZ, E57, PTS, XYZ, PLY)
+ddb thumbs *.JPG -o thumbs/                # thumbnails
+ddb thumbs orthophoto.tif -o thumb.webp -s 1024
+ddb tile orthophoto.tif output_tiles/      # static XYZ/TMS tiles (GeoTIFF, GeoImage, COPC)
+ddb geoproj images/DJI_0018.JPG -o projected/   # project a photo to a georeferenced raster
+```
+
+## Generate a STAC catalog
+
+```bash
+cd my-dataset
+ddb stac                                   # the catalog of the dataset, on stdout
+ddb stac -p orthophoto.tif                 # the STAC item of one file
+```
+
+A Registry serves the same catalog over HTTP: see [STAC API](../stac.mdx).
+
+## Multispectral and thermal
+
+### Merge single-band files
+
+Photogrammetry software often writes one GeoTIFF per band. Merge them into one multi-band COG.
+The band order of the output is the order of the inputs.
+
+```bash
+ddb merge-multispectral -o merged.tif blue.tif green.tif red.tif nir.tif rededge.tif
+```
+
+The command reprojects and resamples every input to one CRS, resolution and extent. To check
+the inputs without a merge:
+
+```bash
+ddb merge-multispectral --validate blue.tif green.tif red.tif nir.tif rededge.tif
+```
+
+The report is JSON. It includes the band shifts that DroneDB found:
+
+```json
+{
+  "ok": true,
+  "errors": [],
+  "warnings": [],
+  "summary": { "totalBands": 5, "dataType": "Float32", "width": 4000, "height": 3000 },
+  "alignment": {
+    "detected": true,
+    "maxShiftPixels": 2.3,
+    "correctionApplied": true,
+    "shiftSource": "xmp",
+    "bands": [
+      { "index": 0, "name": "Blue", "wavelength": 475, "shiftX": 0, "shiftY": 0 },
+      { "index": 1, "name": "Green", "wavelength": 560, "shiftX": 1.1, "shiftY": -0.8 }
+    ]
+  }
+}
+```
+
+### An OpenDroneMap multispectral project
+
+```bash
+ddb add images/
+ddb merge-multispectral \
+  -o odm_orthophoto/multispectral.tif \
+  odm_orthophoto/odm_orthophoto_blue.tif \
+  odm_orthophoto/odm_orthophoto_green.tif \
+  odm_orthophoto/odm_orthophoto_red.tif \
+  odm_orthophoto/odm_orthophoto_nir.tif \
+  odm_orthophoto/odm_orthophoto_rededge.tif
+ddb mask odm_orthophoto/multispectral.tif
+ddb add odm_orthophoto/multispectral_masked.tif
+ddb push
+```
+
+For thermal surveys, add the R-JPEGs as they are. DroneDB reads the calibration data when it
+indexes them.
+
+### How DroneDB reads the bands
+
+DroneDB matches each multispectral or thermal file against the sensor profiles that it ships
+(MicaSense RedEdge-M, RedEdge-MX, Altum, DJI P4 Multispectral, Parrot Sequoia, FLIR thermal
+cameras). It uses the band count, the data type and the XMP/EXIF metadata. The profile gives the
+band names and the default render. Other sensors are generic multi-band rasters; DroneDB reads
+band names and wavelengths from XMP when the file has them.
+
+For thermal R-JPEGs DroneDB reads the Planck constants, the emissivity and the temperature
+range, and computes the temperatures from the raw 16-bit data. A georeferenced thermal GeoTIFF
+holds temperatures in degrees Celsius.
+
+The spectral indices that a raster can compute:
+
+| Index | Bands | Rule |
+|---|---|---|
+| NDVI | Red, NIR | |
+| NDRE | RedEdge, NIR | |
+| GNDVI | Green, NIR | |
+| NDWI | Green, NIR | WMS style |
+| EVI | Red, Blue, NIR | Floating-point (reflectance) rasters only |
+| SAVI | Red, NIR | Floating-point (reflectance) rasters only |
+| OSAVI | Red, NIR | Floating-point (reflectance) rasters only |
+
+SAVI, OSAVI and EVI add constants that assume reflectance from 0 to 1. On 8- or 16-bit rasters
+they give wrong values, so DroneDB offers them only for floating-point rasters. A raster
+without a sensor profile and with five data bands or more is read as R, G, B, RedEdge, NIR. A
+band value that is NaN counts as no data.
+
+## Terrain and raster tools
+
+### Contour lines
+
+```bash
+ddb contour dem.tif -o contours.geojson -i 10 -s 1            # every 10 m, simplified to 1 m
+ddb contour dem.tif -o contours.geojson -n 20                 # 20 levels
+ddb contour dem.tif -o contours.geojson -i 5 --min 0 --max 200
+```
+
+| Option | Description |
+|---|---|
+| `-i, --interval` | Interval in raster units (default: automatic) |
+| `-n, --count` | Number of levels (instead of `--interval`) |
+| `-b, --base` | Offset of the first level |
+| `--min`, `--max` | Ignore values below or above |
+| `-s, --simplify` | Simplification tolerance in raster CRS units (`0`: off) |
+| `--band` | Band (1-based, default `1`) |
+| `-o, --output` | Output GeoJSON |
+
+### Mask orthophoto borders
+
+Make black (or white) border pixels transparent. The output is `<input>_masked.tif`.
+
+```bash
+ddb mask orthophoto.tif
+ddb mask orthophoto.tif -o output.tif -n 20
+ddb mask orthophoto.tif -w            # white borders
+ddb mask orthophoto.tif -c 0,0,128    # a custom border colour
+```
+
+| Option | Description |
+|---|---|
+| `-o, --output` | Output path (default `<input>_masked.tif`) |
+| `-n, --near` | Tolerance in grey levels (default `15`) |
+| `-w, --white` | White borders instead of black |
+| `-c, --color` | A border colour as `r,g,b` |
+
+### Align a raster to a reference
+
+Correct the georeference of an orthophoto or a DEM with a more accurate reference. The output
+is a COG in EPSG:3857.
+
+```bash
+ddb align -i source.tif -r reference.tif -o aligned.tif                   # similarity (default)
+ddb align -i source.tif -r reference.tif -o aligned.tif -m translation    # translation only
+ddb align -i source.tif -r reference.tif --validate                       # check only
+```
+
+| Mode | Degrees of freedom | Method | Use for |
+|---|---|---|---|
+| `similarity` (default) | 4: X/Y shift, rotation, scale | NCC template matching and RANSAC, seeded by phase correlation | General misalignment |
+| `translation` | 2: X/Y shift | Phase correlation | Small GPS offsets, faster |
+
+`--no-seed` turns off the phase-correlation seed (a slower NCC search). `--validate` prints a
+JSON report: CRS compatibility, overlap, GSD comparison and the estimated shift. Both rasters
+must overlap and have compatible coordinate systems.
+
+### Raster analysis in the API
+
+Profiles, area statistics, point values and stockpile volumes are not `ddb` commands. A
+Registry serves them per file (`raster-profile`, `raster-area-stats`, `raster-point-value`,
+`stockpile/detect`, `stockpile/detect-all`, `stockpile/calculate`); a program that loads the
+library calls `DDBGetRasterProfile`, `DDBGetRasterAreaStats`, `DDBDetectStockpile`,
+`DDBDetectAllStockpiles` and `DDBCalculateVolume`. The volume base planes are
+`lowest_perimeter`, `average_perimeter`, `best_fit` and `flat` (a horizontal plane at
+`flatElevation`, default `0`). See the [API reference](../api/reference.mdx).
+
+## 3D models and 3D Tiles
+
+### Build a model
+
+```bash
+ddb add model.obj model.mtl textures/
+ddb build -p model.obj
+```
+
+A model build writes a **bm3d** file (`bm3d/model.bm3d`), DroneDB's multiresolution format,
+and, as a best-effort extra, an OGC 3D Tiles tileset in `3dtiles/`. The `bm3d` program reads
+OBJ, PLY and STL (ASCII and binary). DroneDB converts glTF and GLB to OBJ first (to PLY when
+there are no texture coordinates), and a textured PLY to OBJ, in a temporary folder.
+
+Convert one model without an index:
+
+```bash
+ddb bm3d model.obj output.bm3d
+```
+
+A model built before DroneDB 2.0 has a Nexus file (`nxs/model.nxz`). A rebuild writes `bm3d/`
+and removes `nxs/` only after `bm3d/` is published; a failed rebuild keeps `nxs/`.
+
+### Write OGC 3D Tiles
+
+`ddb 3dtiles` needs the optional Obj2Tiles program.
+
+```bash
+ddb 3dtiles model.obj                                        # next to the input
+ddb 3dtiles model.obj ./3dtiles
+ddb 3dtiles model.obj ./3dtiles --local                      # not georeferenced
+ddb 3dtiles model.obj ./3dtiles --lat 43.7 --lon 10.4 --alt 50
+ddb 3dtiles model.obj ./3dtiles --force-defaults             # skip the size heuristic
+```
+
+By default the georeference comes from sidecar files next to the model (the ODM and Obj2Tiles
+convention). `--lat`, `--lon` and `--alt` set the origin; `--local` forces a local tileset.
+
+The depth of the tile tree follows the number of faces, capped at 6 (at most 4096 tiles at the
+finest level):
+
+| Faces | Depth | Most tiles at the finest level |
+|---|---|---|
+| &lt; 10K | 0 | 1 |
+| 10K–50K | 1 | 4 |
+| 50K–200K | 2 | 16 |
+| 200K–750K | 4 | 256 |
+| 750K–12M | 5 | 1024 |
+| &gt; 12M | 6 | 4096 |
+
+`--force-defaults` uses the Obj2Tiles defaults (divisions 3, LODs 3, octree) for tests.
+
+The command and the model build write the new tileset in a new folder and then replace the old
+one, so a failed run keeps the tileset that was there. An interrupted replacement can leave
+`3dtiles-old/` next to `3dtiles/`; the next build of the model restores it. A model whose bm3d
+file is complete is complete without 3D Tiles: a failure of Obj2Tiles is logged and does not
+retry the build.
+
+### Add a 3D Tiles archive
+
+```bash
+ddb add city.3tz
+ddb build
+```
+
+A `.3tz` is a ZIP with `tileset.json` at its root. The build extracts it into
+`.ddb/build/<hash>/3dtiles/` and fails when `tileset.json` is not at the root.
+
+## Vectors and CAD drawings
+
+```bash
+ddb add contours.geojson buildings.gpkg
+ddb add site.dwg site.prj          # a drawing and its optional coordinate system
+ddb build
+```
+
+A vector build writes a GeoPackage in EPSG:4326 with a spatial index, and Mapbox Vector Tiles in
+EPSG:3857. The highest zoom level is set so that there are at most 10,000 tiles.
+
+GeoPackage, KMZ and GPX files can hold several layers. DroneDB keeps every layer with at least
+one feature; when no layer has a feature, it keeps all of them. GDAL reads a GPX as five layers:
+`waypoints`, `routes`, `tracks`, `route_points` and `track_points` (each point of a route or a
+track with its time and elevation).
+
+### DWG conversion
+
+DroneDB converts a DWG to a temporary DXF with LibreDWG `dwg2dxf`, then builds the DXF.
+
+- DWG R13 to R2018 is supported. AutoCAD 2018 and later save as R2018.
+- 3D solids are not converted.
+- A conversion may run for 120 seconds (`DDB_DWG2DXF_MAX_SECONDS`).
+- A file that does not convert fails the build with a message that names the DWG version.
+  Export the drawing as DXF from your CAD software instead.
+
+### Coordinate system of a drawing
+
+DroneDB looks for the coordinate system of a DXF or DWG in this order:
+
+1. A `.prj` with the same name next to the drawing (`site.dwg` and `site.prj`). A `.prj` with a
+   local coordinate system (for example `LOCAL_CS["Drawing"]`) keeps the drawing off the map.
+2. The coordinate system that AutoCAD or Civil 3D stored in the drawing (the `GEODATA` object),
+   including a drawing placed on a local grid.
+3. DXF only: coordinates that fit in longitude and latitude are read as WGS84 (EPSG:4326).
+
+When none applies, the drawing has no geolocation. DroneDB builds it in its own coordinates, it
+is not on the map, and the OGC services do not publish it. Hub opens it in the 3D viewer. To set
+the coordinate system later, write the `.prj` (or use **Set Coordinate System** in Hub) and
+build again.
+
+## Gaussian splats
+
+### Build a splat
+
+```bash
+ddb add scene.ply
+ddb build                 # needs build-lod
+ddb push                  # a Registry builds splats itself
+```
+
+The build turns the source into **`model.rad`**, a level-of-detail container that the viewer
+streams with range requests, and **`bounds.json`**. The source file is never changed.
+
+The build needs the `build-lod` program. Without it a splat build fails:
+
+```text
+Building Gaussian Splats requires the build-lod tool, which was not found (set DDB_BUILDLOD_PATH or place build-lod next to the DroneDB executable)
+```
+
+DroneDB looks for `build-lod` in this order: `DDB_BUILDLOD_PATH` (when set, the only location);
+the folder of the running executable, then its `../bin`; the folder of the library, then its
+`../bin`; the `PATH`. `build-lod` runs under an idle deadline that grows with the number of
+splats: see [Troubleshooting](/docs/self-hosting/troubleshooting).
+
+### What a splat PLY must look like
+
+DroneDB checks the header of a splat PLY before it runs `build-lod`, and fails the build with
+what to change:
+
+- **Binary little-endian**, version 1.0. ASCII and big-endian PLYs are refused.
+- No list properties. Only the types `char`, `uchar`, `short`, `ushort`, `int`, `uint`,
+  `float` and `double`.
+- The `vertex` element has `x`, `y`, `z`, `f_dc_0..2`, `opacity`, `scale_0..2` and `rot_0..3`.
+- The number of `f_rest_*` properties is **0, 9, 24 or 45** (spherical-harmonics degree 0 to 3).
+- A SuperSplat compressed PLY has a `chunk` element with at least one record for every 256
+  splats, and the `packed_*` properties.
+
+A PLY with a `face` element is a mesh, not a splat. Damaged data that passes the header check is
+refused by `build-lod`; the build error then holds the reason that `build-lod` printed.
+
+### Upload a RAD file
+
+A `.rad` is already what a build writes, so DroneDB does not run `build-lod`. It reads the
+header and the chunk centres, copies the file into the build as `model.rad` and writes
+`bounds.json`. A file it cannot read fails the build with the reason. This works without
+`build-lod`. A `.rad` has no splat count in the index.
+
+### Which way is up
+
+Splats do not say which way is up: COLMAP and the original 3DGS tools store scenes with Y down,
+ODM with Z up. The build estimates it from the coarse splats and writes it in `bounds.json`:
+
+```json
+{
+  "min": [-12.4, -0.8, -9.1],
+  "max": [11.9, 6.2, 10.3],
+  "up": [0.01, -0.99, 0.02],
+  "upConfidence": 0.86,
+  "upSource": "ground-plane"
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `up` | A unit vector, in the coordinates of `model.rad`, that points to the sky |
+| `upConfidence` | 0 to 1. Viewers use `up` from **0.6**. |
+| `upSource` | `ground-plane`: a plane fitted to the splats is the ground. `pca`: no ground was found, `up` is the flattest direction (confidence at most 0.8). `georef`: the splat is georeferenced, `up` is `[0, 0, 1]` with confidence 1. |
+
+The confidence is low when the splats allow two answers: a scene as high as it is wide (a room),
+two grounds that disagree, or as much opacity on each side of the ground. A scene of fewer than
+16 splats gets confidence 0. The three fields are optional: a `bounds.json` of an earlier build
+has none of them.
+
+The thumbnail of a splat is a perspective view rendered from `model.rad`. It looks down 35
+degrees on the scene, stood on the `up` of `bounds.json` (on `−Y` without a confident `up`),
+and aims at the densest part of the scene. A room is shown from above with its upper part and
+near side cut away.
+
+### Convert to SPZ for other tools
+
+```bash
+ddb gsplat scene.ply scene.spz
+DDB_GSPLAT_SH_BITS=5 ddb gsplat scene.ply scene.spz      # fewer bits for the SH bands (1–8)
+DDB_GSPLAT_SH_BITS=5,4 ddb gsplat scene.ply scene.spz    # first band, other bands
+```
+
+`ddb gsplat input.{ply|splat|spz} [output.spz]` converts one file. It does not touch the index,
+does not build and does not need `build-lod`.
+
+- Without an output path it uses the input name with `.spz`. For an `.spz` input, give another
+  path: the command does not overwrite its input.
+- The output is written whole or not at all.
+- A gzip-based SPZ (versions 1 to 3) is copied unchanged. An SPZ version 4 is written as
+  version 3, which every SPZ reader opens.
+- `.ksplat`, `.sog` and `.rad` are not converted.
+
+Hub makes the same file with **Download .spz (for other tools)**; the API is the
+`splat-spz-export` task ([Processing API](../processing-api.mdx#splat-spz-export)).
+
+### Georeference a splat or a model
+
+A splat is stored in the coordinates of the program that trained it. A **georeferenced** splat
+has a local frame with a known place: X points East, Y North, Z up, in metres. DroneDB does not
+georeference a splat by its content: a **sidecar** file next to it gives the frame. The same
+sidecars georeference 3D models.
+
+When a splat is indexed, DroneDB looks for these files in this order and takes the first that
+holds a usable georeference (`<stem>` is the name of the splat without its extension):
+
+| Order | File | Where |
+|---|---|---|
+| 1 | `<stem>.geo.json` | The folder of the splat |
+| 2 | `georef.json` | The folder of the splat (it georeferences every splat in that folder) |
+| 3 | `reference_lla.json` | The folder of the splat |
+| 4 | `coords.txt` | The folder of the splat (ODM's file) |
+| 5 | `odm_georeferencing/coords.txt` | The folder of the splat (a splat at the root of an ODM project) |
+| 6 | `reference_lla.json`, `opensfm/reference_lla.json` | The folder above the splat |
+| 7 | `odm_georeferencing/coords.txt` | The folder above the splat |
+
+A sidecar gives the frame in one of two ways.
+
+**A projected CRS and an offset** (`<stem>.geo.json` or `georef.json` with `crs` and
+`offset`, or `coords.txt`). A point of the scene is the splat coordinates plus the offset, in
+that CRS, which must be projected. `crs` is an EPSG code, a PROJ string or WKT. The offset is
+`[x, y]` or `[x, y, z]` (`z` is 0 when missing):
+
+```json
+{
+  "crs": "EPSG:32632",
+  "offset": [683240.5, 5047920.25, 0]
+}
+```
+
+ODM's `coords.txt` has the CRS on the first line (`WGS84 UTM 32N`, an EPSG code, a PROJ string
+or WKT) and the easting and northing of the offset on the second:
+
+```text
+WGS84 UTM 32N
+683240.5 5047920.25
+```
+
+**A point of the Earth** (`<stem>.geo.json`, `georef.json` or `reference_lla.json` with a
+latitude and a longitude). The frame is the local East-North-Up plane at that point.
+`latitude` can also be `lat`; `longitude` can be `lon` or `lng`; `altitude` can be `alt` or
+`elevation` (0 when missing):
+
+```json
+{
+  "latitude": 45.4642,
+  "longitude": 9.19,
+  "altitude": 120.0
+}
+```
+
+DroneDB reads the sidecar when it indexes the splat. Add the sidecar together with the splat or
+before it. A splat indexed before its sidecar existed is georeferenced only after you index it
+again (`ddb rescan`).
+
+A georeferenced splat:
+
+- has `"up": [0, 0, 1]`, `"upConfidence": 1` and `"upSource": "georef"` in `bounds.json`;
+- has a `wgs84Footprint` in `bounds.json`: a GeoJSON polygon (longitude, latitude) of the
+  bounding box. With a projected CRS it is the exact conversion of the four corners; with a
+  point of the Earth it is the box laid on the local plane;
+- is drawn on the dataset map (a point until it is built, then the footprint), and its
+  measurements are in metres.
+
+```json
+{
+  "min": [-85.2, -61.4, -3.1],
+  "max": [92.7, 70.3, 41.8],
+  "up": [0, 0, 1],
+  "upConfidence": 1,
+  "upSource": "georef",
+  "wgs84Footprint": {
+    "type": "Polygon",
+    "coordinates": [[[9.1888, 45.4637], [9.1912, 45.4637], [9.1912, 45.4648], [9.1888, 45.4648], [9.1888, 45.4637]]]
+  }
+}
+```
+
+### Training data from an ODM project
+
+A splat trained from drone images is georeferenced when it is trained in the coordinates of the
+photogrammetry. `ddb gsplat --training-data` writes the input of a trainer from the outputs of
+an ODM project, in those coordinates:
+
+```bash
+ddb gsplat --training-data <output folder> [--max-image-size <pixels>] [--max-points <count>] <ODM project folder>
+```
+
+The project must have `cameras.json`, `odm_report/shots.geojson`, `images/` and
+`odm_georeferencing/coords.txt`. A missing file stops the export with an error that names it.
+The point cloud (`odm_georeferencing/odm_georeferenced_model.laz`, else
+`odm_filterpoints/point_cloud.ply`) gives the points of the model. Without it `points3D.bin` is
+empty and the trainer starts from random points.
+
+The output folder must be missing (it is created) or empty. It must not be the project folder,
+a folder that holds it or a folder inside it (links are resolved). Do not use a folder of a
+DroneDB dataset: the `georef.json` would georeference every model and splat beside it at the
+next index.
+
+| Output | What it is |
+|---|---|
+| `sparse/0/cameras.bin`, `images.bin`, `points3D.bin` | A COLMAP sparse model (binary, little-endian) in the CRS of `coords.txt` minus its offset: metres, axes East, North, Up |
+| `images/` | The images of the model: links to the originals (copies where a link is not possible), or resized copies with `--max-image-size` |
+| `georef.json` | `{"crs": …, "offset": [easting, northing, 0]}` from `coords.txt`: the sidecar of the splat you train |
+
+| Option | Meaning |
+|---|---|
+| `--max-image-size <pixels>` | The longest side of the exported images. Smaller images keep their size. Images are written as JPEG quality 95 and the cameras are scaled to match. Without it, the originals are used. |
+| `--max-points <count>` | The most points of the model, thinned evenly on a 3D grid. Default `100000`; `0` writes none; at most `10000000`. |
+
+The command prints the output folder on stdout. On stderr it prints the number of images and
+points, and warnings (`Warning: …`). Read them before you train:
+
+- **Nadir images.** When more than 98% of the images are within 12 degrees of nadir, the export
+  says so. A splat trained from them is sharp from above and poor from the side.
+- **The lens.** Brown cameras (ODM's default) become COLMAP `OPENCV`, which has no `k3`. `k3`
+  is folded into `k1` and `k2`, and a warning gives the shift in pixels when it is more than
+  0.05. Perspective cameras become `RADIAL`; `fisheye_opencv` cameras become `OPENCV_FISHEYE`.
+- **Images left out**, with the reason: a camera model that COLMAP does not have (spherical
+  cameras), a camera that is not in `cameras.json`, a file that is missing or has another size,
+  or a file name that another shot has. If no image can be exported, the command fails.
+- **The point cloud**: missing, empty, or away from the cameras (probably in other coordinates).
+
+Then:
+
+1. Train the splat outside DroneDB with a 3DGS trainer that reads a COLMAP model (a folder
+   with `images/` and `sparse/0/`). DroneDB does not train.
+2. Keep the coordinates. A trainer or editor that recentres, rotates or rescales the scene
+   breaks the georeference, and nothing in the file says so.
+3. Put the splat next to `georef.json` in the dataset (or give it its own `<stem>.geo.json`)
+   and build it.
+
+```bash
+ddb gsplat --training-data ./training --max-image-size 2000 ./odm_project
+# … train on ./training, which gives scene.ply …
+cp scene.ply ./training/georef.json my-dataset/
+cd my-dataset && ddb add scene.ply georef.json && ddb build
+```
+
+Hub runs the same export with **Export splat training data**. The API is the
+`splat-training-export` task ([Processing API](../processing-api.mdx#splat-training-export));
+the library export is `DDBExportSplatTrainingData`.
+
+### The views file of a splat
+
+The Hub viewer stores the cameras, pins, measurements, orientation and scale of a splat in a
+JSON file next to it: the splat name with `_cameras.json` instead of the extension
+(`scene.ply` → `scene_cameras.json`). The viewer writes version 2. It reads version 1 and the
+earliest layout (a bare list of cameras) as they are, and rewrites a file as version 2 only when
+a user saves.
+
+```json
+{
+  "version": 2,
+  "orientation": { "upAxis": "-y", "flipped": true, "tiltRoll": 0, "tiltPitch": 0 },
+  "scale": { "metersPerUnit": 0.5 },
+  "cameras": [
+    { "id": 1, "name": "Entrance", "position": [0, 1.6, 4], "quaternion": [0, 0, 0, 1], "fov": 60, "target": [0, 1.4, 0] }
+  ],
+  "annotations": [
+    { "id": 2, "title": "Gate", "text": "Markdown text", "link": "https://example.com", "image": "photos/gate.jpg", "position": [1, 0, 2], "view": null }
+  ],
+  "measurements": [
+    { "id": 3, "kind": "distance", "points": [[0, 0, 0], [1, 0, 0]] }
+  ]
+}
+```
+
+- Every position is in the coordinates of the splat file.
+- With the Auto orientation, `upAxis` is `"auto"`, there is no `flipped`, and `up` holds the
+  vector it resolved to (for example `"up": [0.01, -0.99, 0.02]`). The saved vector wins over
+  the estimate in `bounds.json`, so the saved cameras still match after a rebuild.
+- `link` must be a web address and `image` the path of a file in the dataset.
+- `kind` is `point`, `distance`, `height` or `area`.
+- `scale.metersPerUnit` is set with the scale tool of the viewer. A georeferenced splat is in
+  metres already.
+
+## Photogrammetry results
+
+DroneDB does not process images. Process them with WebODM or ODX, then index the results:
+
+```bash
+ddb add images/ odm_orthophoto/ odm_dem/ odm_georeferencing/ odm_texturing/
+ddb push
+```
+
+To process in Hub with a processing node, see
+[Photogrammetry](/docs/hub-guide/processing/photogrammetry) and the
+[Processing API](../processing-api.mdx#photogrammetry).
+
+## Archives
+
+`ddb add` indexes an archive (ZIP, 7Z, RAR, TAR…) as one Generic file. It does not extract it.
+Extract it before you add the files, or extract it in Hub after a push or share:
+[Archives](/docs/hub-guide/files/archives), or the `archive-extract` task of the
+[Processing API](../processing-api.mdx#archive-extract).

@@ -1,10 +1,109 @@
 ---
 title: "CLI quick start"
-description: "Index, build, share, push and pull data with ddb."
+description: "Index a folder with ddb, build its streaming files, then share, push and pull it with Hub or a self-hosted Registry."
 ---
 
-:::info
+This page takes a folder of drone data from your disk to Hub with the `ddb` command line. To do
+the same in the browser, see [Create an account & first dataset](/docs/get-started/first-dataset).
 
-This page is being written.
+You need:
 
-:::
+- `ddb` [installed](./install.mdx).
+- A folder of data: photos, orthophotos, point clouds, models or vector files.
+- A Hub account, or the URL of a self-hosted Registry and an account on it.
+
+## 1. Create an index
+
+An index is a `.ddb` folder that holds the metadata of your files. Create it in the root folder
+of your data:
+
+```bash
+cd /path/to/survey
+ddb init
+```
+
+## 2. Add files
+
+```bash
+ddb add .
+```
+
+`ddb add` reads the metadata of each file (GPS position, EXIF, bands, coordinate system) and
+gives it an [entry type](/docs/reference/formats#entry-types). You can also add some files only:
+
+```bash
+ddb add images/*.JPG odm_orthophoto/odm_orthophoto.tif
+```
+
+Check what the index holds and what changed on disk:
+
+```bash
+ddb list                  # indexed files
+ddb info images/DJI_0018.JPG -f json
+ddb status                # ? new, ! deleted, M modified
+ddb sync                  # update the index for deleted and modified files
+```
+
+`ddb status` shows new files with `?`. `ddb sync` does not add them: run `ddb add` again.
+
+## 3. Build streaming files (optional)
+
+```bash
+ddb build
+```
+
+`ddb build` writes the streaming versions of the files (COG, COPC, bm3d, vector tiles, splat
+level of detail) under `.ddb/build/`. You do not need it before a push: Hub and Registry build
+the files themselves. Use it to check a build locally, or to serve the files yourself.
+
+`ddb build -p odm_orthophoto/odm_orthophoto.tif` builds one file.
+
+## 4. Share or push
+
+There are two ways to send data to a Registry.
+
+### Share: upload files to a new dataset
+
+```bash
+ddb share images/*.JPG odm_orthophoto/odm_orthophoto.tif
+```
+
+`ddb share` asks for your credentials, uploads the files and prints the URL of the dataset.
+It does not need an index. Without a tag it creates a new dataset in your personal
+organization. To choose the destination:
+
+```bash
+ddb share *.tif -t my-org/my-dataset                     # Hub
+ddb share *.tif -s http://localhost:5000                 # a self-hosted Registry
+ddb share *.tif -t http://localhost:5000/my-org/my-dataset
+```
+
+### Push: sync the index with a dataset
+
+`ddb push` sends the index, its metadata and the changed files. Give the dataset a tag first.
+A tag is `[server/]organization/dataset`; without a server it is Hub.
+
+```bash
+ddb login                       # once; or: ddb login --server http://localhost:5000
+ddb tag my-org/survey-2026      # or: ddb tag http://localhost:5000/my-org/survey-2026
+ddb push
+```
+
+The first push creates the dataset. The next pushes send only what changed.
+
+## 5. Pull and clone
+
+```bash
+ddb clone odm/brighton-beach            # download a dataset into ./brighton-beach
+cd brighton-beach
+ddb pull                                # get the changes made on the server
+```
+
+When the server and your copy both changed, `ddb push` stops and asks you to pull first. Choose
+which side wins with `ddb pull --keep-theirs` (the server) or `ddb pull --keep-ours` (your copy).
+
+## Next steps
+
+- [Cookbook](./cookbook.mdx): metadata, multispectral, terrain, 3D, splats and more.
+- [Command reference](./reference.mdx): every option and environment variable.
+- [Visibility](/docs/hub-guide/sharing/visibility): make the dataset public or unlisted.

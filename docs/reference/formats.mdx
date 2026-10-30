@@ -1,10 +1,113 @@
 ---
 title: "Supported formats & entry types"
-description: "Every file format DroneDB reads and what Hub does with it."
+description: "Every file format DroneDB reads, the entry type it gets, the viewer that opens it and what Hub builds from it."
 ---
 
-:::info
+DroneDB stores every file you upload. It also reads the files of the formats on this page,
+gives each one an **entry type**, and builds streaming versions of them so that Hub can show
+them in the browser.
 
-This page is being written.
+## How DroneDB decides the type
 
-:::
+1. The file extension selects a family of types (for example `.tif` is a raster or a photo).
+2. DroneDB then reads the file:
+   - A TIFF or JPEG 2000 with a coordinate system is a **GeoRaster**. Without one it is a photo.
+   - A photo or a video with a GPS position in its metadata is a **GeoImage** or **GeoVideo**.
+   - An image at least twice as wide as it is high is a **Panorama** (or **GeoPanorama**).
+   - A `.ply` is a **PointCloud**, a **Model** or a **GaussianSplat**, from its header.
+   - A glTF without a mesh, or an STL that holds no triangles, is a **Generic** file.
+3. A file that is not of any other type is **Generic**: Hub stores it and you can download it.
+
+The type is set when the file is indexed. After an upgrade that reads a format in a new way,
+rescan the dataset to update the type of existing files.
+
+## Rasters
+
+<FormatTable category="raster" />
+
+## Point clouds
+
+<FormatTable category="pointcloud" />
+
+## 3D models and 3D Tiles
+
+A model build also writes OGC 3D Tiles, which you can download as a ZIP for CesiumJS, QGIS or
+ArcGIS. A model built before DroneDB 2.0 opens in the previous (Nexus) viewer until Registry
+rebuilds it in the background.
+
+<FormatTable category="model" />
+
+## Gaussian splats
+
+<FormatTable category="splat" />
+
+## Vector data and CAD drawings
+
+<FormatTable category="vector" />
+
+## Photos
+
+<FormatTable category="image" />
+
+## Panoramas
+
+<FormatTable category="panorama" />
+
+## Videos
+
+<FormatTable category="video" />
+
+## Documents
+
+<FormatTable category="document" />
+
+## Archives
+
+<FormatTable category="archive" />
+
+## Other
+
+<FormatTable category="other" />
+
+## Companion files
+
+Some formats need other files next to them. Upload them to the same folder. A build that
+misses a required companion file waits. It starts when the missing file arrives.
+
+| Main file | Companion files | Required |
+|---|---|---|
+| `.obj` | `.mtl` and the textures it names | Yes |
+| `.shp` | `.shx`, `.dbf` | Yes |
+| `.shp` | `.prj`, `.cpg` | No |
+| `.dxf`, `.dwg` | `.prj` with the same name: the coordinate system of the drawing | No |
+| 3D model, Gaussian splat | `<name>.geo.json`, `georef.json`, `reference_lla.json` or ODM's `coords.txt`: the georeference | No |
+| Gaussian splat | `<name>_cameras.json`: saved camera views, pins and measurements | No |
+
+The georeference sidecars and the order in which DroneDB looks for them are in the
+[CLI cookbook](../developers/cli/cookbook.mdx#georeference-a-splat-or-a-model).
+
+## Entry types
+
+Programs that read the [REST API](../developers/api/reference.mdx) or the
+[library](../developers/library.mdx) get the type as a number.
+
+| Number | Type | What it is |
+|---|---|---|
+| 1 | Directory | A folder of the dataset |
+| 2 | Generic | A file DroneDB stores but does not interpret |
+| 3 | GeoImage | A photo with a GPS position |
+| 4 | GeoRaster | A raster with a coordinate system |
+| 5 | PointCloud | A point cloud |
+| 6 | Image | A photo without a GPS position |
+| 7 | DroneDB | A folder that is a DroneDB dataset itself |
+| 8 | Markdown | A Markdown document |
+| 9 | Video | A video without a GPS position |
+| 10 | GeoVideo | A video with a GPS position |
+| 11 | Model | A 3D mesh |
+| 12 | Panorama | A panorama without a GPS position |
+| 13 | GeoPanorama | A panorama with a GPS position |
+| 14 | Vector | Points, lines and polygons with attributes |
+| 15 | GaussianSplat | A Gaussian splat scene |
+| 16 | Tiles3D | An OGC 3D Tiles archive |
+
+Hub shows the type of a file and what it means in the file properties.

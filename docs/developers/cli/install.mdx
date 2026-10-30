@@ -1,10 +1,81 @@
 ---
 title: "Install the CLI"
-description: "Install the ddb command-line tool."
+description: "Install the ddb command-line tool on Windows or Debian/Ubuntu Linux."
 ---
 
-:::info
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-This page is being written.
+`ddb` is the DroneDB command-line tool. It indexes, builds and shares data on your computer,
+and it syncs datasets with Hub or a self-hosted Registry. To run your own Registry, see
+[Self-hosting → Install](/docs/self-hosting/install).
 
-:::
+<Tabs>
+  <TabItem value="windows" label="Windows" default>
+
+1. Download the Windows ZIP of the [latest release](https://github.com/DroneDB/DroneDB/releases/latest).
+2. Extract the archive.
+3. Add the folder to your `PATH`.
+4. Make sure that it works:
+
+   ```text
+   C:\> ddb --version
+   2.0.0 (git commit xxxxxxx)
+   ```
+
+### Allow long paths
+
+Windows refuses a path of 260 characters or more unless long paths are allowed. A build writes
+temporary files about 130 characters below the root of the dataset, so a dataset in a deep
+folder fails to build without long paths. The programs of the package (`ddb`, `bm3d`,
+`gdal-util`, `metadata-util`, `untwine`) are long path aware, but Windows must allow it.
+
+As an administrator, run in PowerShell:
+
+```powershell
+New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name LongPathsEnabled -PropertyType DWord -Value 1 -Force
+```
+
+You can also enable the group policy **Enable Win32 long paths**. Then start the programs again.
+
+Without long paths, keep the root of a dataset under about 130 characters. A program that loads
+`ddb.dll` itself gets long paths only if its own executable is long path aware.
+
+  </TabItem>
+  <TabItem value="linux" label="Linux (Debian/Ubuntu)">
+
+1. Download the `.deb` package of the [latest release](https://github.com/DroneDB/DroneDB/releases/latest).
+2. Install it and make sure that it works:
+
+   ```bash
+   sudo dpkg -i dronedb_x.x.x_amd64.deb
+   ddb --version
+   ```
+
+Only Debian-based distributions (Debian, Ubuntu, Linux Mint and others) are supported. On other
+systems, [build from source](../building-from-source.mdx).
+
+  </TabItem>
+</Tabs>
+
+## What the package contains
+
+| Program | Use |
+|---|---|
+| `ddb` | The command-line tool. It contains the DroneDB library. |
+| `gdal-util` | Reads the rasters, vectors and photos of users in a confined process. |
+| `metadata-util` | Reads and writes image metadata (EXIF, XMP). |
+| `bm3d` | Builds `.bm3d` 3D models. |
+| `build-lod` | Builds the level-of-detail file of Gaussian splats. |
+| `untwine` | Builds COPC point clouds faster (optional). |
+| `Obj2Tiles` | Writes OGC 3D Tiles from 3D models (optional). |
+| `dwg2dxf` | Converts DWG drawings (optional). |
+
+`ddb` finds these programs next to its own executable. To use a program in another folder, set
+its path variable (see [Environment variables](./reference.mdx#helper-programs)).
+
+## Next steps
+
+- [Quick start](./quick-start.mdx): index a folder and push it to Hub.
+- [Cookbook](./cookbook.mdx): recipes for common tasks.
+- [Command reference](./reference.mdx): every command and option.

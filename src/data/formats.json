@@ -1,1 +1,317 @@
-[]
+[
+  {
+    "name": "GeoTIFF",
+    "extensions": [".tif", ".tiff"],
+    "category": "raster",
+    "entryType": "GeoRaster",
+    "view": "Map",
+    "builds": "Cloud Optimized GeoTIFF (COG)",
+    "notes": "Orthophotos, elevation models (DSM, DTM), multispectral and thermal mosaics. A TIFF without a coordinate system is an Image."
+  },
+  {
+    "name": "JPEG 2000",
+    "extensions": [".jp2", ".j2k"],
+    "category": "raster",
+    "entryType": "GeoRaster",
+    "view": "Map",
+    "builds": "Cloud Optimized GeoTIFF (COG)",
+    "notes": "The georeference comes from the GeoJP2 or GMLJP2 box. A nodata value is not read; an alpha channel is kept. Without a coordinate system it is an Image."
+  },
+  {
+    "name": "LAS / LAZ",
+    "extensions": [".las", ".laz"],
+    "category": "pointcloud",
+    "entryType": "PointCloud",
+    "view": "Point cloud viewer, map",
+    "builds": "Cloud Optimized Point Cloud (COPC)",
+    "notes": "LiDAR and photogrammetry point clouds."
+  },
+  {
+    "name": "E57",
+    "extensions": [".e57"],
+    "category": "pointcloud",
+    "entryType": "PointCloud",
+    "view": "Point cloud viewer, map",
+    "builds": "Cloud Optimized Point Cloud (COPC)",
+    "notes": "Terrestrial laser scans."
+  },
+  {
+    "name": "PTS / XYZ",
+    "extensions": [".pts", ".xyz"],
+    "category": "pointcloud",
+    "entryType": "PointCloud",
+    "view": "Point cloud viewer, map",
+    "builds": "Cloud Optimized Point Cloud (COPC)",
+    "notes": "Text point lists."
+  },
+  {
+    "name": "PLY point cloud",
+    "extensions": [".ply"],
+    "category": "pointcloud",
+    "entryType": "PointCloud",
+    "view": "Point cloud viewer, map",
+    "builds": "Cloud Optimized Point Cloud (COPC)",
+    "notes": "A PLY with points and no faces. DroneDB reads the header of every PLY to decide if it is a point cloud, a mesh or a Gaussian splat."
+  },
+  {
+    "name": "Wavefront OBJ",
+    "extensions": [".obj"],
+    "category": "model",
+    "entryType": "Model",
+    "view": "3D model viewer",
+    "builds": "bm3d model, OGC 3D Tiles",
+    "notes": "Upload the .mtl file and the textures with the model. A build that misses one of them waits until the file is uploaded."
+  },
+  {
+    "name": "glTF / GLB",
+    "extensions": [".gltf", ".glb"],
+    "category": "model",
+    "entryType": "Model",
+    "view": "3D model viewer",
+    "builds": "bm3d model, OGC 3D Tiles",
+    "notes": "A glTF with meshes. A glTF without a mesh (only points or lines) is a Generic file."
+  },
+  {
+    "name": "PLY mesh",
+    "extensions": [".ply"],
+    "category": "model",
+    "entryType": "Model",
+    "view": "3D model viewer",
+    "builds": "bm3d model, OGC 3D Tiles",
+    "notes": "A PLY with faces, with or without one texture. A PLY with several textures is a Generic file."
+  },
+  {
+    "name": "STL",
+    "extensions": [".stl"],
+    "category": "model",
+    "entryType": "Model",
+    "view": "3D model viewer",
+    "builds": "bm3d model, OGC 3D Tiles",
+    "notes": "ASCII and binary. Before DroneDB 2.0 an STL was a Generic file: rescan the dataset to change existing ones."
+  },
+  {
+    "name": "OGC 3D Tiles archive",
+    "extensions": [".3tz"],
+    "category": "model",
+    "entryType": "Tiles3D",
+    "view": "3D viewer",
+    "builds": "Extracted tileset",
+    "notes": "A ZIP with tileset.json at its root. A georeferenced tileset is placed on the globe."
+  },
+  {
+    "name": "Gaussian splat PLY",
+    "extensions": [".ply"],
+    "category": "splat",
+    "entryType": "GaussianSplat",
+    "view": "Gaussian splat viewer",
+    "builds": "Level-of-detail RAD (model.rad)",
+    "notes": "The 3DGS layout or the SuperSplat compressed layout, binary little-endian."
+  },
+  {
+    "name": "SPLAT",
+    "extensions": [".splat"],
+    "category": "splat",
+    "entryType": "GaussianSplat",
+    "view": "Gaussian splat viewer",
+    "builds": "Level-of-detail RAD (model.rad)",
+    "notes": "32 bytes per splat, no spherical harmonics."
+  },
+  {
+    "name": "SPZ",
+    "extensions": [".spz"],
+    "category": "splat",
+    "entryType": "GaussianSplat",
+    "view": "Gaussian splat viewer",
+    "builds": "Level-of-detail RAD (model.rad)",
+    "notes": "SPZ versions 1 to 4."
+  },
+  {
+    "name": "KSPLAT",
+    "extensions": [".ksplat"],
+    "category": "splat",
+    "entryType": "GaussianSplat",
+    "view": "Gaussian splat viewer",
+    "builds": "Level-of-detail RAD (model.rad)",
+    "notes": "Cannot be converted to .spz for other tools."
+  },
+  {
+    "name": "SOG",
+    "extensions": [".sog"],
+    "category": "splat",
+    "entryType": "GaussianSplat",
+    "view": "Gaussian splat viewer",
+    "builds": "Level-of-detail RAD (model.rad)",
+    "notes": "A single-file ZIP bundle. The number of splats is unknown until the build. Cannot be converted to .spz."
+  },
+  {
+    "name": "RAD",
+    "extensions": [".rad"],
+    "category": "splat",
+    "entryType": "GaussianSplat",
+    "view": "Gaussian splat viewer",
+    "builds": "Checked and published as it is",
+    "notes": "The level-of-detail format that a build writes. The number of splats is unknown. Cannot be converted to .spz."
+  },
+  {
+    "name": "GeoJSON",
+    "extensions": [".geojson"],
+    "category": "vector",
+    "entryType": "Vector",
+    "view": "Map",
+    "builds": "GeoPackage, vector tiles (MVT)",
+    "notes": ""
+  },
+  {
+    "name": "Shapefile",
+    "extensions": [".shp", ".shz"],
+    "category": "vector",
+    "entryType": "Vector",
+    "view": "Map",
+    "builds": "GeoPackage, vector tiles (MVT)",
+    "notes": "Upload the .shx and .dbf files (and the .prj, .cpg) with the .shp; a build that misses one waits for it. A .shz is a zipped shapefile."
+  },
+  {
+    "name": "GeoPackage",
+    "extensions": [".gpkg"],
+    "category": "vector",
+    "entryType": "Vector",
+    "view": "Map",
+    "builds": "GeoPackage, vector tiles (MVT)",
+    "notes": "Every layer with at least one feature is kept."
+  },
+  {
+    "name": "KML / KMZ",
+    "extensions": [".kml", ".kmz"],
+    "category": "vector",
+    "entryType": "Vector",
+    "view": "Map",
+    "builds": "GeoPackage, vector tiles (MVT)",
+    "notes": "A KMZ can hold several layers."
+  },
+  {
+    "name": "GPX",
+    "extensions": [".gpx"],
+    "category": "vector",
+    "entryType": "Vector",
+    "view": "Map",
+    "builds": "GeoPackage, vector tiles (MVT)",
+    "notes": "Tracks, routes and waypoints. Empty layers are left out."
+  },
+  {
+    "name": "FlatGeobuf",
+    "extensions": [".fgb"],
+    "category": "vector",
+    "entryType": "Vector",
+    "view": "Map",
+    "builds": "GeoPackage, vector tiles (MVT)",
+    "notes": ""
+  },
+  {
+    "name": "TopoJSON",
+    "extensions": [".topojson"],
+    "category": "vector",
+    "entryType": "Vector",
+    "view": "Map",
+    "builds": "GeoPackage, vector tiles (MVT)",
+    "notes": ""
+  },
+  {
+    "name": "DXF (CAD drawing)",
+    "extensions": [".dxf"],
+    "category": "vector",
+    "entryType": "Vector",
+    "view": "Map, or the 3D viewer without a coordinate system",
+    "builds": "GeoPackage, vector tiles (MVT)",
+    "notes": "The coordinate system comes from a .prj next to it, from the drawing, or (DXF only) from coordinates that fit longitude and latitude. Set one in Hub with Set Coordinate System."
+  },
+  {
+    "name": "DWG (CAD drawing)",
+    "extensions": [".dwg"],
+    "category": "vector",
+    "entryType": "Vector",
+    "view": "Map, or the 3D viewer without a coordinate system",
+    "builds": "GeoPackage, vector tiles (MVT)",
+    "notes": "DWG R13 to R2018, converted to DXF with LibreDWG. 3D solids are not converted. Coordinate system as for DXF, except the longitude and latitude rule."
+  },
+  {
+    "name": "Photo",
+    "extensions": [".jpg", ".jpeg", ".png", ".webp", ".gif", ".dng", ".tif", ".tiff", ".jp2", ".j2k"],
+    "category": "image",
+    "entryType": "GeoImage or Image",
+    "view": "Photo viewer; map (GeoImage)",
+    "builds": "",
+    "notes": "GeoImage when the EXIF/XMP metadata has a GPS position, else Image. Thermal R-JPEGs and the bands of multispectral cameras are photos too. A TIFF or JPEG 2000 with a coordinate system is a GeoRaster."
+  },
+  {
+    "name": "Panorama (360°)",
+    "extensions": [".jpg", ".jpeg", ".png", ".webp", ".gif", ".dng", ".tif", ".tiff", ".jp2", ".j2k"],
+    "category": "panorama",
+    "entryType": "GeoPanorama or Panorama",
+    "view": "Panorama viewer; map (GeoPanorama)",
+    "builds": "",
+    "notes": "An image at least twice as wide as it is high. GeoPanorama when it has a GPS position."
+  },
+  {
+    "name": "Video",
+    "extensions": [".mp4", ".mov", ".webm", ".m4v", ".avi", ".mkv"],
+    "category": "video",
+    "entryType": "GeoVideo or Video",
+    "view": "Photo and video viewer; map (GeoVideo)",
+    "builds": "",
+    "notes": "GeoVideo when the metadata has a GPS position, else Video."
+  },
+  {
+    "name": "Markdown",
+    "extensions": [".md"],
+    "category": "document",
+    "entryType": "Markdown",
+    "view": "Markdown viewer",
+    "builds": "",
+    "notes": "A README.md describes the dataset. Users who can write edit it in Hub."
+  },
+  {
+    "name": "PDF",
+    "extensions": [".pdf"],
+    "category": "document",
+    "entryType": "Generic",
+    "view": "PDF viewer of the browser",
+    "builds": "",
+    "notes": "For example the processing report of OpenDroneMap."
+  },
+  {
+    "name": "Text",
+    "extensions": [".txt", ".json", ".csv", ".xml", ".yml", ".yaml", ".log", ".prj", ".wkt"],
+    "category": "document",
+    "entryType": "Generic",
+    "view": "Text editor",
+    "builds": "",
+    "notes": "Files up to 5 MB open in the text editor of Hub. Other source and configuration formats open there too."
+  },
+  {
+    "name": "Archive",
+    "extensions": [".zip", ".7z", ".rar", ".tar", ".tar.gz", ".tgz", ".tar.bz2", ".tbz2", ".tar.xz", ".txz", ".gz", ".bz2", ".xz"],
+    "category": "archive",
+    "entryType": "Generic",
+    "view": "",
+    "builds": "",
+    "notes": "Hub extracts it into the dataset. The ddb command line indexes it as one file and does not extract it."
+  },
+  {
+    "name": "DroneDB dataset",
+    "extensions": [],
+    "category": "other",
+    "entryType": "DroneDB",
+    "view": "File browser",
+    "builds": "",
+    "notes": "A folder that holds its own .ddb index."
+  },
+  {
+    "name": "Any other file",
+    "extensions": [],
+    "category": "other",
+    "entryType": "Generic",
+    "view": "",
+    "builds": "",
+    "notes": "Stored, listed and downloadable. Companion files (.mtl, textures, .shx, .dbf, georeference sidecars, _cameras.json) are Generic files too."
+  }
+]

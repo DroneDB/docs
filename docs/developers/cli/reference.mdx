@@ -1,10 +1,157 @@
 ---
 title: "CLI command reference"
-description: "Every ddb command and option."
+description: "Every ddb command and option, the output and exit codes, and the environment variables that DroneDB reads."
 ---
 
-:::info
+import CLIAutogen from './_cli_autogen.mdx';
 
-This page is being written.
+This page lists every `ddb` command with its options, the output rules and the environment
+variables of DroneDB. For tasks, see the [cookbook](./cookbook.mdx). The command list at the end
+is generated from the `ddb` program itself.
 
-:::
+## Commands by task
+
+| Task | Commands |
+|---|---|
+| Index files | `init`, `add`, `remove` (`rm`), `list` (`ls`), `search`, `info`, `status`, `sync`, `rescan`, `cleanup` |
+| Work with a Registry | `login`, `logout`, `share`, `clone`, `push`, `pull`, `tag`, `stamp`, `delta` (`diff`) |
+| Build streaming files | `build`, `cog`, `copc`, `bm3d`, `3dtiles`, `tile`, `thumbs`, `gsplat` |
+| Process rasters | `contour`, `mask`, `align`, `merge-multispectral`, `geoproj` |
+| Metadata | `meta`, `setexif`, `password`, `stac` |
+| Maintenance | `system clean` (remove the user cache) |
+
+## Output and exit codes
+
+`ddb` writes the output of a command (text, JSON, GeoJSON) to **stdout**. It writes log
+messages (warnings, `--debug` records) to **stderr**. You can pipe the output of
+`ddb info -f json` or `ddb list -f json` to another program as it is.
+
+| Exit code | When |
+|---|---|
+| `0` | The command succeeded. Also `ddb --help` and `ddb <command> --help`. |
+| `1` | The command failed: no arguments, an unknown command, an invalid argument or format, a failed push or pull, or a Registry that cannot be reached. The message is on stderr. |
+
+`ddb push`, `ddb pull`, `ddb clone` and `ddb share` accept only `http` and `https` Registry
+URLs. A Registry that cannot be reached fails at once with
+`could not connect to <url>: <reason>`, without a password prompt.
+
+Before DroneDB 2.0 the log also went to stdout, and some failures exited with `0`.
+
+## Environment variables
+
+DroneDB reads these variables when it runs. Integer variables accept digits only: a value such
+as `1024MB` is ignored and the default applies. Programs that load the library set the
+process-wide settings with `DDBConfigure` instead (see [DroneDB library](../library.mdx#process-configuration)).
+
+### General
+
+| Variable | Default | Description |
+|---|---|---|
+| `DDB_LOG` | not set | Any value: write a log file (`ddb-log.csv`) in the current folder. |
+| `DDB_DEBUG` | not set | Any value: verbose debug output on stderr, as `--debug`. |
+| `DDB_HOME` | `~/.ddb` | The DroneDB home folder: saved credentials and the user profile. |
+| `DDB_DATA` | the bundled folder | The folder of the bundled data files (time zones, PROJ, GDAL). A `GDAL_DATA`, `PROJ_DATA` or `PROJ_LIB` that you set wins. |
+| `DDB_OPENTOPOGRAPHY_KEY` | not set | OpenTopography API key, used to estimate the relative altitude of images from the world DSM. Without it the altitude comes from GPS (one warning). There is no built-in key. |
+| `DDB_USERNAME`, `DDB_PASSWORD` | not set | Credentials that `ddb share --non-interactive` uses when there are no saved ones. |
+
+### Threads and disk
+
+| Variable | Default | Description |
+|---|---|---|
+| `DDB_INDEX_THREADS` | cores, at most 8 | Files that `ddb add` (and a Registry that indexes uploads) hashes and reads at the same time. `0`: every core. `1`: one file at a time. |
+| `DDB_CPU_POOL_SIZE` | cores − 1 | Worker threads the library may run at once beside the calling threads. `0` runs everything on the calling thread. |
+| `DDB_IO_THREADS` | `4` | Threads of one disk-bound step, such as hashing pushed files or deleting build folders. |
+| `DDB_BUILD_THREADS` | `min(8, cores)` | Threads of one build: GDAL warping and compression in a COG build, the `bm3d` program in a model build. `0`: all cores. `ddb build --threads` lowers it for one build. |
+| `DDB_MIN_FREE_DISK_MB` | `512` | Free MiB a build needs on the volume it writes to. Below it the build fails as retryable. `0` turns the check off. |
+
+### Helper programs
+
+DroneDB runs some work in separate programs. When a path variable is not set, DroneDB looks
+for the program next to the `ddb` executable, next to the library, in `../bin` and on `PATH`.
+A path variable that is set is the only location used.
+
+| Variable | Default | Description |
+|---|---|---|
+| `DDB_GDAL_UTIL_PATH` | search | The `gdal-util` program, which reads the rasters, vectors and photos of users in a confined process. |
+| `DDB_GDAL_SANDBOX` | `best-effort` | How the workers of `gdal-util` are confined. `best-effort` applies the layers the host has and logs the missing ones once. `strict` refuses to start when a layer is missing. `off` applies none (tests and debugging only). `gdal-util --sandbox-report` lists the layers of the host. |
+| `DDB_GDAL_UTIL_MAX_SECONDS` | `43200` (12 hours) | The longest a COG or vector build in `gdal-util` may run. |
+| `DDB_METADATA_UTIL_PATH` | search | The `metadata-util` program, which reads and writes image metadata (EXIF, XMP). |
+| `DDB_BM3D_PATH` | search | The `bm3d` program, which builds `.bm3d` models. |
+| `DDB_BUILDLOD_PATH` | search | The `build-lod` program, which every Gaussian splat build needs. |
+| `DDB_BUILDLOD_IDLE_TIMEOUT_SECONDS` | from the splat count | Replaces the idle deadline of `build-lod` for every build: an integer from 1 to 86400. See [Troubleshooting](/docs/self-hosting/troubleshooting). |
+| `DDB_OBJ2TILES_PATH` | search | The optional `Obj2Tiles` program, which writes OGC 3D Tiles. |
+| `DDB_OBJ2TILES_MAX_CORES` | not set | The most cores `Obj2Tiles` may use (at most the cores of the computer). |
+| `DDB_DWG2DXF_PATH` | search | The optional LibreDWG `dwg2dxf` program, which converts DWG drawings. |
+| `DDB_DWG2DXF_MAX_SECONDS` | `120` | The longest one DWG conversion may run. |
+| `DDB_UNTWINE_PATH` | search | The optional `untwine` program, which builds COPC point clouds faster. |
+
+### Point clouds (COPC)
+
+| Variable | Default | Description |
+|---|---|---|
+| `DDB_COPC_BACKEND` | `auto` | `untwine`, `pdal` or `auto`. Unknown values are ignored. |
+| `DDB_USE_PDAL_COPC` | not set | `1` forces the PDAL `writers.copc` backend. It wins over `DDB_COPC_BACKEND`. |
+
+### COG builds
+
+These are also GDAL configuration options (`CPLSetConfigOption`).
+
+| Variable | Default | Description |
+|---|---|---|
+| `DDB_COG_JPEG_QUALITY` | `75` | JPEG quality (1–100) of a COG. Only 8-bit RGB or RGBA rasters use JPEG; all others use LZW. |
+| `DDB_WARP_MEMORY_MB` | `512` | GDALWarp memory buffer in MB (`-wm`). |
+| `DDB_COG_CACHE_MB` | `1024` | GDAL block cache in MB during a COG build. The previous size comes back when the last build ends. |
+| `DDB_GDAL_CACHE_MB` | `1024` | Upper bound of GDAL's process-wide block cache, applied at start-up (16 to 1048576). It never raises the cache and is ignored when `GDAL_CACHEMAX` is set. |
+
+A COG build needs about `DDB_COG_CACHE_MB` + `DDB_WARP_MEMORY_MB` + 1 GB of driver temporary
+data. A 72 MB, 40 001 × 90 001 px thermal mosaic used 2.4 GB with the defaults.
+
+### Library hosts: index connections
+
+Programs that load the library (Registry, language bindings) keep idle index connections and
+use them again for the next call on the same dataset (about 0.8 ms less per call). The `ddb`
+command runs one command per process and keeps none.
+
+| Variable | Default | Description |
+|---|---|---|
+| `DDB_DB_POOL_SIZE` | `4` | Idle connections kept per dataset. `0` turns the reuse off. |
+| `DDB_DB_POOL_MAX` | `64` | Idle connections kept in total. Each holds about 1 MB, plus up to 2 MB of SQLite page cache. |
+| `DDB_DB_POOL_IDLE_SECONDS` | `60` | Idle connections close after this many seconds. |
+
+Index writes do not checkpoint: their changes stay in `.ddb/dbase.sqlite-wal` until SQLite's
+automatic checkpoint, the last connection closes, a host calls `DDBCheckpoint`, or the host
+exits normally. Thus:
+
+- Copy or back up the whole `.ddb` folder, `dbase.sqlite-wal` included. To copy
+  `dbase.sqlite` alone, call `DDBCheckpoint` (or `DDBReleaseConnections`) first.
+- Never replace `dbase.sqlite` while connections are open. Call `DDBReleaseConnections` before
+  you delete, move or replace a dataset folder. Registry does this.
+
+### Library hosts: map tiles and renders
+
+| Variable | Default | Description |
+|---|---|---|
+| `DDB_RASTER_CACHE_SIZE` | `8` | Idle tilers (or open rasters) kept per file. `0` turns the reuse off. |
+| `DDB_RASTER_CACHE_MAX` | `64` | Idle tilers and open rasters kept in total. |
+| `DDB_RASTER_CACHE_IDLE_SECONDS` | `60` | Idle ones close after this many seconds. |
+| `DDB_PCTILE_RESOLUTION_OFFSET` | `2` | A point-cloud tile reads the COPC levels down to the resolution of this many zoom levels above the tile. |
+| `DDB_COPC_NODE_CACHE_MB` | `256` | Memory for decoded COPC nodes that point-cloud tiles share. `0` turns the cache off. |
+| `DDB_RENDER_THREADS` | `4` | Warper threads of a map render (WMS GetMap, WCS GetCoverage) that runs alone. Under load each render uses one thread. `0`: all cores. |
+
+A kept raster is used again only while the file has the same modification time, size and (on
+Linux and macOS) inode, so a rebuilt COG is opened again.
+
+Tiles are PNG, JPEG or WebP. Thumbnails are WebP at quality 80. A JPEG that holds a smaller copy
+of the photo (the MPF preview of DJI cameras and most phones) is thumbnailed from that copy,
+about three times faster.
+
+### Push and Gaussian splats
+
+| Variable | Default | Description |
+|---|---|---|
+| `DDB_VERIFY_PUSH_HASHES` | on | `0` skips the hash check of pushed files when the host verifies the bytes itself. |
+| `DDB_GSPLAT_SH_BITS` | SPZ defaults | Spherical-harmonics bit depth of `ddb gsplat`. One value (`5`) sets `sh1Bits`; two values (`5,4`) set `sh1Bits` and `shRestBits`. Each from `1` to `8`. |
+
+## Commands
+
+<CLIAutogen />
