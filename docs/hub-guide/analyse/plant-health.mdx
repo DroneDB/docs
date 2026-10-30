@@ -52,7 +52,7 @@ a colormap. Nothing is processed in advance: you can change the index at any tim
 | Option | What it does | Default |
 |---|---|---|
 | **Preset** | A band combination or an index made for the camera that took the images. It shows when Hub knows the camera. | — |
-| **Formula** | The vegetation index. **None (bands only)** shows the bands; see [Colormaps, bands & histogram](./colormaps.mdx). | None |
+| **Formula** | The vegetation index. **None (bands only)** shows the bands; see [Colormaps, bands & histogram](/hub-guide/analyse/colormaps.mdx). | None |
 | **Colormap** | The colours of the index. | Red-Yellow-Green |
 | **Stretch** | How Hub maps the values to the colours: **Percentile (2%-98%)**, **Min / Max**, **Std Dev (±2σ)** or **Custom**. | Percentile |
 | **Rescale** | The minimum and the maximum value, for example `-1,1`. Empty: automatic. | Automatic |
@@ -83,16 +83,16 @@ band whatever the band order of the camera.
 
 - Plant Health needs a georaster with two or more data bands, or a GeoTIFF photo with a
   footprint. A raster with one band per file needs
-  [Merge multispectral bands](../processing/merge-multispectral.mdx) first.
+  [Merge multispectral bands](/hub-guide/processing/merge-multispectral.mdx) first.
 - **Export** is not available when the result is larger than the export limit of the Hub.
 - When the map shows two or more rasters, each raster with bands has its own leaf button in the
   layer opacity panel.
 
 ## Related
 
-- [Colormaps, bands & histogram](./colormaps.mdx)
-- [Thermal imagery](./thermal.mdx)
-- [Merge multispectral bands](../processing/merge-multispectral.mdx)
-- [Export a raster](../processing/export-raster.mdx)
+- [Colormaps, bands & histogram](/hub-guide/analyse/colormaps.mdx)
+- [Thermal imagery](/hub-guide/analyse/thermal.mdx)
+- [Merge multispectral bands](/hub-guide/processing/merge-multispectral.mdx)
+- [Export a raster](/hub-guide/processing/export-raster.mdx)
 
 <ForDevelopers api="/docs/developers/api/workflows" />

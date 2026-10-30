@@ -7,7 +7,7 @@ description: "Update Registry, upgrade to Registry 3.0 with DroneDB 2.0, and mov
 
 Registry migrates its databases when the web server starts. To update:
 
-1. [Back up](./backup-restore.mdx) the databases, `appsettings.json` and the `data/` folder.
+1. [Back up](/self-hosting/backup-restore.mdx) the databases, `appsettings.json` and the `data/` folder.
 2. Check the new version against your settings: run the new image (or binary) with `--check`.
 3. Replace Registry and start it.
 
@@ -23,7 +23,7 @@ Native: replace the files of the release and, if the new version needs it, the D
 Then start Registry again.
 
 Read the [release notes](https://github.com/DroneDB/Registry/releases) of every version you skip.
-Administrators also see them in the Hub, from the [update check](./update-check.mdx#the-answer-and-what-the-hub-shows).
+Administrators also see them in the Hub, from the [update check](/self-hosting/update-check.mdx#the-answer-and-what-the-hub-shows).
 
 ### The Hub updates itself
 
@@ -45,7 +45,7 @@ server version, it reloads the page and shows the dialog **DroneDB Hub has been 
 links to the release pages on GitHub. Embedded views (`?embed=1`) skip the check.
 
 Branding files in `data/branding/` are never touched by the upgrade (see
-[Hub UI customization](./configuration.mdx#hub-ui-customization)).
+[Hub UI customization](/self-hosting/configuration.mdx#hub-ui-customization)).
 
 ## Upgrade to Registry 3.0 (DroneDB 2.0)
 
@@ -68,7 +68,7 @@ Registry 3.0 runs on DroneDB 2.0 and changes the deployment in a few places.
    ```
 
 4. **Reverse proxy.** Set `KnownProxies` and `KnownNetworks` (see
-   [Reverse proxy](./production.mdx#reverse-proxy)). Without them, Registry ignores the forwarded
+   [Reverse proxy](/self-hosting/production.mdx#reverse-proxy)). Without them, Registry ignores the forwarded
    headers of a proxy on the Docker bridge.
 5. **Count duplicate dataset slugs.** A migration adds a unique index on the organization and the
    slug of datasets. Two datasets of one organization with the same slug (left by a race in older
@@ -102,7 +102,7 @@ Registry 3.0 runs on DroneDB 2.0 and changes the deployment in a few places.
   zone.
 - **Administrator password.** `DefaultAdmin.Password` only creates a new administrator. To recover
   a password, use `--reset-admin-password` (see
-  [Troubleshooting](./troubleshooting.mdx#reset-the-administrator-password)).
+  [Troubleshooting](/self-hosting/troubleshooting.mdx#reset-the-administrator-password)).
 - **Logs.** Log files are named per instance type (`registry-web*.txt`,
   `registry-node-<host name>*.txt`, `registry-thumbs*.txt`) and roll daily (14 kept). Give each
   processing node container a fixed `hostname`.
@@ -123,10 +123,10 @@ program, instead of the Nexus format. Models built before the upgrade have only 
 
 You do not need to do anything:
 
-- The nightly [artifact completeness check](./configuration.mdx#artifactcompletenesscheckercron)
+- The nightly [artifact completeness check](/self-hosting/configuration.mdx#artifactcompletenesscheckercron)
   (`0 2 * * *`) finds these models and queues a rebuild for each.
 - The rebuilds run on the background `rebuilds` queue, **one at a time** on each process, with at
-  most [`ProcessingBudget:BackgroundRebuildThreads`](./configuration.mdx#processingbudget) threads
+  most [`ProcessingBudget:BackgroundRebuildThreads`](/self-hosting/configuration.mdx#processingbudget) threads
   (default 2). They do not slow down the builds that users wait for. An entry that already has a
   build job is skipped.
 - Until its rebuild is done, a model opens in the previous (Nexus) viewer. When the rebuild writes
@@ -134,7 +134,7 @@ You do not need to do anything:
   is retried and stays a background rebuild.
 
 To start the check at once instead of waiting for the night, trigger the recurring job in the
-[Hangfire dashboard](./admin-pages.mdx#hangfire), or call (administrator):
+[Hangfire dashboard](/self-hosting/admin-pages.mdx#hangfire), or call (administrator):
 
 ```bash
 curl -X POST -H "Authorization: Bearer <admin token>" https://registry.example.com/sys/check-artifact-completeness
@@ -174,7 +174,7 @@ curl -X POST -H "Authorization: Bearer <admin token>" -H "Content-Type: applicat
   https://registry.example.com/sys/cleanup
 ```
 
-The nightly [`DatasetCleanupCron`](./configuration.mdx#datasetcleanupcron) job does the same.
+The nightly [`DatasetCleanupCron`](/self-hosting/configuration.mdx#datasetcleanupcron) job does the same.
 
 ## Branding folder
 

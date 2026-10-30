@@ -23,14 +23,14 @@ are hidden. Type in **Search users** to filter the list; click **Refresh** to lo
 :::note When the page is missing
 
 **Manage Users** is shown only when Registry manages the accounts itself. With
-[LDAP](./ldap.mdx) or an external authentication service (`ExternalAuthUrl`), the directory
+[LDAP](/self-hosting/ldap.mdx) or an external authentication service (`ExternalAuthUrl`), the directory
 manages users, passwords and the admin role, and the Hub hides the page.
 
 :::
 
 ## The first administrator
 
-The first start creates the administrator of the [`DefaultAdmin`](./configuration.mdx#defaultadmin)
+The first start creates the administrator of the [`DefaultAdmin`](/self-hosting/configuration.mdx#defaultadmin)
 setting: `admin` / `password123` (a Docker Compose install takes the password from
 `REGISTRY_ADMIN_PASSWORD`). Change the password at once in **My Account**. The **Delete User**
 button is always disabled for the user `admin`.
@@ -44,13 +44,13 @@ button is always disabled for the user `admin`.
    <Screenshot id="self-hosting/users--add" />
 
 2. Enter the **Username**, the **Email** and the **Password**. The dialog shows the rules of the
-   [password policy](./configuration.mdx#passwordpolicy) under the password field.
+   [password policy](/self-hosting/configuration.mdx#passwordpolicy) under the password field.
 3. Optional: choose one or more **Roles**.
 4. Click **Add User**.
 
 </Steps>
 
-When [`EnableDefaultUserOrganization`](./configuration.mdx#enabledefaultuserorganization) is on
+When [`EnableDefaultUserOrganization`](/self-hosting/configuration.mdx#enabledefaultuserorganization) is on
 (the default), the new user also gets a personal organization with the user name as slug.
 
 ## Edit a user
@@ -88,7 +88,7 @@ click **Delete** next to a role.
 | Role | Meaning |
 |------|---------|
 | `admin` | Instance administrator: every organization and dataset, the admin pages, Hangfire. It cannot be deleted. |
-| Other roles | Labels you create. They give no rights by themselves. Use them in [tool gating](./processing-nodes.mdx#tool-gating) (`AllowedRoles`) to allow a tool for some users only. |
+| Other roles | Labels you create. They give no rights by themselves. Use them in [tool gating](/self-hosting/processing-nodes.mdx#tool-gating) (`AllowedRoles`) to allow a tool for some users only. |
 
 Assign roles to a user with **Edit User**. Remove a role from every user before you delete it.
 
@@ -124,12 +124,12 @@ the Registry.
 Owners and members manage their own organizations on the Organizations page of the Hub: see
 [Dataset members & organizations](/docs/hub-guide/datasets/members). By default only
 administrators add and remove members; with
-[`EnableOrganizationMemberManagement`](./configuration.mdx#enableorganizationmembermanagement),
+[`EnableOrganizationMemberManagement`](/self-hosting/configuration.mdx#enableorganizationmembermanagement),
 owners can do it too (**Manage Members**).
 
 ## Storage quotas
 
-1. Turn on [`EnableStorageLimiter`](./configuration.mdx#enablestoragelimiter) and restart
+1. Turn on [`EnableStorageLimiter`](/self-hosting/configuration.mdx#enablestoragelimiter) and restart
    Registry.
 2. Give each user a quota in MB with the `maxStorageMB` key of the user's metadata. The Hub has no
    field for it: use the API (`POST /users/{userName}/meta`, see

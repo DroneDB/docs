@@ -41,7 +41,7 @@ A file without a badge is ready. The file browser, the table view and the detail
 | Clock | **Queued**: the build waits for its turn | Wait |
 | Triangle | **Waiting for files**: a file that the build needs is not in the dataset | Upload the missing file (see below) |
 | Triangle | **On Hold**: a temporary error | Nothing. Hub tries again by itself |
-| Red cross | **Failed** | Read the log in the [Tasks tab](./tasks.mdx), then build the file again |
+| Red cross | **Failed** | Read the log in the [Tasks tab](/hub-guide/processing/tasks.mdx), then build the file again |
 
 Point at a badge to see the reason. When you open a file that is not ready, a window tells you why. It
 offers **Start Processing**, **Wait and Open** or **Retry Processing**, as the case needs.
@@ -74,7 +74,7 @@ Some files need companion files with the same name:
 
 When a companion file is missing, the build does not fail. It waits, and the badge shows **Waiting for
 files** with the missing names. Upload the missing files to the folder that the message names. The build
-starts at once, with no timer. If you turned on [build notification e-mails](../account/build-notifications.mdx),
+starts at once, with no timer. If you turned on [build notification e-mails](/hub-guide/account/build-notifications.mdx),
 you get one e-mail that names the missing files.
 
 ## Download a built file
@@ -97,7 +97,7 @@ you get one e-mail that names the missing files.
 | **Download 3D Tiles (.zip)** | `<name>.3dtiles.zip`, OGC 3D Tiles with `tileset.json` at its root |
 
 The files take the name of your file. An uploaded `.3tz` archive has no 3D Tiles download, because it is a
-3D Tiles archive already. Splats have [their own downloads](../viewing/splat-downloads.mdx).
+3D Tiles archive already. Splats have [their own downloads](/hub-guide/viewing/splat-downloads.mdx).
 
 ## Limits & requirements
 
@@ -107,9 +107,9 @@ The files take the name of your file. An uploaded `.3tz` archive has no 3D Tiles
 
 ## Related
 
-- [Tasks panel & logs](./tasks.mdx)
-- [Open Hub data in QGIS](../sharing/qgis.mdx)
-- [Build notification e-mails](../account/build-notifications.mdx)
+- [Tasks panel & logs](/hub-guide/processing/tasks.mdx)
+- [Open Hub data in QGIS](/hub-guide/sharing/qgis.mdx)
+- [Build notification e-mails](/hub-guide/account/build-notifications.mdx)
 - [Upload your data](/docs/get-started/upload)
 
 <ForDevelopers cli="ddb build --force odm_orthophoto/odm_orthophoto.tif" api="/docs/developers/api/workflows" />

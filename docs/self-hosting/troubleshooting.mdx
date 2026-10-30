@@ -12,23 +12,23 @@ of the storage folder (see [Logs](#logs)). Most messages name the setting or the
 
 A setting in `appsettings.json` or in the environment is not valid; the message names the key. Fix
 it and check with `Registry.Web <storage folder> --check` (exit code `0` when the settings are
-valid). See the [Configuration reference](./configuration.mdx).
+valid). See the [Configuration reference](/self-hosting/configuration.mdx).
 
 **`Unable to use the DDB library: …`**
 
 Registry needs the DroneDB library 2.x with every function it calls. Use the Docker image, or
 install the DroneDB release that your Registry version pins (`DdbVersion` in `Directory.Build.props`
-of the Registry source). See [Install → Native](./install.mdx#native).
+of the Registry source). See [Install → Native](/self-hosting/install.mdx#native).
 
 **`no matching manifest for linux/arm64/v8` when you pull the image**
 
 The image is built for `linux/amd64` only. Add `--platform linux/amd64`. See
-[Apple Silicon and other ARM computers](./install.mdx#apple-silicon-and-other-arm-computers).
+[Apple Silicon and other ARM computers](/self-hosting/install.mdx#apple-silicon-and-other-arm-computers).
 
 **A processing node stops with `HangfireProvider InMemory is not supported for a processing node`**
 
 Nodes share the job queue with the web server: use MySQL or MariaDB. See
-[Processing nodes](./processing-nodes.mdx#registry-processing-nodes).
+[Processing nodes](/self-hosting/processing-nodes.mdx#registry-processing-nodes).
 
 **The container never becomes healthy**
 
@@ -58,7 +58,7 @@ docker run --rm -v registry-data:/data -e REGISTRY_ADMIN_PASSWORD='new-strong-pa
   dronedb/registry --reset-admin-password
 ```
 
-The new password must follow the [password policy](./configuration.mdx#passwordpolicy). With LDAP,
+The new password must follow the [password policy](/self-hosting/configuration.mdx#passwordpolicy). With LDAP,
 passwords are in the directory.
 
 ## Dataset initialization fails on macOS
@@ -78,7 +78,7 @@ index template onto this file system. Each failed attempt leaves a `.ddb` folder
 **Solution**
 
 Run Registry with a named volume for `/data`, as in
-[macOS: use a named volume](./install.mdx#macos-use-a-named-volume). To keep the settings and users
+[macOS: use a named volume](/self-hosting/install.mdx#macos-use-a-named-volume). To keep the settings and users
 of the old folder, copy them into the volume before you start the new container. This command also
 removes the broken `.ddb` folders, so Registry creates the indexes again:
 
@@ -100,11 +100,11 @@ where no dataset was initialized correctly.
 **Every client has the same address `172.x.0.1`, or all anonymous users share one rate limit**
 
 Registry ignores `X-Forwarded-For` from a proxy it does not trust. Add the Docker bridge range to
-`KnownNetworks`. See [Reverse proxy](./production.mdx#reverse-proxy).
+`KnownNetworks`. See [Reverse proxy](/self-hosting/production.mdx#reverse-proxy).
 
 **Links in e-mails or share links point to `localhost` or to `http`**
 
-Set [`ExternalUrlOverride`](./configuration.mdx#externalurloverride) to the public URL, and make
+Set [`ExternalUrlOverride`](/self-hosting/configuration.mdx#externalurloverride) to the public URL, and make
 the proxy send `X-Forwarded-Proto`.
 
 ### Tuning the reverse proxy for large uploads
@@ -127,7 +127,7 @@ Four settings matter:
   the window to 2 MB (20 MB/s per stream at 100 ms). HTTP/1.1 is not affected: TCP does the flow
   control.
 - **Body-size limit.** Remove or raise the limit of the proxy. You can still cap uploads in Registry
-  with [`MaxRequestBodySize`](./configuration.mdx#maxrequestbodysize): a larger request gets
+  with [`MaxRequestBodySize`](/self-hosting/configuration.mdx#maxrequestbodysize): a larger request gets
   `413 Payload Too Large` before any byte is stored.
 - **Read timeout.** `proxy_read_timeout` must cover the time between the last byte of the upload and
   the answer. That is normally the index commit (milliseconds). Two cases make it longer: buffering
@@ -234,39 +234,39 @@ file done when Registry reports it. Raise `proxy_read_timeout` if this happens o
 
 | Symptom | What to check |
 |---------|---------------|
-| `413 Payload Too Large` | [`MaxRequestBodySize`](./configuration.mdx#maxrequestbodysize) and the body limit of the proxy |
-| A file is refused with a message about its extension | The file type is blocked: [`BlockedFileExtensions`](./configuration.mdx#import) or `AllowedFileExtensions` |
-| Uploads are refused for one user | The [storage quota](./users.mdx#storage-quotas) of the user is full |
+| `413 Payload Too Large` | [`MaxRequestBodySize`](/self-hosting/configuration.mdx#maxrequestbodysize) and the body limit of the proxy |
+| A file is refused with a message about its extension | The file type is blocked: [`BlockedFileExtensions`](/self-hosting/configuration.mdx#import) or `AllowedFileExtensions` |
+| Uploads are refused for one user | The [storage quota](/self-hosting/users.mdx#storage-quotas) of the user is full |
 | Uploads fail for everyone | Free disk space and the permissions of `DatasetsPath` (the `registry` user must own it) |
 
 ## Builds
 
 Builds make what the Hub shows of a file (tiles, COPC, bm3d, splat levels of detail). Failed and
-running builds are in the [Hangfire dashboard](./admin-pages.mdx#hangfire), with the error.
+running builds are in the [Hangfire dashboard](/self-hosting/admin-pages.mdx#hangfire), with the error.
 
 **A build fails with a lack of disk space**
 
 A build needs free space on the volume it writes to: 512 MiB by default
-([`Ddb:MinFreeDiskMb`](./configuration.mdx#ddb)). Free space, or move `/data` to a larger
-partition (see [Disks and temporary files](./production.mdx#disks-and-temporary-files)). Registry
-retries such builds automatically, and the [pending builds job](./configuration.mdx#processpendingbuildscron)
+([`Ddb:MinFreeDiskMb`](/self-hosting/configuration.mdx#ddb)). Free space, or move `/data` to a larger
+partition (see [Disks and temporary files](/self-hosting/production.mdx#disks-and-temporary-files)). Registry
+retries such builds automatically, and the [pending builds job](/self-hosting/configuration.mdx#processpendingbuildscron)
 starts them again later.
 
 **A build waits for files**
 
 A build that misses a companion file (the `.mtl` of an `.obj`, a texture, the `.dbf` or `.shx` of a
 `.shp`) is not a failure. It runs when a file with the missing name is added to the dataset. Users
-with [build notifications](./email.mdx#build-notifications) get the missing names by e-mail.
+with [build notifications](/self-hosting/email.mdx#build-notifications) get the missing names by e-mail.
 
 **A build runs twice, or collides with itself**
 
 With MySQL, Hangfire hands a job that runs longer than
-[`HangfireInvisibilityTimeoutHours`](./configuration.mdx#hangfireinvisibilitytimeouthours) (4 hours)
+[`HangfireInvisibilityTimeoutHours`](/self-hosting/configuration.mdx#hangfireinvisibilitytimeouthours) (4 hours)
 to another worker. Raise it for very long builds.
 
 **A build fails on Windows with a long path**
 
-Turn on long paths: see [Windows: long paths](./install.mdx#windows-long-paths).
+Turn on long paths: see [Windows: long paths](/self-hosting/install.mdx#windows-long-paths).
 
 ### A splat build stops without output
 
@@ -335,31 +335,31 @@ curl -X POST -H "Authorization: Bearer <admin token>" \
 ```
 
 Add `?retentionDays=30` to override the retention for that run. See
-[`JobIndexCleanupCron`](./configuration.mdx#jobindexcleanupcron) and
-[`JobIndexRetentionDays`](./configuration.mdx#jobindexretentiondays).
+[`JobIndexCleanupCron`](/self-hosting/configuration.mdx#jobindexcleanupcron) and
+[`JobIndexRetentionDays`](/self-hosting/configuration.mdx#jobindexretentiondays).
 
 **A queued e-mail failed**
 
 Open it in Hangfire: the reason is there. Usually the process that ran it has e-mail off or another
-password. See [E-mail](./email.mdx#turn-on-e-mail).
+password. See [E-mail](/self-hosting/email.mdx#turn-on-e-mail).
 
 ## Sign-in problems
 
 - Check that `Secret` is set and the same on every Registry process: all of them read the same
   `appsettings.json`.
-- Check [`TokenExpirationInDays`](./configuration.mdx#tokenexpirationindays).
+- Check [`TokenExpirationInDays`](/self-hosting/configuration.mdx#tokenexpirationindays).
 - Clear the cookies of the site in the browser.
-- With LDAP, see [LDAP troubleshooting](./ldap.mdx#troubleshooting).
+- With LDAP, see [LDAP troubleshooting](/self-hosting/ldap.mdx#troubleshooting).
 
 ## Slow performance
 
 - Use MySQL or MariaDB instead of SQLite.
-- Add Redis as [`CacheProvider`](./configuration.mdx#cacheprovider) for a busy instance.
-- Declare the processes of the host in [`HostBudget`](./configuration.mdx#hostbudget), or tune
-  [`ProcessingBudget`](./configuration.mdx#processingbudget) and
-  [`NativeConcurrency`](./configuration.mdx#nativeconcurrency).
+- Add Redis as [`CacheProvider`](/self-hosting/configuration.mdx#cacheprovider) for a busy instance.
+- Declare the processes of the host in [`HostBudget`](/self-hosting/configuration.mdx#hostbudget), or tune
+  [`ProcessingBudget`](/self-hosting/configuration.mdx#processingbudget) and
+  [`NativeConcurrency`](/self-hosting/configuration.mdx#nativeconcurrency).
 - On Apple Silicon, the image runs under emulation: see
-  [Apple Silicon](./install.mdx#apple-silicon-and-other-arm-computers).
+  [Apple Silicon](/self-hosting/install.mdx#apple-silicon-and-other-arm-computers).
 
 ## Health checks
 
@@ -374,7 +374,7 @@ curl -H "Authorization: Bearer <token>" http://localhost:5000/quickhealth
 curl -H "Authorization: Bearer <token>" http://localhost:5000/health
 ```
 
-`<token>` is an administrator token or the [`MonitorToken`](./configuration.mdx#monitortoken), which
+`<token>` is an administrator token or the [`MonitorToken`](/self-hosting/configuration.mdx#monitortoken), which
 can also be sent as `?token=<MonitorToken>`.
 
 `/health` reports each check by name: the cache, the DroneDB library, the user manager, the
@@ -391,7 +391,7 @@ Hangfire (at least one server) and the thumbnail generator. With LDAP or e-mail 
 | Native | `registry-data/logs/registry*.txt` |
 
 Files roll daily; the last 14 are kept, at most 100 MB each. To change the level, see
-[Configuration → Logging](./configuration.mdx#logging).
+[Configuration → Logging](/self-hosting/configuration.mdx#logging).
 
 ## Get help
 

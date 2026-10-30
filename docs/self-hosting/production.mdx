@@ -3,7 +3,7 @@ title: "Production checklist"
 description: "What to set up before you run Registry in production: secrets, database, reverse proxy, disks, processing nodes, monitoring and logs."
 ---
 
-Do these steps before users depend on your Registry. The [Docker Compose setup](./install.mdx#docker-compose-production)
+Do these steps before users depend on your Registry. The [Docker Compose setup](/self-hosting/install.mdx#docker-compose-production)
 already does some of them; the list says which.
 
 ## Checklist
@@ -20,7 +20,7 @@ already does some of them; the list says which.
 | 8 | [Monitor health and read the logs](#health-checks-and-monitoring) | Health checks done |
 | 9 | [Turn on e-mail](#e-mail-and-update-check) | You do it |
 | 10 | [Restrict access](#access-and-limits) | You do it |
-| 11 | [Plan backups](./backup-restore.mdx) | You do it |
+| 11 | [Plan backups](/self-hosting/backup-restore.mdx) | You do it |
 
 After each change of `appsettings.json`, run `Registry.Web <storage folder> --check` (or the image
 with `--check`) and restart the Registry services.
@@ -43,13 +43,13 @@ with `--check`) and restart the Registry services.
 ## Database
 
 SQLite and the in-memory job queue are the defaults. For production use MySQL or MariaDB for all
-three stores; processing nodes require it. See [Configuration → Database](./configuration.mdx#database).
+three stores; processing nodes require it. See [Configuration → Database](/self-hosting/configuration.mdx#database).
 The Compose setup uses MariaDB 10.6 with InnoDB settings that keep the shared tablespace from
 growing; they take effect only on a new data folder of the database.
 
 ## Public URL
 
-Set [`ExternalUrlOverride`](./configuration.mdx#externalurloverride) to the address users open,
+Set [`ExternalUrlOverride`](/self-hosting/configuration.mdx#externalurloverride) to the address users open,
 for example `https://registry.example.com`. E-mails, share links and the update check use it.
 Without it, e-mails have no links and no logo.
 
@@ -63,8 +63,8 @@ it to terminate TLS. The proxy must:
   limits, download limits, logs) and the scheme from the second (`Secure` cookies, HSTS). It does
   not read `X-Forwarded-Host`.
 - connect from an address that Registry trusts. Registry applies the forwarded headers only when the
-  peer is in [`KnownProxies`](./configuration.mdx#knownproxies) (IP addresses, default `127.0.0.1`
-  and `::1`) or inside [`KnownNetworks`](./configuration.mdx#knownnetworks) (CIDR). From any other
+  peer is in [`KnownProxies`](/self-hosting/configuration.mdx#knownproxies) (IP addresses, default `127.0.0.1`
+  and `::1`) or inside [`KnownNetworks`](/self-hosting/configuration.mdx#knownnetworks) (CIDR). From any other
   peer they are ignored, so a client cannot fake its address.
 
 ```json
@@ -100,7 +100,7 @@ server {
 ```
 
 Large uploads need more proxy settings (request buffering, the HTTP/2 window, timeouts). See
-[Tuning the reverse proxy for large uploads](./troubleshooting.mdx#tuning-the-reverse-proxy-for-large-uploads).
+[Tuning the reverse proxy for large uploads](/self-hosting/troubleshooting.mdx#tuning-the-reverse-proxy-for-large-uploads).
 
 ## Disks and temporary files
 
@@ -146,7 +146,7 @@ images that declared `VOLUME /data`, to an anonymous Docker volume on the root f
 :::
 
 On macOS, use a named volume, not a host folder: see
-[macOS: use a named volume](./install.mdx#macos-use-a-named-volume).
+[macOS: use a named volume](/self-hosting/install.mdx#macos-use-a-named-volume).
 
 If datasets are on a volume mounted outside `/data`, list it in `REGISTRY_EXTRA_OWNED_PATHS`
 (paths separated by spaces), so the container gives it to the `registry` user at start.
@@ -182,8 +182,8 @@ ASP.NET Core Data Protection keys. When a web server and processing nodes run as
 processes, they must share the keys, or a node cannot read what the web server encrypted. Do one
 of these:
 
-- use Redis as [`CacheProvider`](./configuration.mdx#cacheprovider): the keys are then kept in Redis;
-- set [`DataProtectionKeysPath`](./configuration.mdx#dataprotectionkeyspath) to a folder that all
+- use Redis as [`CacheProvider`](/self-hosting/configuration.mdx#cacheprovider): the keys are then kept in Redis;
+- set [`DataProtectionKeysPath`](/self-hosting/configuration.mdx#dataprotectionkeyspath) to a folder that all
   processes share, for example `./data/protection-keys`.
 
 The Compose setup sets neither. Add one of them when you use processing nodes.
@@ -191,13 +191,13 @@ The Compose setup sets neither. Add one of them when you use processing nodes.
 ## CPU and memory
 
 A web server and processing nodes on one machine must not each plan the whole machine. Declare
-them in [`HostBudget`](./configuration.mdx#hostbudget). The Compose file sets
+them in [`HostBudget`](/self-hosting/configuration.mdx#hostbudget). The Compose file sets
 `AppSettings__HostBudget__WebServers=1` and `AppSettings__HostBudget__ProcessingNodes=2` on every
 Registry service: keep these numbers equal to the services you run. **Admin → Configuration**
 shows the effective budget.
 
 If a build can take longer than 4 hours (a very large point cloud, mesh or orthophoto), raise
-[`HangfireInvisibilityTimeoutHours`](./configuration.mdx#hangfireinvisibilitytimeouthours). A job
+[`HangfireInvisibilityTimeoutHours`](/self-hosting/configuration.mdx#hangfireinvisibilitytimeouthours). A job
 that runs longer can start a second time on another worker.
 
 ## Health checks and monitoring
@@ -208,7 +208,7 @@ that runs longer can start a second time on another worker.
 | `GET /quickhealth` | Administrator or `MonitorToken` | Quick check |
 | `GET /health` | Administrator or `MonitorToken` | Full report: databases, DroneDB, storage, Hangfire, and SMTP and LDAP when they are on |
 
-Set [`MonitorToken`](./configuration.mdx#monitortoken) and send it as
+Set [`MonitorToken`](/self-hosting/configuration.mdx#monitortoken) and send it as
 `Authorization: Bearer <token>` or as `?token=<token>`. Do not use `/quickhealth` as a container
 health check: without the token it never passes.
 
@@ -239,23 +239,23 @@ at `Warning`; the Compose template starts at `Information`.
 ## E-mail and update check
 
 - Turn on e-mail to send build notifications and update notices: see
-  [E-mail (SMTP) & templates](./email.mdx). Every Registry service needs the same SMTP settings.
+  [E-mail (SMTP) & templates](/self-hosting/email.mdx). Every Registry service needs the same SMTP settings.
 - Registry checks once a day for new versions and sends data about the deployment to dronedb.app.
-  Read [Update check](./update-check.mdx), declare your use, or switch the check off.
+  Read [Update check](/self-hosting/update-check.mdx), declare your use, or switch the check off.
 
 ## Access and limits
 
-Review these settings (all in the [Configuration reference](./configuration.mdx)):
+Review these settings (all in the [Configuration reference](/self-hosting/configuration.mdx)):
 
-- [`AllowedOrigins`](./configuration.mdx#allowedorigins): CORS is open to all origins by default.
-- [`PasswordPolicy`](./configuration.mdx#passwordpolicy): at least 8 characters and one digit by
+- [`AllowedOrigins`](/self-hosting/configuration.mdx#allowedorigins): CORS is open to all origins by default.
+- [`PasswordPolicy`](/self-hosting/configuration.mdx#passwordpolicy): at least 8 characters and one digit by
   default.
-- [`DisableAnonymousBulkDownloads`](./configuration.mdx#disableanonymousbulkdownloads) and
-  [`MaxConcurrentDownloadsPerUser`](./configuration.mdx#maxconcurrentdownloadsperuser).
-- [`MaxRequestBodySize`](./configuration.mdx#maxrequestbodysize): uploads have no size limit by
+- [`DisableAnonymousBulkDownloads`](/self-hosting/configuration.mdx#disableanonymousbulkdownloads) and
+  [`MaxConcurrentDownloadsPerUser`](/self-hosting/configuration.mdx#maxconcurrentdownloadsperuser).
+- [`MaxRequestBodySize`](/self-hosting/configuration.mdx#maxrequestbodysize): uploads have no size limit by
   default.
-- [`EnableStorageLimiter`](./configuration.mdx#enablestoragelimiter) to set storage quotas per user.
-- [`HubOptions`](./configuration.mdx#huboptions), for example `ShowRegistrationLink`.
+- [`EnableStorageLimiter`](/self-hosting/configuration.mdx#enablestoragelimiter) to set storage quotas per user.
+- [`HubOptions`](/self-hosting/configuration.mdx#huboptions), for example `ShowRegistrationLink`.
 
 ## Altitude estimation
 

@@ -29,7 +29,7 @@ in the container). The first start creates the file from the built-in defaults
   one day.
 
 In the Hub, administrators can read the effective configuration in **Admin → Configuration**: see
-[Admin pages](./admin-pages.mdx#configuration).
+[Admin pages](/self-hosting/admin-pages.mdx#configuration).
 
 ## Summary
 
@@ -95,7 +95,7 @@ It cannot be used with `LdapSettings`. Default: `null`.
 
 LDAP or Active Directory sign-in. It cannot be used with `ExternalAuthUrl`. When `Enabled` is
 `true`, `Server`, `BaseDn` and a `SearchFilter` with `{0}` are required. See
-[LDAP / Active Directory](./ldap.mdx) for the setup and examples.
+[LDAP / Active Directory](/self-hosting/ldap.mdx) for the setup and examples.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -312,7 +312,7 @@ upload (`/share/upload/{token}`). `null`: no limit. Example: `21474836480` (20 G
 
 Behind a reverse proxy, also raise or remove the limit of the proxy and turn off its request
 buffering, so that Registry applies the limit. See
-[Tuning the reverse proxy for large uploads](./troubleshooting.mdx#tuning-the-reverse-proxy-for-large-uploads).
+[Tuning the reverse proxy for large uploads](/self-hosting/troubleshooting.mdx#tuning-the-reverse-proxy-for-large-uploads).
 
 ### BatchTokenLength
 
@@ -391,7 +391,7 @@ files. They can still download single files. Signed-in users are not affected. T
 The administrator that Registry creates on the first start (local accounts only). `Email`,
 `UserName` and `Password` are required. A later change of `Password` does not change the password
 of the existing account: use **My Account**, or
-[`--reset-admin-password`](./troubleshooting.mdx#reset-the-administrator-password).
+[`--reset-admin-password`](/self-hosting/troubleshooting.mdx#reset-the-administrator-password).
 
 ```json
 "DefaultAdmin": {
@@ -404,7 +404,7 @@ of the existing account: use **My Account**, or
 ### EnableStorageLimiter
 
 Limits the storage of each user to the `maxStorageMB` value of the user's metadata. A user without
-the value has no limit. See [Storage quotas](./users.mdx#storage-quotas). Default: `false`.
+the value has no limit. See [Storage quotas](/self-hosting/users.mdx#storage-quotas). Default: `false`.
 
 ### EnableDefaultUserOrganization
 
@@ -464,7 +464,7 @@ Default: `null`.
 
 IP addresses of the reverse proxies whose `X-Forwarded-For` and `X-Forwarded-Proto` headers Registry
 trusts. A value replaces the default: list loopback too if the proxy also connects over it. An
-address that is not valid stops the start. See [Reverse proxy](./production.mdx#reverse-proxy).
+address that is not valid stops the start. See [Reverse proxy](/self-hosting/production.mdx#reverse-proxy).
 Default: `["127.0.0.1", "::1"]`.
 
 ### KnownNetworks
@@ -490,7 +490,7 @@ Registry adds these headers to every response. There is nothing to configure.
 The outgoing mail server. E-mail is off by default: while `Enabled` is `false`, Registry writes each
 e-mail to the log and drops it. When `Enabled` is `true`, `Host` and `FromAddress` are required, and
 `UserName` and `Password` must be set together (or both left empty). See
-[E-mail (SMTP) & templates](./email.mdx).
+[E-mail (SMTP) & templates](/self-hosting/email.mdx).
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -508,7 +508,7 @@ e-mail to the log and drops it. When `Enabled` is `true`, `Host` and `FromAddres
 
 ### BuildNotifications
 
-How [build notification e-mails](./email.mdx#build-notifications) are grouped. They need `Smtp`.
+How [build notification e-mails](/self-hosting/email.mdx#build-notifications) are grouped. They need `Smtp`.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
@@ -516,7 +516,7 @@ How [build notification e-mails](./email.mdx#build-notifications) are grouped. T
 
 ## Update check
 
-Registry asks dronedb.app once a day for new versions. See [Update check](./update-check.mdx) for
+Registry asks dronedb.app once a day for new versions. See [Update check](/self-hosting/update-check.mdx) for
 what it sends.
 
 ### UpdateCheckCron
@@ -645,7 +645,7 @@ dataset. The first match is used. Default:
 
 The asynchronous tasks (exports, imports, archive extraction, photogrammetry and others). Section
 `AppSettings:ProcessingPlatform`; every field is optional. Tool gating and processing nodes are on
-[Processing nodes & features](./processing-nodes.mdx); the task API is on
+[Processing nodes & features](/self-hosting/processing-nodes.mdx); the task API is on
 [Processing platform API](/docs/developers/processing-api).
 
 **Limits and quotas:**
@@ -702,8 +702,8 @@ Builds that wait and their retries never block a download or an import.
 | `RemoteNodePollIntervalSeconds` | `2` | Interval between two status requests to a remote node |
 | `RemoteNodePollMaxBackoffSeconds` | `30` | Longest interval after repeated failures |
 | `RemoteNodeRequestTimeoutSeconds` | `30` | Timeout of a request to a remote node |
-| `NodeOdx` | `[]` | NodeODX nodes for photogrammetry: `Id` (default `default`), `Url`, `Token` (optional), `Title` (optional). See [Processing nodes & features](./processing-nodes.mdx#nodeodx-nodes-for-photogrammetry). |
-| `Tools` | `{}` | Tool gating by tool id. See [Processing nodes & features](./processing-nodes.mdx#tool-gating). |
+| `NodeOdx` | `[]` | NodeODX nodes for photogrammetry: `Id` (default `default`), `Url`, `Token` (optional), `Title` (optional). See [Processing nodes & features](/self-hosting/processing-nodes.mdx#nodeodx-nodes-for-photogrammetry). |
+| `Tools` | `{}` | Tool gating by tool id. See [Processing nodes & features](/self-hosting/processing-nodes.mdx#tool-gating). |
 
 ```json
 "ProcessingPlatform": {
@@ -720,7 +720,7 @@ Or with environment variables: `AppSettings__ProcessingPlatform__MaxConcurrentTa
 
 The Hub reads its branding and some switches from `AppSettings:HubOptions`. Registry sends the
 block to the browser through the anonymous `/sys/features` endpoint, and the Hub applies it when it
-loads. E-mails use the same branding (see [E-mail → Branding](./email.mdx#branding)).
+loads. E-mails use the same branding (see [E-mail → Branding](/self-hosting/email.mdx#branding)).
 
 ### HubOptions
 
@@ -872,14 +872,14 @@ rebuild uses at most [`ProcessingBudget:BackgroundRebuildThreads`](#processingbu
 first check after an upgrade rebuilds the old models one after the other without slowing user
 builds. An entry that already has a build job is skipped. Until a rebuild writes `bm3d/`, the model
 stays viewable from `nxs/` in the previous viewer. A failed rebuild keeps it; a temporary failure
-is retried like a build and stays a background rebuild. See [Upgrading](./upgrading.mdx#3d-models-nexus-to-bm3d).
+is retried like a build and stays a background rebuild. See [Upgrading](/self-hosting/upgrading.mdx#3d-models-nexus-to-bm3d).
 
 ### JobIndexCleanupCron
 
 The job that deletes old finished records (Succeeded, Failed, Deleted) from the `JobIndices` table.
 The same job deletes sent build notifications older than 30 days (it keeps the record of a build
 that still waits for files) and sends the notifications that waited for more than one hour (see
-[Build notifications](./email.mdx#when-an-e-mail-is-sent)). `POST /sys/cleanup-jobindices`
+[Build notifications](/self-hosting/email.mdx#when-an-e-mail-is-sent)). `POST /sys/cleanup-jobindices`
 (administrators) runs it once; the optional `retentionDays` query parameter overrides the
 retention for that run.
 
@@ -992,7 +992,7 @@ These variables are not in `appsettings.json`.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `INSTANCE_TYPE` | `0` | [Instance type](./index.mdx#instance-types) of the container |
+| `INSTANCE_TYPE` | `0` | [Instance type](/self-hosting/index.mdx#instance-types) of the container |
 | `REGISTRY_PORT` | `5000` | HTTP port inside the container (the health check uses it too) |
 | `APP_USER` | `registry` | User that runs Registry in the container (uid/gid `1654`) |
 | `REGISTRY_EXTRA_OWNED_PATHS` | — | Paths outside `/data` that Registry writes, separated by spaces; the container gives them to `APP_USER` at start |
@@ -1010,7 +1010,7 @@ These variables are not in `appsettings.json`.
 | `DDB_METADATA_UTIL_PATH` | Path to `metadata-util` |
 | `DDB_BM3D_PATH` | Path to `bm3d` |
 | `DDB_BUILDLOD_PATH` | Path to `build-lod` |
-| `DDB_BUILDLOD_IDLE_TIMEOUT_SECONDS` | Replaces the idle deadline of `build-lod`, 1 to 86400. See [Troubleshooting](./troubleshooting.mdx#a-splat-build-stops-without-output). |
+| `DDB_BUILDLOD_IDLE_TIMEOUT_SECONDS` | Replaces the idle deadline of `build-lod`, 1 to 86400. See [Troubleshooting](/self-hosting/troubleshooting.mdx#a-splat-build-stops-without-output). |
 | `DDB_UNTWINE_PATH` | Path to `untwine` |
 
 The `Ddb` section and `ProcessingBudget` set `DDB_CPU_POOL_SIZE`, `DDB_IO_THREADS`,

@@ -320,7 +320,7 @@ endpoints do the whole flow:
 | `POST /orgs/{orgSlug}/import` | Creates an empty dataset and starts the import |
 
 To copy datasets or organizations between Registries as an administrator, see
-[Import from another Registry](./api/workflows.mdx#import-from-another-registry).
+[Import from another Registry](/developers/api/workflows.mdx#import-from-another-registry).
 
 ### photogrammetry
 
@@ -384,7 +384,7 @@ the file. The same query with `role=gsplat.lod` downloads `site.rad`.
 
 Exports the ODM project in a folder of the dataset as the training data of a Gaussian splat: a
 COLMAP sparse model in metres, the images and the georeference, in one ZIP. See
-[Training data from an ODM project](./cli/cookbook.mdx#training-data-from-an-odm-project).
+[Training data from an ODM project](/developers/cli/cookbook.mdx#training-data-from-an-odm-project).
 
 ```json
 {
@@ -422,4 +422,4 @@ Some quick operations are plain endpoints of a dataset, not tasks:
 | `POST …/raster-profile`, `GET …/raster-area-stats`, `GET …/raster-point-value` | Values of a raster along a line, in an area, at a point |
 | `POST …/stockpile/detect`, `…/stockpile/detect-all`, `…/stockpile/calculate` | Stockpile footprint and volume on an elevation model |
 
-Their parameters are in the [API reference](./api/reference.mdx) of the server.
+Their parameters are in the [API reference](/developers/api/reference.mdx) of the server.

@@ -35,6 +35,16 @@ export function loadPages(dir = DOCS_DIR) {
     });
 }
 
+/** The translated pages of every locale (i18n/<locale>/docusaurus-plugin-content-docs/current). */
+export function loadTranslatedPages() {
+  const i18n = path.join(REPO_ROOT, 'i18n');
+  if (!fs.existsSync(i18n)) return [];
+  return fs.readdirSync(i18n)
+    .map(locale => path.join(i18n, locale, 'docusaurus-plugin-content-docs', 'current'))
+    .filter(dir => fs.existsSync(dir))
+    .flatMap(dir => loadPages(dir));
+}
+
 /** A front matter value that is a string or a list of strings, as a list. */
 export function asList(value) {
   if (value === undefined || value === null) return [];

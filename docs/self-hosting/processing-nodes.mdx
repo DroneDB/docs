@@ -10,7 +10,7 @@ nodes for photogrammetry, and tool gating (which tools users see). The task API 
 
 ## Registry processing nodes
 
-A Registry process with [instance type](./index.mdx#instance-types) `1` (processing node) runs only
+A Registry process with [instance type](/self-hosting/index.mdx#instance-types) `1` (processing node) runs only
 background jobs: builds, imports, exports, clean-ups and e-mails. It has no HTTP server. Add nodes
 when the builds of one server are too slow, and run the web server with instance type `2`.
 
@@ -20,14 +20,14 @@ Rules for a deployment with nodes:
 - The job store must be **MySQL or MariaDB** (`HangfireProvider: Mysql`). A node refuses to start
   with `InMemory`.
 - Share the **data protection keys**: Redis, or a shared
-  [`DataProtectionKeysPath`](./configuration.mdx#dataprotectionkeyspath).
+  [`DataProtectionKeysPath`](/self-hosting/configuration.mdx#dataprotectionkeyspath).
 - Give each node container a fixed **`hostname`**: its log file is `registry-node-<host name>*.txt`.
-- **Declare the processes** of each machine in [`HostBudget`](./configuration.mdx#hostbudget).
+- **Declare the processes** of each machine in [`HostBudget`](/self-hosting/configuration.mdx#hostbudget).
 - Give each node the same **e-mail** settings as the web server: nodes send the queued e-mails.
 - Only the web server migrates the databases and extracts the Hub. Start it first; the Compose file
   starts the nodes when the web server is healthy.
 
-The [Docker Compose setup](./install.mdx#docker-compose-production) has a web server and two nodes.
+The [Docker Compose setup](/self-hosting/install.mdx#docker-compose-production) has a web server and two nodes.
 To add a node, copy a node service, give it a new `hostname`, and raise
 `AppSettings__HostBudget__ProcessingNodes` on every service.
 
@@ -37,19 +37,19 @@ Each process that runs jobs has three Hangfire servers:
 
 | Queue | Workers | Runs |
 |-------|---------|------|
-| `builds` | [`ProcessingBudget:HeavyWorkers`](./configuration.mdx#processingbudget) | Native builds (COG, COPC, bm3d, LOD, raster exports and tools) |
-| `rebuilds` | 1 | Background rebuilds of entries built with an older layout (see [Upgrading](./upgrading.mdx#3d-models-nexus-to-bm3d)) |
-| `tasks`, `default` | [`ProcessingBudget:LightWorkers`](./configuration.mdx#processingbudget) | Other tasks, imports, clean-ups, thumbnails, e-mails |
+| `builds` | [`ProcessingBudget:HeavyWorkers`](/self-hosting/configuration.mdx#processingbudget) | Native builds (COG, COPC, bm3d, LOD, raster exports and tools) |
+| `rebuilds` | 1 | Background rebuilds of entries built with an older layout (see [Upgrading](/self-hosting/upgrading.mdx#3d-models-nexus-to-bm3d)) |
+| `tasks`, `default` | [`ProcessingBudget:LightWorkers`](/self-hosting/configuration.mdx#processingbudget) | Other tasks, imports, clean-ups, thumbnails, e-mails |
 
-The [Hangfire dashboard](./admin-pages.mdx#hangfire) shows the servers of every process and the jobs
+The [Hangfire dashboard](/self-hosting/admin-pages.mdx#hangfire) shows the servers of every process and the jobs
 of each queue.
 
 ## Thumbnail generator
 
 A Registry process with instance type `3` makes thumbnails for a web server. Set
-[`RemoteThumbnailGeneratorUrl`](./configuration.mdx#remotethumbnailgeneratorurl) on the web server
+[`RemoteThumbnailGeneratorUrl`](/self-hosting/configuration.mdx#remotethumbnailgeneratorurl) on the web server
 to its address. Both read the same `appsettings.json`, so they share the
-[`ThumbnailGeneratorToken`](./configuration.mdx#thumbnailgeneratortoken). The generator refuses
+[`ThumbnailGeneratorToken`](/self-hosting/configuration.mdx#thumbnailgeneratortoken). The generator refuses
 to start without the token.
 
 ## NodeODX nodes for photogrammetry
@@ -84,7 +84,7 @@ List the nodes in `AppSettings:ProcessingPlatform:NodeOdx`:
 Signed-in users read the list, the processing options and the status of each node through
 `GET /sys/processingNodes`, `GET /sys/processingNodes/{nodeId}/options` and
 `GET /sys/processingNodes/{nodeId}/status`. The polling of remote nodes is tuned with the
-`RemoteNode…` keys of [`ProcessingPlatform`](./configuration.mdx#processingplatform). Users start
+`RemoteNode…` keys of [`ProcessingPlatform`](/self-hosting/configuration.mdx#processingplatform). Users start
 photogrammetry from the Hub: see [Photogrammetry](/docs/hub-guide/processing/photogrammetry).
 
 ## Tool gating
@@ -102,7 +102,7 @@ tool id. A tool that is not listed is enabled for everyone.
 |-------|------|---------|-------------|
 | `Availability` | `Enabled`, `Disabled` or `Hidden` | `Enabled` | The switch of the tool |
 | `DisabledMessage` | `string` | `null` | Tooltip of a disabled tool, and the body of the `403` of a refused submit. Ignored when `Hidden`. |
-| `AllowedRoles` | `string[]` | `[]` (everyone) | Roles that may use the tool. `admin` is the administrator role; other values are [roles you created](./users.mdx#roles). |
+| `AllowedRoles` | `string[]` | `[]` (everyone) | Roles that may use the tool. `admin` is the administrator role; other values are [roles you created](/self-hosting/users.mdx#roles). |
 | `AllowedOrgs` | `string[]` | `[]` (all) | Organization slugs where the tool may be used |
 | `HideWhenNotAllowed` | `bool` | `true` | A user outside `AllowedRoles` or `AllowedOrgs` gets the tool hidden (`true`) or disabled with `DisabledMessage` (`false`) |
 
@@ -153,7 +153,7 @@ task is submitted, so a client cannot get around them by calling the API.
 ### In the Hub
 
 **Admin → Configuration** has a **Tool Gating** section that shows the current `Tools` value as
-JSON. See [Admin pages](./admin-pages.mdx#configuration).
+JSON. See [Admin pages](/self-hosting/admin-pages.mdx#configuration).
 
 <Screenshot id="self-hosting/processing-nodes--tool-gating" />
 
@@ -161,5 +161,5 @@ JSON. See [Admin pages](./admin-pages.mdx#configuration).
 
 The number of tasks per user, organization and server, the daily output budget of each
 organization and the size limits of archives and exports are keys of
-[`ProcessingPlatform`](./configuration.mdx#processingplatform). These limits count only the tasks
+[`ProcessingPlatform`](/self-hosting/configuration.mdx#processingplatform). These limits count only the tasks
 that users start: dataset builds have their own queues and never count.

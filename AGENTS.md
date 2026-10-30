@@ -63,3 +63,7 @@ Hub URLs are built only in `src/lib/hub.mjs`.
 - In MDX, Markdown inside a component (for example a list inside `<Steps>`) needs blank lines
   around it.
 - An iframe of Hub must use `?embed=1`; Registry blocks framing otherwise.
+- Links between pages start from the docs root: `[Map viewer](/hub-guide/viewing/map.mdx)`, never
+  `./map.mdx` or `../viewing/map.mdx`. Docusaurus resolves a relative link in the locale folder of
+  the page that has it, so it breaks when only one of the two pages is translated.
+  `npm run check:links -- --offline` fails on a relative link.

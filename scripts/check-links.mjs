@@ -23,7 +23,7 @@
 
 import {HUB_URL, HUB_VIEWS, hubUrl, listApiUrl} from '../src/lib/hub.mjs';
 import * as hub from '../src/lib/hub.mjs';
-import {loadPages, asList, lineOf} from './lib/docs.mjs';
+import {loadPages, loadTranslatedPages, asList, lineOf} from './lib/docs.mjs';
 import {parseArgs} from '../media-capture/lib/env.mjs';
 import {loadShots} from '../media-capture/lib/shots.mjs';
 
@@ -42,6 +42,7 @@ const errors = [];
 const warnings = [];
 /** Dataset paths to check: key org/ds/path -> { org, ds, path, where[] } */
 const targets = new Map();
+const orgs = new Map(); // org → where it is linked
 const embeds = new Map();
 const youtube = new Map();
 
@@ -108,6 +109,16 @@ for (const page of pages) {
   }
 
   for (const u of body.matchAll(URL_RE)) checkHubUrl(u[0].replace(/[.,;:!?]+$/, ''), `${page.rel}:${lineOf(page, u.index)}`);
+}
+
+// Links between pages start from the docs root (/hub-guide/viewing/map.mdx). Docusaurus resolves
+// a relative link in the locale folder of the page that has it, so a relative link breaks as
+// soon as only one of the two pages is translated.
+const RELATIVE_LINK_RE = /\]\((\.{1,2}\/[^)\s]*)\)/g;
+for (const page of [...pages, ...loadTranslatedPages()]) {
+  for (const l of withoutComments(page.body).matchAll(RELATIVE_LINK_RE)) {
+    errors.push(`${page.rel}:${lineOf(page, l.index)}: relative link ${l[1]}: start it from the docs root (/<section>/<page>.mdx)`);
+  }
 }
 
 function checkComponent(name, p, where) {
@@ -178,7 +189,6 @@ function checkHubUrl(text, where) {
   }
 }
 
-const orgs = new Map();
 function addOrg(org, where) {
   if (!orgs.has(org)) orgs.set(org, []);
   orgs.get(org).push(where);

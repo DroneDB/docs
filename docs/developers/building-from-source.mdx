@@ -126,7 +126,7 @@ python3 scripts/check-abi.py bump                                # vs the previo
 python3 scripts/check-abi.py tag --tag v2.0.0                    # a release tag equals package.json
 ```
 
-See [DroneDB library (C API)](./library.mdx) for the contract itself.
+See [DroneDB library (C API)](/developers/library.mdx) for the contract itself.
 
 ---
 
@@ -154,7 +154,7 @@ bm3d is GPL-3.0 (its web viewer is MIT). DroneDB ships the program with the lice
 git submodule update --init apps/gdal-util
 ```
 
-`ddb` looks for `gdal-util` next to its own executable, next to `libddb`, in `../bin` and on `PATH`; set `DDB_GDAL_UTIL_PATH` to use a program in another location. `DDB_GDAL_SANDBOX=strict|best-effort|off` chooses how its workers are confined (see the [environment variables](./cli/reference.mdx#helper-programs)); `gdal-util --sandbox-report` prints the layers the host offers, which is worth running in the container that serves production.
+`ddb` looks for `gdal-util` next to its own executable, next to `libddb`, in `../bin` and on `PATH`; set `DDB_GDAL_UTIL_PATH` to use a program in another location. `DDB_GDAL_SANDBOX=strict|best-effort|off` chooses how its workers are confined (see the [environment variables](/developers/cli/reference.mdx#helper-programs)); `gdal-util --sandbox-report` prints the layers the host offers, which is worth running in the container that serves production.
 
 ---
 
@@ -221,7 +221,7 @@ git submodule update --init vendor/spark
 ./full-build-linux.sh              # Linux
 ```
 
-If `build-lod` is missing, a Gaussian Splat build fails (it does not fall back to another format) until the tool is installed: place it next to `ddbcmd` or point `DDB_BUILDLOD_PATH` at it. See [Build a splat](./cli/cookbook.mdx#build-a-splat).
+If `build-lod` is missing, a Gaussian Splat build fails (it does not fall back to another format) until the tool is installed: place it next to `ddbcmd` or point `DDB_BUILDLOD_PATH` at it. See [Build a splat](/developers/cli/cookbook.mdx#build-a-splat).
 
 ---
 

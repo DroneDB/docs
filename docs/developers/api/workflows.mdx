@@ -4,7 +4,7 @@ description: "Create a dataset, upload files (also large and resumable), list an
 ---
 
 The examples use `curl` against Hub. For a self-hosted Registry, change the host. Every
-request that changes data needs a token: see [Authentication](./authentication.mdx).
+request that changes data needs a token: see [Authentication](/developers/api/authentication.mdx).
 
 ```bash
 HUB=https://hub.dronedb.app
@@ -14,7 +14,7 @@ DS=$HUB/orgs/my-org/ds/survey-2026
 ```
 
 All dataset routes start with `/orgs/{orgSlug}/ds/{dsSlug}`. The full list of endpoints and
-fields is in the API reference of each Registry, at [`/scalar/v1`](./reference.mdx).
+fields is in the API reference of each Registry, at [`/scalar/v1`](/developers/api/reference.mdx).
 
 ## Create a dataset
 
@@ -127,7 +127,7 @@ curl -H "$AUTH" $DS/builds/pending                                            # 
 In a listing, each built entry has `artifacts: [{role, url, mediaType, downloadName?}]`. Read
 the URL of a build file from this list. Do not compose `/build/` paths yourself: the URL holds
 the version of the file (`…/build/{hash}@{version}/{path}`), and a rebuild changes it. See
-[Build file URLs](./reference.mdx#build-file-urls).
+[Build file URLs](/developers/api/reference.mdx#build-file-urls).
 
 To download a build product with a file name:
 
@@ -139,7 +139,7 @@ curl -H "$AUTH" -OJ "$DS/build-artifact?path=model.obj&role=model.3dtiles"      
 
 Without `role` you get the first artifact with a download name (COG, COPC, GeoPackage, the 3D
 Tiles of a model, the RAD of a splat). The roles are listed in the
-[library build manifest](../library.mdx#build-manifest). `400`: the entry has no downloadable
+[library build manifest](/developers/library.mdx#build-manifest). `400`: the entry has no downloadable
 artifact. `404`: it is not built, or has no artifact of that role.
 
 ### Builds that wait
@@ -181,7 +181,7 @@ curl -H "$AUTH" -OJ $DS/tasks/$TASK/result   # the file, when the state is Succe
 
 Poll the status, or open `GET …/tasks/events`, a server-sent event stream that sends a `tasks`
 event when the task list of the dataset changes. Every tool and its parameters are on the
-[Processing API](../processing-api.mdx) page.
+[Processing API](/developers/processing-api.mdx) page.
 
 ## Import from another Registry
 
@@ -227,7 +227,7 @@ and the totals. Before Registry 3.0 the import ran inside the request and answer
 the result.
 
 To fill one dataset from another Registry or from an archive URL, use the `import-dataset` and
-`import-file` [tasks](../processing-api.mdx#import-dataset) instead.
+`import-file` [tasks](/developers/processing-api.mdx#import-dataset) instead.
 
 ## What the CLI uses
 

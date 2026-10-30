@@ -47,13 +47,13 @@ with the file.
 | **Size** | The file size |
 | **Modified** | The date of the file, and how long ago that was |
 | **Coordinates** | The position of a geotagged file, with its altitude |
-| **Coordinate system** | For a CAD drawing: where its coordinate system comes from. See [Set a coordinate system (CAD)](./coordinate-system.mdx) |
+| **Coordinate system** | For a CAD drawing: where its coordinate system comes from. See [Set a coordinate system (CAD)](/hub-guide/files/coordinate-system.mdx) |
 | **Resolution** | For a georeferenced raster: the ground size of one pixel |
 | **Dimensions** | Width × height in pixels, and the megapixels |
 | Other rows | What DroneDB read from the file: camera make and model, capture time, bands, the GPS accuracy and the flight speed |
 
 Altitudes, GPS accuracies and speeds show in the units of
-[Preferences](../account/preferences.mdx) (**Units** tab).
+[Preferences](/hub-guide/account/preferences.mdx) (**Units** tab).
 
 ## The entry type window
 
@@ -65,12 +65,12 @@ formats it covers are in [Supported formats & entry types](/docs/reference/forma
 
 - DroneDB decides the entry type when it indexes the file. You cannot change it in Hub. A file that
   DroneDB cannot read is **File**.
-- After an upgrade that reads more from some files, a [rescan](./rescan.mdx) updates the properties.
+- After an upgrade that reads more from some files, a [rescan](/hub-guide/files/rescan.mdx) updates the properties.
 
 ## Related
 
-- [File browser](./browser.mdx)
+- [File browser](/hub-guide/files/browser.mdx)
 - [Supported formats & entry types](/docs/reference/formats)
-- [Builds: what Hub generates and why](../processing/builds.mdx)
+- [Builds: what Hub generates and why](/hub-guide/processing/builds.mdx)
 
 <ForDevelopers cli="ddb info odm_orthophoto/odm_orthophoto.tif -f json" api="/docs/developers/api/workflows" />

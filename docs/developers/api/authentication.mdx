@@ -83,7 +83,7 @@ curl -u survey-bot:'…' \
 | `401 Unauthorized` | You are not signed in, or the token is no longer valid. Sign in again. |
 | `403 Forbidden` | You are signed in, but you do not have the permission. Before Registry 3.0 this was also a `401`. |
 
-Errors are `ProblemDetails`: see [Errors](./reference.mdx#errors).
+Errors are `ProblemDetails`: see [Errors](/developers/api/reference.mdx#errors).
 
 ## Health checks
 
@@ -94,4 +94,4 @@ as a bearer token or as `?token=`. `/health/live` and `/version` need nothing.
 
 `ddb login` saves the credentials of a server for `ddb push`, `ddb pull`, `ddb clone` and
 `ddb share`. Scripts can use `ddb share --non-interactive` with `DDB_USERNAME` and
-`DDB_PASSWORD`. See the [CLI cookbook](../cli/cookbook.mdx#share-from-a-script).
+`DDB_PASSWORD`. See the [CLI cookbook](/developers/cli/cookbook.mdx#share-from-a-script).

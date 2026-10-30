@@ -53,7 +53,7 @@ back into a dataset.
 
    <Screenshot id="processing/photogrammetry--progress" />
 
-10. When the task ends, the results are in the output folder. Hub then [builds](./builds.mdx) them, so
+10. When the task ends, the results are in the output folder. Hub then [builds](/hub-guide/processing/builds.mdx) them, so
     they open on the map and in the viewers.
 
     <Screenshot id="processing/photogrammetry--results" />
@@ -71,7 +71,7 @@ back into a dataset.
 | **Fast Orthophoto** | An orthophoto only. Faster, lower quality, no 3D products |
 | **High Resolution (1 cm/px)** | An orthophoto and a DSM at 1 cm per pixel. Much slower |
 | **Multispectral** | Radiometric calibration of a multispectral camera, and a DSM |
-| **Volume Analysis** | A DSM with a dense point cloud, for [stockpile volumes](../analyse/stockpile.mdx) |
+| **Volume Analysis** | A DSM with a dense point cloud, for [stockpile volumes](/hub-guide/analyse/stockpile.mdx) |
 
 ## Options
 
@@ -92,16 +92,16 @@ An option you change replaces the value of the profile. The other options of the
 - You need write access to the dataset.
 - The server needs a processing node. Without one, the **Run Photogrammetry** button is not shown. When
   your account or organization cannot use processing, the button is grey and its tooltip says why.
-- On DroneDB Hub, every [plan](../account/plans.mdx) includes processing. The plan sets the priority.
+- On DroneDB Hub, every [plan](/hub-guide/account/plans.mdx) includes processing. The plan sets the priority.
 - The results count toward your storage.
 - Processing time depends on the number of images, the profile and the node. A small flight takes minutes; a
   large one can take hours.
 
 ## Related
 
-- [Tasks panel & logs](./tasks.mdx)
-- [Builds](./builds.mdx)
-- [Merge multispectral bands](./merge-multispectral.mdx)
+- [Tasks panel & logs](/hub-guide/processing/tasks.mdx)
+- [Builds](/hub-guide/processing/builds.mdx)
+- [Merge multispectral bands](/hub-guide/processing/merge-multispectral.mdx)
 - [Processing nodes (self-hosting)](/docs/self-hosting/processing-nodes)
 
 <ForDevelopers api="/docs/developers/processing-api" apiLabel="Processing platform REST API" />

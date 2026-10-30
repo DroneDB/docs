@@ -46,7 +46,7 @@ flowchart LR
 | **Databases** | Three stores: identity (users and roles), registry (organizations, datasets, jobs) and Hangfire (the job queue). SQLite and an in-memory job queue by default; MySQL or MariaDB for production. |
 | **Storage folder** | One folder (`/data` in the container) with `appsettings.json`, the datasets, the cache, the temporary files and the logs. |
 | **Background jobs** | [Hangfire](https://www.hangfire.io/) runs the builds, imports, exports, clean-ups and e-mails. Builds have their own queue, so a long build does not block an import or a download. |
-| **Processing nodes** | Extra Registry processes that run only background jobs. They share the databases and the storage folder with the web server. See [Processing nodes & features](./processing-nodes.mdx). |
+| **Processing nodes** | Extra Registry processes that run only background jobs. They share the databases and the storage folder with the web server. See [Processing nodes & features](/self-hosting/processing-nodes.mdx). |
 | **NodeODX** | An OpenDroneMap processing node. Registry can send photos to it for photogrammetry. Optional. |
 
 ### Instance types
@@ -65,9 +65,9 @@ One Registry program has four roles. You choose the role with `--instance-type` 
 
 | Setup | For | Page |
 |-------|-----|------|
-| One Docker container, SQLite | A test, a small team, one server | [Install → Docker](./install.mdx#docker) |
-| Docker Compose: MariaDB, a web server and two processing nodes | Production | [Install → Docker Compose](./install.mdx#docker-compose-production) and the [Production checklist](./production.mdx) |
-| Native binaries | A server without Docker, Windows | [Install → Native](./install.mdx#native) |
+| One Docker container, SQLite | A test, a small team, one server | [Install → Docker](/self-hosting/install.mdx#docker) |
+| Docker Compose: MariaDB, a web server and two processing nodes | Production | [Install → Docker Compose](/self-hosting/install.mdx#docker-compose-production) and the [Production checklist](/self-hosting/production.mdx) |
+| Native binaries | A server without Docker, Windows | [Install → Native](/self-hosting/install.mdx#native) |
 
 ## Useful endpoints
 
@@ -83,7 +83,7 @@ One Registry program has four roles. You choose the role with `--instance-type` 
 
 ## Next steps
 
-1. [Install](./install.mdx) Registry.
-2. Go through the [Production checklist](./production.mdx).
-3. Read the [Configuration reference](./configuration.mdx) for every setting.
-4. [Add users and organizations](./users.mdx).
+1. [Install](/self-hosting/install.mdx) Registry.
+2. Go through the [Production checklist](/self-hosting/production.mdx).
+3. Read the [Configuration reference](/self-hosting/configuration.mdx) for every setting.
+4. [Add users and organizations](/self-hosting/users.mdx).

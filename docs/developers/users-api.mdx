@@ -5,7 +5,7 @@ description: "Manage users, roles, storage quotas, organizations and their membe
 
 These endpoints manage the accounts of a Registry. Most of them need an administrator. For the
 same tasks in the admin pages of Hub, see [Users, organizations & roles](/docs/self-hosting/users).
-To sign in and get a token, see [Authentication](./api/authentication.mdx).
+To sign in and get a token, see [Authentication](/developers/api/authentication.mdx).
 
 The examples use a self-hosted Registry:
 
@@ -79,7 +79,7 @@ batches were deleted.
 | `DELETE /users/roles/{roleName}` | Admin | Delete a role (`204`). The `admin` role cannot be deleted. |
 
 `admin` is the system administrator. A role can also limit who may use a processing tool (see
-[Feature gating](./processing-api.mdx#feature-gating)).
+[Feature gating](/developers/processing-api.mdx#feature-gating)).
 
 ## Storage and user metadata
 

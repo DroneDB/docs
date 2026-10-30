@@ -24,10 +24,10 @@ publish it.
 |---|---|---|
 | **Private** | Only you, the members of your organization and the administrators | No |
 | **Unlisted** | Anybody who has the link | No |
-| **Public** | Anybody | Yes: in the dataset list of a public organization and in the [STAC catalog](./stac.mdx) |
+| **Public** | Anybody | Yes: in the dataset list of a public organization and in the [STAC catalog](/hub-guide/sharing/stac.mdx) |
 
 Members of the organization can always open its datasets. What they can change depends on their
-[role](../datasets/members.mdx).
+[role](/hub-guide/datasets/members.mdx).
 
 {/* TODO verify: the Registry lists every dataset a caller can read, unlisted ones included, in the
     datasets list of an organization and in the STAC catalog (only the datasets map leaves unlisted datasets
@@ -49,13 +49,13 @@ Members of the organization can always open its datasets. What they can change d
 
 </Steps>
 
-You can also choose the visibility when you [create a dataset](../datasets/create.mdx), and for the new
-dataset that [photogrammetry](../processing/photogrammetry.mdx) can make.
+You can also choose the visibility when you [create a dataset](/hub-guide/datasets/create.mdx), and for the new
+dataset that [photogrammetry](/hub-guide/processing/photogrammetry.mdx) can make.
 
 ## From the Share dialog
 
 When you share a file of a private dataset with a link, an embed or an OGC service, the
-[Share dialog](./links-embeds.mdx) shows **Allow access to anyone with the link**. This button changes the
+[Share dialog](/hub-guide/sharing/links-embeds.mdx) shows **Allow access to anyone with the link**. This button changes the
 visibility of the **whole dataset** to **Unlisted**. To undo it, set the visibility back to **Private** in the
 settings.
 
@@ -70,8 +70,8 @@ settings.
 
 ## Related
 
-- [Share links & embeds](./links-embeds.mdx)
-- [Create & configure a dataset](../datasets/create.mdx)
-- [Organization members & roles](../datasets/members.mdx)
+- [Share links & embeds](/hub-guide/sharing/links-embeds.mdx)
+- [Create & configure a dataset](/hub-guide/datasets/create.mdx)
+- [Organization members & roles](/hub-guide/datasets/members.mdx)
 
 <ForDevelopers cli="ddb meta set visibility 2   # 0 private, 1 unlisted, 2 public" api="/docs/developers/api/workflows" />

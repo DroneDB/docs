@@ -5,7 +5,7 @@ description: "Recipes for ddb: sharing and syncing, metadata, multispectral and 
 
 Recipes for the `ddb` command line, by task. Each recipe shows the commands, then the rules
 that a script or an integration must know. For every option of a command, see the
-[command reference](./reference.mdx).
+[command reference](/developers/cli/reference.mdx).
 
 ## Paths and glob patterns
 
@@ -142,7 +142,7 @@ ddb rescan -e dwg,dxf
 ddb rescan --continue-on-error
 ```
 
-The type names are in the [command reference](./reference.mdx#rescan).
+The type names are in the [command reference](/developers/cli/reference.mdx#rescan).
 
 ## Build streaming files
 
@@ -180,7 +180,7 @@ ddb stac                                   # the catalog of the dataset, on stdo
 ddb stac -p orthophoto.tif                 # the STAC item of one file
 ```
 
-A Registry serves the same catalog over HTTP: see [STAC API](../stac.mdx).
+A Registry serves the same catalog over HTTP: see [STAC API](/developers/stac.mdx).
 
 ## Multispectral and thermal
 
@@ -335,7 +335,7 @@ Registry serves them per file (`raster-profile`, `raster-area-stats`, `raster-po
 library calls `DDBGetRasterProfile`, `DDBGetRasterAreaStats`, `DDBDetectStockpile`,
 `DDBDetectAllStockpiles` and `DDBCalculateVolume`. The volume base planes are
 `lowest_perimeter`, `average_perimeter`, `best_fit` and `flat` (a horizontal plane at
-`flatElevation`, default `0`). See the [API reference](../api/reference.mdx).
+`flatElevation`, default `0`). See the [API reference](/developers/api/reference.mdx).
 
 ## 3D models and 3D Tiles
 
@@ -543,7 +543,7 @@ does not build and does not need `build-lod`.
 - `.ksplat`, `.sog` and `.rad` are not converted.
 
 Hub makes the same file with **Download .spz (for other tools)**; the API is the
-`splat-spz-export` task ([Processing API](../processing-api.mdx#splat-spz-export)).
+`splat-spz-export` task ([Processing API](/developers/processing-api.mdx#splat-spz-export)).
 
 ### Georeference a splat or a model
 
@@ -689,7 +689,7 @@ cd my-dataset && ddb add scene.ply georef.json && ddb build
 ```
 
 Hub runs the same export with **Export splat training data**. The API is the
-`splat-training-export` task ([Processing API](../processing-api.mdx#splat-training-export));
+`splat-training-export` task ([Processing API](/developers/processing-api.mdx#splat-training-export));
 the library export is `DDBExportSplatTrainingData`.
 
 ### The views file of a splat
@@ -737,11 +737,11 @@ ddb push
 
 To process in Hub with a processing node, see
 [Photogrammetry](/docs/hub-guide/processing/photogrammetry) and the
-[Processing API](../processing-api.mdx#photogrammetry).
+[Processing API](/developers/processing-api.mdx#photogrammetry).
 
 ## Archives
 
 `ddb add` indexes an archive (ZIP, 7Z, RAR, TAR…) as one Generic file. It does not extract it.
 Extract it before you add the files, or extract it in Hub after a push or share:
 [Archives](/docs/hub-guide/files/archives), or the `archive-extract` task of the
-[Processing API](../processing-api.mdx#archive-extract).
+[Processing API](/developers/processing-api.mdx#archive-extract).

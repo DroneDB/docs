@@ -8,16 +8,16 @@ main Hub concepts have more detail in [Key concepts](/get-started/key-concepts.m
 
 **3D Tiles** — An OGC standard that splits a large 3D model into tiles, so that a viewer loads
 only the part in view. A `.3tz` file holds a 3D Tiles set in one archive. Hub opens it in the
-[3D viewer](../hub-guide/viewing/3d-viewer.mdx).
+[3D viewer](/hub-guide/viewing/3d-viewer.mdx).
 
 **Artifact** — One file that a build makes, for example the streaming copy of a point
 cloud.
 
 **bm3d** — The format of DroneDB for 3D models with more than one level of detail. Hub builds
-it from a 3D model, and the [3D model viewer](../hub-guide/viewing/3d-model.mdx) streams it.
+it from a 3D model, and the [3D model viewer](/hub-guide/viewing/3d-model.mdx) streams it.
 
 **Build** — A copy of a file that Hub makes after the upload, so that the viewers can
-stream the file. The original file does not change. See [Builds](../hub-guide/processing/builds.mdx).
+stream the file. The original file does not change. See [Builds](/hub-guide/processing/builds.mdx).
 
 **COG (Cloud Optimized GeoTIFF)** — A GeoTIFF arranged so that a program can read only the
 part and the zoom level that it needs. Hub builds a COG from each orthophoto and elevation
@@ -40,16 +40,16 @@ bare ground. **DEM** (digital elevation model) is the general term.
 that index, read and convert drone data. See [Developers](/docs/developers).
 
 **Embed** — A Hub view in another web page, with an `iframe`. See
-[Share links & embeds](../hub-guide/sharing/links-embeds.mdx).
+[Share links & embeds](/hub-guide/sharing/links-embeds.mdx).
 
 **Entry** — A file or a folder in a dataset, with the properties that Hub read from it.
 
 **Entry type** — The kind of an entry (GeoImage, GeoRaster, PointCloud, Model, Vector and
 others). It decides which viewer opens the file. See
-[Supported formats & entry types](./formats.mdx).
+[Supported formats & entry types](/reference/formats.mdx).
 
 **Gaussian splat** — A photorealistic 3D scene made of millions of small coloured blobs. Hub
-opens it in the [splat viewer](../hub-guide/viewing/splats.mdx).
+opens it in the [splat viewer](/hub-guide/viewing/splats.mdx).
 
 **Georeferenced** — Tied to places on the Earth. A georeferenced file has coordinates, so Hub can
 put it on the map.
@@ -63,13 +63,13 @@ usually GeoTIFF files.
 **LAS, LAZ** — The usual file formats for point clouds. LAZ is compressed LAS.
 
 **Multispectral** — Imagery with bands outside visible light, for example near-infrared and red
-edge. Hub uses it for [plant health](../hub-guide/analyse/plant-health.mdx).
+edge. Hub uses it for [plant health](/hub-guide/analyse/plant-health.mdx).
 
 **NDVI** — Normalized Difference Vegetation Index: a value from −1 to 1, computed from the red and
 near-infrared bands, that shows how green and healthy plants are.
 
 **OGC services** — Standard web services for maps and features (WMS, WMTS, WFS, WCS, OGC API).
-GIS programs such as QGIS read them. See [OGC services](../hub-guide/sharing/ogc.mdx).
+GIS programs such as QGIS read them. See [OGC services](/hub-guide/sharing/ogc.mdx).
 
 **Organization** — A group of datasets that belongs to a user. Other users can
 be members. Each user has a personal organization.
@@ -78,10 +78,10 @@ be members. Each user has a personal organization.
 map. Photogrammetry makes it from many overlapping drone photos.
 
 **Panorama** — A 360° or wide photo. Hub opens it in the
-[panorama viewer](../hub-guide/viewing/panoramas.mdx).
+[panorama viewer](/hub-guide/viewing/panoramas.mdx).
 
 **Photogrammetry** — Making orthophotos, elevation models, point clouds and 3D models from
-overlapping photos. See [Photogrammetry](../hub-guide/processing/photogrammetry.mdx).
+overlapping photos. See [Photogrammetry](/hub-guide/processing/photogrammetry.mdx).
 
 **Point cloud** — A set of 3D points, often millions, that samples the shape of the terrain and
 the objects on it.
@@ -99,18 +99,18 @@ the `.mtl` file of an `.obj` model, or the `_measurements.geojson` file of an or
 `brighton-beach` in `/r/odm/brighton-beach`.
 
 **STAC** — SpatioTemporal Asset Catalog: a standard catalog of geospatial data. Public datasets
-are in the STAC catalog of Hub. See [STAC catalog](../hub-guide/sharing/stac.mdx).
+are in the STAC catalog of Hub. See [STAC catalog](/hub-guide/sharing/stac.mdx).
 
 **Tagline** — The short description of a dataset that shows under its name in lists.
 
 **Task** — Work that Hub does in the background: a build, a photogrammetry run, an export or an
-import. See [Tasks panel & logs](../hub-guide/processing/tasks.mdx).
+import. See [Tasks panel & logs](/hub-guide/processing/tasks.mdx).
 
 **Thermal imagery** — Images where each pixel holds a temperature. See
-[Thermal imagery](../hub-guide/analyse/thermal.mdx).
+[Thermal imagery](/hub-guide/analyse/thermal.mdx).
 
 **Vector** — Geographic shapes: points, lines and polygons with attributes, for example
 GeoJSON, KML, Shapefile, GPX and DXF files.
 
 **Visibility** — Who can see a dataset: **Private**, **Unlisted** or **Public**. See
-[Visibility](../hub-guide/sharing/visibility.mdx).
+[Visibility](/hub-guide/sharing/visibility.mdx).

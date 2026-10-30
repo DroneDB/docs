@@ -4,14 +4,14 @@ description: "Send e-mail from Registry through your SMTP server, brand the e-ma
 ---
 
 Registry sends e-mail through an SMTP server: the test e-mail, the
-[update e-mails](./update-check.mdx#update-e-mails) to administrators and the build notifications to
+[update e-mails](/self-hosting/update-check.mdx#update-e-mails) to administrators and the build notifications to
 users. E-mail is off by default. While it is off, Registry writes each e-mail it would send to the
 log and drops it, and everything else works as before.
 
 ## Turn on e-mail
 
 1. Add the `Smtp` section to `AppSettings` in `appsettings.json` (all keys:
-   [Configuration → Smtp](./configuration.mdx#smtp)):
+   [Configuration → Smtp](/self-hosting/configuration.mdx#smtp)):
 
    ```json
    "Smtp": {
@@ -26,7 +26,7 @@ log and drops it, and everything else works as before.
    ```
 
 2. Set the password as the environment variable `AppSettings__Smtp__Password`, not in the file.
-3. Set [`ExternalUrlOverride`](./configuration.mdx#externalurloverride) to the public URL of
+3. Set [`ExternalUrlOverride`](/self-hosting/configuration.mdx#externalurloverride) to the public URL of
    Registry. E-mails link to it and load the logo from it. Without it, e-mails have no links, no
    logo and no icon, and Registry logs a warning at start.
 4. Restart Registry. The start log shows `E-mail: smtp.example.com:587 (StartTls)`.
@@ -138,7 +138,7 @@ the full addresses.
 ## Branding
 
 Every e-mail looks like the Hub of the instance. Registry reads the
-[Hub settings](./configuration.mdx#hub-ui-customization); there is no separate setting for e-mails.
+[Hub settings](/self-hosting/configuration.mdx#hub-ui-customization); there is no separate setting for e-mails.
 
 | Setting | Use in the e-mail | When it is not set or not usable |
 |---------|-------------------|----------------------------------|
@@ -175,7 +175,7 @@ the e-mail looks like, is on [Build notification e-mails](/docs/hub-guide/accoun
 
 - E-mail is on. While it is off, the Hub does not show the **Notifications** tab.
 - The account has a valid e-mail address and is not deactivated. Users cannot change their own
-  address: an administrator sets it ([Edit a user](./users.mdx#edit-a-user)).
+  address: an administrator sets it ([Edit a user](/self-hosting/users.mdx#edit-a-user)).
 - `ExternalUrlOverride` is set. Without it, the e-mail is still sent, without links and logo.
 
 ### When an e-mail is sent
@@ -187,13 +187,13 @@ Builds that Registry starts by itself (a rescan, a check of the built files) sen
 
 - **Final failures only.** While Registry retries a build automatically (no disk space, a tool
   timeout), nothing is sent. When the retries give up, the
-  [pending builds job](./configuration.mdx#processpendingbuildscron) can still build the file later.
+  [pending builds job](/self-hosting/configuration.mdx#processpendingbuildscron) can still build the file later.
 - **Grouped.** The first build of a user that ends starts a wait of
-  [`BuildNotifications:DigestMinutes`](./configuration.mdx#buildnotifications) (5 minutes). Then one
+  [`BuildNotifications:DigestMinutes`](/self-hosting/configuration.mdx#buildnotifications) (5 minutes). Then one
   e-mail lists every build of that user that ended in the wait. Before it sends, Registry reads the
   setting of the user again.
 - **After a restart.** When Registry stops during a wait, the daily
-  [`JobIndexCleanupCron`](./configuration.mdx#jobindexcleanupcron) job sends the builds that waited
+  [`JobIndexCleanupCron`](/self-hosting/configuration.mdx#jobindexcleanupcron) job sends the builds that waited
   for more than one hour. It also deletes the records of sent builds after 30 days, but keeps the
   record of a build that still waits for files. With that job turned off, none of this happens.
 - **Waiting for files.** A build that misses a companion file (an `.mtl`, a texture, the `.dbf` of a

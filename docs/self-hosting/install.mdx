@@ -37,7 +37,7 @@ Open [http://localhost:5000](http://localhost:5000) and sign in with the default
 Change it at once in the Hub: open the user menu, then **My Account**
 ([/account](http://localhost:5000/account)). The `DefaultAdmin` setting creates the administrator
 on the first start only; a later change of the setting does not change the password. To recover a
-lost password, see [Reset the administrator password](./troubleshooting.mdx#reset-the-administrator-password).
+lost password, see [Reset the administrator password](/self-hosting/troubleshooting.mdx#reset-the-administrator-password).
 
 :::
 
@@ -92,7 +92,7 @@ docker cp registry:/data ./registry-data-copy
 ```
 
 To recover an instance that you started with a host folder, see
-[Dataset initialization fails on macOS](./troubleshooting.mdx#dataset-initialization-fails-on-macos).
+[Dataset initialization fails on macOS](/self-hosting/troubleshooting.mdx#dataset-initialization-fails-on-macos).
 
 ### Apple Silicon and other ARM computers
 
@@ -215,7 +215,7 @@ start the services later with `docker compose up -d` instead of the script.
 To stop the services, run `docker compose down`. A change of `appsettings.json` takes effect
 after a restart of the Registry services (`docker compose restart`).
 
-Then go through the [Production checklist](./production.mdx).
+Then go through the [Production checklist](/self-hosting/production.mdx).
 
 The repository also has `docker/testing`: MariaDB 11, phpMyAdmin on port `8080` and one Registry
 container with the `dronedb/registry:dev` image. It is for testing changes, not for production.
@@ -251,7 +251,7 @@ Registry.Web [options] <storage folder>
 |--------|--------------|
 | `<storage folder>` | Required. The folder where Registry keeps its settings and data. |
 | `-a`, `--address` | Address to listen on. Default `localhost:5000`. Use `0.0.0.0:5000` to accept connections from other computers. |
-| `-t`, `--instance-type` | `0` default (web server and jobs), `1` processing node, `2` web server, `3` thumbnail generator. See [Instance types](./index.mdx#instance-types). |
+| `-t`, `--instance-type` | `0` default (web server and jobs), `1` processing node, `2` web server, `3` thumbnail generator. See [Instance types](/self-hosting/index.mdx#instance-types). |
 | `-c`, `--check` | Checks `appsettings.json` and the environment with the rules of a start, writes nothing and exits: `0` when the settings are valid. |
 | `--reset-admin-password` | Sets a new password for the configured default administrator and exits. The password comes from the `REGISTRY_ADMIN_PASSWORD` variable or from standard input, never from the command line. |
 | `-r`, `--reset-hub` | Deletes the Hub folder (`ClientApp`) and extracts it again. |
@@ -262,7 +262,7 @@ Exit codes: `0` success, `1` an invalid setting or another start failure (the me
 cause), `2` an invalid command line.
 
 To use MySQL or MariaDB instead of SQLite, see
-[Configuration → Database](./configuration.mdx#database).
+[Configuration → Database](/self-hosting/configuration.mdx#database).
 
 ### Windows: long paths
 
@@ -288,6 +288,6 @@ To build the Registry image or the binaries yourself, see
 
 ## Next steps
 
-- [Production checklist](./production.mdx)
-- [Configuration reference](./configuration.mdx)
-- [Users, organizations & roles](./users.mdx)
+- [Production checklist](/self-hosting/production.mdx)
+- [Configuration reference](/self-hosting/configuration.mdx)
+- [Users, organizations & roles](/self-hosting/users.mdx)

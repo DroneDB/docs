@@ -56,7 +56,7 @@ file names, user names, e-mail addresses of users, logs, counts of users or file
 | `env` | `docker` or `native` | Whether the node runs in a container (Docker, Kubernetes or containerd). Support matrix. |
 | `instanceType` | `default`, `processingNode`, `webServer` or `thumbnailGenerator` | Role of the node that sends the check, from the `InstanceType` key. Support matrix. |
 | `db` | `sqlite` or `mysql` | Database provider. Support matrix. |
-| `baseUrl` | `http` or `https` URL, at most 512 characters, or `null` | Public address of the deployment. It is [`ExternalUrlOverride`](./configuration.mdx#externalurloverride) if set, otherwise the address Registry saw in a request it served. dronedb.app [checks it](#the-url-check). Identifies who runs the deployment. |
+| `baseUrl` | `http` or `https` URL, at most 512 characters, or `null` | Public address of the deployment. It is [`ExternalUrlOverride`](/self-hosting/configuration.mdx#externalurloverride) if set, otherwise the address Registry saw in a request it served. dronedb.app [checks it](#the-url-check). Identifies who runs the deployment. |
 | `hostname` | Text, at most 64 characters, or `null` | Host name of the node that sends the check. Identifies who runs the deployment. |
 | `domain` | Letters, digits, `.`, `_`, `-`; at most 253 characters; or `null` | Network or directory domain of the node (for example an Active Directory domain). Usually `null` on Linux and in containers. Identifies who runs the deployment. |
 | `licenseRef` | Text, at most 64 characters, or `null` | Reference of a licence. Reserved for a later release: Registry always sends `null`. |
@@ -139,11 +139,11 @@ The Hub does not show the icon when the check is off, when there is no answer ye
 ## Update e-mails
 
 When a new version is published, Registry can e-mail the administrators of **your** deployment. The e-mail is sent by
-**your own Registry**, through **your own SMTP server** (see [E-mail](./email.mdx)), to the users with the administrator
+**your own Registry**, through **your own SMTP server** (see [E-mail](/self-hosting/email.mdx)), to the users with the administrator
 role that have an e-mail address. No address goes to dronedb.app for this, and dronedb.app does not send or see these
 e-mails.
 
-The key [`UpdateCheckEmail`](./configuration.mdx#updatecheckemail) chooses which versions are e-mailed:
+The key [`UpdateCheckEmail`](/self-hosting/configuration.mdx#updatecheckemail) chooses which versions are e-mailed:
 
 | Value | E-mail is sent for |
 |-------|--------------------|
@@ -210,7 +210,7 @@ and explains your rights.
 ## Configuration
 
 Three keys of the `AppSettings` section control the check: `UpdateCheckCron`, `UpdateCheckEndpoint`
-and `UpdateCheckEmail`. See [Configuration → Update check](./configuration.mdx#update-check).
+and `UpdateCheckEmail`. See [Configuration → Update check](/self-hosting/configuration.mdx#update-check).
 
 ## Turn the check off
 

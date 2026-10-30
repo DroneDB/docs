@@ -72,7 +72,7 @@ Registry runs this sequence at start-up and refuses to start when the library is
 | `gdalCacheMb` | `DDB_GDAL_CACHE_MB` | `1024` | Size in MiB of GDAL's block cache, shared by the whole process (tiles, renders, thumbnails, statistics, builds); 16 to 1048576. Set with `DDBConfigure`, it is the size of the cache at once, raising or lowering GDAL's own default (5 % of the RAM) and winning over `GDAL_CACHEMAX`. From the environment or the default it is an upper bound only: `DDBRegisterProcess` lowers GDAL's cache to it, never raises it, and leaves an explicit `GDAL_CACHEMAX` alone. A build in flight keeps the cache it asked for (`DDB_COG_CACHE_MB`) until it ends. |
 | `cacheDir` | `DDB_HOME` (then `$DDB_HOME/.ddb`) | `~/.ddb` | Absolute folder where the library caches thumbnails, tiles, index templates and DSM tiles. The registry credentials of the `ddb` command line stay in the profile folder. |
 
-Environment variables are read strictly: digits only, so `1024MB` is ignored and the default applies. The other environment variables of the library (index connections, COG builds, renders) are listed in the [CLI reference](./cli/reference.mdx#environment-variables).
+Environment variables are read strictly: digits only, so `1024MB` is ignored and the default applies. The other environment variables of the library (index connections, COG builds, renders) are listed in the [CLI reference](/developers/cli/reference.mdx#environment-variables).
 
 ## Errors
 
@@ -189,7 +189,7 @@ The export is in the `cancellable` list of `DDBGetCapabilities()`.
 
 ## Training data of a Gaussian splat
 
-`DDBExportSplatTrainingData(ddbPath, folder, outFolder, optionsJson, progress, progressUserData, &output)` is `ddb gsplat --training-data` on a dataset. It reads the ODM project that is in `folder` of the dataset (an entry path; `NULL`, `""` and `"."` are the root) and writes the [training data](./cli/cookbook.mdx#training-data-from-an-odm-project) into `outFolder`, a folder of the filesystem (UTF-8) that is created if it is missing. It must be missing or empty, outside the dataset and neither the folder of the project, a folder that holds it nor a folder inside it (links are resolved), so that no file the export did not make is replaced: a COLMAP sparse model in `sparse/0`, the images in `images/` and `georef.json`. The project needs `cameras.json`, `odm_report/shots.geojson`, `images/` and `odm_georeferencing/coords.txt`, and has its point cloud in `odm_georeferencing/odm_georeferenced_model.laz` or `odm_filterpoints/point_cloud.ply`. The call only reads the dataset.
+`DDBExportSplatTrainingData(ddbPath, folder, outFolder, optionsJson, progress, progressUserData, &output)` is `ddb gsplat --training-data` on a dataset. It reads the ODM project that is in `folder` of the dataset (an entry path; `NULL`, `""` and `"."` are the root) and writes the [training data](/developers/cli/cookbook.mdx#training-data-from-an-odm-project) into `outFolder`, a folder of the filesystem (UTF-8) that is created if it is missing. It must be missing or empty, outside the dataset and neither the folder of the project, a folder that holds it nor a folder inside it (links are resolved), so that no file the export did not make is replaced: a COLMAP sparse model in `sparse/0`, the images in `images/` and `georef.json`. The project needs `cameras.json`, `odm_report/shots.geojson`, `images/` and `odm_georeferencing/coords.txt`, and has its point cloud in `odm_georeferencing/odm_georeferenced_model.laz` or `odm_filterpoints/point_cloud.ply`. The call only reads the dataset.
 
 | Argument | Meaning |
 |----------|---------|
@@ -213,11 +213,11 @@ A failed or canceled call may leave a partial `outFolder`: delete it. The export
 
 `DDBGetRasterInfo` reports, in `indexLayer`, the spectral indices `DDBRenderRasterIndex` (the WMS index layer) can render from the raster: a subset of `NDVI`, `NDRE`, `NDWI`, `SAVI`, `EVI`, in that order, `[]` when there are none. The bands come from the raster's sensor profile; a raster without named bands and with five data bands or more is read as R, G, B, RedEdge, NIR. SAVI and EVI are listed only for floating-point rasters. `DDBRenderRasterIndex` refuses an index the list does not hold, with the reason.
 
-The formula list of `DDBGetRasterMetadata` marks the formulas a raster cannot compute with `"disabled": true` and a `disabledReason` ("Requires bands: ..." or, for SAVI, OSAVI and EVI on an integer raster, "... needs reflectance values"). See [How DroneDB reads the bands](./cli/cookbook.mdx#how-dronedb-reads-the-bands).
+The formula list of `DDBGetRasterMetadata` marks the formulas a raster cannot compute with `"disabled": true` and a `disabledReason` ("Requires bands: ..." or, for SAVI, OSAVI and EVI on an integer raster, "... needs reflectance values"). See [How DroneDB reads the bands](/developers/cli/cookbook.mdx#how-dronedb-reads-the-bands).
 
 ## Index files
 
-The library keeps idle index connections open between calls and leaves committed changes in `.ddb/dbase.sqlite-wal`. Call `DDBCheckpoint` before copying `dbase.sqlite` without its WAL, and `DDBReleaseConnections` before deleting, moving or replacing a dataset folder from the same process. Details and settings: [CLI reference](./cli/reference.mdx#library-hosts-index-connections).
+The library keeps idle index connections open between calls and leaves committed changes in `.ddb/dbase.sqlite-wal`. Call `DDBCheckpoint` before copying `dbase.sqlite` without its WAL, and `DDBReleaseConnections` before deleting, moving or replacing a dataset folder from the same process. Details and settings: [CLI reference](/developers/cli/reference.mdx#library-hosts-index-connections).
 
 ## Output contract
 
