@@ -1,0 +1,242 @@
+# Shots of the Self-hosting section (docs/self-hosting/*).
+#
+# Every shot here uses the throwaway local Registry of media-capture/local/start.sh (base: local) and
+# the default administrator (auth: admin): production admin pages show real users.
+#
+# Demo inputs (made by start.sh, nothing else to create):
+#   - the user `docsdemo` next to `admin`, so the Users table has two rows and the second row can
+#     open the Delete User dialog (the button is disabled for `admin`);
+#   - the organization `acme-surveys` (owner docsdemo), shown in the organizations dialogs.
+# Nice to have for admin-pages--tasks: one finished task in acme-surveys (for example an
+# archive-extract of a small ZIP), so the Tasks table is not empty.
+#
+# E-mail: start.sh turns SMTP on towards MailHog (web UI on DDB_DOCS_MAIL_PORT, default 5181).
+# self-hosting/email--preview clicks "Send me a test", so run it before self-hosting/email--received,
+# which opens the MailHog web UI by absolute URL (not a Hub path).
+#
+# Update check: start.sh sets AppSettings__UpdateCheckCron=disabled. The Usage and contact card then
+# shows a note that the check is off, and the update icon never appears (update-check--notes is
+# blocked until a local run with the check on and an older Registry version).
+
+- id: self-hosting/admin-pages--menu
+  type: screenshot
+  alt: The user menu of an administrator with Manage Users, Tasks, Configuration, Hangfire and API Docs
+  page: self-hosting/admin-pages
+  url: /r
+  base: local
+  auth: admin
+  waitFor: { selector: "[aria-controls='user_menu']", networkIdle: true, extraMs: 500 }
+  actions:
+    - click: "[aria-controls='user_menu']"
+    - wait: "#user_menu"
+  highlight: "text=Manage Users"
+  crop: null
+  blocked: null
+
+- id: self-hosting/users--list
+  type: screenshot
+  alt: The User Management page with the users, their roles, organizations and storage
+  page: self-hosting/users
+  url: /admin/users
+  base: local
+  auth: admin
+  waitFor: { selector: "[aria-label='Search users']", networkIdle: true, extraMs: 500 }
+  actions: []
+  highlight: null
+  crop: null
+  blocked: null
+
+- id: self-hosting/users--add
+  type: screenshot
+  alt: The Add User dialog with user name, e-mail, password rules and roles
+  page: self-hosting/users
+  url: /admin/users
+  base: local
+  auth: admin
+  waitFor: { selector: "[aria-label='Search users']", networkIdle: true, extraMs: 300 }
+  actions:
+    - click: "text=New User"            # needs aria-label
+    - wait: "#add-user-dialog-username"
+    - fill: { selector: "#add-user-dialog-username", value: surveyor }
+    - fill: { selector: "#add-user-dialog-email", value: surveyor@example.com }
+  highlight: null
+  crop: "#addUserDialog"
+  blocked: null
+
+- id: self-hosting/users--organizations
+  type: screenshot
+  alt: Manage User Organizations with the organizations of a user and their permissions
+  page: self-hosting/users
+  url: /admin/users
+  base: local
+  auth: admin
+  waitFor: { selector: "[aria-label='Search users']", networkIdle: true, extraMs: 300 }
+  actions:
+    # the Organizations column button of the second row (docsdemo); the toolbar button has the same text but no title
+    - click: "td [title='Manage Organizations'] >> nth=1"
+    - wait: "text=User Organizations"
+  highlight: null
+  crop: null
+  blocked: null
+
+- id: self-hosting/users--roles
+  type: screenshot
+  alt: The Role Management dialog with a field for a new role and the existing roles
+  page: self-hosting/users
+  url: /admin/users
+  base: local
+  auth: admin
+  waitFor: { selector: "[aria-label='Search users']", networkIdle: true, extraMs: 300 }
+  actions:
+    - click: "text=Manage Roles"        # needs aria-label
+    - wait: "#role-management-dialog-role-name"
+  highlight: null
+  crop: null
+  blocked: null
+
+- id: self-hosting/users--delete
+  type: screenshot
+  alt: The Delete User dialog with the successor and the warning that all data will be deleted
+  page: self-hosting/users
+  url: /admin/users
+  base: local
+  auth: admin
+  waitFor: { selector: "[aria-label='Search users']", networkIdle: true, extraMs: 300 }
+  actions:
+    # second row (docsdemo): the button of admin is disabled. The shot never confirms the dialog.
+    - click: "[aria-label='Delete User'] >> nth=1"
+    - wait: "#users-transfer-data-to-successor"
+  highlight: "#users-transfer-data-to-successor"
+  crop: null
+  blocked: null
+
+- id: self-hosting/admin-pages--config
+  type: screenshot
+  alt: The Configuration page with the Usage and contact card, the E-mail templates card and the setting sections
+  page: self-hosting/admin-pages
+  url: /admin/config
+  base: local
+  auth: admin
+  waitFor: { selector: "section[aria-labelledby='usage-contact-title']", networkIdle: true, extraMs: 500 }
+  actions: []
+  highlight: "text=Copy AppSettings JSON"
+  crop: null
+  blocked: null
+
+- id: self-hosting/processing-nodes--tool-gating
+  type: screenshot
+  alt: The Tool Gating section of the Configuration page
+  page: self-hosting/processing-nodes
+  url: /admin/config
+  base: local
+  auth: admin
+  waitFor: { selector: "section[aria-labelledby='usage-contact-title']", networkIdle: true, extraMs: 500 }
+  actions:
+    - click: "text=Tool Gating"         # accordion header, needs aria-label
+    - wait: 800
+    - scroll: { selector: "text=Tool Gating Config", y: 0 }
+  highlight: "text=Tool Gating"
+  crop: null
+  blocked: null
+
+- id: self-hosting/admin-pages--tasks
+  type: screenshot
+  alt: The Tasks page of the administrator with the user, tool and state filters
+  page: self-hosting/admin-pages
+  url: /admin/tasks
+  base: local
+  auth: admin
+  waitFor: { selector: "[aria-label='Filter by state']", networkIdle: true, extraMs: 500 }
+  actions: []
+  highlight: null
+  crop: null
+  blocked: null
+
+- id: self-hosting/admin-pages--hangfire
+  type: screenshot
+  alt: The Hangfire dashboard of Registry
+  page: self-hosting/admin-pages
+  url: /hangfire
+  base: local
+  auth: admin                          # the dashboard reads the sign-in cookie of the Hub
+  waitFor: { networkIdle: true, extraMs: 1500 }
+  actions: []
+  highlight: null
+  crop: null
+  blocked: null
+
+- id: self-hosting/email--templates
+  type: screenshot
+  alt: The E-mail templates card with the subject, the body and the placeholders
+  page: self-hosting/email
+  url: /admin/config
+  base: local
+  auth: admin
+  waitFor: { selector: "section[aria-labelledby='email-templates-title']", networkIdle: true, extraMs: 500 }
+  actions: []
+  highlight: null
+  crop: "section[aria-labelledby='email-templates-title']"
+  blocked: null
+
+- id: self-hosting/email--preview
+  type: screenshot
+  alt: The preview of the build notification with three sample builds
+  page: self-hosting/email
+  url: /admin/config
+  base: local
+  auth: admin
+  waitFor: { selector: "section[aria-labelledby='email-templates-title']", networkIdle: true, extraMs: 500 }
+  actions:
+    - click: "section[aria-labelledby='email-templates-title'] >> text=Preview"
+    - wait: "#email-template-preview-title"
+    # sends the sample to admin@example.com in MailHog for self-hosting/email--received
+    - click: "section[aria-labelledby='email-templates-title'] >> text=Send me a test"
+    - wait: 1500
+  highlight: null
+  crop: "section[aria-labelledby='email-templates-title']"
+  blocked: null
+
+- id: self-hosting/email--received
+  type: screenshot
+  alt: A build notification e-mail as a user receives it, in a mail client
+  page: self-hosting/email
+  url: http://localhost:5181/          # MailHog web UI (DDB_DOCS_MAIL_PORT), not a Hub path
+  base: local
+  auth: none
+  waitFor: { networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: ".msglist-message >> nth=0"  # MailHog's own markup, not the Hub
+    - wait: 1000
+  highlight: null
+  crop: null
+  blocked: null
+
+- id: self-hosting/update-check--usage-card
+  type: screenshot
+  alt: The Usage and contact card with the usage question and the optional contact address
+  page: self-hosting/update-check
+  url: /admin/config
+  base: local
+  auth: admin
+  waitFor: { selector: "section[aria-labelledby='usage-contact-title']", networkIdle: true, extraMs: 500 }
+  actions: []
+  highlight: null
+  crop: "section[aria-labelledby='usage-contact-title']"
+  # needs the update check on: start.sh sets UpdateCheckCron=disabled, and the card then shows a note
+  blocked: null
+
+- id: self-hosting/update-check--notes
+  type: screenshot
+  alt: The release notes dialog that administrators open from the update icon
+  page: self-hosting/update-check
+  url: /r
+  base: local
+  auth: admin
+  waitFor: { selector: "[aria-label*='is available, show what']", networkIdle: true, extraMs: 500 }
+  actions:
+    - click: "[aria-label*='is available, show what']"
+    - wait: 1000
+  highlight: null
+  crop: null
+  # the icon shows only when dronedb.app reports a newer version than the local Registry
+  blocked: release

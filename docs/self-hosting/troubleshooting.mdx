@@ -1,10 +1,400 @@
 ---
 title: "Troubleshooting"
-description: "Common problems and how to fix them."
+description: "Fix common Registry problems: start failures, reverse proxy and upload issues, builds that fail or stop, the helper programs, health checks and logs."
 ---
 
-:::info
+First read the log: `docker compose logs -f` (or `docker logs -f registry`), or the files in `logs/`
+of the storage folder (see [Logs](#logs)). Most messages name the setting or the file that is wrong.
 
-This page is being written.
+## Registry does not start
+
+**`Invalid setting: …` and exit code 1**
+
+A setting in `appsettings.json` or in the environment is not valid; the message names the key. Fix
+it and check with `Registry.Web <storage folder> --check` (exit code `0` when the settings are
+valid). See the [Configuration reference](./configuration.mdx).
+
+**`Unable to use the DDB library: …`**
+
+Registry needs the DroneDB library 2.x with every function it calls. Use the Docker image, or
+install the DroneDB release that your Registry version pins (`DdbVersion` in `Directory.Build.props`
+of the Registry source). See [Install → Native](./install.mdx#native).
+
+**`no matching manifest for linux/arm64/v8` when you pull the image**
+
+The image is built for `linux/amd64` only. Add `--platform linux/amd64`. See
+[Apple Silicon and other ARM computers](./install.mdx#apple-silicon-and-other-arm-computers).
+
+**A processing node stops with `HangfireProvider InMemory is not supported for a processing node`**
+
+Nodes share the job queue with the web server: use MySQL or MariaDB. See
+[Processing nodes](./processing-nodes.mdx#registry-processing-nodes).
+
+**The container never becomes healthy**
+
+The health check must run `/healthcheck.sh` (the check of the image) or call `GET /health/live`.
+`/quickhealth` needs the `MonitorToken` or an administrator, so a `curl …/quickhealth` health check
+never passes. The first start after the switch to the non-root user gives `/data` to the `registry`
+user, which can take long on a large volume: the Compose file allows a start period of 10 minutes.
+
+**`Cannot change the owner of …` at start**
+
+The container cannot give a path to the `registry` user (a read-only or root-squashed mount). Run
+`sudo chown -R 1654:1654` on the path on the host, or make the mount writable.
+
+## Reset the administrator password
+
+`DefaultAdmin.Password` creates the first administrator only; changing it later does nothing. Set a
+new password for the configured default administrator with `--reset-admin-password`. Registry reads
+the password from `REGISTRY_ADMIN_PASSWORD` or from standard input, never from the command line,
+sets it and exits.
+
+```bash
+# Native
+REGISTRY_ADMIN_PASSWORD='new-strong-password' ./Registry.Web ./registry-data --reset-admin-password
+
+# Docker (stop the running container first)
+docker run --rm -v registry-data:/data -e REGISTRY_ADMIN_PASSWORD='new-strong-password' \
+  dronedb/registry --reset-admin-password
+```
+
+The new password must follow the [password policy](./configuration.mdx#passwordpolicy). With LDAP,
+passwords are in the directory.
+
+## Dataset initialization fails on macOS
+
+**Symptoms**
+
+- Creating a dataset fails with `filesystem error: cannot copy: Permission denied`.
+- The log repeats `Table 'entries' not found (not a valid database: ...)` every minute for one or
+  more datasets, often `public/default`.
+
+**Cause**
+
+`/data` is a host folder that Docker Desktop shares through virtiofs. DroneDB cannot copy its empty
+index template onto this file system. Each failed attempt leaves a `.ddb` folder with an empty
+`dbase.sqlite` file, and Registry then treats the dataset as initialized.
+
+**Solution**
+
+Run Registry with a named volume for `/data`, as in
+[macOS: use a named volume](./install.mdx#macos-use-a-named-volume). To keep the settings and users
+of the old folder, copy them into the volume before you start the new container. This command also
+removes the broken `.ddb` folders, so Registry creates the indexes again:
+
+```bash
+docker volume create registry-data
+docker run --rm -v registry-data:/data -v /ABSOLUTE/PATH/TO/OLD/DATA:/old alpine \
+  sh -c 'cp -a /old/. /data/ && rm -rf /data/datasets/*/*/.ddb'
+```
+
+:::caution
+
+The `rm` command removes the index of every dataset in the volume. Use it only for an instance
+where no dataset was initialized correctly.
 
 :::
+
+## Reverse proxy
+
+**Every client has the same address `172.x.0.1`, or all anonymous users share one rate limit**
+
+Registry ignores `X-Forwarded-For` from a proxy it does not trust. Add the Docker bridge range to
+`KnownNetworks`. See [Reverse proxy](./production.mdx#reverse-proxy).
+
+**Links in e-mails or share links point to `localhost` or to `http`**
+
+Set [`ExternalUrlOverride`](./configuration.mdx#externalurloverride) to the public URL, and make
+the proxy send `X-Forwarded-Proto`.
+
+### Tuning the reverse proxy for large uploads
+
+Registry **streams** uploads to storage as the bytes arrive and hashes each file while it is
+written, so the answer follows the last byte within milliseconds. A reverse proxy keeps this only if
+it forwards the body as it arrives and, over HTTP/2, gives each upload stream a large enough window.
+
+Four settings matter:
+
+- **Request-body buffering.** With buffering on (the nginx default), the proxy writes the whole
+  upload to a temporary file before it contacts Registry. The upload is written to disk twice, the
+  proxy needs scratch space as large as the file, and the browser shows 100 % while the proxy still
+  sends the file to Registry (*file size ÷ temp-disk speed*: tens of seconds per GB on mechanical
+  disks). Buffering off streams the body to Registry.
+- **The HTTP/2 stream window.** With buffering off and HTTP/2 on, nginx gives each upload stream a
+  window of `http2_body_preread_size` (64 KB by default) and fills it again one buffer at a time.
+  Each stream then moves at most *window ÷ round-trip time*: 1.6 MB/s at 40 ms, 0.64 MB/s at
+  100 ms, whatever the uplink. A single large file uses one stream, so it is the worst case. Raise
+  the window to 2 MB (20 MB/s per stream at 100 ms). HTTP/1.1 is not affected: TCP does the flow
+  control.
+- **Body-size limit.** Remove or raise the limit of the proxy. You can still cap uploads in Registry
+  with [`MaxRequestBodySize`](./configuration.mdx#maxrequestbodysize): a larger request gets
+  `413 Payload Too Large` before any byte is stored.
+- **Read timeout.** `proxy_read_timeout` must cover the time between the last byte of the upload and
+  the answer. That is normally the index commit (milliseconds). Two cases make it longer: buffering
+  on (the replay above) and older Registry versions, which hash after the upload (*file size ÷
+  min(hash rate, disk read rate)*, for example 10 GB on a mechanical-disk host ≈ 70 s). Keep it at
+  600 s or more.
+
+#### nginx
+
+```nginx
+server {
+    listen 443 ssl;            # or "listen 443 ssl http2;" (nginx < 1.25) / "http2 on;"
+    server_name registry.example.com;
+
+    # Large uploads (0 = no limit, or a cap such as 20g)
+    client_max_body_size 0;
+
+    # Needed with HTTP/2 and request buffering off: the window of each upload stream
+    # (server level, not allowed in location). Uses up to 2 MB of memory per upload.
+    http2_body_preread_size 2m;
+    client_body_buffer_size 2m;
+
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_http_version 1.1;          # needed for unbuffered request bodies
+
+        # Stream the upload to Registry instead of writing it to a temp file first
+        proxy_request_buffering off;
+
+        proxy_connect_timeout 600s;
+        proxy_send_timeout    600s;
+        proxy_read_timeout    600s;
+        send_timeout          600s;
+
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+Buffering **on** is still a valid choice, for example for a proxy that must absorb slow clients: it
+does not hit the HTTP/2 window limit, but it keeps the second copy on disk and the wait after 100 %.
+Response buffering (`proxy_buffering`) can stay on: the live task updates of Registry (server-sent
+events) turn it off per response with `X-Accel-Buffering: no`.
+
+#### Apache (httpd) with mod_proxy
+
+`mod_proxy_http` already streams request bodies to the backend, so set the limits, the timeouts and
+the HTTP/2 window:
+
+```apache
+<VirtualHost *:443>
+    ServerName registry.example.com
+
+    ProxyPreserveHost On
+    # timeout (seconds) keeps the backend connection open during long uploads
+    ProxyPass        / http://localhost:5000/ timeout=600
+    ProxyPassReverse / http://localhost:5000/
+
+    # Large uploads (0 = no limit, or a byte cap)
+    LimitRequestBody 0
+
+    # mod_reqtimeout stops slow request bodies by default; the deadline is extended
+    # as long as data arrives at 1 KB/s or more
+    RequestReadTimeout body=30,MinRate=1024
+
+    # With mod_http2 (Protocols h2 http/1.1): the window of each stream is 64 KB by
+    # default and caps every upload at window ÷ round-trip time
+    H2WindowSize 2097152
+
+    RequestHeader set X-Forwarded-Proto "https"
+</VirtualHost>
+```
+
+If large uploads fail with `408 Request Timeout` or a reset connection, the cause is usually
+`mod_reqtimeout` (`RequestReadTimeout`), not `Timeout` or `ProxyTimeout`: change the `body=` rule as
+above. Enable `mod_proxy`, `mod_proxy_http` and `mod_headers`.
+
+#### Caddy and Traefik
+
+Both stream request bodies and use 1 MB HTTP/2 windows: no upload settings are needed. Keep their
+timeouts longer than the longest upload.
+
+#### Check the result: upload diagnostics
+
+In the Hub, open **My Account**, then **Upload diagnostics**, and click **Run test**. The Upload
+window links to it too (**Uploads slower than expected? Test the connection**). The Hub sends 8 MB
+of random data to Registry (`POST /sys/upload-probe`, dropped on arrival) on one connection and then
+on six in parallel, and shows the protocol (`h2` or `http/1.1`), the round-trip time and the
+throughput. When one HTTP/2 stream runs at about 64 KB (or 1 MB) ÷ round-trip time, the card shows
+"The reverse proxy window is limiting uploads" with a link to this section. A user can run the test
+a few times per minute.
+
+#### "504 Gateway Timeout" after the upload reached 100 %
+
+The proxy stopped waiting for the answer while Registry was still adding the file (see **Read
+timeout** above). The file is usually in the dataset. The Hub does not upload it again: it asks
+Registry for the state of the upload (`GET /orgs/{org}/ds/{ds}/obj/uploads/{uploadId}`) and marks the
+file done when Registry reports it. Raise `proxy_read_timeout` if this happens often.
+
+## Uploads
+
+| Symptom | What to check |
+|---------|---------------|
+| `413 Payload Too Large` | [`MaxRequestBodySize`](./configuration.mdx#maxrequestbodysize) and the body limit of the proxy |
+| A file is refused with a message about its extension | The file type is blocked: [`BlockedFileExtensions`](./configuration.mdx#import) or `AllowedFileExtensions` |
+| Uploads are refused for one user | The [storage quota](./users.mdx#storage-quotas) of the user is full |
+| Uploads fail for everyone | Free disk space and the permissions of `DatasetsPath` (the `registry` user must own it) |
+
+## Builds
+
+Builds make what the Hub shows of a file (tiles, COPC, bm3d, splat levels of detail). Failed and
+running builds are in the [Hangfire dashboard](./admin-pages.mdx#hangfire), with the error.
+
+**A build fails with a lack of disk space**
+
+A build needs free space on the volume it writes to: 512 MiB by default
+([`Ddb:MinFreeDiskMb`](./configuration.mdx#ddb)). Free space, or move `/data` to a larger
+partition (see [Disks and temporary files](./production.mdx#disks-and-temporary-files)). Registry
+retries such builds automatically, and the [pending builds job](./configuration.mdx#processpendingbuildscron)
+starts them again later.
+
+**A build waits for files**
+
+A build that misses a companion file (the `.mtl` of an `.obj`, a texture, the `.dbf` or `.shx` of a
+`.shp`) is not a failure. It runs when a file with the missing name is added to the dataset. Users
+with [build notifications](./email.mdx#build-notifications) get the missing names by e-mail.
+
+**A build runs twice, or collides with itself**
+
+With MySQL, Hangfire hands a job that runs longer than
+[`HangfireInvisibilityTimeoutHours`](./configuration.mdx#hangfireinvisibilitytimeouthours) (4 hours)
+to another worker. Raise it for very long builds.
+
+**A build fails on Windows with a long path**
+
+Turn on long paths: see [Windows: long paths](./install.mdx#windows-long-paths).
+
+### A splat build stops without output
+
+`build-lod` (the program that builds the levels of detail of a Gaussian splat) is watched by an idle
+deadline. A run that prints nothing for that long is stopped, and the build fails with
+`build-lod killed after N s without output`, where N is the deadline. `build-lod` prints nothing
+while it sorts the splats, builds each level, prunes and writes the result, and these steps take
+longer for a larger splat, so the deadline grows with the number of splats:
+
+- **8 minutes per million splats**, rounded up to a whole second;
+- at least **3600 seconds** (1 hour) and at most **86400 seconds** (24 hours).
+
+For example, a PLY of 31.6 million splats (7.45 GB) gets about 4.2 hours. The splat count comes from
+the header of the source (PLY, `.splat`, SPZ, `.ksplat`). For a `.sog`, which has no header that
+DroneDB reads, it is estimated from the file size at 236 bytes per splat (a PLY with SH degree 3), so
+a compressed `.sog` often gets the minimum.
+
+To change the deadline for every build, set `DDB_BUILDLOD_IDLE_TIMEOUT_SECONDS` in the environment of
+every Registry process to an integer from 1 to 86400. Any other value fails the build before it
+starts.
+
+If the error is `Building Gaussian Splats requires the build-lod tool, which was not found`, install
+`build-lod` (it is in the DroneDB release package) or set `DDB_BUILDLOD_PATH`.
+
+## Helper programs
+
+libddb starts helper programs of its package for the risky or heavy work. The Docker image has them.
+On a native install they come with the DroneDB package, next to `libddb`. libddb looks for each one
+in the folder of the running program, the folder of `libddb` (and `../bin` of each), then on the
+`PATH`; an environment variable overrides the search.
+
+| Program | Variable | Message when it is missing | Effect |
+|---------|----------|----------------------------|--------|
+| `gdal-util` | `DDB_GDAL_UTIL_PATH` | `gdal-util was not found, and it is needed to read raster and vector files; …` | Rasters, vectors and photos cannot be read or built |
+| `metadata-util` | `DDB_METADATA_UTIL_PATH` | `metadata-util was not found, and it is needed to read image metadata; …` | Images are not indexed with their EXIF and XMP |
+| `bm3d` | `DDB_BM3D_PATH` | `bm3d not found; set DDB_BM3D_PATH or install bm3d next to ddb` | 3D models do not build |
+| `build-lod` | `DDB_BUILDLOD_PATH` | see [above](#a-splat-build-stops-without-output) | Gaussian splats do not build |
+
+A variable that is set but does not point to an executable file makes the program unavailable, with
+a message such as `DDB_GDAL_UTIL_PATH=… is not an executable file`.
+
+**`gdal-util` "speaks protocol X, this ddb needs Y"**
+
+The `gdal-util` program found does not match the version of `libddb`: for example an old copy on the
+`PATH`. Install the `gdal-util` of the same DroneDB release, or point `DDB_GDAL_UTIL_PATH` at it.
+
+**`gdal-util` refuses to start with `DDB_GDAL_SANDBOX=strict`**
+
+`gdal-util` confines its workers with what the host offers (on Linux: resource limits, a file system
+and network lockdown, a filter on system calls). `strict` refuses to run when a layer is missing;
+`best-effort` (the default) applies what is there and logs the missing layers once. Run
+`gdal-util --sandbox-report` in the container or on the host to see the layers. Use `off` only for
+tests.
+
+## Background jobs
+
+**The `JobIndices` table grows too large**
+
+The job index keeps a record of each build job. A scheduled clean-up removes old finished records
+(every night at 4:00, after 60 days). If the table is already very large, start a purge now
+(administrator):
+
+```bash
+curl -X POST -H "Authorization: Bearer <admin token>" \
+  http://localhost:5000/sys/cleanup-jobindices
+```
+
+Add `?retentionDays=30` to override the retention for that run. See
+[`JobIndexCleanupCron`](./configuration.mdx#jobindexcleanupcron) and
+[`JobIndexRetentionDays`](./configuration.mdx#jobindexretentiondays).
+
+**A queued e-mail failed**
+
+Open it in Hangfire: the reason is there. Usually the process that ran it has e-mail off or another
+password. See [E-mail](./email.mdx#turn-on-e-mail).
+
+## Sign-in problems
+
+- Check that `Secret` is set and the same on every Registry process: all of them read the same
+  `appsettings.json`.
+- Check [`TokenExpirationInDays`](./configuration.mdx#tokenexpirationindays).
+- Clear the cookies of the site in the browser.
+- With LDAP, see [LDAP troubleshooting](./ldap.mdx#troubleshooting).
+
+## Slow performance
+
+- Use MySQL or MariaDB instead of SQLite.
+- Add Redis as [`CacheProvider`](./configuration.mdx#cacheprovider) for a busy instance.
+- Declare the processes of the host in [`HostBudget`](./configuration.mdx#hostbudget), or tune
+  [`ProcessingBudget`](./configuration.mdx#processingbudget) and
+  [`NativeConcurrency`](./configuration.mdx#nativeconcurrency).
+- On Apple Silicon, the image runs under emulation: see
+  [Apple Silicon](./install.mdx#apple-silicon-and-other-arm-computers).
+
+## Health checks
+
+```bash
+# Liveness, no sign-in: the process serves HTTP
+curl http://localhost:5000/health/live
+
+# Quick check
+curl -H "Authorization: Bearer <token>" http://localhost:5000/quickhealth
+
+# Full report
+curl -H "Authorization: Bearer <token>" http://localhost:5000/health
+```
+
+`<token>` is an administrator token or the [`MonitorToken`](./configuration.mdx#monitortoken), which
+can also be sent as `?token=<MonitorToken>`.
+
+`/health` reports each check by name: the cache, the DroneDB library, the user manager, the
+registry and identity databases, the free disk space of the datasets, cache, temp and storage paths,
+Hangfire (at least one server) and the thumbnail generator. With LDAP or e-mail on, it also has the
+`LDAP health check` and the `SMTP health check` (a mail outage is **Degraded**, not Unhealthy).
+
+## Logs
+
+| Deployment | Where |
+|------------|-------|
+| Docker Compose | `docker compose logs <service>`; files in `data/logs/`: `registry-web*.txt`, `registry-node-<host name>*.txt`, `registry-thumbs*.txt` |
+| One container | `docker logs registry`; files in `logs/` of the volume: `registry*.txt` |
+| Native | `registry-data/logs/registry*.txt` |
+
+Files roll daily; the last 14 are kept, at most 100 MB each. To change the level, see
+[Configuration → Logging](./configuration.mdx#logging).
+
+## Get help
+
+1. Read the [FAQ](/docs/reference/faq).
+2. Search the [Registry issues](https://github.com/DroneDB/Registry/issues) on GitHub.
+3. Commercial support: [dronedb.app/contact](https://dronedb.app/contact).

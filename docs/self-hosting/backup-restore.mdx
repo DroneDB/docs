@@ -1,10 +1,119 @@
 ---
 title: "Backup & restore"
-description: "Back up and restore a Registry."
+description: "What to back up in a Registry deployment, how to make a consistent copy of the databases and the storage folder, and how to restore it."
 ---
 
-:::info
+A Registry deployment has two parts to back up: the **databases** and the **storage folder**.
+Back them up together: a dataset is a database record and a folder, and a restore needs both from
+the same moment.
 
-This page is being written.
+## What to back up
+
+The storage folder (`/data` in the container) with the default paths:
+
+```text
+registry-data/                 # storage folder
+├── appsettings.json           # back up: all settings and secrets
+├── identity.db, registry.db   # back up (SQLite only), with their -wal and -shm files
+├── datasets/                  # back up: the files and the index (.ddb) of every dataset
+├── data/                      # back up (StoragePath)
+│   ├── .instance-id           #   the identity of the deployment
+│   ├── .email-templates.json  #   the saved e-mail templates
+│   └── branding/              #   logos, favicons, manifest
+├── ClientApp/                 # skip: the Hub, extracted again at start
+├── cache/                     # skip: tiles and thumbnails, made again
+├── temp/                      # skip: temporary files
+└── logs/                      # optional
+```
+
+| Item | Why |
+|------|-----|
+| `appsettings.json` | All settings, the `Secret` that signs sign-in tokens and the `ThumbnailGeneratorToken`. A new `Secret` signs out every user. |
+| Identity database | Users, passwords, roles |
+| Registry database | Organizations, datasets, members, the job index, build notifications |
+| `datasets/` | The files of every dataset, their index (`.ddb/`) and their builds (`.ddb/build`). Builds can be made again, but that takes long on a large server. |
+| `data/.instance-id` | The [instance ID](./update-check.mdx#find-the-instance-id). Without it, Registry makes a new ID. |
+| `data/.email-templates.json`, `data/branding/` | Your template text and branding files |
+| The folder of [`DataProtectionKeysPath`](./configuration.mdx#dataprotectionkeyspath), if set | Without the keys, Registry cannot read the passwords that queued imports keep |
+
+With MySQL or MariaDB, the databases are `RegistryAuth` (identity), `RegistryData` (registry) and
+`RegistryHangfire` (the job queue). The job queue is optional: without it, jobs that waited are lost
+and the recurring jobs are created again at start. With `HangfireProvider` `InMemory` there is
+nothing to back up for jobs.
+
+## Make a backup
+
+The simplest consistent backup is with Registry stopped.
+
+### Docker Compose with MariaDB
+
+```bash
+cd Registry/docker/production
+
+# 1. Stop Registry (keep the database running)
+docker compose stop registry_webserver registry_node_1 registry_node_2
+
+# 2. Dump the databases
+docker compose exec db sh -c 'mysqldump -uroot -p"$MYSQL_ROOT_PASSWORD" \
+  --single-transaction --routines --databases RegistryAuth RegistryData RegistryHangfire' \
+  > registry-db-$(date +%F).sql
+
+# 3. Copy the settings and the storage folder (without cache, temp and the Hub)
+tar czf registry-data-$(date +%F).tar.gz \
+  --exclude=./data/cache --exclude=./data/temp --exclude=./data/ClientApp \
+  ./appsettings.json ./data
+
+# 4. Start Registry again
+docker compose start registry_webserver registry_node_1 registry_node_2
+```
+
+### One container with SQLite
+
+```bash
+docker stop registry
+docker run --rm -v registry-data:/data -v "$PWD":/backup alpine \
+  tar czf /backup/registry-data-$(date +%F).tar.gz \
+  --exclude=./cache --exclude=./temp --exclude=./ClientApp -C /data .
+docker start registry
+```
+
+With a host folder instead of a named volume, stop the container and copy the folder.
+
+:::tip Large servers
+
+For terabytes of datasets, copy `datasets/` with an incremental tool (`rsync`, a snapshot of the
+file system or of the volume) and keep the database dump and the file copy from the same stop.
+Without a stop, take the database dump first and the file copy right after; datasets that changed
+in between may need a **Rescan** after a restore.
 
 :::
+
+## Restore
+
+1. Install the **same Registry version** that made the backup. Upgrade after the restore.
+2. Stop Registry.
+3. Restore the databases:
+
+   ```bash
+   docker compose exec -T db sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD"' < registry-db-2026-10-30.sql
+   ```
+
+   For SQLite, `identity.db` and `registry.db` come back with the storage folder.
+4. Restore `appsettings.json` and the storage folder.
+5. Give the files to the container user (the image runs as uid/gid `1654`):
+
+   ```bash
+   sudo chown -R 1654:1654 ./data ./appsettings.json
+   ```
+
+6. Check the settings: run Registry with `--check`.
+7. Start Registry. It extracts the Hub again and makes the cache again when users open files.
+
+After a restore to another address, set [`ExternalUrlOverride`](./configuration.mdx#externalurloverride)
+to the new URL.
+
+## Move to another server
+
+A move is a backup and a restore. Keep `data/.instance-id`: the update check then sees the same
+deployment. To move from SQLite to MySQL or MariaDB, there is no built-in converter: changing the
+provider starts with empty databases.
