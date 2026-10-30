@@ -28,9 +28,9 @@ export class Registry {
     return res;
   }
 
-  /** JSON (or text) of a request; throws RegistryError on a status that is not 2xx. */
+  /** JSON (or text) of a request to an API path or a full URL; throws RegistryError on a status that is not 2xx. */
   async request(method, endpoint, {body, json, auth = true, headers = {}} = {}) {
-    const url = this.base + endpoint;
+    const url = /^https?:\/\//.test(endpoint) ? endpoint : this.base + endpoint;
     const h = {...headers};
     if (auth && this.token) h.Authorization = `Bearer ${this.token}`;
     if (json !== undefined) {

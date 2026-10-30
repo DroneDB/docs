@@ -1,0 +1,164 @@
+# The demo data that `npm run reset-demo` (reset-demo.mjs) puts back before each capture: the
+# organization of the demo account, its datasets and their files, and the account settings.
+# Every dataset of the organization is deleted and created again from this list, so each capture
+# starts from the same state. Shot files say in their header comments what they need; add it here.
+#
+# A file comes from one of:
+#   from: <org>/<dataset>/<path>   a file of a public showcase dataset on the source Hub (--source,
+#                                  default the Hub that is reset: the local mirror and
+#                                  hub.dronedb.app have the same datasets under the same slugs).
+#                                  `*`, `?` and `[...]` in the file name take every match; `dest` is a
+#                                  folder (ends with /). Downloads are cached in
+#                                  $DDB_DOCS_HOME/demo-inputs-cache.
+#   file: <path>                   a local file under the demo inputs root (DDB_DOCS_INPUTS, default
+#                                  /mnt/data/datasets), or an absolute path
+#   text: <content>                a small text file written by the script
+#   zip: [ <entries> ]             a ZIP made by the script; each entry is a from/file/text source
+#                                  with `as`, its path in the archive (a folder for a glob)
+# `bytes: N` with from or file keeps only the first N bytes (a damaged file).
+# Input files are never committed to the docs repository.
+
+org:
+  slug: acme-surveys
+  name: Acme Surveys
+  description: Demo organization of the documentation
+
+account:
+  # The Preferences of the demo account go back to the Hub defaults (every section deleted)
+  resetPreferences: true
+  # User metadata, set with the administrator account when DDB_DOCS_ADMIN_USER is available
+  # (the Account page and Storage Info show a used / total bar)
+  meta:
+    maxStorageMB: 10240
+
+datasets:
+  # Get started: the dataset "just created" and the target of the upload shots
+  - slug: getting-started
+    name: Getting started
+    visibility: private
+    files: []
+
+  # Get started: the first map; the share shots make it Unlisted, the reset makes it Private again
+  - slug: first-map
+    name: First map
+    visibility: private
+    files:
+      - dest: odm_orthophoto/odm_orthophoto.tif
+        from: odm/brighton-beach/odm_orthophoto/odm_orthophoto.tif
+
+  # Files and Datasets pages
+  - slug: site-a
+    name: Site A
+    visibility: private
+    files:
+      - dest: README.md
+        from: odm/aukerman/README.md
+      - dest: options.json
+        from: odm/zoo/options.json
+      - dest: ortho.tif
+        from: odm/brighton-beach/odm_orthophoto/odm_orthophoto.tif
+      - dest: ortho_measurements.geojson
+        from: odm/brighton-beach/odm_orthophoto/odm_orthophoto_measurements.geojson
+      - dest: notes-old.txt
+        text: "Notes of the first survey of Site A. Replaced by the notes of the second survey.\n"
+      - dest: products/ortho.tif
+        from: odm/brighton-beach/odm_orthophoto/odm_orthophoto.tif
+      - dest: DJI_0001.JPG
+        from: odm/brighton-beach/images/DJI_0018.JPG
+      - dest: DJI_0002.JPG
+        from: odm/brighton-beach/images/DJI_0019.JPG
+      - dest: DJI_0003.JPG
+        from: odm/brighton-beach/images/DJI_0020.JPG
+      # A ZIP of at most 20 MB (here about 14 MB) with files in a subfolder
+      - dest: survey-archive.zip
+        zip:
+          - as: photos/
+            from: odm/brighton-beach/images/DJI_002[0-3].JPG
+          - as: README.md
+            from: odm/brighton-beach/README.md
+      # The CAD drawing without a coordinate system (Autodesk sample: licence to confirm before a
+      # production capture)
+      - dest: civil_example-imperial.dwg
+        file: vectors/dwg/civil_example-imperial.dwg
+
+  - slug: old-survey
+    name: Old survey
+    visibility: private
+    files:
+      - dest: notes.txt
+        text: "Old survey notes.\n"
+
+  # Measure and Analyse pages: two orthophotos to measure and compare
+  - slug: sheffield-park
+    name: Sheffield Park
+    visibility: private
+    files:
+      - dest: park-1.tif
+        from: odm/sheffield-park-1/odm_orthophoto/odm_orthophoto.tif
+      - dest: park-2.tif
+        from: odm/sheffield-park-2/odm_orthophoto/odm_orthophoto.tif
+
+  # Measure a splat: a copy of train.ply without its cameras (no pins, no scale, no measurements)
+  - slug: splats
+    name: Splats
+    visibility: private
+    files:
+      - dest: train.ply
+        from: odx/splats/train.ply
+
+  # Processing: builds that complete, wait for a file and fail
+  - slug: builds
+    name: Builds
+    visibility: private
+    files:
+      - dest: orthophoto.tif
+        from: odm/brighton-beach/odm_orthophoto/odm_orthophoto.tif
+      # An OBJ without its material file (it names odm_textured_model_geo.mtl): "Waiting for files"
+      - dest: house.obj
+        from: odm/brighton-beach/odm_texturing/odm_textured_model_geo.obj
+      # A LAZ cut after 300 KB: its header indexes, its build fails (a file that is not a LAZ at
+      # all is refused by the upload)
+      - dest: broken.laz
+        from: odm/brighton-beach/odm_georeferencing/odm_georeferenced_model.laz
+        bytes: 300000
+
+  # Processing: the 18 images of Brighton Beach for photogrammetry
+  - slug: photogrammetry
+    name: Photogrammetry
+    visibility: private
+    files:
+      - dest: images/
+        from: odm/brighton-beach/images/*.JPG
+
+  # Processing: the five bands of one MicaSense capture
+  - slug: multispectral
+    name: Multispectral
+    visibility: private
+    files:
+      - dest: bands/
+        from: odx/micasense/images/IMG_0180_?.tif
+
+  # Processing: align a raster to a reference
+  - slug: align
+    name: Align
+    visibility: private
+    files:
+      - dest: orthos/sheffield-park-1.tif
+        from: odm/sheffield-park-1/odm_orthophoto/odm_orthophoto.tif
+      - dest: orthos/sheffield-park-2.tif
+        from: odm/sheffield-park-2/odm_orthophoto/odm_orthophoto.tif
+
+  # Processing: Mask borders needs an orthophoto with a black (no-data) border; the source is not
+  # chosen yet, so the dataset is empty and its shots are blocked
+  - slug: mask-borders
+    name: Mask borders
+    visibility: private
+    files: []
+
+  # Sharing pages and the dataset download shot (the visibility shots never change it)
+  - slug: share-demo
+    name: Share demo
+    visibility: private
+    files:
+      - dest: orthophoto.tif
+        from: odm/brighton-beach/odm_orthophoto/odm_orthophoto.tif
