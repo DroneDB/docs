@@ -1,10 +1,87 @@
 ---
 title: "Copy, cut, paste & transfer"
-description: "Copy or move files within a dataset and to another dataset."
+description: "Copy or move files within a dataset and to another dataset, and what happens when names are the same."
+hub_feature: [menu:Copy, menu:Cut, menu:Paste, menu:Transfer]
+datasets: [odm/brighton-beach]
+requires: { access: write }
 ---
 
-:::info
+<Clip id="files/copy-paste--flow" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="brighton-beach"
+         hint="Sign in, select a file and press Ctrl+C. Open a dataset of your own and press Ctrl+V." />
+
+## When to use it
+
+Copy files to make a second version of them. Move files to put them in another folder or in
+another dataset. You can copy from any dataset that you can read, also a public one, into a
+dataset where you can write.
+
+## Steps
+
+<Steps>
+
+1. Select one or more files or folders.
+2. Press Ctrl+C (Cmd+C on a Mac), or right-click and click **Copy**. To move the files, press
+   Ctrl+X or click **Cut**.
+
+   <Screenshot id="files/copy-paste--context-menu" />
+
+3. A clipboard panel at the bottom right shows **Copy** or **Cut**, the source and the items. Click
+   **Clear clipboard** in it to empty the clipboard.
+
+   <Screenshot id="files/copy-paste--clipboard-panel" />
+
+4. Open the destination folder. It can be in another dataset: open that dataset in the same browser
+   tab.
+5. Press Ctrl+V, or right-click and click **Paste**.
+6. If files with the same names are in the destination, the **Paste Conflict** window opens. Click
+   **Skip All**, **Overwrite All** or **Cancel**.
+
+   <Screenshot id="files/copy-paste--conflict" />
+
+</Steps>
+
+A copy stays on the clipboard, so you can paste it again. A cut is used once.
+
+## Transfer to another dataset
+
+**Transfer** moves files to another dataset without the clipboard.
+
+1. Select the files, right-click and click **Tools** › **Transfer**.
+2. Select the **Destination Organization** and the **Destination Dataset**.
+3. Type a **Destination Path (optional)**, for example `folder/subfolder`, or leave it empty for the
+   root folder. Select **Overwrite existing files** if necessary.
+4. Click **Transfer**.
+
+<Screenshot id="files/copy-paste--transfer" />
+
+## What happens
+
+| Action | Same dataset | Another dataset |
+|---|---|---|
+| Copy, then paste | A copy in the new folder | A copy; the source stays |
+| Cut, then paste | A move | A move; the files leave the source |
+| Transfer | — | A move; the files leave the source |
+
+A copied or moved file keeps its builds, so Hub does not build it again. Files that a
+build waits for (for example the `.mtl` of a model) start that build when they arrive.
+
+## Limits & requirements
+
+- Paste and **Transfer** need write access to the destination dataset. Cut needs write access to the
+  source.
+- You cannot paste into the folder that the items come from.
+- The clipboard is kept in the browser tab. It stays after a reload, and it is empty in a new tab.
+- **Transfer** is not available while a file of the selection is building.
+- A paste where some items fail shows a summary window with the moved, skipped and failed items.
+
+## Related
+
+- [Folders, rename & delete](./folders.mdx)
+- [Import from a URL or another Registry](./import.mdx)
+- [Builds: what Hub generates and why](../processing/builds.mdx)
+
+<ForDevelopers api="/docs/developers/api/workflows" apiLabel="Copy, move and transfer with the REST API" />

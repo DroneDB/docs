@@ -1,10 +1,57 @@
 ---
 title: "Rescan a dataset"
-description: "Read the files of a dataset again after a change."
+description: "Read the metadata of every file of a dataset again and rebuild its derived files."
+hub_feature: [rescan-dataset]
+requires: { access: write }
 ---
 
-:::info
+<Screenshot id="files/rescan--confirm" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive hint="Sign in, open a dataset of your own and click Settings (the wrench button)." />
+
+## When to use it
+
+Rescan a dataset after a DroneDB upgrade that reads more from some files, or when the
+metadata of files looks wrong: a missing GPS position, a wrong time, a missing thumbnail, a
+file with the wrong entry type.
+
+## Steps
+
+<Steps>
+
+1. Open the dataset and click **Settings** (the wrench button at the top right).
+2. Under **Maintenance**, click **Rescan Dataset**.
+
+   <Screenshot id="files/rescan--settings" />
+
+3. Read the side effects and click **Rescan**.
+4. Open the **Tasks** tab to follow the rescan.
+
+</Steps>
+
+## What happens
+
+- DroneDB reads every file again and replaces its metadata (GPS position, time, type and the
+  other properties) with the new values.
+- Hub deletes the cached thumbnails, tiles and built files of the dataset, and builds them again.
+- Until a file is built again, its viewers are not available.
+
+## Limits & requirements
+
+- A rescan of a large dataset can take a long time.
+- The rescan of Hub covers all the files of the dataset. To rescan only some entry types or file
+  extensions, use the CLI or the API (below).
+- A server administrator can rescan the matching files of every dataset with one API request, for
+  example all DWG and DXF drawings after an upgrade. See [Upgrading](/docs/self-hosting/upgrading).
+
+## Related
+
+- [File properties & entry types](./properties.mdx)
+- [Builds: what Hub generates and why](../processing/builds.mdx)
+- [Tasks panel & logs](../processing/tasks.mdx)
+
+<ForDevelopers cli={`ddb rescan
+ddb rescan -t georaster,pointcloud
+ddb rescan -e dwg,dxf`} api="/docs/developers/processing-api" apiLabel="The rescan-index task in the processing API" />

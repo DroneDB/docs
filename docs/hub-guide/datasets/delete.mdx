@@ -1,10 +1,56 @@
 ---
 title: "Delete a dataset or organization"
-description: "Delete a dataset or an organization and what happens to its files."
+description: "Delete a dataset or an organization, and what happens to its files."
+hub_feature: [delete-dataset, delete-organization]
+requires: { data: Delete permission in the organization (owner, or a member with Read/Write/Delete or Admin) }
 ---
 
-:::info
+<Screenshot id="datasets/delete--dataset-confirm" />
 
-This page is being written.
+<Requires />
 
-:::
+## When to use it
+
+Delete a dataset when you do not need its files any more, for example to free storage. Delete an
+organization to remove it and all of its datasets. You cannot undo a delete.
+
+To delete only some files of a dataset, see [Folders, rename & delete](../files/folders.mdx).
+
+## Steps
+
+<Steps>
+
+1. Open the datasets page of the organization.
+2. Click the red trash button (**Delete dataset**) in the **Actions** column of the dataset. You can
+   also right-click the row and click **Delete**.
+3. Read the warning and click **Remove**.
+4. To delete an organization, open **My Organizations** and click the red trash button
+   (**Delete organization**) on its card. Read the warning and click **Remove**.
+
+   <Screenshot id="datasets/delete--organization-confirm" />
+
+</Steps>
+
+## What happens
+
+- The dataset leaves the list at once. The server then deletes its folder in the background: the
+  files, the builds and the thumbnails. It also stops the builds that run for the dataset.
+- When you delete an organization, Hub deletes all of its datasets too.
+- Links and embeds of a deleted dataset stop working.
+
+## Limits & requirements
+
+- You need the delete permission: you own the organization, you are a server administrator, or you
+  are a member with **Read/Write/Delete** or **Admin**. See [Organization members & roles](./members.mdx).
+- The shared organization `public` has no delete button.
+- The server administrator can turn off dataset creation. Then the delete buttons of datasets do
+  not show either.
+- Copy the files that you want to keep before you delete. See [Download files & ZIP export](../files/download.mdx).
+
+## Related
+
+- [Download files & ZIP export](../files/download.mdx)
+- [Export your data & delete your account](../account/export-delete.mdx)
+- [Folders, rename & delete](../files/folders.mdx)
+
+<ForDevelopers api="/docs/developers/api/workflows" apiLabel="Delete a dataset with the REST API" />

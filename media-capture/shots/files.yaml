@@ -1,0 +1,507 @@
+# Shots of the Hub guide pages under docs/hub-guide/files/ (the file browser and file actions).
+#
+# Read-only shots use odm/zoo (736 entries), odm/brighton-beach and odm/aukerman with auth: none.
+# Demo inputs (reset-demo.mjs) for the shots with auth: demo, in the dataset acme-surveys/site-a:
+#   - README.md: a copy of odm/aukerman README.md
+#   - options.json: a copy of odm/zoo options.json (opens in the text editor, shows Format)
+#   - ortho.tif: a small georeferenced GeoTIFF (for example a crop of the odm/brighton-beach
+#     orthophoto), and ortho_measurements.geojson next to it (the sidecar of the rename shot)
+#   - notes-old.txt: any small text file (the delete shot opens its confirmation only)
+#   - products/ortho.tif: a second copy of ortho.tif in the folder products (the paste conflict)
+#   - survey-archive.zip: a ZIP of up to 20 MB with a few files in a subfolder
+#   - civil_example-imperial.dwg: the CAD drawing without a coordinate system (dataset gap: licence
+#     to confirm, source /mnt/data/datasets/vectors/dwg/); its shots are blocked until it is added
+#
+# The Hub has no aria-label on the header Download and Settings buttons (title only).
+# The capture format has no right-click action yet: the shots that need the context menu say so
+# on the action that stands for the right-click.
+
+- id: files/browser--views
+  type: clip
+  alt: The images folder of a dataset in the grid view, then the table view and the expanded table view
+  page: hub-guide/files/browser
+  url: /r/odm/zoo
+  auth: none
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[aria-label='Folders'] >> text=images"
+    - wait: 2500
+    - click: "[aria-label='Files'] [role='option'] >> nth=0"
+    - wait: 1500
+    - click: "[aria-label='Table View']"
+    - wait: 1500
+    - click: "[aria-label='Expanded Table View']"
+    - wait: 1500
+    - click: "[aria-label='Grid View']"
+    - wait: 1500
+  maxSeconds: 20
+  blocked: null
+  youtubeId: null
+
+- id: files/browser--grid
+  type: screenshot
+  alt: The file browser with the folder tree, the grid of photos and the detail panel of the selected photo
+  page: hub-guide/files/browser
+  url: /r/odm/zoo
+  auth: none
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[aria-label='Folders'] >> text=images"
+    - wait: 2500
+    - click: "[aria-label='Files'] [role='option'] >> nth=0"
+    - wait: 1500
+  crop: null
+  blocked: null
+
+- id: files/browser--table
+  type: screenshot
+  alt: The table view of the file browser with the Name, Type, Size and Modified columns
+  page: hub-guide/files/browser
+  url: /r/odm/zoo
+  auth: none
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[aria-label='Table View']"
+    - wait: 2000
+  highlight: "[aria-label='Grid View']"
+  crop: null
+  blocked: null
+
+- id: files/browser--search
+  type: screenshot
+  alt: The search box above the folder tree with the JSON files of the whole dataset
+  page: hub-guide/files/browser
+  url: /r/odm/zoo
+  auth: none
+  waitFor:
+    selector: "[aria-label='Search files']"
+    networkIdle: true
+  actions:
+    - fill: { selector: "[aria-label='Search files']", value: "*.json" }
+    - press: Enter
+    - wait: 2500
+  highlight: "[aria-label='Search files']"
+  crop: null
+  blocked: null
+
+- id: files/browser--context-menu
+  type: screenshot
+  alt: The context menu of a file with the open, edit, download, tools, copy and delete actions
+  page: hub-guide/files/browser
+  url: /r/odm/brighton-beach
+  auth: none
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[aria-label='Folders'] >> text=odm_orthophoto"
+    - wait: 1500
+    - click: "[role='option']:has-text('odm_orthophoto.tif')"   # needs right-click (contextmenu)
+    - wait: "text=Properties"
+  crop: null
+  blocked: null
+
+- id: files/properties--detail-panel
+  type: screenshot
+  alt: The detail panel of an orthophoto with its preview and its properties
+  page: hub-guide/files/properties
+  url: /r/odm/brighton-beach
+  auth: none
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[aria-label='Folders'] >> text=odm_orthophoto"
+    - wait: 1500
+    - click: "[role='option']:has-text('odm_orthophoto.tif')"
+    - wait: "text=Coordinates"
+    - wait: 1000
+  crop: null
+  blocked: null
+
+- id: files/properties--entry-type
+  type: screenshot
+  alt: The window that explains the GeoRaster entry type
+  page: hub-guide/files/properties
+  url: /r/odm/brighton-beach
+  auth: none
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[aria-label='Folders'] >> text=odm_orthophoto"
+    - wait: 1500
+    - click: "[role='option']:has-text('odm_orthophoto.tif')"
+    - click: "[aria-label='What is GeoRaster?']"
+    - wait: "text=How DroneDB recognizes it"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: files/folders--rename-sidecars
+  type: screenshot
+  alt: The Rename window with Also rename sidecar files and the measurements file that is renamed too
+  page: hub-guide/files/folders
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[role='option']:has-text('ortho.tif')"
+    - click: "[aria-label='Rename']"
+    - wait: "text=Also rename sidecar files"
+  highlight: "label[for='renameSidecarsCheckbox']"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: files/folders--new-folder
+  type: screenshot
+  alt: The Create folder window with a folder name
+  page: hub-guide/files/folders
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Create folder']"
+    networkIdle: true
+  actions:
+    - click: "[aria-label='Create folder']"
+    - fill: { selector: "[aria-label='Folder name']", value: "flight-2" }
+  highlight: "[aria-label='Create folder']"
+  crop: null
+  blocked: null
+
+- id: files/folders--delete-confirm
+  type: screenshot
+  alt: The confirmation before a file is deleted
+  page: hub-guide/files/folders
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[role='option']:has-text('notes-old.txt')"
+    - click: "[aria-label='Remove']"
+    - wait: "text=Confirm delete"
+  # never click Remove in the dialog
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: files/copy-paste--flow
+  type: clip
+  alt: Copy a file with Ctrl+C, open another folder and paste it with Ctrl+V
+  page: hub-guide/files/copy-paste
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[role='option']:has-text('README.md')"
+    - press: Control+C
+    - wait: "[aria-label='Clear clipboard']"
+    - wait: 1000
+    - click: "[aria-label='Folders'] >> text=products"
+    - wait: 1500
+    - press: Control+V
+    - wait: 2500
+  maxSeconds: 20
+  blocked: null
+  youtubeId: null
+
+- id: files/copy-paste--context-menu
+  type: screenshot
+  alt: The Copy, Cut and Paste items of the context menu
+  page: hub-guide/files/copy-paste
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[role='option']:has-text('ortho.tif')"   # needs right-click (contextmenu)
+    - wait: "text=Cut"
+  highlight: "text=Copy"
+  crop: null
+  blocked: null
+
+- id: files/copy-paste--clipboard-panel
+  type: screenshot
+  alt: The clipboard panel with the copied item and its source dataset
+  page: hub-guide/files/copy-paste
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[role='option']:has-text('ortho.tif')"
+    - press: Control+C
+    - wait: "[aria-label='Clear clipboard']"
+  highlight: "[aria-label='Clear clipboard']"
+  crop: null
+  blocked: null
+
+- id: files/copy-paste--conflict
+  type: screenshot
+  alt: The Paste Conflict window with Skip All, Overwrite All and Cancel
+  page: hub-guide/files/copy-paste
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[role='option']:has-text('ortho.tif')"
+    - press: Control+C
+    - click: "[aria-label='Folders'] >> text=products"
+    - wait: 1500
+    - press: Control+V
+    - wait: "text=Paste Conflict"
+  # never click a choice: products/ortho.tif must stay as reset-demo made it
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: files/copy-paste--transfer
+  type: screenshot
+  alt: The Transfer to Dataset window with the destination organization, dataset and path
+  page: hub-guide/files/copy-paste
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[role='option']:has-text('ortho.tif')"   # needs right-click (contextmenu)
+    - hover: "text=Tools"
+    - click: "text=Transfer"
+    - wait: "text=Destination Organization"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: files/import--url-dialog
+  type: screenshot
+  alt: The Import from URL window with a verified URL, the file name and the destination folder
+  page: hub-guide/files/import
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Upload']"
+    networkIdle: true
+  actions:
+    - click: "[aria-label='Upload']"
+    - click: "text=Import from URL"
+    - fill: { selector: "#import-from-url-dialog-file-url", value: "https://hub.dronedb.app/orgs/odm/ds/brighton-beach/download?path=odm_report/report.pdf" }
+    - click: "button:has-text('Verify')"
+    - wait: "text=Reachable"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: files/import--dataset-dialog
+  type: screenshot
+  alt: The Import dataset window with a DroneDB Hub source verified, its file count and size
+  page: hub-guide/files/import
+  url: /r/acme-surveys
+  auth: demo
+  waitFor:
+    selector: "text=Import Dataset"   # needs aria-label
+    networkIdle: true
+  actions:
+    - click: "button:has-text('Import Dataset')"   # needs aria-label
+    - click: "[aria-labelledby='import-dataset-dialog-source-label']"
+    - click: "text=DroneDB Registry / Hub"
+    - fill: { selector: "#import-dataset-dialog-registry-url", value: "https://hub.dronedb.app" }
+    - fill: { selector: "[aria-label='Organization slug']", value: "odm" }
+    - fill: { selector: "[aria-label='Dataset slug']", value: "brighton-beach" }
+    - click: "button:has-text('Verify')"
+    - wait: "text=Source reachable"
+  # never click Import
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: files/archives--extract-dialog
+  type: screenshot
+  alt: The Extract Archive window with the destination folder and the overwrite and delete options
+  page: hub-guide/files/archives
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[role='option']:has-text('survey-archive.zip')"
+    - press: Enter   # Enter on a tile opens it: Extract Archive for a writer
+    - wait: "text=Extract Archive"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: files/archives--extracted
+  type: screenshot
+  alt: The files of an extracted archive in the file browser
+  page: hub-guide/files/archives
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[role='option']:has-text('survey-archive.zip')"
+    - press: Enter
+    - wait: "text=Extract Archive"
+    - click: "[role='dialog'] button:has-text('Extract')"
+    - wait: "text=Extract Completed"
+    - wait: 2000
+  crop: null
+  blocked: null
+
+- id: files/download--confirm
+  type: screenshot
+  alt: The download button at the top of the page and its confirmation for the selected file
+  page: hub-guide/files/download
+  url: /r/odm/brighton-beach
+  auth: none
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[aria-label='Folders'] >> text=odm_report"
+    - wait: 1500
+    - click: "[role='option']:has-text('report.pdf')"
+    - click: "[title='Download report.pdf']"   # needs aria-label
+    - wait: "text=Are you sure you want to download"
+  # never click Download in the dialog
+  crop: null
+  blocked: null
+
+- id: files/download--build-downloads
+  type: screenshot
+  alt: The Tools menu of an orthophoto with Download COG
+  page: hub-guide/files/download
+  url: /r/odm/brighton-beach
+  auth: none
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[aria-label='Folders'] >> text=odm_orthophoto"
+    - wait: 1500
+    - click: "[role='option']:has-text('odm_orthophoto.tif')"   # needs right-click (contextmenu)
+    - hover: "text=Tools"
+    - wait: "text=Download COG"
+  highlight: "text=Download COG"
+  crop: null
+  blocked: null
+
+- id: files/edit-text--markdown
+  type: screenshot
+  alt: A README in the Markdown viewer in edit mode, with the save button
+  page: hub-guide/files/edit-text
+  open:
+    org: acme-surveys
+    ds: site-a
+    path: README.md
+    view: markdown
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Edit']"
+    networkIdle: true
+  actions:
+    - click: "[aria-label='Edit']"
+    - wait: "[aria-label='Markdown source']"
+  highlight: "[aria-label='Save']"
+  crop: null
+  blocked: null
+
+- id: files/edit-text--editor
+  type: screenshot
+  alt: The text editor with a JSON file, the Format button and the Save button
+  page: hub-guide/files/edit-text
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[role='option']:has-text('options.json')"
+    - press: Enter   # a .json file opens in the text editor
+    - wait: "text=Format"
+    - click: ".cm-content"   # needs aria-label (the CodeMirror editor area has none)
+    - press: End
+    - press: Enter
+    - wait: "text=You have unsaved changes"
+  highlight: "button:has-text('Format')"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: files/rescan--settings
+  type: screenshot
+  alt: The Maintenance section of the Dataset Settings window with Rescan Dataset
+  page: hub-guide/files/rescan
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Files']"
+    networkIdle: true
+  actions:
+    - click: "[title='Settings']"   # needs aria-label
+    - wait: "text=Rescan Dataset"
+  highlight: "button:has-text('Rescan Dataset')"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: files/rescan--confirm
+  type: screenshot
+  alt: The Rescan Dataset confirmation with its side effects
+  page: hub-guide/files/rescan
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Files']"
+    networkIdle: true
+  actions:
+    - click: "[title='Settings']"   # needs aria-label
+    - click: "button:has-text('Rescan Dataset')"
+    - wait: "text=Are you sure you want to rescan this dataset?"
+  # never click Rescan
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: files/coordinate-system--dialog
+  type: screenshot
+  alt: The Set Coordinate System window of a DWG drawing with an EPSG code
+  page: hub-guide/files/coordinate-system
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[role='option']:has-text('civil_example-imperial.dwg')"   # needs right-click (contextmenu)
+    - hover: "text=Tools"
+    - click: "text=Set Coordinate System"
+    - fill: { selector: "[aria-label='Coordinate system (EPSG code or WKT)']", value: "EPSG:2229" }
+  # never click Apply
+  crop: "[role='dialog']"
+  blocked: data
+
+- id: files/coordinate-system--properties
+  type: screenshot
+  alt: The Coordinate system row of a drawing without a coordinate system
+  page: hub-guide/files/coordinate-system
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[role='option']:has-text('civil_example-imperial.dwg')"
+    - wait: "text=None: local drawing coordinates"
+  highlight: "text=None: local drawing coordinates"
+  crop: null
+  blocked: data

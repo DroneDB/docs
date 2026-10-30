@@ -1,10 +1,69 @@
 ---
 title: "Folders, rename & delete"
-description: "Create folders, rename and delete files."
+description: "Create folders, move files by drag and drop, rename files with their sidecar files, and delete files."
+hub_feature: ["menu:Create Folder", menu:Rename, menu:Delete]
+requires: { access: write }
 ---
 
-:::info
+<Screenshot id="files/folders--rename-sidecars" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive hint="Sign in and open a dataset of your own." />
+
+## When to use it
+
+Keep the files of a dataset in order: one folder per flight or per product, clear names, no
+files that you do not need.
+
+## Steps
+
+<Steps>
+
+1. To create a folder, open the parent folder and click **Create folder** in the toolbar. You can
+   also right-click and click **Create Folder**. Type the **Folder name** and click **Create folder**.
+
+   <Screenshot id="files/folders--new-folder" />
+
+2. To move files, select them and drag them onto a folder. You can drag from the list to the tree,
+   and from the tree to the list. Hub highlights the folder that gets the files.
+3. To rename a file or a folder, select it and click **Rename** in the toolbar, or right-click it and
+   click **Rename**. Type the new name and click **Rename**.
+4. If the file has sidecar files, such as `ortho_measurements.geojson` next to `ortho.tif`, keep
+   **Also rename sidecar files** selected. Hub then renames them with the file.
+5. To delete, select the files and folders, then click **Remove** in the toolbar, press Delete, or
+   right-click and click **Delete**. Click **Remove** to confirm.
+
+   <Screenshot id="files/folders--delete-confirm" />
+
+</Steps>
+
+## Options
+
+| Option | What it does | Default |
+|---|---|---|
+| **Also rename sidecar files** | Renames the files named `<name>_<suffix>` next to the file, for example its saved measurements or the cameras of a splat | On |
+
+## What happens
+
+- A move or a rename keeps the builds of a file: Hub does not build it again. A rename that gives
+  a file a type that Hub builds (for example `.tif`) starts a build.
+- Renaming the root of the tree renames the dataset. Its slug and its address change, and the page
+  opens at the new address.
+- A delete removes the files from the dataset. If some files cannot be deleted,
+  a window lists them with the reason.
+
+## Limits & requirements
+
+- A name cannot contain `/`, `\` or `..`, and cannot start with `.`.
+- You cannot move a folder into itself or into one of its subfolders.
+- To move files to another dataset, use [Copy, cut, paste & transfer](./copy-paste.mdx).
+- You cannot undo a delete.
+
+## Related
+
+- [File browser](./browser.mdx)
+- [Copy, cut, paste & transfer](./copy-paste.mdx)
+- [Delete a dataset or organization](../datasets/delete.mdx)
+
+<ForDevelopers cli="ddb rm flight-1/old-ortho.tif" api="/docs/developers/api/workflows" />

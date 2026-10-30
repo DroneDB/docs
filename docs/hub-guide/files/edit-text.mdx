@@ -1,10 +1,73 @@
 ---
 title: "Edit text & Markdown"
-description: "Edit text files and the README of a dataset in the browser."
+description: "Edit text files, JSON, GeoJSON and the README of a dataset in the browser."
+hub_feature: [menu:Edit]
+datasets: [odm/aukerman]
+requires: { access: write }
 ---
 
-:::info
+<Screenshot id="files/edit-text--markdown" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="aukerman" path="README.md" view="markdown"
+         hint="Visitors can read the README. In a dataset where you can write, the pencil button edits it." />
+
+## When to use it
+
+Fix a typo in a README, add notes to a dataset, or correct a value in a JSON or GeoJSON file,
+without a download and a new upload.
+
+## Edit a Markdown file
+
+<Steps>
+
+1. Double-click the Markdown file (for example `README.md`). It opens in the Markdown viewer.
+2. Click the pencil button (**Edit**) at the top right. The viewer shows the Markdown source.
+3. Change the text and click the save button (**Save**).
+
+</Steps>
+
+To add a README to a dataset, click **Settings** (the wrench button), then **Add Readme**. Hub
+creates `README.md` in the root of the dataset and opens it.
+
+## Edit a text file
+
+<Steps>
+
+1. Double-click a text file, such as `.txt`, `.json`, `.csv`, `.xml`, `.yml` or `.prj`. It opens in the
+   text editor.
+2. For a file that does not open as text, for example `.geojson`, `.kml` or `.gpx`, right-click it
+   and click **Edit**.
+
+   <Screenshot id="files/edit-text--editor" />
+
+3. Change the text. For a JSON or GeoJSON file, click **Format** (Shift+Alt+F) to indent it.
+4. Click **Save**, or press Ctrl+S (Cmd+S on a Mac).
+5. Click **Close**. With unsaved changes, Hub asks: **Save and Close**, **Discard and Close** or
+   **Cancel**.
+
+</Steps>
+
+## Options
+
+| Option | What it does |
+|---|---|
+| Syntax colors | JSON and GeoJSON; Markdown; XML, KML, GPX, HTML and SVG |
+| **Format** | Indents a JSON or GeoJSON file. Shows only for these files |
+
+## Limits & requirements
+
+- Without write access, the editor opens the file read-only, and the Markdown viewer has no
+  pencil button.
+- The text editor opens files up to 5 MB. A larger text file opens in a new browser tab, and
+  **Edit** does not show for it.
+- **Edit** does not show for binary files: images, rasters, point clouds, models, archives,
+  videos and office documents.
+- Hub indexes a saved file again, so its properties follow the new content.
+
+## Related
+
+- [Markdown & PDF](../viewing/markdown-pdf.mdx)
+- [Create & configure a dataset](../datasets/create.mdx)
+- [File browser](./browser.mdx)

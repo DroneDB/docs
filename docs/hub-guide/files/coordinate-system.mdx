@@ -1,10 +1,72 @@
 ---
 title: "Set a coordinate system (CAD)"
-description: "Give a DWG or DXF drawing without a coordinate system its place on the map."
+description: "Place a DWG or DXF drawing that has no coordinate system on the map, or keep it in local drawing coordinates."
+hub_feature: ["menu:Set Coordinate System"]
+requires: { access: write, data: A DWG or DXF drawing }
 ---
 
-:::info
+<Screenshot id="files/coordinate-system--dialog" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive hint="Sign in, upload a DWG or DXF drawing to a dataset of your own and right-click it." />
+
+## When to use it
+
+Most CAD drawings do not say which coordinate system their coordinates are in. Without one, Hub
+cannot place the drawing on the map. It shows the drawing in the 3D viewer, in local drawing
+coordinates. If you know the coordinate system of the drawing, set it once, and Hub places the
+drawing on the map.
+
+## Steps
+
+<Steps>
+
+1. Click the drawing and read the **Coordinate system** row of its properties. **None: local drawing
+   coordinates** means that the drawing has no coordinate system.
+
+   <Screenshot id="files/coordinate-system--properties" />
+
+2. Right-click the drawing and click **Tools** › **Set Coordinate System**.
+3. Select **Coordinate system** and type an EPSG code (`EPSG:32632`, or only `32632`) or a WKT
+   definition. To keep the drawing off the map, select **Local drawing coordinates (not placed on
+   the map)**.
+4. Click **Apply**. Hub saves the coordinate system and builds the drawing again.
+
+</Steps>
+
+## Where the coordinate system comes from
+
+DroneDB looks for a coordinate system in this order. The **Coordinate system** row tells which one
+it used.
+
+| Source | Row shows |
+|---|---|
+| A `.prj` file with the same name next to the drawing (`site.dwg` and `site.prj`) | `… (from the .prj file)` |
+| The geographic location that AutoCAD or Civil 3D stored in the drawing | `… (stored in the drawing)` |
+| A DXF only: coordinates that fit longitude and latitude | `WGS84 (EPSG:4326), assumed` |
+| None of these | `None: local drawing coordinates` and the units of the drawing |
+
+## What happens
+
+- **Apply** writes `<drawing name>.prj` next to the drawing. Other GIS software reads this file too.
+  An upload of a `.prj` file with the same name does the same.
+- To use the coordinate system of the drawing again, delete the `.prj` file.
+- A drawing in local coordinates opens in the [3D viewer](../viewing/3d-viewer.mdx) without a globe,
+  with its units, for example **Local coordinates (m)**.
+
+## Limits & requirements
+
+- DWG files from AutoCAD R13 to R2018 (AutoCAD 2018 and later save as R2018). If a DWG does not
+  convert, export it as DXF from your CAD software and upload the DXF.
+- 3D solids are not converted. A drawing that has only 3D solids shows nothing.
+- A drawing without a coordinate system is not on the map and not in the OGC services (WMS, WFS,
+  WMTS, OGC API).
+
+## Related
+
+- [File properties & entry types](./properties.mdx)
+- [3D viewer (unified)](../viewing/3d-viewer.mdx)
+- [Supported formats & entry types](/docs/reference/formats)
+
+<ForDevelopers cli="ddb add site.dwg site.prj" api="/docs/developers/api/workflows" />

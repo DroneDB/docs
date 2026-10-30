@@ -1,10 +1,78 @@
 ---
 title: "Import from a URL or another Registry"
-description: "Add files from a URL or from another DroneDB Registry."
+description: "Add one file from a URL to a dataset, or make a new dataset from another DroneDB Registry or from an archive URL."
+hub_feature: [import-from-url, import-dataset]
+requires: { access: write }
 ---
 
-:::info
+<Screenshot id="files/import--url-dialog" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive hint="Sign in, open a dataset of your own, click Upload, then Import from URL." />
+
+## When to use it
+
+Import when the data is already on a web server or on another Hub. The server downloads it, so
+your computer and your connection are not used. This is fast for large files.
+
+## Import one file from a URL
+
+<Steps>
+
+1. Open the destination folder in the dataset.
+2. Click **Upload** in the toolbar, then **Import from URL**. You can also copy a URL and press
+   Ctrl+V on the file list: the same window opens with the URL in it.
+3. Type the **File URL** and click **Verify**. Hub shows if the URL is reachable, the size of the file,
+   and if its type or size is not allowed.
+4. Change the **File name** and the **Destination folder** if necessary. Select **Overwrite existing
+   file** to replace a file with the same name.
+5. If the server asks for a user name and a password, open **Authentication (optional)** and type
+   them.
+6. Click **Import**. The window shows the progress. You can close it: the import continues in the
+   **Tasks** tab.
+
+</Steps>
+
+## Make a dataset from another Registry or an archive
+
+<Steps>
+
+1. Open the datasets page of the organization and click **Import Dataset**.
+2. Select the **Source**:
+   - **DroneDB Registry / Hub**: type the **Registry URL**, for example `https://hub.dronedb.app`.
+     For a private dataset, type the **Username** and the **Password** of an account on that server.
+     Click **Browse organizations** and **Browse datasets** to select the **Organization** and the
+     **Dataset**, or type their slugs.
+   - **Archive URL**: type the **Archive URL** of a ZIP, TAR, 7z or RAR file, and an optional user name
+     and password.
+3. Click **Verify**. Hub shows the number of files and the size.
+
+   <Screenshot id="files/import--dataset-dialog" />
+
+4. Type the **Dataset Name**, select the **Visibility** and check the **Slug**.
+5. Click **Import**. Click **Run in background** to close the window while the import runs. Hub tells
+   you when it ends.
+
+</Steps>
+
+## What happens
+
+- The imported files are indexed and built like uploaded files.
+- An archive from an **Archive URL** is extracted into the new dataset.
+- Hub keeps the password of the source only for the import, encrypted.
+
+## Limits & requirements
+
+- Only `http` and `https` URLs. The server refuses addresses of private and local networks.
+- The server administrator sets the largest file and import size, and can block some file types.
+- **Import Dataset** needs write access to the organization. **Import from URL** needs write access
+  to the dataset.
+
+## Related
+
+- [Upload your data](/docs/get-started/upload)
+- [Extract archives](./archives.mdx)
+- [Tasks panel & logs](../processing/tasks.mdx)
+
+<ForDevelopers api="/docs/developers/api/workflows" apiLabel="Import with the REST API (single files, datasets and whole organizations)" />

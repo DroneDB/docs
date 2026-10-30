@@ -1,10 +1,85 @@
 ---
 title: "Browse organizations & datasets"
-description: "Find organizations and datasets on Hub, sort and search them."
+description: "Find organizations and datasets on Hub: list or map, search, sort and the columns of the datasets list."
+hub_feature: [route:Organizations, route:Datasets]
+requires: { access: none }
 ---
 
-:::info
+<Screenshot id="datasets/browse--datasets-list" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" hint="The public ODM organization: sort the list, then switch to Map." />
+
+## When to use it
+
+An **organization** groups datasets, and a **dataset** holds files. Use the **Organizations** page to find
+the organizations you work in. Use the datasets page of an organization to find a dataset and open it.
+
+## Steps
+
+<Steps>
+
+1. Sign in, click the user button at the top right and click **My Organizations**.
+   Hub lists the organizations that you own. **My Datasets** opens the datasets of your personal
+   organization.
+
+   <Screenshot id="datasets/browse--organizations" />
+
+2. To also see the organizations that you are a member of, turn on **Show all**.
+3. Type in **Search organizations** to filter the list by name, slug, description or owner.
+4. Use the sort control to sort by **Name**, **Creation date**, **Last modified** or
+   **Number of datasets**. The arrow button next to it changes the direction.
+5. Click an organization to open its datasets page.
+6. On the datasets page, click a column header to sort by **Dataset**, **Creation Date**, **Modified**,
+   **Files**, **Size** or **Visibility**. Type in **Search datasets** to filter by name, slug or tagline.
+7. Click **Map** to see one pin per dataset. Click a cluster to zoom in, and click a pin to open the
+   dataset.
+
+   <Screenshot id="datasets/browse--datasets-map" />
+
+8. Click a dataset row to open the dataset in the [file browser](../files/browser.mdx).
+
+</Steps>
+
+You do not need an account to open a public organization. Open its address directly, for example
+`hub.dronedb.app/r/odm`. Hub then shows its public datasets.
+
+## Options
+
+| Option | What it does | Default |
+|---|---|---|
+| **List** / **Map** | Shows the organizations or datasets as a list, or as pins on a map | List |
+| **Show all** | Adds the organizations that you are a member of to the list | Off |
+| Sort control | Sorts the organizations | Name, ascending |
+| **No location** | On the map: opens the list of the datasets that have no pin | — |
+| Rows per page | 5, 10, 25, 50 or 100 rows | 10 |
+
+Hub remembers the view, the sort and the rows per page, and saves them to your account. Set the
+defaults in [Preferences](../account/preferences.mdx) on the **Lists** tab.
+
+## What the values mean
+
+- **Modified**: the last time the index of the dataset changed. Hub counts added, removed, moved
+  or renamed files, and changes to metadata or visibility. Builds do not count. The value can be a
+  short time late.
+- The **Modified** time of an organization is the newest of its datasets. Hub shows it, and the number
+  of datasets, only for organizations that you own or are a member of.
+- A dataset gets a pin when at least one of its files has coordinates: an orthophoto, an elevation
+  model, a point cloud, a vector file or a geotagged image. You cannot place a dataset by hand.
+- On the datasets page, a tag shows your role in the organization: **Viewer**, **Editor**, **Editor+**
+  or **Admin**. See [Organization members & roles](./members.mdx).
+
+## Limits & requirements
+
+- The **Organizations** page needs a signed-in account.
+- On narrow screens, Hub hides some columns of the datasets list.
+
+## Related
+
+- [Create & configure a dataset](./create.mdx)
+- [Organization members & roles](./members.mdx)
+- [File browser](../files/browser.mdx)
+- [Visibility: public, unlisted, private](../sharing/visibility.mdx)
+
+<ForDevelopers api="/docs/developers/api/workflows" apiLabel="List organizations and datasets with the REST API" />

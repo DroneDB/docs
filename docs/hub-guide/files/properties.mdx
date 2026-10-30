@@ -1,10 +1,76 @@
 ---
 title: "File properties & entry types"
-description: "Read the properties of a file and change how Hub reads it."
+description: "Read the properties of a file, learn what its entry type means, and copy its hash or coordinates."
+hub_feature: [menu:Properties, entry-type-dialog]
+datasets: [odm/brighton-beach]
+requires: { access: read }
 ---
 
-:::info
+<Screenshot id="files/properties--detail-panel" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="brighton-beach" hint="Open odm_orthophoto in the tree and click odm_orthophoto.tif." />
+
+## When to use it
+
+Read the properties of a file to check what DroneDB found in it: its type, size, position,
+coordinate system, camera, bands or point count. Use the entry type help to learn what Hub can do
+with the file.
+
+## Steps
+
+<Steps>
+
+1. Click a file. The detail panel on the right shows its preview and its properties.
+2. To see the properties in a window, right-click the file and click **Properties**. With more than
+   one file selected, the window shows the number of items, their total **Size** and their **Type**.
+3. Click the question mark next to the **Type** value (**What is GeoRaster?**, for example). A window
+   explains the entry type.
+
+   <Screenshot id="files/properties--entry-type" />
+
+4. Click the copy button in the **Size** row to copy the hash of the file. Click the copy button in
+   the **Coordinates** row to copy the latitude, longitude and altitude.
+5. Click the question mark next to a coordinate system code, such as `EPSG:4326` in the
+   **Coordinates** row, to open its page on epsg.io.
+6. A value with many fields shows as a button. Click it to open the fields in a larger window.
+
+</Steps>
+
+## The rows
+
+| Row | What it shows |
+|---|---|
+| **Type** | The entry type: Folder, File, GeoImage, GeoRaster, Point Cloud, Image, Markdown, Video, GeoVideo, 3D Model, Panorama, GeoPanorama, Vector, Gaussian Splat or 3D Tiles |
+| **Path** | The path in the dataset |
+| **Size** | The file size |
+| **Modified** | The date of the file, and how long ago that was |
+| **Coordinates** | The position of a geotagged file, with its altitude |
+| **Coordinate system** | For a CAD drawing: where its coordinate system comes from. See [Set a coordinate system (CAD)](./coordinate-system.mdx) |
+| **Resolution** | For a georeferenced raster: the ground size of one pixel |
+| **Dimensions** | Width × height in pixels, and the megapixels |
+| Other rows | What DroneDB read from the file: camera make and model, capture time, bands, the GPS accuracy and the flight speed |
+
+Altitudes, GPS accuracies and speeds show in the units of
+[Preferences](../account/preferences.mdx) (**Units** tab).
+
+## The entry type window
+
+It has five parts: **How DroneDB recognizes it**, **What its properties show**, **What you can do with
+it**, **Examples** and, for some types, **Learn more in the documentation**. Each type and the file
+formats it covers are in [Supported formats & entry types](/docs/reference/formats).
+
+## Limits & requirements
+
+- DroneDB decides the entry type when it indexes the file. You cannot change it in Hub. A file that
+  DroneDB cannot read is **File**.
+- After an upgrade that reads more from some files, a [rescan](./rescan.mdx) updates the properties.
+
+## Related
+
+- [File browser](./browser.mdx)
+- [Supported formats & entry types](/docs/reference/formats)
+- [Builds: what Hub generates and why](../processing/builds.mdx)
+
+<ForDevelopers cli="ddb info odm_orthophoto/odm_orthophoto.tif -f json" api="/docs/developers/api/workflows" />

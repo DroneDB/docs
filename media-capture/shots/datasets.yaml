@@ -1,0 +1,218 @@
+# Shots of the Hub guide pages under docs/hub-guide/datasets/ (organizations and datasets).
+#
+# Demo inputs (reset-demo.mjs) for the shots with auth: demo, all in the organization acme-surveys
+# (display name "Acme Surveys") of the docs-demo account:
+#   - dataset site-a ("Site A"): a few geotagged JPEGs (for example the first images of
+#     odm/brighton-beach images/, one of them named DJI_0001.JPG), no thumbnail file.
+#   - dataset old-survey ("Old survey"): any small file; the delete shot opens its confirmation only.
+#   - the personal organization of docs-demo exists too (the Organizations page lists both).
+# The members shots run on the local Registry (base: local, auth: admin): member management is off
+# on hub.dronedb.app. The local Registry needs AppSettings EnableOrganizationMemberManagement=true,
+# an organization acme-surveys and one extra user (for example "surveyor", surveyor@example.com)
+# added as a member with Read/Write.
+#
+# The Hub has no aria-label on: the header Settings button (title "Settings" only), the
+# Create Dataset / Create Organization / Members / Import Dataset buttons (visible text only).
+# The capture format has no right-click action yet; shots that need the context menu say so.
+
+- id: datasets/browse--organizations
+  type: screenshot
+  alt: The Organizations page with the organizations of the signed-in user, the search box and the sort control
+  page: hub-guide/datasets/browse
+  url: /r
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Search organizations']"
+    networkIdle: true
+    extraMs: 800
+  highlight: "label[for='organizations-show-all']"
+  crop: null
+  blocked: null
+
+- id: datasets/browse--datasets-list
+  type: screenshot
+  alt: The datasets page of the ODM organization with thumbnails, taglines and sortable columns
+  page: hub-guide/datasets/browse
+  url: /r/odm
+  auth: none
+  waitFor:
+    selector: "[aria-label='Search datasets']"
+    networkIdle: true
+    extraMs: 1500
+  crop: null
+  blocked: null
+
+- id: datasets/browse--datasets-map
+  type: screenshot
+  alt: The Map view of the ODM organization with one pin per dataset
+  page: hub-guide/datasets/browse
+  url: /r/odm
+  auth: none
+  waitFor:
+    selector: "[aria-label='Show the datasets as']"
+    networkIdle: true
+  actions:
+    - click: "[aria-label='Show the datasets as'] >> text=Map"
+    - wait: 3000
+  highlight: "[aria-label='Show the datasets as']"
+  crop: null
+  blocked: null
+
+- id: datasets/create--flow
+  type: clip
+  alt: Create a dataset, open it and open its Settings
+  page: hub-guide/datasets/create
+  url: /r/acme-surveys
+  auth: demo
+  waitFor:
+    selector: "text=Create Dataset"   # needs aria-label
+    networkIdle: true
+  actions:
+    - click: "text=Create Dataset"   # needs aria-label
+    - fill: { selector: "#dataset-dialog-dataset-name", value: "Quarry survey 2026" }
+    - fill: { selector: "#dataset-dialog-tagline", value: "North quarry, monthly flight" }
+    - wait: 800
+    - click: "[role='dialog'] button:has-text('Create')"
+    - wait: "[aria-label='Files']"
+    - wait: 1200
+    - click: "[title='Settings']"   # needs aria-label
+    - wait: 2000
+  maxSeconds: 20
+  blocked: null
+  youtubeId: null
+
+- id: datasets/create--dialog
+  type: screenshot
+  alt: The Create new dataset dialog with the name, visibility, slug and tagline
+  page: hub-guide/datasets/create
+  url: /r/acme-surveys
+  auth: demo
+  waitFor:
+    selector: "text=Create Dataset"   # needs aria-label
+    networkIdle: true
+  actions:
+    - click: "text=Create Dataset"   # needs aria-label
+    - fill: { selector: "#dataset-dialog-dataset-name", value: "Quarry survey 2026" }
+    - fill: { selector: "#dataset-dialog-tagline", value: "North quarry, monthly flight" }
+    - wait: 500
+  highlight: "#dataset-dialog-dataset-name"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: datasets/create--settings
+  type: screenshot
+  alt: The Dataset Settings window with tagline, thumbnail, readme, visibility, license and rescan
+  page: hub-guide/datasets/create
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Files']"
+    networkIdle: true
+  actions:
+    - click: "[title='Settings']"   # needs aria-label
+    - wait: "text=Changes are saved as you make them"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: datasets/create--set-thumbnail
+  type: screenshot
+  alt: The context menu of a photo with Set as Dataset Thumbnail
+  page: hub-guide/datasets/create
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Files'] [role='option']"
+    networkIdle: true
+  actions:
+    - click: "[role='option']:has-text('DJI_0001.JPG')"
+    # needs a right-click action on the selected tile: the context menu opens on contextmenu
+    - click: "[role='option']:has-text('DJI_0001.JPG')"
+    - wait: "text=Set as Dataset Thumbnail"
+    - hover: "text=Set as Dataset Thumbnail"
+  highlight: "text=Set as Dataset Thumbnail"
+  crop: null
+  blocked: null
+
+- id: datasets/members--dialog
+  type: screenshot
+  alt: The Manage Members window with the Add Member fields and the list of current members
+  page: hub-guide/datasets/members
+  url: /r/acme-surveys
+  base: local
+  auth: admin
+  waitFor:
+    selector: "text=Members"   # needs aria-label
+    networkIdle: true
+  actions:
+    - click: "button:has-text('Members')"   # needs aria-label
+    - wait: "text=Current Members"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: datasets/members--add
+  type: screenshot
+  alt: The permission levels of a new member in the Manage Members window
+  page: hub-guide/datasets/members
+  url: /r/acme-surveys
+  base: local
+  auth: admin
+  waitFor:
+    selector: "text=Members"   # needs aria-label
+    networkIdle: true
+  actions:
+    - click: "button:has-text('Members')"   # needs aria-label
+    - wait: "text=Add Member"
+    - click: "[aria-labelledby='organization-members-dialog-permissions-label']"
+    - wait: "text=Read/Write/Delete"
+  highlight: "[aria-labelledby='organization-members-dialog-permissions-label']"
+  crop: null
+  blocked: null
+
+- id: datasets/members--create-organization
+  type: screenshot
+  alt: The Add New Organization dialog with name, description and Public
+  page: hub-guide/datasets/members
+  url: /r
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Search organizations']"
+    networkIdle: true
+  actions:
+    - click: "text=Create Organization"   # needs aria-label (the wide-screen button has a label only)
+    - fill: { selector: "#organization-dialog-name", value: "Coastal Monitoring" }
+    - fill: { selector: "#organization-dialog-description", value: "Beach and dune surveys" }
+    - wait: 400
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: datasets/delete--dataset-confirm
+  type: screenshot
+  alt: The confirmation before a dataset is deleted, with the irreversible warning
+  page: hub-guide/datasets/delete
+  url: /r/acme-surveys
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Delete dataset']"
+    networkIdle: true
+  actions:
+    - click: "tr:has-text('Old survey') [aria-label='Delete dataset']"
+    - wait: "text=This action is irreversible."
+  # never click Remove: the shot shows the question only
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: datasets/delete--organization-confirm
+  type: screenshot
+  alt: The confirmation before an organization and all its datasets are deleted
+  page: hub-guide/datasets/delete
+  url: /r
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Delete organization']"
+    networkIdle: true
+  actions:
+    - click: "[aria-label='Delete organization'] >> nth=0"   # the first card by name: Acme Surveys
+    - wait: "text=All the datasets owned by this organization will be deleted too."
+  # never click Remove: the shot shows the question only
+  crop: "[role='dialog']"
+  blocked: null

@@ -1,10 +1,72 @@
 ---
 title: "Download files & ZIP export"
-description: "Download single files, built files and ZIP exports."
+description: "Download one file, a selection or a whole dataset as a ZIP, and the built COG, COPC, GeoPackage and 3D Tiles of a file."
+hub_feature: [menu:Download, "menu:Download COG", "menu:Download COPC", "menu:Download GPKG", "menu:Download 3D Tiles (.zip)"]
+datasets: [odm/brighton-beach]
+requires: { access: read }
 ---
 
-:::info
+<Screenshot id="files/download--confirm" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="brighton-beach" hint="Select odm_report/report.pdf and click the download button at the top right." />
+
+## When to use it
+
+Download the original files to use them in other software, or download the whole dataset as a
+backup. Download a built file when another tool needs an optimized format: a Cloud Optimized
+GeoTIFF (COG), a COPC point cloud, a GeoPackage or 3D Tiles.
+
+## Steps
+
+<Steps>
+
+1. Select one or more files or folders. Select nothing to download the whole dataset.
+2. Click the download button at the top right of the page (**Download**), or right-click and click
+   **Download**. The button shows the number of selected files.
+3. If you used the button at the top, click **Download** to confirm.
+4. To download a built file, right-click the file and open **Tools**. Click **Download COG**,
+   **Download COPC**, **Download GPKG** or **Download 3D Tiles (.zip)**.
+
+   <Screenshot id="files/download--build-downloads" />
+
+</Steps>
+
+## What you get
+
+| Selection | Download |
+|---|---|
+| One file | The file as it is |
+| Several files, or a folder | A ZIP archive |
+| Nothing selected | A ZIP archive of the whole dataset |
+| A large selection, or the whole dataset, when you are signed in | A ZIP archive that the server prepares in the background. The download starts when it is ready. It is also in the [Tasks](../processing/tasks.mdx) tab |
+
+| Tools item | File type | Download |
+|---|---|---|
+| **Download COG** | Orthophoto, elevation model, other georeferenced rasters | Cloud Optimized GeoTIFF |
+| **Download COPC** | Point cloud | Cloud Optimized Point Cloud (COPC) |
+| **Download GPKG** | Vector | GeoPackage |
+| **Download 3D Tiles (.zip)** | 3D model | The 3D Tiles of the model in a ZIP |
+
+The name of a built file comes from the name of the original file. A Tools item shows only when the
+build of the file is complete. Gaussian splats have their own downloads: see
+[Splat downloads](../viewing/splat-downloads.mdx).
+
+## Limits & requirements
+
+- Read access is sufficient: anyone can download from a public dataset.
+- The server can limit the number of downloads that run at the same time for each user. When you
+  reach the limit, Hub says **Download limit reached** and you must wait for a download to finish.
+- Hub prepares one background archive at a time for each dataset.
+- The server administrator can allow only signed-in users to download several files or a whole
+  dataset. Then the button says **Login required to download multiple files or the entire dataset**.
+- The server sets the size above which an archive is prepared in the background.
+
+## Related
+
+- [Open Hub data in QGIS](../sharing/qgis.mdx)
+- [Export a raster (GeoTIFF)](../processing/export-raster.mdx)
+- [Export your data & delete your account](../account/export-delete.mdx)
+
+<ForDevelopers api="/docs/developers/api/workflows" apiLabel="Download files and built artifacts with the REST API" />

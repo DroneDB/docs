@@ -1,10 +1,76 @@
 ---
-title: "Organization members & roles"
-description: "Add members to an organization and give them roles."
+title: "Organizations, members & roles"
+description: "Create and edit an organization, add members and give each one a permission level."
+hub_feature: [members]
+requires: { access: owner }
 ---
 
-:::info
+<Screenshot id="datasets/members--dialog" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive hint="Sign in and open My Organizations." />
+
+## When to use it
+
+Create an organization for a team or a client, and add the people who work on its datasets.
+Each member gets a permission level. The permission level applies to all the datasets of the
+organization.
+
+## Steps
+
+<Steps>
+
+1. To create an organization, open **My Organizations** and click **Create Organization**.
+   Type a **Name** and an optional **Description**, select **Public** for a public organization,
+   and click **Create**.
+
+   <Screenshot id="datasets/members--create-organization" />
+
+2. To change the name, description or **Public** later, click the pencil button (**Edit organization**)
+   on the card of the organization, or next to its name on its datasets page.
+3. To manage the members, open the datasets page of the organization and click **Members**.
+   On the **Organizations** page, the people button (**Manage members**) on the card does the same.
+4. Under **Add Member**, select the **User** and the **Permissions**. Click **Add**.
+
+   <Screenshot id="datasets/members--add" />
+
+5. To change the level of a member, select a new level in the **Permissions** column. Hub saves it at
+   once.
+6. To remove a member, click **Remove** and confirm.
+
+</Steps>
+
+## Permission levels
+
+| Permissions | Role tag | What the member can do |
+|---|---|---|
+| **Read Only** | Viewer | Open and download the datasets of the organization |
+| **Read/Write** | Editor | Also create datasets, upload, edit, move and build files (the default for a new member) |
+| **Read/Write/Delete** | Editor+ | Also delete files and datasets |
+| **Admin** | Admin | Also manage the members of the organization |
+
+The role tag shows on the datasets page of the organization, next to the number of datasets.
+
+The owner of the organization and the administrators of the server always have all the rights.
+
+## Limits & requirements
+
+- The server administrator turns member management on or off. When it is off, the **Members**
+  and **Manage members** buttons do not show.
+- To add a member, Hub reads the list of the users of the server. In this version only a server
+  administrator can read that list. Other owners see an error, and can only change or remove
+  existing members. {/* TODO verify: the Members dialog loads GET /users (admin only) to fill the User list */}
+- A slug is made from the organization name. It cannot change after creation.
+- **Public** applies to the organization only. Each dataset keeps its own
+  [visibility](../sharing/visibility.mdx).
+- The server administrator can make organizations read-only in Hub. Then the create, edit and delete
+  buttons do not show.
+
+## Related
+
+- [Browse organizations & datasets](./browse.mdx)
+- [Delete a dataset or organization](./delete.mdx)
+- [Users, organizations & roles (administrators)](/docs/self-hosting/users)
+
+<ForDevelopers api="/docs/developers/users-api" apiLabel="Users & organizations API" />

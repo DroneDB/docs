@@ -1,10 +1,70 @@
 ---
-title: "Extract ZIP archives"
-description: "Extract a ZIP archive into a dataset."
+title: "Extract archives"
+description: "Extract a ZIP, 7z, RAR or TAR archive in a dataset, so that each file is indexed and built."
+hub_feature: [menu:Extract]
+requires: { access: write, data: An archive file in the dataset }
 ---
 
-:::info
+<Screenshot id="files/archives--extract-dialog" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive hint="Sign in, upload a ZIP to a dataset of your own and double-click it." />
+
+## When to use it
+
+Upload one archive instead of thousands of files, then extract it on the server. Each extracted
+file becomes a normal file of the dataset, with its properties, thumbnail and builds.
+
+## Steps
+
+<Steps>
+
+1. Upload the archive to the dataset. See [Upload your data](/docs/get-started/upload).
+2. Double-click the archive. You can also right-click it and click **Tools** › **Extract**.
+3. In **Extract to**, keep the folder of the archive, type another folder, or click **Browse folders**.
+   Leave it empty for the root of the dataset. Hub says if the folder exists or will be created.
+4. Select **Overwrite existing files** and **Delete archive after extraction** if necessary.
+5. Click **Extract**. The window shows the progress. When the extraction is complete, Hub opens the
+   destination folder.
+
+   <Screenshot id="files/archives--extracted" />
+
+</Steps>
+
+## Options
+
+| Option | What it does | Default |
+|---|---|---|
+| **Extract to** | The destination folder, relative to the root of the dataset | The folder of the archive |
+| **Overwrite existing files** | Replaces files with the same path. Off: Hub keeps the existing files and skips those entries | Off |
+| **Delete archive after extraction** | Deletes the archive when all files are extracted | Off |
+
+## Formats
+
+ZIP (`.zip`), 7-Zip (`.7z`), RAR (`.rar`), TAR (`.tar`), compressed TAR (`.tar.gz`, `.tgz`,
+`.tar.bz2`, `.tbz2`, `.tar.xz`, `.txz`), and one compressed file (`.gz`, `.bz2`, `.xz`).
+
+## What happens
+
+- The extraction is all or nothing. If it fails, Hub removes every file it wrote and puts back every
+  file it replaced.
+- Hub skips entries with a file type that the server does not allow, and reserved names such as
+  `.ddb`. An entry with an unsafe path, for example one that contains `..`, stops the extraction.
+- Hub starts a build for each extracted file that it builds (orthophotos, point clouds, models …).
+
+## Limits & requirements
+
+- The server administrator sets the largest archive that Hub extracts. The server also needs free
+  disk space for the extracted files.
+- The extraction runs as a task: follow it in the [Tasks](../processing/tasks.mdx) tab.
+- To import an archive from a web address, use **Import Dataset** › **Archive URL**. See
+  [Import from a URL or another Registry](./import.mdx).
+
+## Related
+
+- [Upload your data](/docs/get-started/upload)
+- [Import from a URL or another Registry](./import.mdx)
+- [Builds: what Hub generates and why](../processing/builds.mdx)
+
+<ForDevelopers api="/docs/developers/api/workflows" apiLabel="Run the archive-extract task with the REST API" />

@@ -1,10 +1,83 @@
 ---
 title: "Create & configure a dataset"
-description: "Create a dataset and set its name, tagline, cover, README, visibility and settings."
+description: "Create a dataset and set its name, tagline, thumbnail, README, visibility and license."
+hub_feature: ["menu:Set as Dataset Thumbnail"]
+requires: { data: Write access to the organization }
 ---
 
-:::info
+<Clip id="datasets/create--flow" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive hint="Sign in, open My Datasets and click Create Dataset." />
+
+## When to use it
+
+Create a dataset for each survey, site or project. A dataset has a name, an optional tagline, a
+thumbnail, a visibility and a license. You can change all of them later.
+
+## Steps
+
+<Steps>
+
+1. Open the datasets page of your organization and click **Create Dataset**.
+
+   <Screenshot id="datasets/create--dialog" />
+
+2. Type a **Dataset Name**. Hub makes the **Dataset Slug** (the name in the address) from it.
+3. Select the **Visibility** and type an optional **Tagline**.
+4. Keep **Open dataset after creation** selected to go to the new dataset. Click **Create**.
+5. To configure the dataset, open it and click **Settings** (the wrench button at the top right).
+   The changes are saved as you make them.
+
+   <Screenshot id="datasets/create--settings" />
+
+6. To use the image of a file as the thumbnail, right-click the file and click
+   **Set as Dataset Thumbnail**.
+
+   <Screenshot id="datasets/create--set-thumbnail" />
+
+</Steps>
+
+To change the name, tagline or visibility from the datasets page, click the pencil button
+(**Edit dataset**) in the **Actions** column.
+
+## Options
+
+| Option | Where | What it does | Default |
+|---|---|---|---|
+| **Dataset Name** | Create, Edit | The name in the lists. The slug comes from it: lower case letters, numbers, `-` and `_` | — |
+| **Visibility** | Create, Edit, Settings | **Private**, **Unlisted** or **Public**. See [Visibility](../sharing/visibility.mdx) | Private |
+| **Tagline** | Create, Edit, Settings | A short description under the name, up to 256 characters. The dataset search finds it | Empty |
+| **Thumbnail** | Settings | **Upload** a WebP, JPEG or PNG image, or **Remove** it | None |
+| **Readme** | Settings | **Add Readme** creates `README.md` in the dataset and opens it | None |
+| **License** | Settings | The license of the data, from a list of common licenses | Proprietary |
+| **Rescan Dataset** | Settings | See [Rescan a dataset](../files/rescan.mdx) | — |
+
+## Quick upload to a new dataset
+
+**Upload Files** in the user menu opens a page where you drop files or click **Upload Files**.
+Hub creates a new dataset in your personal organization, with a generated slug, and opens it when
+all files are uploaded. This dataset is **Public**. Change its visibility in **Settings** if the
+data is not for everyone.
+
+## Limits & requirements
+
+- You need write access to the organization. The server administrator can turn off dataset
+  creation.
+- Two datasets of an organization cannot have the same slug.
+- A new name changes the slug, so the address of the dataset changes. Old links to the dataset
+  stop working.
+- The thumbnail is a file in the root of the dataset: `thumbnail.webp`, `.jpg` or `.png`, or
+  `cover.webp`, `.jpg` or `.png`. Hub uses the first one it finds in this order. Without one, the
+  list shows a placeholder.
+- **Set as Dataset Thumbnail** replaces the current thumbnail. Hub asks first.
+
+## Related
+
+- [Upload your data](/docs/get-started/upload)
+- [Browse organizations & datasets](./browse.mdx)
+- [Edit text & Markdown](../files/edit-text.mdx)
+- [Delete a dataset or organization](./delete.mdx)
+
+<ForDevelopers api="/docs/developers/api/workflows" apiLabel="Create a dataset with the REST API" />
