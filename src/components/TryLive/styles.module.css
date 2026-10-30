@@ -1,0 +1,9 @@
+.box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin: 1rem 0 1.5rem;
+}
+.button { white-space: nowrap; }
+.hint { color: var(--ifm-color-emphasis-800); font-size: 0.95rem; }

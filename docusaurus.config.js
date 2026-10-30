@@ -1,13 +1,14 @@
 // @ts-check
-// Note: type annotations allow type checking and IDEs autocompletion
 
 const {themes} = require('prism-react-renderer');
-const lightCodeTheme = themes.github;
+const redirects = require('./redirects');
+
+const HUB_URL = 'https://hub.dronedb.app';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'DroneDB',
-  tagline: 'Documentation',
+  tagline: 'Store, view, measure and share drone data in your browser',
   url: 'https://docs.dronedb.app',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -15,30 +16,29 @@ const config = {
   favicon: 'img/favicon.ico',
   trailingSlash: false,
 
+  organizationName: 'DroneDB',
+  projectName: 'docs',
+
+  customFields: {
+    hubUrl: HUB_URL,
+  },
+
   plugins: [
+    ['@docusaurus/plugin-client-redirects', {redirects}],
+  ],
+
+  themes: [
+    '@docusaurus/theme-mermaid',
     [
-      '@docusaurus/plugin-client-redirects',
-      {
-        redirects: [
-          // Desktop deprecated
-          { from: '/docs/desktop', to: '/docs/overview' },
-          // Moved to features/
-          { from: '/docs/multispectral', to: '/docs/features/multispectral' },
-          { from: '/docs/terrain-analytics', to: '/docs/features/terrain-analytics' },
-          // Moved to integrations/
-          { from: '/docs/api-reference', to: '/docs/integrations/api-reference' },
-          { from: '/docs/ogc-services', to: '/docs/integrations/ogc-services' },
-          { from: '/docs/registry/stac-api', to: '/docs/integrations/stac-api' },
-          // Moved to contributing/
-          { from: '/docs/building-from-source', to: '/docs/contributing/building-from-source' },
-          // Moved to registry/admin/
-          { from: '/docs/registry/production', to: '/docs/registry/admin/production' },
-          { from: '/docs/registry/configuration', to: '/docs/registry/admin/configuration' },
-          { from: '/docs/registry/user-management', to: '/docs/registry/admin/user-management' },
-          { from: '/docs/registry/processing-platform', to: '/docs/registry/admin/processing-platform' },
-          { from: '/docs/registry/troubleshooting', to: '/docs/registry/admin/troubleshooting' },
-        ],
-      },
+      require.resolve('@easyops-cn/docusaurus-search-local'),
+      /** @type {import('@easyops-cn/docusaurus-search-local').PluginOptions} */
+      ({
+        hashed: true,
+        language: ['en', 'it'],
+        indexBlog: false,
+        docsRouteBasePath: '/docs',
+        highlightSearchTermsOnTargetPage: true,
+      }),
     ],
   ],
 
@@ -51,19 +51,19 @@ const config = {
     },
   },
 
-  themes: ['@docusaurus/theme-mermaid'],
-
-  // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'DroneDB', // Usually your GitHub org/user name.
-  projectName: 'docs', // Usually your repo name.
-
-  // Even if you don't use internalization, you can use this field to set useful
-  // metadata like html lang. For example, if your site is Chinese, you may want
-  // to replace "en" with "zh-Hans".
+  // Untranslated pages fall back to English. Screenshots and clips are shared by every
+  // locale, because the Hub itself is in English.
   i18n: {
     defaultLocale: 'en',
-    locales: ['en'],
+    locales: ['en', 'it', 'fr', 'de', 'es', 'zh-Hans'],
+    localeConfigs: {
+      en: {label: 'English', htmlLang: 'en'},
+      it: {label: 'Italiano', htmlLang: 'it'},
+      fr: {label: 'Français', htmlLang: 'fr'},
+      de: {label: 'Deutsch', htmlLang: 'de'},
+      es: {label: 'Español', htmlLang: 'es'},
+      'zh-Hans': {label: '简体中文', htmlLang: 'zh-Hans'},
+    },
   },
 
   presets: [
@@ -73,11 +73,10 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          //editUrl:
-            //'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+          editUrl: 'https://github.com/DroneDB/docs/edit/master/',
+          showLastUpdateTime: true,
         },
+        blog: false,
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
@@ -88,117 +87,62 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      image: 'img/logo.svg',
       navbar: {
         title: 'DroneDB',
-        logo: {
-          alt: 'DroneDB',
-          src: 'img/logo.svg',
-        },
+        logo: {alt: 'DroneDB', src: 'img/logo.svg'},
         items: [
-          {
-            type: 'doc',
-            docId: 'overview',
-            position: 'left',
-            label: 'Overview',
-          },
-          {
-            type: 'doc',
-            docId: 'getting-started/index',
-            position: 'left',
-            label: 'Getting Started',
-          },
-          {
-            type: 'doc',
-            docId: 'cli/index',
-            position: 'left',
-            label: 'CLI',
-          },
-          {
-            type: 'doc',
-            docId: 'registry/index',
-            position: 'left',
-            label: 'Registry',
-          },
-          {
-            type: 'doc',
-            docId: 'features/index',
-            position: 'left',
-            label: 'Features',
-          },
-          {
-            type: 'doc',
-            docId: 'integrations/index',
-            position: 'left',
-            label: 'Integrations',
-          },
-          {
-            type: 'doc',
-            docId: 'faq',
-            position: 'left',
-            label: 'FAQ',
-          },
-        //   {
-        //     type: 'doc',
-        //     docId: 'intro',
-        //     position: 'left',
-        //     label: 'Server',
-        //   },
-        //   {
-        //     type: 'doc',
-        //     docId: 'intro',
-        //     position: 'left',
-        //     label: 'ddb',
-        //   },
-          {
-            href: 'https://github.com/DroneDB',
-            label: 'GitHub',
-            position: 'right',
-          },
+          {type: 'docSidebar', sidebarId: 'getStarted', position: 'left', label: 'Get started'},
+          {type: 'docSidebar', sidebarId: 'hubGuide', position: 'left', label: 'Hub guide'},
+          {type: 'docSidebar', sidebarId: 'selfHosting', position: 'left', label: 'Self-hosting'},
+          {type: 'docSidebar', sidebarId: 'developers', position: 'left', label: 'Developers'},
+          {type: 'doc', docId: 'reference/faq', position: 'left', label: 'FAQ'},
+          {type: 'localeDropdown', position: 'right'},
+          {href: 'https://github.com/DroneDB', label: 'GitHub', position: 'right'},
+          {href: HUB_URL, label: 'Open Hub', position: 'right', className: 'navbar-open-hub'},
         ],
       },
       footer: {
         style: 'dark',
         links: [
-        //   {
-        //     title: 'Docs',
-        //     items: [
-        //       {
-        //         label: 'Overview',
-        //         to: '/docs/overview',
-        //       },
-        //     ],
-        //   },
-        //   {
-        //     title: 'Social',
-        //     items: [
-        //       {
-        //         label: 'Twitter',
-        //         href: 'https://twitter.com/dronedb',
-        //       },
-        //     ],
-        //   },
           {
-            title: 'Links',
+            title: 'Documentation',
             items: [
-              {
-                label: "dronedb.app",
-                href: "https://dronedb.app"
-              },
-              {
-                label: "GitHub",
-                href: "https://github.com/DroneDB"
-              }
+              {label: 'Get started', to: '/docs/get-started'},
+              {label: 'Hub guide', to: '/docs/hub-guide'},
+              {label: 'Self-hosting', to: '/docs/self-hosting'},
+              {label: 'Developers', to: '/docs/developers'},
+            ],
+          },
+          {
+            title: 'Reference',
+            items: [
+              {label: 'Supported formats', to: '/docs/reference/formats'},
+              {label: 'Glossary', to: '/docs/reference/glossary'},
+              {label: 'FAQ', to: '/docs/reference/faq'},
+            ],
+          },
+          {
+            title: 'DroneDB',
+            items: [
+              {label: 'DroneDB Hub', href: HUB_URL},
+              {label: 'dronedb.app', href: 'https://dronedb.app'},
+              {label: 'YouTube', href: 'https://www.youtube.com/@DroneDB'},
+              {label: 'GitHub', href: 'https://github.com/DroneDB'},
             ],
           },
         ],
         copyright: `Made with ❤ by DroneDB Contributors`,
       },
       prism: {
-        theme: lightCodeTheme
+        theme: themes.github,
+        darkTheme: themes.dracula,
+        additionalLanguages: ['bash', 'powershell', 'json', 'yaml', 'csharp'],
       },
       colorMode: {
-        disableSwitch: true
-      }
+        defaultMode: 'light',
+        respectPrefersColorScheme: true,
+      },
     }),
 };
 

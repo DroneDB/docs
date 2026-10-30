@@ -1,43 +1,47 @@
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
-
-/* You can override the default Infima variables here. */
+/* DroneDB brand blue (the Hub's primary palette, webapp/js/libs/palette.js) */
 :root {
-  --ifm-color-primary: #424242;
-  --ifm-color-primary-dark: #323232;
-  --ifm-color-primary-darker: #222222;
-  --ifm-color-primary-darkest: #121212;
-  --ifm-color-primary-light: #4183c4;
-  --ifm-color-primary-lighter: #3875b3;
-  --ifm-color-primary-lightest: #32689f;
+  --ifm-color-primary: #0070e0;
+  --ifm-color-primary-dark: #0065ca;
+  --ifm-color-primary-darker: #005fbe;
+  --ifm-color-primary-darkest: #004e9d;
+  --ifm-color-primary-light: #007bf6;
+  --ifm-color-primary-lighter: #0a82fa;
+  --ifm-color-primary-lightest: #2d95fb;
+  --ifm-color-primary-lightest-bg: #e6f1fd;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
+  --ifm-color-primary: #4d9cf0;
+  --ifm-color-primary-dark: #2f8bee;
+  --ifm-color-primary-darker: #2082ed;
+  --ifm-color-primary-darkest: #116bcc;
+  --ifm-color-primary-light: #6badf2;
+  --ifm-color-primary-lighter: #7ab5f3;
+  --ifm-color-primary-lightest: #a7cdf7;
+  --ifm-color-primary-lightest-bg: #001f40;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
-article a{
-    --ifm-link-decoration: underline;
+article a {
+  --ifm-link-decoration: underline;
 }
 
-article div.theme-doc-markdown img{
-    border-radius: 4px;
-    box-shadow: 2px 2px 6px #999;
+/* The Hub has no dark theme: a thin border keeps light screenshots apart from a dark page */
+article div.theme-doc-markdown img {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 6px;
 }
 
-article div.theme-doc-markdown em img{
-    box-shadow: none;
+article div.theme-doc-markdown em img {
+  border: 0;
+}
+
+.navbar-open-hub {
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+}
+.navbar-open-hub::after {
+  content: ' ↗';
 }

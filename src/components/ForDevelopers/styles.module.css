@@ -1,0 +1,9 @@
+.box {
+  margin: 2rem 0 1rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+}
+.box summary { cursor: pointer; font-weight: 600; }
+.body { margin-top: 0.75rem; }
+.body > :last-child { margin-bottom: 0; }
