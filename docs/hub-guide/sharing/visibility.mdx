@@ -1,10 +1,77 @@
 ---
 title: "Visibility: public, unlisted, private"
-description: "Who can see a dataset."
+description: Choose who can see and download a dataset, and change it in the dataset settings.
+hub_feature: []
+datasets: [odm/brighton-beach]
+requires: { access: write }
 ---
 
-:::info
+<Screenshot id="sharing/visibility--settings" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="brighton-beach" hint="A public dataset: you can open it without an account." />
+
+## When to use it
+
+Every dataset has a visibility. It decides who can open the dataset without being a member of its
+organization. A new dataset is **Private**. Make it **Unlisted** to share it by link, or **Public** to
+publish it.
+
+## The three levels
+
+| Visibility | Who can see and download the data | Listed for others |
+|---|---|---|
+| **Private** | Only you, the members of your organization and the administrators | No |
+| **Unlisted** | Anybody who has the link | No |
+| **Public** | Anybody | Yes: in the dataset list of a public organization and in the [STAC catalog](./stac.mdx) |
+
+Members of the organization can always open its datasets. What they can change depends on their
+[role](../datasets/members.mdx).
+
+{/* TODO verify: the Registry lists every dataset a caller can read, unlisted ones included, in the
+    datasets list of an organization and in the STAC catalog (only the datasets map leaves unlisted datasets
+    out). Prod showed an unlisted dataset in /stac on 2026-10-30. Reported as a defect; this table states
+    the intended behaviour. */}
+
+## Steps
+
+<Steps>
+
+1. Open the dataset.
+
+2. Click **Settings** (the wrench button in the header). The **Dataset Settings** window opens.
+
+3. Under **Sharing**, select the **Visibility**: **Public**, **Unlisted** or **Private**. The line under the
+   list says what the choice means.
+
+4. Click **Close**. The change is saved at once: there is no Save button.
+
+</Steps>
+
+You can also choose the visibility when you [create a dataset](../datasets/create.mdx), and for the new
+dataset that [photogrammetry](../processing/photogrammetry.mdx) can make.
+
+## From the Share dialog
+
+When you share a file of a private dataset with a link, an embed or an OGC service, the
+[Share dialog](./links-embeds.mdx) shows **Allow access to anyone with the link**. This button changes the
+visibility of the **whole dataset** to **Unlisted**. To undo it, set the visibility back to **Private** in the
+settings.
+
+<Screenshot id="sharing/visibility--allow-access" />
+
+## Limits & requirements
+
+- You need write access to change the visibility. Readers see the setting, but cannot change it.
+- A link to an unlisted dataset works for anyone who has it. Treat it like a password: when you set the
+  dataset back to **Private**, old links stop working.
+- The **License** of the dataset is in the same window. It tells others how they can use public data.
+
+## Related
+
+- [Share links & embeds](./links-embeds.mdx)
+- [Create & configure a dataset](../datasets/create.mdx)
+- [Organization members & roles](../datasets/members.mdx)
+
+<ForDevelopers cli="ddb meta set visibility 2   # 0 private, 1 unlisted, 2 public" api="/docs/developers/api/workflows" />

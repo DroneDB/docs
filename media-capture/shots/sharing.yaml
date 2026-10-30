@@ -1,0 +1,290 @@
+# Shots of the Hub guide → Sharing & integration pages (docs/hub-guide/sharing/*.mdx).
+#
+# Demo inputs that reset-demo.mjs must create in the organization acme-surveys (private, owner docs-demo):
+#   share-demo      (dataset, visibility PRIVATE)  orthophoto.tif   a copy of odm/brighton-beach
+#                                                                   odm_orthophoto/odm_orthophoto.tif (built)
+#   The visibility shots must never click "Allow access to anyone with the link" or change the visibility:
+#   reset-demo.mjs sets share-demo back to PRIVATE before each run anyway.
+#
+# The QGIS shots marked `desktop: qgis` show the QGIS desktop program, not a Hub page: the Playwright runner
+# cannot take them. They are recorded by hand (the clip matches marketing clip C23) with the QGIS URL that
+# sharing/qgis--share-dialog shows.
+#
+# Right-click: `click: { selector, button: right }` opens the context menu of the file browser.
+
+# ---- Visibility ---------------------------------------------------------------------------------------------
+
+- id: sharing/visibility--settings
+  type: screenshot
+  alt: The Dataset Settings window with the Visibility list open
+  page: hub-guide/sharing/visibility
+  url: /r/acme-surveys/share-demo
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "[title='Settings']"
+    networkIdle: true
+  actions:
+    - click: "[title='Settings']"
+    - wait: "#settings"
+    - click: "[aria-labelledby='settings-visibility-label']"
+    - wait: "role=option[name='Unlisted']"
+  highlight: "[aria-labelledby='settings-visibility-label']"
+  crop: "#settings"
+  blocked: null
+
+- id: sharing/visibility--allow-access
+  type: screenshot
+  alt: The Share window of a file in a private dataset, with Allow access to anyone with the link
+  page: hub-guide/sharing/visibility
+  url: /r/acme-surveys/share-demo
+  base: hub
+  auth: demo
+  waitFor:
+    selector: "text=orthophoto.tif"
+    networkIdle: true
+  actions:
+    - click: { selector: "text=orthophoto.tif", button: right }
+    - click: "role=menuitem[name='Share/Embed']"
+    - wait: "role=button[name='Allow access to anyone with the link']"   # do NOT click it
+  highlight: "role=button[name='Allow access to anyone with the link']"
+  crop: "#share-embed"
+  blocked: null
+
+# ---- Share links & embeds -----------------------------------------------------------------------------------
+
+- id: sharing/links-embeds--copy-iframe
+  type: clip
+  alt: Copy the embed code of an orthophoto and paste it into a web page
+  page: hub-guide/sharing/links-embeds
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: none
+  waitFor:
+    selector: "text=odm_orthophoto"
+    networkIdle: true
+  actions:
+    - click: "text=odm_orthophoto"
+    - wait: "text=odm_orthophoto.tif"
+    - click: { selector: "text=odm_orthophoto.tif", button: right }
+    - click: "role=menuitem[name='Share/Embed']"
+    - click: "#share-mode"
+    - click: "role=option[name='Embed']"
+    - click: "[aria-label='Embed code']"
+    - wait: 1500
+    # second half: a local test page (media-capture/fixtures/embed.html, to be added) with the copied
+    # iframe pasted in, loading the map
+  highlight: "[aria-label='Embed code']"
+  maxSeconds: 30
+  blocked: null
+  youtubeId: null
+
+- id: sharing/links-embeds--embed-poster
+  type: screenshot
+  alt: The orthophoto of odm/brighton-beach in the embedded Hub map
+  page: hub-guide/sharing/links-embeds
+  url: /r/odm/brighton-beach/view/b2RtX29ydGhvcGhvdG8vb2RtX29ydGhvcGhvdG8udGlm/map?embed=1
+  base: hub
+  auth: none
+  viewport: { width: 1200, height: 800 }
+  waitFor:
+    selector: ".ol-layer canvas"
+    networkIdle: true
+    extraMs: 2000
+  actions: []
+  highlight: null
+  crop: null
+  blocked: null
+
+- id: sharing/links-embeds--menu
+  type: screenshot
+  alt: The file menu with Share/Embed
+  page: hub-guide/sharing/links-embeds
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: none
+  waitFor:
+    selector: "text=odm_orthophoto"
+    networkIdle: true
+  actions:
+    - click: "text=odm_orthophoto"
+    - wait: "text=odm_orthophoto.tif"
+    - click: { selector: "text=odm_orthophoto.tif", button: right }
+    - wait: "role=menuitem[name='Share/Embed']"
+  highlight: "role=menuitem[name='Share/Embed']"
+  crop: null
+  blocked: null
+
+- id: sharing/links-embeds--link
+  type: screenshot
+  alt: The Share / Embed window in Link mode with the Share link and its copy button
+  page: hub-guide/sharing/links-embeds
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: none
+  waitFor:
+    selector: "text=odm_orthophoto"
+    networkIdle: true
+  actions:
+    - click: "text=odm_orthophoto"
+    - wait: "text=odm_orthophoto.tif"
+    - click: { selector: "text=odm_orthophoto.tif", button: right }
+    - click: "role=menuitem[name='Share/Embed']"
+    - wait: "[aria-label='Share link']"
+  highlight: "[aria-label='Copy to clipboard']"
+  crop: "#share-embed"
+  blocked: null
+
+- id: sharing/links-embeds--embed-code
+  type: screenshot
+  alt: The Share / Embed window in Embed mode with the iframe code
+  page: hub-guide/sharing/links-embeds
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: none
+  waitFor:
+    selector: "text=odm_orthophoto"
+    networkIdle: true
+  actions:
+    - click: "text=odm_orthophoto"
+    - wait: "text=odm_orthophoto.tif"
+    - click: { selector: "text=odm_orthophoto.tif", button: right }
+    - click: "role=menuitem[name='Share/Embed']"
+    - click: "#share-mode"
+    - click: "role=option[name='Embed']"
+    - wait: "[aria-label='Embed code']"
+  highlight: "[aria-label='Embed code']"
+  crop: "#share-embed"
+  blocked: null
+
+# ---- QGIS ---------------------------------------------------------------------------------------------------
+
+- id: sharing/qgis--share-dialog
+  type: screenshot
+  alt: The Share window in QGIS mode with the QGIS steps and the QGIS URL
+  page: hub-guide/sharing/qgis
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: none
+  waitFor:
+    selector: "text=odm_orthophoto"
+    networkIdle: true
+  actions:
+    - click: "text=odm_orthophoto"
+    - wait: "text=odm_orthophoto.tif"
+    - click: { selector: "text=odm_orthophoto.tif", button: right }
+    - click: "role=menuitem[name='Share/Embed']"
+    - click: "#share-mode"
+    - click: "role=option[name='QGIS']"
+    - wait: "[aria-label='QGIS URL']"
+  highlight: "[aria-label='QGIS URL']"
+  crop: "#share-embed"
+  blocked: null
+
+- id: sharing/qgis--tms
+  type: screenshot
+  alt: The Share window in TMS mode with the tile URL
+  page: hub-guide/sharing/qgis
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: none
+  waitFor:
+    selector: "text=odm_orthophoto"
+    networkIdle: true
+  actions:
+    - click: "text=odm_orthophoto"
+    - wait: "text=odm_orthophoto.tif"
+    - click: { selector: "text=odm_orthophoto.tif", button: right }
+    - click: "role=menuitem[name='Share/Embed']"
+    - click: "#share-mode"
+    - click: "role=option[name='TMS (Tile Map Service)']"
+    - wait: "[aria-label='Share link']"
+  highlight: "[aria-label='Share link']"
+  crop: "#share-embed"
+  blocked: null
+
+- id: sharing/qgis--qgis-dialog
+  type: screenshot
+  alt: The QGIS Add Raster Layer window with Protocol HTTP(S) and the URL from Hub
+  page: hub-guide/sharing/qgis
+  desktop: qgis                          # QGIS desktop, not a Hub page: recorded by hand (see the top)
+  url: null
+  base: hub
+  auth: none
+  blocked: null
+
+- id: sharing/qgis--add-layer
+  type: clip
+  alt: Copy the QGIS URL of an orthophoto in Hub and add it as a raster layer in QGIS
+  page: hub-guide/sharing/qgis
+  desktop: qgis                          # QGIS desktop: recorded by hand, matches marketing clip C23
+  url: null
+  base: hub
+  auth: none
+  maxSeconds: 40
+  blocked: null
+  youtubeId: null
+
+# ---- OGC services -------------------------------------------------------------------------------------------
+
+- id: sharing/ogc--wfs-vector
+  type: screenshot
+  alt: The Share window of a KMZ in WFS mode with the GetCapabilities and GetFeature URLs
+  page: hub-guide/sharing/ogc
+  url: /r/odm/vector
+  base: hub
+  auth: none
+  waitFor:
+    selector: "text=civil_war"
+    networkIdle: true
+  actions:
+    - click: "text=civil_war"
+    - wait: "text=civil_war_by_campaign.kmz"
+    - click: { selector: "text=civil_war_by_campaign.kmz", button: right }
+    - click: "role=menuitem[name='Share/Embed']"
+    - click: "#share-mode"
+    - click: "role=option[name='WFS (Web Feature Service)']"
+    - wait: "[aria-label='GetCapabilities URL']"
+  highlight: "#share-mode"
+  crop: "#share-embed"
+  blocked: null
+
+- id: sharing/ogc--hints
+  type: screenshot
+  alt: How to use this OGC service, for the WMS of an orthophoto
+  page: hub-guide/sharing/ogc
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: none
+  waitFor:
+    selector: "text=odm_orthophoto"
+    networkIdle: true
+  actions:
+    - click: "text=odm_orthophoto"
+    - wait: "text=odm_orthophoto.tif"
+    - click: { selector: "text=odm_orthophoto.tif", button: right }
+    - click: "role=menuitem[name='Share/Embed']"
+    - click: "#share-mode"
+    - click: "role=option[name='WMS (Web Map Service)']"
+    - click: "[aria-label='How to use this service']"
+    - wait: "#ogc-usage-hints"
+  highlight: null
+  crop: "#ogc-usage-hints"
+  blocked: null
+
+# ---- STAC ---------------------------------------------------------------------------------------------------
+
+- id: sharing/stac--collection
+  type: screenshot
+  alt: The STAC collection of odm/brighton-beach as JSON
+  page: hub-guide/sharing/stac
+  url: /stac/collections/odm/brighton-beach   # one public collection: the root catalog lists other users' datasets
+  base: hub
+  auth: none
+  waitFor:
+    selector: "body"
+    networkIdle: true
+  actions: []
+  highlight: null
+  crop: null
+  blocked: null

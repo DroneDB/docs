@@ -1,10 +1,69 @@
 ---
-title: "STAC catalog"
-description: "Find public datasets through the STAC catalog."
+title: STAC catalog
+description: Find the public datasets of Hub and their files through the STAC catalog, in STAC Browser or any STAC client.
+hub_feature: []
+datasets: [odm/brighton-beach]
+requires: { access: none }
 ---
 
-:::info
+<Screenshot id="sharing/stac--collection" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="brighton-beach"
+         hint="This public dataset is the STAC collection odm/brighton-beach of the catalog." />
+
+## When to use it
+
+STAC (SpatioTemporal Asset Catalog) is an open standard to describe and search geospatial data. Hub publishes
+a STAC catalog. Use it to find public datasets by place and date in a STAC client, or to give a data portal a
+standard way to list your published data.
+
+## How Hub maps to STAC
+
+| Hub | STAC |
+|---|---|
+| The Hub server | The catalog, at `https://hub.dronedb.app/stac` |
+| A dataset | A collection, with the id `<organization>/<dataset>` |
+| A file of a dataset | An item, with links to download it |
+
+## Steps: browse the catalog
+
+<Steps>
+
+1. Open [STAC Browser](https://radiantearth.github.io/stac-browser/).
+
+2. Paste the address of the catalog, `https://hub.dronedb.app/stac`, and open it.
+
+3. Open a collection to see the area, the files and the links to download them.
+
+</Steps>
+
+To open one dataset directly, use the address of its collection:
+
+```text
+https://hub.dronedb.app/stac/collections/odm/brighton-beach
+```
+
+Other STAC tools, such as pystac or the STAC support of QGIS, open the same addresses.
+
+## Publish a dataset in the catalog
+
+Set the dataset to **Public** (see [Visibility](./visibility.mdx)). Private datasets are not in the catalog
+for other users.
+
+{/* TODO verify: the catalog lists every dataset the caller can read, so unlisted datasets show in it for
+    everyone (prod, 2026-10-30). Reported as a defect. */}
+
+## Limits & requirements
+
+- No account is needed to read the catalog of public datasets.
+- When a program signs in to the catalog, the catalog lists the datasets of that account too.
+
+## Related
+
+- [Visibility: public, unlisted, private](./visibility.mdx)
+- [OGC services from the Share dialog](./ogc.mdx)
+- [Open Hub data in QGIS](./qgis.mdx)
+
+<ForDevelopers api="/docs/developers/stac" apiLabel="STAC API reference" />

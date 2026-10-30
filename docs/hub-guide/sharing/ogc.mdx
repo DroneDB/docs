@@ -1,10 +1,84 @@
 ---
-title: "OGC services from the Share dialog"
-description: "Use WMS, WFS and other OGC services of a dataset."
+title: OGC services from the Share dialog
+description: Copy the WMS, WMTS, WFS, WCS and OGC API URLs of a file or a folder, and see how to use them in QGIS, ArcGIS Pro and GDAL.
+hub_feature: []
+datasets: [odm/brighton-beach, odm/vector]
+requires: { access: read, data: A georaster or a vector }
 ---
 
-:::info
+<Screenshot id="sharing/ogc--wfs-vector" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="vector" path="civil_war/civil_war_by_campaign.kmz" view="map"
+         hint="In the file browser, right-click the KMZ, click Share/Embed and select Share: WFS (Web Feature Service)." />
+
+## When to use it
+
+GIS programs and web maps speak the OGC standards. Every dataset of Hub offers them for its georasters and
+vectors. Copy a service URL from the Share dialog and add it to QGIS, ArcGIS Pro, GeoServer, OpenLayers or
+any other OGC client.
+
+## Steps
+
+<Steps>
+
+1. Right-click a file or a folder and click **Share/Embed**. For a folder, the window is **Share Folder**.
+
+2. Open the **Share** list. The services are under **OGC services**. A service that the file cannot offer
+   shows **(n/a)**.
+
+3. Select a service. The window shows its URLs. Click the copy button of the URL you need, usually the
+   **GetCapabilities URL**.
+
+4. Click the question mark next to the list (**How to use this service**). The window shows what the service
+   returns and the steps for QGIS, ArcGIS Pro and GDAL, with your URL.
+
+   <Screenshot id="sharing/ogc--hints" />
+
+5. Follow the steps in your program.
+
+</Steps>
+
+## Services
+
+| Service | Gives | For |
+|---|---|---|
+| **WMS (Web Map Service)** | Map images, rendered by the server | Georasters and vectors |
+| **WMTS (Web Map Tile Service)** | Ready-made map tiles | Georasters and vectors |
+| **WFS (Web Feature Service)** | The vector features themselves | Vectors only |
+| **WCS (Web Coverage Service)** | The raster values, for example as GeoTIFF | Georasters only |
+| **OGC API Features** | Vector features as JSON (GeoJSON) | Vectors, from a file (not from a folder) |
+| **OGC API Tiles** | Tiles, through the newer OGC API | Georasters and vectors, from a file (not from a folder) |
+
+The window shows the URLs that the service has, for example **GetCapabilities URL**, **Landing page**,
+**Collections**, **RESTful tile template**, **GetMap (sample)**, **GetFeature (sample)** or **GetCoverage
+(sample)**. A *sample* URL is an example request. Replace its placeholders, such as the bounding box of
+GetMap, before you use it.
+
+For a multispectral raster, WMS also offers index styles such as NDVI, when the bands allow them.
+
+## Limits & requirements
+
+- Only georasters and vectors can be shared through OGC services. Other files show **Not supported**.
+- Share a folder to get one service for all the georasters and vectors in it.
+- For a private dataset, the window shows **Allow access to anyone with the link**. The button makes the whole
+  dataset **Unlisted** (see [Visibility](./visibility.mdx)). Programs can also sign in with your user name and
+  password (Basic authentication).
+
+## Related
+
+- [Open Hub data in QGIS](./qgis.mdx)
+- [Share links & embeds](./links-embeds.mdx)
+- [STAC catalog](./stac.mdx)
+
+<ForDevelopers api="/docs/developers/ogc" apiLabel="OGC services reference">
+
+The services of a dataset are under `https://hub.dronedb.app/orgs/<org>/ds/<dataset>/`. For example, the WMS
+capabilities of the public showcase dataset odm/brighton-beach:
+
+```text
+https://hub.dronedb.app/orgs/odm/ds/brighton-beach/wms?service=WMS&request=GetCapabilities&version=1.3.0
+```
+
+</ForDevelopers>

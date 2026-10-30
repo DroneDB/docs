@@ -1,10 +1,94 @@
 ---
-title: "Open Hub data in QGIS"
-description: "Use orthophotos, point clouds and vectors from Hub in QGIS."
+title: Open Hub data in QGIS
+description: Stream an orthophoto (COG), a point cloud (COPC) or map tiles from Hub into QGIS, without a download.
+hub_feature: []
+datasets: [odm/brighton-beach]
+requires: { access: read, data: A built georaster, point cloud or vector }
 ---
 
-:::info
+<Clip id="sharing/qgis--add-layer" />
 
-This page is being written.
+<Requires />
+
+<TryLive org="odm" ds="brighton-beach"
+         hint="Right-click odm_orthophoto/odm_orthophoto.tif, click Share/Embed and select Share: QGIS." />
+
+## When to use it
+
+You work in QGIS and you want the Hub data as layers: an orthophoto under your vectors, a point cloud in the
+3D view. QGIS reads the built files of Hub directly over the internet. It reads only the part that it shows,
+so a large orthophoto opens in seconds.
+
+## Steps: orthophoto or point cloud
+
+<Steps>
+
+1. In Hub, right-click the file and click **Share/Embed**.
+
+2. Select **Share: QGIS**. The window shows the QGIS steps and the **QGIS URL**. Click the copy button.
+
+   <Screenshot id="sharing/qgis--share-dialog" />
+
+3. In QGIS, open **Layer** → **Add Layer**:
+   - for an orthophoto or another raster: **Add Raster Layer**;
+   - for a point cloud: **Add Point Cloud Layer**.
+
+4. Set **Source Type** to **Protocol: HTTP(S)**. Paste the URL. Click **Add**.
+
+   <Screenshot id="sharing/qgis--qgis-dialog" />
+
+5. For a private dataset, set **Authentication** to **Basic** and type your Hub user name and password.
+
+</Steps>
+
+The URL points to the Cloud Optimized GeoTIFF (COG) of a raster, or to the Cloud Optimized Point Cloud (COPC) of
+a point cloud: the files that the [build](../processing/builds.mdx) makes.
+
+:::warning Copy the link again after a rebuild
+
+The QGIS URL names the current build of the file. When the file is built again or replaced, the URL changes.
+A QGIS project that keeps the old URL can stop loading the layer. Then copy the URL from the Share dialog again
+and change the source of the layer in QGIS. Do not type or edit these URLs by hand.
 
 :::
+
+## Steps: map tiles (XYZ / TMS)
+
+Tiles are images that are ready to show. Use them for a background layer in QGIS, Leaflet, MapLibre or
+OpenLayers.
+
+<Steps>
+
+1. In the Share dialog, select **Share: TMS (Tile Map Service)**. Copy the **Share link**.
+
+   <Screenshot id="sharing/qgis--tms" />
+
+2. In QGIS, open the **Browser** panel, right-click **XYZ Tiles** and click **New Connection**.
+
+3. Paste the URL, give the connection a name and click **OK**. Double-click the connection to add the layer.
+
+</Steps>
+
+## WMS, WFS and other services
+
+For a vector, or to load several layers of a dataset at once, use the OGC services of the dataset. The
+[OGC services](./ogc.mdx) page shows how to copy their URLs from the Share dialog and add them to QGIS.
+
+## Limits & requirements
+
+- The file must be built. Before the build ends, QGIS mode shows **Not supported** and you can download the
+  file instead.
+- QGIS mode works for georasters, point clouds and vectors (for a vector, the URL is its GeoPackage). TMS
+  works for georasters, geo-referenced images and point clouds.
+- TMS and links need a **Public** or **Unlisted** dataset. For a private dataset, the window offers
+  **Allow access to anyone with the link**, which makes the whole dataset **Unlisted**.
+- You can also download the built file: **Tools** → **Download COG** or **Download COPC** in the file menu
+  (see [Builds](../processing/builds.mdx)).
+
+## Related
+
+- [OGC services from the Share dialog](./ogc.mdx)
+- [Share links & embeds](./links-embeds.mdx)
+- [Builds](../processing/builds.mdx)
+
+<ForDevelopers api="/docs/developers/ogc" apiLabel="OGC services reference" />

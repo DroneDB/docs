@@ -1,10 +1,80 @@
 ---
-title: "Share links & embeds"
-description: "Share a link to a view or embed it in a web page."
+title: Share links & embeds
+description: Copy a link to a file in its viewer, or the code that puts the viewer in your own web page.
+hub_feature: [menu:Share/Embed]
+datasets: [odm/brighton-beach]
+requires: { access: read }
 ---
 
-:::info
+<Clip id="sharing/links-embeds--copy-iframe" />
 
-This page is being written.
+<Requires />
 
-:::
+<LiveEmbed org="odm" ds="brighton-beach" path="odm_orthophoto/odm_orthophoto.tif" view="map"
+           poster="sharing/links-embeds--embed-poster" title="An embedded Hub map: odm/brighton-beach orthophoto" />
+
+## When to use it
+
+Send a colleague a link that opens an orthophoto, a point cloud or a 3D model straight in its viewer. Or put
+the viewer in a web page, a blog or a project report, so that readers can pan and zoom without leaving it.
+The embed above is a live Hub viewer.
+
+## Steps
+
+<Steps>
+
+1. In the file browser, right-click the file and click **Share/Embed**. You can also select the file and
+   click the share button in the header, or **Share/Embed** in the details panel.
+
+   <Screenshot id="sharing/links-embeds--menu" />
+
+2. The **Share / Embed** window opens with **Share: Link**. Click the copy button next to **Share link**.
+   The link opens the file in its default viewer.
+
+   <Screenshot id="sharing/links-embeds--link" />
+
+3. To embed the viewer, select **Share: Embed**. Click the code, or the copy button, to copy it.
+
+   <Screenshot id="sharing/links-embeds--embed-code" />
+
+4. Paste the code into the HTML of your page.
+
+</Steps>
+
+## Share modes
+
+| Mode | What you get |
+|---|---|
+| **Link** | The address of the file in its viewer. For a file without a viewer: a link that opens the file in the browser |
+| **Embed** | An `<iframe>` of the viewer, 600 × 400 pixels, that can go full screen |
+| **TMS (Tile Map Service)** | A tile URL for other map programs. See [Open Hub data in QGIS](./qgis.mdx) |
+| **QGIS** | The direct link of the built file. See [Open Hub data in QGIS](./qgis.mdx) |
+| WMS, WMTS, WFS, WCS, OGC API | Service URLs. See [OGC services](./ogc.mdx) |
+
+## The embed code
+
+The code looks like this. Change `width` and `height` to fit your page:
+
+```html
+<iframe frameborder="0" width="600" height="400" allowfullscreen
+        allow="fullscreen" src="https://hub.dronedb.app/r/…/map?embed=1"></iframe>
+```
+
+- Keep `?embed=1` at the end of the address. Without it, the browser does not show the Hub inside another
+  site.
+- In an embed, the Hub hides its header: only the viewer shows.
+- Copy the code from the window, do not write the address by hand: the path of the file is encoded in it.
+
+## Limits & requirements
+
+- A link or an embed works for others only when the dataset is **Public** or **Unlisted**. For a private
+  dataset, the window shows **Allow access to anyone with the link**. That button makes the whole dataset
+  **Unlisted** (see [Visibility](./visibility.mdx)).
+- Link and Embed are for one file. A folder offers the [OGC services](./ogc.mdx) only.
+- A viewer loads the data of the file. A large point cloud or model in an embed can be slow on a phone.
+
+## Related
+
+- [Visibility: public, unlisted, private](./visibility.mdx)
+- [Open Hub data in QGIS](./qgis.mdx)
+- [Share your first map](/docs/get-started/share-first-map)
