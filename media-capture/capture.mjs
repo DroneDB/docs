@@ -215,7 +215,7 @@ async function captureWithRetry(browser, shot, tmp) {
     } catch (e) {
       lastError = e;
       console.warn(`${shot.id}: ${e.message.split('\n')[0]}`);
-      if (e.fatal) break;
+      if (e.fatal || e instanceof ReferenceError || e instanceof SyntaxError) break; // the same again on a retry
     }
   }
   return {id: shot.id, ok: false, attempts: RETRIES + 1, ms: Date.now() - start, error: lastError.message.split('\n')[0]};
@@ -259,7 +259,9 @@ async function storageState(browser, role, base) {
 }
 
 /** Whether the shot sets the splat quality itself (an action that names Quality). */
-const setsSplatQuality = shot => /quality/i.test(JSON.stringify(shot.actions));
+function setsSplatQuality(shot) {
+  return /quality/i.test(JSON.stringify(shot.actions));
+}
 
 async function captureOnce(browser, shot, tmp) {
   const base = resolveBase(shot.base, args.base);

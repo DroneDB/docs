@@ -55,3 +55,15 @@
     - drag: { from: [720, 450], to: [560, 380] }
     - wait: 1500
   maxSeconds: 15
+
+- id: files/browser--pipeline-test-demo
+  type: screenshot
+  alt: Context menu of a file in the demo dataset
+  page: hub-guide/files/browser
+  url: /r/acme-surveys/site-a
+  auth: demo
+  waitFor: { selector: "text=ortho.tif", networkIdle: true }
+  actions:
+    - rightClick: "text=ortho.tif"
+    - wait: "role=menuitem[name='Properties']"
+  highlight: "role=menuitem[name='Properties']"
