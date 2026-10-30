@@ -42,7 +42,7 @@ CLI commands, API calls and implementation detail go to `docs/developers/` or
 |-----------|-----|
 | `<Screenshot id alt caption />` | Captured image `static/media/<id>.webp` |
 | `<Clip id caption />` | YouTube clip behind its poster; the id maps to a `youtubeId` |
-| `<TryLive org ds path view hint />` | Button that opens a public dataset on hub.dronedb.app |
+| `<TryLive org ds path view hint />` | Button that opens a public dataset on hub.dronedb.app (`compare="a.tif,b.tif"` opens the compare view) |
 | `<LiveEmbed org ds path view poster />` | Live Hub viewer, loaded on click |
 | `<Steps>` | Numbered steps around a Markdown ordered list |
 | `<ForDevelopers cli api>` | Collapsed box with the CLI or API way |

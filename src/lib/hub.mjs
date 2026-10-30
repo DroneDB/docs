@@ -14,11 +14,25 @@ export function encodePath(path) {
   return btoa(binary);
 }
 
-/** URL of a dataset, or of one file in one of its views. */
-export function hubUrl({org, ds, path, view, embed = false, base = HUB_URL}) {
+/** URL-safe base64 without padding, as the Hub encodes compare paths (b64urlEncode). */
+export function encodePathUrlSafe(path) {
+  return encodePath(path).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+/**
+ * URL of a dataset, of one file in one of its views, or of the compare view of 2 or more
+ * rasters (`compare`: dataset-relative paths, leftmost first; the Hub's compareUrl).
+ */
+export function hubUrl({org, ds, path, view, compare, embed = false, base = HUB_URL}) {
   if (!org) return base;
   let url = `${base}/r/${encodeURIComponent(org)}`;
   if (ds) url += `/${encodeURIComponent(ds)}`;
+  if (ds && compare) {
+    const query = new URLSearchParams();
+    compare.forEach(p => query.append('p', encodePathUrlSafe(p)));
+    url += `/compare?${query}`;
+    return embed ? `${url}&embed=1` : url;
+  }
   if (ds && path && view) {
     if (!HUB_VIEWS.includes(view)) throw new Error(`Unknown Hub view "${view}"`);
     url += `/view/${encodePath(path)}/${view}`;
