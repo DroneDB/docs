@@ -1,11 +1,46 @@
 ---
 title: "Developers"
-description: "The DroneDB CLI, library and APIs, and which one to use."
+description: "The DroneDB CLI, the C library, the REST API, STAC and OGC services: what each one does and which one to use."
 slug: /developers
 ---
 
-:::info
+DroneDB has five ways in for code and scripts. They share one engine: the DroneDB library
+(`libddb`) indexes the files, builds the streaming versions and answers the questions. Hub and
+Registry use the same library on the server.
 
-This page is being written.
+| Interface | What it is | Runs on | Use it to |
+|---|---|---|---|
+| [`ddb` CLI](./cli/quick-start.mdx) | A command-line tool | Your computer | Index and check folders, build files offline, share, push and pull datasets, script batch jobs |
+| [DroneDB library (C API)](./library.mdx) | `libddb.so` / `ddb.dll` with the C header `ddb.h` | Your program | Put DroneDB inside an application in C, C++, .NET, Python or any language with a C FFI |
+| [REST API](./api/workflows.mdx) | The HTTP API of Registry (and of Hub) | A Registry server | Automate uploads, listings, builds and tasks; manage users and organizations; build your own front end |
+| [STAC API](./stac.mdx) | A SpatioTemporal Asset Catalog of the datasets | A Registry server | Find datasets and files with STAC tools (pystac, STAC Browser, QGIS) |
+| [OGC services](./ogc.mdx) | WMS, WFS, WMTS, WCS and OGC API per dataset | A Registry server | Show datasets in GIS software and web maps (QGIS, ArcGIS, OpenLayers, MapLibre) |
 
-:::
+## Which one to use
+
+- **You have files on a disk and want them on Hub.** Use `ddb share` or `ddb push`. See the
+  [CLI quick start](./cli/quick-start.mdx).
+- **You run a nightly job or a pipeline.** Use the CLI for local work and the
+  [REST API](./api/workflows.mdx) for server work: uploads, builds, processing tasks.
+- **You write a desktop or server application that reads drone data.** Load the
+  [library](./library.mdx). The CLI already contains it, so a command-line user does not need it.
+- **You want the data in QGIS or a web map.** Use the [OGC services](./ogc.mdx), or the direct
+  COG and COPC links. Hub users can also start from the
+  [QGIS guide](/docs/hub-guide/sharing/qgis).
+- **You index many datasets in a catalog.** Use the [STAC API](./stac.mdx).
+- **You manage a self-hosted Registry.** See [Self-hosting](/docs/self-hosting), the
+  [Users & organizations API](./users-api.mdx) and the [Processing API](./processing-api.mdx).
+
+## Pages in this section
+
+- DroneDB CLI: [Install](./cli/install.mdx) · [Quick start](./cli/quick-start.mdx) ·
+  [Cookbook](./cli/cookbook.mdx) · [Command reference](./cli/reference.mdx)
+- [DroneDB library (C API)](./library.mdx)
+- REST API: [Authentication](./api/authentication.mdx) ·
+  [Common workflows](./api/workflows.mdx) · [Reference and conventions](./api/reference.mdx)
+- [STAC API](./stac.mdx) · [OGC services](./ogc.mdx)
+- [Processing API](./processing-api.mdx) · [Users & organizations API](./users-api.mdx)
+- [Building from source](./building-from-source.mdx) · [Contributing](./contributing.mdx)
+
+The formats that DroneDB reads and their entry types are in
+[Supported formats & entry types](/docs/reference/formats).

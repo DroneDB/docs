@@ -1,10 +1,109 @@
 ---
 title: "FAQ"
-description: "Frequently asked questions."
+description: "Frequently asked questions about DroneDB Hub, the ddb command line, self-hosting and DroneDB Desktop."
 ---
 
-:::info
+## Hub
 
-This page is being written.
+### What file formats does Hub support?
 
-:::
+Photos, videos and panoramas; GeoTIFF and JPEG 2000 rasters (orthophotos, elevation models,
+multispectral and thermal mosaics); LAS, LAZ, E57, PTS, XYZ and PLY point clouds; OBJ, glTF,
+GLB, PLY and STL models and OGC 3D Tiles; Gaussian splats (PLY, SPLAT, SPZ, KSPLAT, SOG, RAD);
+GeoJSON, Shapefile, GeoPackage, KML, KMZ, GPX, FlatGeobuf, TopoJSON, DXF and DWG vector data;
+Markdown, PDF and text documents. Hub stores any other file too.
+
+The full list, with what Hub does with each format, is in
+[Supported formats & entry types](./formats.mdx).
+
+### Why is my file a "Generic" file?
+
+DroneDB gives a file a type from its extension and its content. A file is Generic when it is not
+of a format that DroneDB reads, or when its content does not match: for example a glTF without
+a mesh, or a PLY with several textures. See [How DroneDB decides the type](./formats.mdx#how-dronedb-decides-the-type).
+
+### Why does my file wait for its build?
+
+Some formats need companion files: an `.obj` needs its `.mtl` and textures, a `.shp` needs its
+`.shx` and `.dbf`. The build waits until you upload the missing file, then starts at once. See
+[Builds](/docs/hub-guide/processing/builds).
+
+### Can I use Hub on a phone or a tablet?
+
+Yes. Hub picks a layout from the size of the screen:
+
+- **Phones** (a screen up to 767 pixels wide): the dataset page has tabs for **Browser** (the
+  folder tree), **Files**, **Properties**, **Map** and **Tasks**, so each part fills the screen.
+- **Tablets** (768 to 991 pixels): the panels stay side by side, as on a computer. Hub
+  remembers their sizes separately from the computer layout.
+- The viewers work with touch. The point cloud viewer loads fewer points on a phone. The splat
+  viewer has larger movement buttons on a touch screen and needs WebGL 2.
+
+### How do I make a dataset public?
+
+Change its visibility to **Public** (anyone can find it), **Unlisted** (anyone with the link can
+open it) or **Private**. See [Visibility](/docs/hub-guide/sharing/visibility). From the command
+line, see the [CLI cookbook](/docs/developers/cli/cookbook#visibility).
+
+### Can I open Hub data in QGIS or ArcGIS?
+
+Yes. Every dataset has WMS, WFS, WMTS, WCS and OGC API services, and direct links to Cloud
+Optimized GeoTIFFs and point clouds. See [Open Hub data in QGIS](/docs/hub-guide/sharing/qgis)
+and the [OGC services reference](/docs/developers/ogc).
+
+### What is STAC and why should I care?
+
+[STAC (SpatioTemporal Asset Catalog)](https://stacspec.org/) is an open standard that describes
+geospatial data. Hub publishes a STAC catalog of the datasets, so other tools can find your
+public data and read its metadata. See [STAC catalog](/docs/hub-guide/sharing/stac).
+
+### Does DroneDB process drone images?
+
+DroneDB stores, shows and shares the results of photogrammetry. Hub can send images to a
+processing node (NodeODX) and add the results to a dataset: see
+[Photogrammetry](/docs/hub-guide/processing/photogrammetry). To process on your own computer,
+use [WebODM](https://docs.webodm.org) and upload the results.
+
+### How much does Hub cost?
+
+See the [plans page](https://dronedb.app/plans).
+
+## The command line and self-hosting
+
+### What is the difference between Hub, Registry and the ddb command line?
+
+- **Hub** is the web app at [hub.dronedb.app](https://hub.dronedb.app). You upload, view,
+  measure and share data in the browser.
+- **Registry** is the server behind Hub. You can run your own Registry for your organization.
+- **`ddb`** is a command-line tool. It indexes folders on your computer, builds streaming files
+  and syncs datasets with Hub or a Registry. It is for power users and scripts.
+
+See [Developers](/docs/developers) for the CLI, the library and the APIs.
+
+### Can I run my own Registry?
+
+Yes, with Docker or as a native program. See [Self-hosting](/docs/self-hosting).
+
+### Which databases does Registry support?
+
+SQLite (the default, for small installations) and MySQL or MariaDB (for production). See the
+[configuration reference](/docs/self-hosting/configuration).
+
+## DroneDB Desktop
+
+### What is the status of DroneDB Desktop?
+
+DroneDB Desktop is the standalone Windows application. It is in **maintenance mode**: it gets no
+new features. It is still sold as a one-time purchase on the [plans page](https://dronedb.app/plans)
+for users who must work offline. For everything else, use [Hub](https://hub.dronedb.app), which
+works in any browser and has many more features.
+
+**If you bought a DroneDB Desktop licence**, you get **3 months of the Professional plan on Hub
+free of charge**. Write to [support@dronedb.app](mailto:support@dronedb.app) to activate the
+offer.
+
+## Support
+
+### How do I get commercial support?
+
+[Get in touch](https://dronedb.app/contact).

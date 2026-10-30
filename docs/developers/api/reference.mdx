@@ -1,10 +1,143 @@
 ---
-title: "REST API reference"
-description: "Where to find the full REST API reference."
+title: "API reference and conventions"
+description: "Where to find the full REST API reference of a Registry, and the rules that it does not show: request formats, errors, paging, build-file URLs and the feature catalog."
 ---
 
-:::info
+## The full reference
 
-This page is being written.
+Every Registry serves its own interactive API reference, generated from its code:
 
-:::
+| What | Where |
+|---|---|
+| Interactive reference (Scalar) | `/scalar/v1`, for example [hub.dronedb.app/scalar/v1](https://hub.dronedb.app/scalar/v1) |
+| OpenAPI document | `/swagger/v1/swagger.json` |
+
+The reference of a Registry always matches its version. Use it for the list of endpoints, the
+parameters and the response fields. This page holds the rules that apply to all endpoints.
+
+## Requests
+
+- **Routes.** An organization is `/orgs/{orgSlug}`, a dataset `/orgs/{orgSlug}/ds/{dsSlug}`.
+  Files, builds, tasks, metadata and the OGC services of a dataset are below that. System and
+  administration endpoints are below `/sys`, users below `/users`.
+- **Slugs** have 2 to 128 characters: lowercase letters, digits, `_` and `-`. They start with a
+  letter or a digit and have no `--`. A refused slug answers `400` with the rule.
+- **Bodies.** Many endpoints read form fields (`multipart/form-data` or
+  `application/x-www-form-urlencoded`): sign-in, datasets, organizations, uploads, builds,
+  search. Newer endpoints read JSON: tasks, imports, preferences, members, users. The reference
+  says which one each endpoint takes.
+- **Dataset paths** (`path`) are relative to the root of the dataset, with `/` or `\` as the
+  separator. An absolute path, a `..` segment, the reserved `.ddb` folder or a path that is not
+  valid UTF-8 is refused with `400`.
+- **Enumerations** are numbers in JSON: dataset visibility `0` private, `1` unlisted, `2`
+  public; organization permissions `0` read only, `1` read and write, `2` read, write and
+  delete, `3` admin. Entry types are numbers too:
+  see [entry types](/docs/reference/formats#entry-types).
+- **Times.** Index values (`mtime`) and token expiry (`expires`) are Unix seconds. Database
+  records (`creationDate`, `lastModified`) are ISO 8601 dates.
+- **Cancellation.** A request whose client disconnects stops its work and gets no answer. The
+  server logs it as `499`.
+
+## Errors
+
+Errors are RFC 9457 `ProblemDetails` with the media type `application/problem+json`:
+
+```json
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+  "title": "Forbidden",
+  "status": 403,
+  "detail": "The current user is not allowed to read this dataset",
+  "traceId": "00-…",
+  "noRetry": true
+}
+```
+
+- Show `detail` to the user.
+- `noRetry: true` means that the same request will fail again. Do not retry it.
+- Validation errors of a body are `ValidationProblemDetails`: an `errors` object per field and
+  the joined messages in `detail`.
+- Before Registry 3.0 the body was `{"error": "…"}`. A client that also talks to older servers
+  falls back to `error`.
+
+| Status | Meaning |
+|---|---|
+| `400` | Invalid parameters |
+| `401` | Not signed in, or the token is no longer valid |
+| `403` | Signed in without permission (a `401` before Registry 3.0). Admin-only endpoints say "Only administrators can perform this operation". |
+| `404` | Not found |
+| `409` | Conflict |
+| `413` | Too large (`noRetry: true`) |
+| `429` | Too many requests: the concurrent download limit or a rate limit. Read `Retry-After`. |
+| `500` | Server error |
+| `503` | Temporary: a busy index, a build that holds it, a server that stops. Read `Retry-After` and try again. |
+| `507` | The storage quota is full |
+
+The OGC services answer with the exception format of their standard instead: see
+[OGC errors](../ogc.mdx#errors).
+
+## Paging
+
+| Endpoint | Parameters | Total |
+|---|---|---|
+| `GET /orgs/{orgSlug}/ds` | `skip`, `take` (at most 500), `q` (search in name, slug and tagline), `sort` (`name`, `creationDate`, `lastModified`, `entries`, `size`, `visibility`), `desc=true`, `slugs` (a comma-separated list) | `X-Total-Count` header |
+| `GET …/tasks`, `GET /sys/tasks` | `skip`, `take` (at most 200), `toolId`, `state` | |
+| `GET /stac/collections/{org}/{ds}/items` | `limit` (default 10, at most 10000), `offset`, `bbox`, `datetime` | `numberMatched` |
+| `GET /stac/collections` | `limit` (default 10, at most 100), `offset` | |
+| WFS `GetFeature` | `count` (at most 10000), `startIndex` | `numberMatched` |
+| OGC API `…/items` | `limit` (at most 1000), `offset`, `bbox` | |
+
+`GET /orgs/{orgSlug}/ds` without parameters returns every dataset. With any of them it returns
+one page. `GET …/tasks` sends an `ETag`: a request with `If-None-Match` gets `304` while the
+list is the same.
+
+## Build file URLs
+
+The build products of an entry (COG, COPC, bm3d, vector tiles, 3D Tiles, RAD) are served below
+`…/build/{hash}/{path}` and `…/build/{hash}@{version}/{path}`. Rules:
+
+- **Read the URL from the entry.** Listings and pending builds give each entry
+  `artifacts: [{role, url, mediaType, downloadName?}]`. Never compose a `/build/` path.
+- **The URL holds a version.** `version` changes when a build rewrites the file under the same
+  hash (a forced rebuild, a newer layout). A rebuild gives the entry a new URL in the next
+  listing. Treat `version` as opaque: compare it, do not parse it.
+- **Caching.** When the URL names the current version, the answer is
+  `Cache-Control: private, max-age=86400, immutable`. Without a version, or with a replaced
+  one, it is `private, no-cache` with an `ETag`; a conditional request gets `304` while the file
+  is the same. Files that the index of a directory artifact names by a relative URL (the tiles
+  of a 3D Tiles `tileset.json`) get the same version.
+- **Range requests** work on every build file. `HEAD` sends the headers of `GET`.
+- **Media types** come from the library: COG
+  `image/tiff; application=geotiff; profile=cloud-optimized`, COPC
+  `application/vnd.laszip+copc`, GeoPackage `application/geopackage+sqlite3`, bm3d
+  `application/vnd.dronedb.bm3d`.
+- **Legacy outputs.** A model built before DroneDB 2.0 lists `model.nexus` instead of
+  `model.bm3d` until the background rebuild; a point cloud built before COPC lists
+  `pointcloud.ept`. A client that reads the roles in its order of preference shows the old
+  output until the new one exists.
+
+For a link that you give to a person or paste in QGIS, copy it from Hub: it changes after a
+rebuild. To download a product under the name of the entry, use
+`GET …/build-artifact?path=…&role=…` ([workflows](./workflows.mdx#builds-and-build-files)).
+The roles are in the [library build manifest](../library.mdx#build-manifest).
+
+## The feature catalog
+
+`GET /sys/features` needs no sign-in. Clients read it to know what the server offers:
+
+| Field | Description |
+|---|---|
+| `registryVersion`, `hubVersion`, `ddbVersion` | The versions of the backend, the web app and the DroneDB library |
+| `taskTools` | The processing tools: id, version, title, required access, artifact flag, and `hidden`, `disabled`, `disabledMessage` |
+| `taskStates` | The task states, each with `isTerminal` |
+| `entryTypes` | The entry types of the library: `{id, name, buildable, thumbnail, sidecarExtensions, roles}`. `thumbnail` is `none`, `file` or `build`. |
+| `archiveExtensions` | The archive suffixes the server extracts, lowercase, compound ones first (`tar.gz` before `gz`) |
+| `emailEnabled` | Whether the server sends e-mail. When `false`, hide what needs e-mail. |
+| `userManagement`, `organizationMemberManagement` | Whether local users and organization members can be managed (`false` with external authentication) |
+| `storageLimiter`, `maxConcurrentDownloadsPerUser`, `disableAnonymousBulkDownloads`, `maxExportSizeBytes`, `bulkDownloadAsyncThresholdBytes` | Limits |
+| `passwordPolicy` | The password rules, or `null` |
+| `datasetThumbnailCandidates` | The file names that give a dataset its thumbnail, in order |
+| `updateCheckEnabled`, `instanceHash` | The update check of the instance |
+| `hubOptions` | Branding and feature flags of the web app |
+
+`GET /sys/version` returns the Registry version.

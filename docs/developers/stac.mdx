@@ -1,10 +1,73 @@
 ---
 title: "STAC API"
-description: "The STAC API of Registry."
+description: "Find datasets and files of a Registry with the SpatioTemporal Asset Catalog (STAC) API: endpoints, search, paging and client tools."
 ---
 
-:::info
+Registry implements the [STAC API](https://stacspec.org/) (STAC 1.1.0). Each dataset is a STAC
+**collection**, and each georeferenced file in it is a STAC **item** with links to the file and
+its thumbnail. STAC tools can then find and read the data without knowing DroneDB.
 
-This page is being written.
+For a Hub user's view of the catalog, see [STAC catalog](/docs/hub-guide/sharing/stac).
 
-:::
+## Endpoints
+
+| Endpoint | Description |
+|---|---|
+| `GET /stac` | The landing page (root catalog), with links to the conformance, the collections and the search |
+| `GET /stac/conformance` | The conformance classes |
+| `GET /stac/collections` | The collections that you can read. `limit` (default 10, at most 100) and `offset` |
+| `GET /stac/collections/{orgSlug}/{dsSlug}` | The collection of a dataset |
+| `GET /stac/collections/{orgSlug}/{dsSlug}/items` | The items of a dataset. `bbox`, `datetime`, `limit` (default 10, at most 10000) and `offset` |
+| `GET /stac/collections/{orgSlug}/{dsSlug}/items/{featureId}` | One item |
+| `GET /stac/search`, `POST /stac/search` | A search across collections: `bbox`, `intersects`, `datetime`, `collections`, `ids`, `limit` |
+| `GET /orgs/{orgSlug}/ds/{dsSlug}/stac` | The collection of a dataset (the same object) |
+
+The id of a collection is `organization/dataset`, for example `odm/brighton-beach`. Private
+datasets are in the answers only for users who can read them: send a token
+([Authentication](./api/authentication.mdx)).
+
+## Examples
+
+```bash
+# The root catalog of Hub
+curl https://hub.dronedb.app/stac
+
+# The collection and the first items of a public dataset
+curl https://hub.dronedb.app/stac/collections/odm/brighton-beach
+curl "https://hub.dronedb.app/stac/collections/odm/brighton-beach/items?limit=5"
+
+# A search in an area
+curl -X POST https://hub.dronedb.app/stac/search \
+     -H "Content-Type: application/json" \
+     -d '{"collections": ["odm/brighton-beach"], "bbox": [-92.0, 46.84, -91.99, 46.85], "limit": 10}'
+```
+
+An item collection has `numberMatched` and `numberReturned`. A search page has a `next` link
+(with a `token`) while there are more results: follow it to read the next page.
+
+An item has the footprint of the file as its geometry, and assets with the download URL of the
+file (`roles: ["data"]`) and of its thumbnail (`roles: ["thumbnail"]`).
+
+## Client tools
+
+- [STAC Browser](https://radiantearth.github.io/stac-browser/): open
+  `https://radiantearth.github.io/stac-browser/#/external/hub.dronedb.app/stac`, or the URL of
+  your own Registry.
+- [pystac-client](https://pystac-client.readthedocs.io/) in Python:
+
+  ```python
+  from pystac_client import Client
+
+  catalog = Client.open("https://hub.dronedb.app/stac")
+  search = catalog.search(collections=["odm/brighton-beach"], max_items=5)
+  for item in search.items():
+      print(item.id, list(item.assets))
+  ```
+
+- QGIS has a STAC data source (**Layer → Add Layer**, or the Browser panel), and other STAC
+  tools connect to the same URL.
+
+## Offline catalogs
+
+`ddb stac` writes the STAC catalog of a local dataset, without a Registry. See the
+[CLI cookbook](./cli/cookbook.mdx#generate-a-stac-catalog).

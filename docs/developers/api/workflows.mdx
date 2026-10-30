@@ -1,10 +1,245 @@
 ---
-title: "REST API: common workflows"
-description: "Upload, list, build and follow tasks through the REST API."
+title: "Common API workflows"
+description: "Create a dataset, upload files (also large and resumable), list and download them, follow builds, run processing tasks and import from another Registry with the REST API."
 ---
 
-:::info
+The examples use `curl` against Hub. For a self-hosted Registry, change the host. Every
+request that changes data needs a token: see [Authentication](./authentication.mdx).
 
-This page is being written.
+```bash
+HUB=https://hub.dronedb.app
+TOKEN=$(curl -s -X POST $HUB/users/authenticate -F username=survey-bot -F password='…' | jq -r .token)
+AUTH="Authorization: Bearer $TOKEN"
+DS=$HUB/orgs/my-org/ds/survey-2026
+```
 
-:::
+All dataset routes start with `/orgs/{orgSlug}/ds/{dsSlug}`. The full list of endpoints and
+fields is in the API reference of each Registry, at [`/scalar/v1`](./reference.mdx).
+
+## Create a dataset
+
+```bash
+curl -X POST -H "$AUTH" $HUB/orgs/my-org/ds \
+     -F slug=survey-2026 -F name="Survey 2026" -F visibility=0
+```
+
+`visibility` is `0` private, `1` unlisted, `2` public. Change it later with
+`PUT /orgs/{orgSlug}/ds/{dsSlug}` (form fields `name`, `visibility`). Rename the dataset with
+`POST …/rename` (form field `slug`).
+
+## Upload files
+
+### One request
+
+`POST …/obj` takes a `multipart/form-data` body. Each file part goes to the `path` field sent
+before it.
+
+```bash
+# One file: 201 with the entry
+curl -X POST -H "$AUTH" $DS/obj \
+     -F path=odm_orthophoto/odm_orthophoto.tif -F file=@odm_orthophoto.tif
+
+# Several files (a bundle, at most 64 parts): 200 with one result per file
+curl -X POST -H "$AUTH" $DS/obj \
+     -F path=images/DJI_0001.JPG -F file=@DJI_0001.JPG \
+     -F path=images/DJI_0002.JPG -F file=@DJI_0002.JPG
+
+# A folder: no file part
+curl -X POST -H "$AUTH" $DS/obj -F path=images
+```
+
+- Access, the storage quota (from `Content-Length`) and a `path` sent before its file are
+  checked before the first byte is stored. A refused upload fails at once (`401`, `403`,
+  `404`, `507`).
+- In a bundle a file that fails does not fail the others. Each result is
+  `{ "path", "entry", "error", "status" }`.
+- After the upload, Registry builds the files that can be built, in the background.
+
+### A response that gets lost
+
+Send a unique `X-Upload-Id` header (8 to 64 letters, digits, `-` or `_`). If the response is
+lost (for example a proxy timeout after the last byte), ask before you send the file again:
+
+```bash
+curl -H "$AUTH" $DS/obj/uploads/0f6c2b9e-upload-17
+```
+
+| Status | Meaning |
+|---|---|
+| `200` | Done (`state: "Done"`, with the results) or failed (`state: "Failed"`, with the error). |
+| `202` | The server still receives or adds the files. Ask again later. |
+| `404` | Unknown id. Send the file again. |
+
+A `POST …/obj` that repeats the id of a finished upload returns its results without storing
+the files again. Receipts are kept for 24 hours.
+
+### Large files: resumable chunks
+
+For files too large for one request, send chunks of at most 128 MB:
+
+1. `POST …/obj/chunk`, one per chunk. The form fields `fileId`, `chunkIndex`, `totalChunks`,
+   `totalFileSize`, `chunkSize` and `path` come before the `chunk` file part. Chunks can arrive
+   in any order and can be sent again. Each answer lists the chunks still missing.
+2. After an interruption, `GET …/obj/chunk/{fileId}` says which chunks to send again.
+3. `POST …/obj/chunk/{fileId}/commit` adds the file: `201` with the entry, or `409` with the
+   missing chunks. A second commit returns the same entry.
+
+An upload that is not committed is removed after 24 hours.
+
+### Check the connection
+
+`POST /sys/upload-probe` reads and discards a body of at most 16 MB and answers
+`{ bytes, serverMs }`. Use it to measure the upload speed. Any signed-in user may call it, 28
+times per minute.
+
+## List, search and download
+
+```bash
+curl -H "$AUTH" "$DS/list"                          # the root folder
+curl -H "$AUTH" "$DS/list?path=odm_orthophoto"      # a folder
+curl -H "$AUTH" -X POST $DS/search -F query='*.tif' -F recursive=true
+```
+
+An entry has `path`, `hash`, `type` (a number: see
+[entry types](/docs/reference/formats#entry-types)), `properties`, `mtime`, `size` and, for a
+file with a location, `point_geom` and `polygon_geom`. A buildable entry also has its build
+state and `artifacts` (below).
+
+```bash
+curl -H "$AUTH" -OJ "$DS/download?path=odm_report/report.pdf"   # one file
+curl -H "$AUTH" -o part.zip "$DS/download?path=README.md&path=LICENSE"   # several: a ZIP
+curl -H "$AUTH" -OJ "$DS/download/odm_report/report.pdf"        # the path in the URL
+curl -H "$AUTH" -o index.zip "$DS/ddb"                          # the DroneDB index
+```
+
+Repeat `path` for each file. `inline=1` shows a file in the browser instead of a download.
+`GET …/thumb?path=…` returns a WebP thumbnail.
+
+## Builds and build files
+
+Registry builds every buildable file after it arrives. To start a build yourself:
+
+```bash
+curl -X POST -H "$AUTH" $DS/build -F path=odm_orthophoto/odm_orthophoto.tif   # add -F force=true to build again
+curl -H "$AUTH" $DS/builds/pending                                            # builds that wait or retry
+```
+
+In a listing, each built entry has `artifacts: [{role, url, mediaType, downloadName?}]`. Read
+the URL of a build file from this list. Do not compose `/build/` paths yourself: the URL holds
+the version of the file (`…/build/{hash}@{version}/{path}`), and a rebuild changes it. See
+[Build file URLs](./reference.mdx#build-file-urls).
+
+To download a build product with a file name:
+
+```bash
+curl -H "$AUTH" -OJ "$DS/build-artifact?path=odm_orthophoto/odm_orthophoto.tif"       # the COG
+curl -H "$AUTH" -OJ "$DS/build-artifact?path=scan.laz"                                 # scan.copc.laz
+curl -H "$AUTH" -OJ "$DS/build-artifact?path=model.obj&role=model.3dtiles"             # model.3dtiles.zip
+```
+
+Without `role` you get the first artifact with a download name (COG, COPC, GeoPackage, the 3D
+Tiles of a model, the RAD of a splat). The roles are listed in the
+[library build manifest](../library.mdx#build-manifest). `400`: the entry has no downloadable
+artifact. `404`: it is not built, or has no artifact of that role.
+
+### Builds that wait
+
+A build that misses a companion file (an `.obj` without its `.mtl` or a texture, a `.shp`
+without its `.shx` or `.dbf`) waits for the file. No timer retries it. When a file with the
+missing name arrives (upload, push, move, copy or transfer; any folder, letter case ignored),
+the build starts at once.
+
+In a listing such an entry has `buildStatus: "pending"`, `buildMissingDependencies` and
+`buildAwaitingFiles: true`. Read the flag; do not derive it from the missing files. In
+`GET …/builds/pending`, `awaitingFiles` is `true` for a build that waits for files and `false`
+for one that Registry retries.
+
+A build that failed for a temporary reason (low disk space, a full disk, a tool that stopped
+printing) is retried after 1, 2, 5, 10, 20, 40, then 60 minutes, at most 12 times. A build
+that fails for another reason (invalid input, a missing tool) is not retried.
+
+## Processing tasks
+
+Long jobs (exports, ZIP downloads, photogrammetry, imports, extraction) are tasks:
+
+```bash
+# What this dataset offers, with the JSON Schema of each tool's parameters
+curl -H "$AUTH" $DS/tasks/tools
+
+# Start a task: 202 with taskId, statusUrl and resultUrl
+curl -X POST -H "$AUTH" -H "Content-Type: application/json" $DS/tasks -d '{
+  "toolId": "raster-export",
+  "path": "odm_orthophoto/odm_orthophoto.tif",
+  "params": { "formula": "NDVI", "colormap": "rdylgn" }
+}'
+
+# Follow it
+curl -H "$AUTH" $DS/tasks/$TASK              # state, progress, log tail, artifact
+curl -H "$AUTH" "$DS/tasks/$TASK/log?since=0"
+curl -H "$AUTH" -OJ $DS/tasks/$TASK/result   # the file, when the state is Succeeded
+```
+
+Poll the status, or open `GET …/tasks/events`, a server-sent event stream that sends a `tasks`
+event when the task list of the dataset changes. Every tool and its parameters are on the
+[Processing API](../processing-api.mdx) page.
+
+## Import from another Registry
+
+An administrator of the target Registry can copy a dataset or a whole organization from another
+Registry. The import runs as a background job:
+
+```bash
+curl -X POST -H "$AUTH" -H "Content-Type: application/json" $HUB/sys/import-dataset -d '{
+  "sourceRegistryUrl": "https://source-registry.example.com",
+  "username": "source-user",
+  "password": "…",
+  "sourceOrganization": "source-org",
+  "sourceDataset": "source-dataset",
+  "destinationOrganization": "target-org",
+  "destinationDataset": "target-dataset",
+  "mode": "Archive"
+}'
+```
+
+| Field | Description |
+|---|---|
+| `sourceRegistryUrl` | Scheme and host of the source, without a path. `http` or `https`; private and reserved addresses are refused. |
+| `username`, `password` | A user of the source who can read the data. Stored encrypted in the job. |
+| `sourceOrganization`, `sourceDataset` | What to copy. |
+| `destinationOrganization` | Optional: the source organization slug. |
+| `destinationDataset` | Optional. |
+| `mode` | `Archive` (default): one ZIP. `ParallelFiles`: the files one by one in parallel; a file that exists with the same hash is skipped. |
+
+`POST /sys/import-organization` takes the same fields without `sourceDataset` and
+`destinationDataset`, and imports every dataset of the organization.
+
+Both answer `202` with `{ "jobId", "statusUrl" }` (also in `Location`). An invalid request is a
+`400` before a job is queued.
+
+| Request | What it does |
+|---|---|
+| `GET /sys/imports/{jobId}` | `{ jobId, state, result, error }`. `state` is `Enqueued`, `Processing`, `Succeeded`, `Failed`, `Deleted`… |
+| `DELETE /sys/imports/{jobId}` | Cancels the import (`204`). |
+
+`result` lists the imported datasets, the errors per dataset (with the phase
+`Authentication`, `Download`, `Save` or `General`), the errors per file (`ParallelFiles` only)
+and the totals. Before Registry 3.0 the import ran inside the request and answered `200` with
+the result.
+
+To fill one dataset from another Registry or from an archive URL, use the `import-dataset` and
+`import-file` [tasks](../processing-api.mdx#import-dataset) instead.
+
+## What the CLI uses
+
+`ddb share` and `ddb push` use their own endpoints, which you do not need to call yourself:
+
+| Endpoints | Used by |
+|---|---|
+| `POST /share/init`, `/share/upload/{token}`, `/share/upload-chunk/{token}`, `/share/commit/{token}`, `/share/rollback/{token}`; `GET /share/info/{token}` | `ddb share` |
+| `POST …/push/init`, `…/push/upload`, `…/push/meta`, `…/push/commit` | `ddb push` |
+| `GET …/stamp`, `GET …/download`, `POST …/meta/dump` | `ddb pull`, `ddb clone` |
+
+`push/init` compares the stamp of the client with the dataset once and returns the files to
+upload. When the dataset changed since the last sync it answers `pullRequired: true`.
+`push/commit` applies the change only if the dataset did not change meanwhile, and only if each
+uploaded file matches the hash in the stamp.

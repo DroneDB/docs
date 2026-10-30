@@ -1,10 +1,38 @@
 ---
 title: "Contributing"
-description: "How to contribute to DroneDB."
+description: "How to contribute to DroneDB: report issues, improve the docs, and send code to the DroneDB, Registry and Hub repositories."
 ---
 
-:::info
+Thank you for your interest in DroneDB. You can help in several ways:
 
-This page is being written.
+- **Report an issue.** Open an issue in the repository of the component. Say what you did, what
+  you expected and what happened. Add the version (`ddb --version`, or the versions in
+  `GET /sys/features` of a Registry) and, if you can, a small file that shows the problem.
+- **Improve the documentation.** Every page of this site has an **Edit this page** link at the
+  bottom. It opens the page in the docs repository.
+- **Send code.** Open a pull request. For a large change, open an issue first to agree on the
+  approach.
+- **Test new versions.** Build from source and report what breaks.
 
-:::
+## Repositories
+
+| Repository | What it holds |
+|---|---|
+| [DroneDB/DroneDB](https://github.com/DroneDB/DroneDB) | The C++ library (`libddb`) and the `ddb` command line |
+| [DroneDB/Registry](https://github.com/DroneDB/Registry) | The Registry server (.NET) |
+| [DroneDB/Hub](https://github.com/DroneDB/Hub) | The Hub web app (Vue), a submodule of Registry |
+| [DroneDB/bm3d](https://github.com/DroneDB/bm3d) | The bm3d 3D model builder and viewer |
+| [DroneDB/gdal-util](https://github.com/DroneDB/gdal-util) | The helper that reads user files with GDAL |
+| [DroneDB/metadata-util](https://github.com/DroneDB/metadata-util) | The helper that reads and writes image metadata |
+| [DroneDB/docs](https://github.com/DroneDB/docs) | This documentation |
+
+## Build and test
+
+- DroneDB: [Building from source](./building-from-source.mdx), including how to run the unit
+  and integration tests.
+- The C API contract and its version rules: [DroneDB library](./library.mdx#versions-and-abi).
+
+## Get help
+
+- Read the [FAQ](/docs/reference/faq).
+- Write to [support@dronedb.app](mailto:support@dronedb.app).

@@ -1,10 +1,425 @@
 ---
 title: "Processing platform API"
-description: "Run and follow processing tasks through the API."
+description: "Run and follow processing tasks through the API: the task life cycle, the endpoints, the tools and their parameters, and how feature gating shows in the answers."
 ---
 
-:::info
+Long jobs on a dataset run as **tasks** on the processing platform of Registry: exports, ZIP
+downloads, photogrammetry, imports, archive extraction, rescans and splat exports. A task runs
+in the background (Hangfire), off the HTTP request, and the server keeps its state, log and
+result. Hub uses the same API for the **Tasks** panel.
 
-This page is being written.
+To configure the platform on your own server (limits, processing nodes, which tools are on), see
+[Processing nodes & feature gating](/docs/self-hosting/processing-nodes).
 
-:::
+## Concepts
+
+- **Tool**: a named, versioned operation, for example `raster-export`. A tool declares the
+  access it needs (read or write), whether it makes a file to download (an **artifact**), and a
+  JSON Schema of its parameters.
+- **Task**: one run of a tool on a dataset, with a `taskId`.
+- **Artifact**: the file that a task makes, for example a `.tif` or a `.zip`. The server deletes
+  it after a time (`ProcessingPlatform:ArtifactTtlHours`).
+- **Deduplication**: a task with the same tool, version and parameters, sent again within the
+  look-back window (`DedupLookbackHours`), returns the existing task (`200` with
+  `deduplicated: true`) instead of a new one (`202`). Send `force: true` to run it again.
+
+## Task states
+
+```text
+Created → Enqueued → Scheduled → Processing → Succeeded
+                                            → Failed
+                                            → Deleted
+```
+
+`Created`, `Enqueued`, `Scheduled` and `Processing` are active. `Succeeded`, `Failed` and
+`Deleted` are terminal. `GET /sys/features` lists the states with `isTerminal` in `taskStates`.
+
+## Endpoints
+
+All task endpoints are below `/orgs/{orgSlug}/ds/{dsSlug}/tasks`.
+
+| Request | What it does |
+|---|---|
+| `GET …/tasks/tools` | The tools of this dataset: id, version, title, required access, artifact flag, JSON Schema, and `hidden`, `disabled`, `disabledMessage` |
+| `POST …/tasks` | Start a task: `202`, or `200` for a deduplicated one |
+| `GET …/tasks` | The tasks of the dataset: `toolId`, `state`, `skip`, `take` (default 50, at most 200). Sends an `ETag`; `If-None-Match` gets `304` while nothing changed. |
+| `GET …/tasks/events` | Server-sent events (`text/event-stream`): a `tasks` event when the task list changes, and a comment every 25 seconds to keep the connection open |
+| `GET …/tasks/{id}` | State, progress, log tail and artifact of a task |
+| `GET …/tasks/{id}/log?since={cursor}` | The log lines after a cursor |
+| `GET …/tasks/{id}/result` | Download the artifact (range requests work) |
+| `DELETE …/tasks/{id}` | Cancel a task. Only its owner or an administrator can. |
+| `POST …/tasks/{id}/retry` | Queue a failed task again. `409` when its state does not allow it. |
+| `POST …/tasks/{id}/delete` | Remove one terminal task and its artifact from the history. `400` for a task that is still active. |
+| `POST …/tasks/clear?toolId=` | Remove every terminal task (of one tool, with `toolId`) and its artifacts |
+
+Administrators list the tasks of every user and dataset with
+`GET /sys/tasks?toolId=&state=&userId=&skip=0&take=50`. The per-dataset endpoints above work for
+them on any dataset.
+
+### Start a task
+
+```http
+POST /orgs/my-org/ds/survey-2026/tasks
+Content-Type: application/json
+
+{
+  "toolId": "raster-export",
+  "path": "odm_orthophoto/odm_orthophoto.tif",
+  "params": { "formula": "NDVI", "colormap": "rdylgn" },
+  "force": false
+}
+```
+
+`version` is optional: without it the current version of the tool runs.
+
+| Status | Meaning |
+|---|---|
+| `202 Accepted` | A new task. `Location` is its status URL. |
+| `200 OK` | `deduplicated: true`: an earlier task with the same request. |
+| `400` | Unknown tool, invalid parameters or an invalid path |
+| `403` | The tool is disabled or hidden for you (see [Feature gating](#feature-gating)), or you do not have the access it needs |
+| `413`, `429` | A limit: the output would be too large, or you have too many tasks running or queued |
+
+```json
+{
+  "taskId": "abc123",
+  "toolId": "raster-export",
+  "version": "1",
+  "deduplicated": false,
+  "statusUrl": "/orgs/my-org/ds/survey-2026/tasks/abc123",
+  "resultUrl": "/orgs/my-org/ds/survey-2026/tasks/abc123/result",
+  "estimatedOutputBytes": 52428800
+}
+```
+
+### Follow a task
+
+```json
+{
+  "taskId": "abc123",
+  "toolId": "raster-export",
+  "version": "1",
+  "state": "Processing",
+  "progress": { "percent": 42, "phase": "Warping bands" },
+  "createdAt": "2026-06-13T10:00:00Z",
+  "startedAt": "2026-06-13T10:00:05Z",
+  "finishedAt": null,
+  "logCursor": 18,
+  "logTail": ["[10:00:05] Starting export ...", "..."],
+  "artifact": null,
+  "error": null
+}
+```
+
+When the task succeeds, `artifact` holds `sizeBytes`, `sha256`, `resultUrl` and `expiresAt`.
+`GET …/result` returns the file with `Content-Disposition: attachment` and the SHA-256 as its
+`ETag`. It works only when the state is `Succeeded` and the tool makes an artifact.
+
+To read the log as it grows, pass the `cursor` of each answer as `since` of the next request:
+
+```json
+{ "cursor": 25, "lines": ["[10:00:10] Band 1/4 done", "..."], "truncatedFromTail": 0 }
+```
+
+## Feature gating
+
+An administrator can disable or hide a tool, or allow it only for some roles or organizations.
+Gating only narrows the access that a tool needs; it never widens it. The answers show it:
+
+| Endpoint | What you see |
+|---|---|
+| `GET /sys/features` | `taskTools[]` with `hidden`, `disabled` and `disabledMessage`, without the organization rule |
+| `GET …/tasks/tools` | The same fields, with the organization rule of this dataset |
+| `POST …/tasks` | A hidden or disabled tool answers `403` with `disabledMessage` (or a default message), whatever the client sends |
+
+A client hides a tool with `hidden: true` and greys it out with `disabled: true`, with
+`disabledMessage` as the reason. The `403` of the server decides in every case. The settings are
+in [Processing nodes & feature gating](/docs/self-hosting/processing-nodes).
+
+## Tools
+
+The tools that a server offers are in `GET …/tasks/tools`, with the JSON Schema of their
+parameters. These are the tools of Registry 3.0.
+
+| Tool | Title | Access | Artifact |
+|---|---|---|---|
+| `build` | Build | Write | No |
+| `raster-export` | Export raster (GeoTIFF) | Read | `.tif` |
+| `bulk-download` | Download archive (ZIP) | Read | `.zip` |
+| `align-raster` | Align GeoTIFF to reference | Write | No |
+| `merge-multispectral` | Merge multispectral bands | Write | No |
+| `archive-extract` | Extract archive | Write | No |
+| `rescan-index` | Rescan index | Write | No |
+| `import-file` | Import file from URL | Write | No |
+| `import-dataset` | Import dataset | Write | No |
+| `photogrammetry` | Photogrammetry (NodeODX) | Write | No |
+| `splat-spz-export` | Export splat as .spz | Read | No (a build artifact) |
+| `splat-training-export` | Export splat training data | Read | `.zip` |
+
+The tools without an artifact change the dataset: their new files are indexed, and the files
+that can be built are built in the background.
+
+### build
+
+Builds an entry, like `POST …/build`, as a task you can follow.
+
+```json
+{ "path": "odm_orthophoto/odm_orthophoto.tif", "force": false }
+```
+
+Both are optional. Without `path` it builds the pending entries.
+
+### raster-export
+
+Exports a raster as a GeoTIFF with display settings applied: a preset, a band selection, a
+spectral index, a colormap, a rescale. Memory stays bounded at any size.
+
+```json
+{
+  "path": "odm_orthophoto/odm_orthophoto.tif",
+  "preset": null,
+  "bands": null,
+  "formula": "NDVI",
+  "bandFilter": null,
+  "colormap": "rdylgn",
+  "rescale": "-1,1",
+  "fileName": null
+}
+```
+
+`path` is required. The others are optional.
+
+### bulk-download
+
+Packs some entries, or the whole dataset, into a ZIP.
+
+```json
+{ "paths": ["images/DJI_0001.JPG", "images/DJI_0002.JPG"], "archiveName": "my-selection.zip" }
+```
+
+Without `paths` the ZIP holds the whole dataset, `.ddb` folder included. Small selections can be
+downloaded directly with `GET …/download` instead. Selections larger than
+`bulkDownloadAsyncThresholdBytes` of `GET /sys/features` should use this task.
+
+### align-raster
+
+Aligns a GeoTIFF to a reference GeoTIFF (phase correlation and NCC) and adds the result to the
+dataset as a new COG. Build the output afterwards to get its map tiles.
+
+```json
+{
+  "sourcePath": "survey-2026.tif",
+  "referencePath": "reference-2024.tif",
+  "outputPath": "survey-2026-aligned.tif",
+  "mode": "similarity"
+}
+```
+
+`sourcePath`, `referencePath` and `outputPath` are required. `mode` is `similarity` (4 degrees of
+freedom, default) or `translation` (2, faster). `POST …/align/validate` checks the inputs
+first.
+
+### merge-multispectral
+
+Merges single-band GeoTIFFs into one multi-band COG in the dataset.
+
+```json
+{ "paths": ["red.tif", "green.tif", "blue.tif", "nir.tif"], "outputPath": "merged.tif" }
+```
+
+`paths` (at least two, in band order) and `outputPath` are required.
+`POST …/merge-multispectral/validate` and `…/preview` check the inputs first.
+
+### archive-extract
+
+Extracts an archive of the dataset. Each file is indexed as if it was uploaded, and the files
+that can be built are built.
+
+```json
+{ "sourcePath": "uploads/batch.zip", "destPath": "extracted/", "deleteArchive": false, "overwrite": false }
+```
+
+`sourcePath` is required. `destPath` is the root by default. The archive formats are in
+`archiveExtensions` of `GET /sys/features`.
+
+### rescan-index
+
+Reads the metadata of the entries again (EXIF, location, type), for example after an upgrade
+that reads more.
+
+```json
+{ "types": "image,geoimage", "extensions": "jpg,tif", "stopOnError": false }
+```
+
+All optional. An entry must match both filters. An unknown type or an invalid extension (such
+as `*.dwg`) is a `400`. Without a filter, the task clears the build cache and builds the whole
+dataset again. With a filter, it builds only the rescanned entries that can be built, one at a
+time; a failed build does not fail the task.
+
+To rescan every dataset that has matching entries, an administrator sends
+`POST /sys/rescan`:
+
+```bash
+curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" -H "Content-Type: application/json" \
+     -d '{"extensions": ["dwg", "dxf"]}' https://registry.example.com/sys/rescan
+```
+
+| Field | Description |
+|---|---|
+| `types` | Entry types, for example `["vector"]` |
+| `extensions` | File extensions, for example `["dwg", "dxf"]` |
+| `organizationSlug` | Only this organization (optional) |
+| `datasetSlug` | Only this dataset; needs `organizationSlug` (optional) |
+| `stopOnError` | Stop a dataset at its first error (default `false`) |
+
+At least one of `types` and `extensions` is required. The answer is `202` with the id of a
+background job, which starts a `rescan-index` task for each dataset with matching entries. The
+tasks run on the build queue.
+
+### import-file
+
+Downloads one file from an `http` or `https` URL into the dataset, then indexes and builds it.
+The download refuses private addresses and keeps to the storage budget.
+
+```json
+{
+  "url": "https://example.com/data/orthophoto.tif",
+  "fileName": "orthophoto.tif",
+  "folder": "imports",
+  "overwrite": false,
+  "username": null,
+  "password": null,
+  "sizeBytes": null
+}
+```
+
+`url` and `fileName` are required. `password` must be an encrypted credential.
+`POST …/import/verify-url` checks a URL first; `POST …/import/url` starts the import.
+
+### import-dataset
+
+Fills a new, empty dataset from another Registry (`registry`) or from an archive URL
+(`archive-url`).
+
+```json
+{
+  "sourceType": "registry",
+  "budgetBytes": null,
+  "params": { "…": "the parameters of the source" }
+}
+```
+
+`sourceType` and `params` are required. The parameters depend on the source. The organization
+endpoints do the whole flow:
+
+| Request | What it does |
+|---|---|
+| `GET /orgs/{orgSlug}/import/sources` | The source types this server offers |
+| `POST /orgs/{orgSlug}/import/verify` | Checks a source without creating anything |
+| `POST /orgs/{orgSlug}/import/browse` | Lists the organizations or datasets of a `registry` source |
+| `POST /orgs/{orgSlug}/import` | Creates an empty dataset and starts the import |
+
+To copy datasets or organizations between Registries as an administrator, see
+[Import from another Registry](./api/workflows.mdx#import-from-another-registry).
+
+### photogrammetry
+
+Sends images to a NodeODX processing node and extracts the results (orthophoto, DEM, point
+cloud, model…) into the dataset, or into a new dataset.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `folder` | string | The folder to take the images from (default: the whole dataset) |
+| `images` | string[] | The image paths, instead of a folder |
+| `nodeId` | string | The processing node (default: the first one) |
+| `name` | string | The task name on the node |
+| `options` | `{name, value}[]` | NodeODX options, passed as they are, for example `[{"name": "dsm", "value": true}]` |
+| `destPath` | string | The folder for the results. Required unless `createNewDataset` is `true`. |
+| `createNewDataset` | boolean | Put the results in a new dataset |
+| `newDatasetName` | string | The slug of the new dataset (generated when missing) |
+| `newDatasetOrgSlug` | string | Its organization (default: the same one) |
+| `newDatasetVisibility` | string | `PRIVATE` (default), `UNLISTED` or `PUBLIC` |
+
+The results come as one archive from the node and are extracted into the dataset; there is no
+separate artifact. The nodes and their options:
+
+| Request | What it does |
+|---|---|
+| `GET /sys/processingNodes` | The nodes you can use: id and title (never the URL or the token) |
+| `GET /sys/processingNodes/{nodeId}/options` | The options of a node, read live from it: name, type, domain, help, default |
+| `GET /sys/processingNodes/{nodeId}/status` | Whether the node can be reached, and its queue |
+
+Common NodeODX options: `dsm`, `dtm`, `orthophoto`, `pc`, `3d-tiles`, `feature-quality`
+(`low`, `medium`, `high`), `gsd`.
+
+### splat-spz-export
+
+Makes the `.spz` of a built Gaussian splat for other tools. The task has no file of its own:
+DroneDB keeps the `.spz` in the build of the entry (role `gsplat.export`).
+
+```json
+{ "toolId": "splat-spz-export", "path": "scenes/site.ply", "params": {}, "force": true }
+```
+
+- `path` is required: a Gaussian splat whose build is complete. A path that is not in the
+  dataset or not built is `404`; an entry that is not a splat is `400`.
+- A `.ksplat`, `.sog` or `.rad` source is accepted by the request and fails in the task.
+- Send `force: true` to run it again instead of getting the earlier task. DroneDB returns the
+  file it has when it is not older than the dataset file (the log says
+  `The .spz file was already exported`).
+- The task runs in the build queue and holds the build lock of the entry. It waits while a
+  build or another export of the entry runs.
+
+When the state is `Succeeded`, download the file:
+
+```http
+GET /orgs/{orgSlug}/ds/{dsSlug}/build-artifact?path=scenes/site.ply&role=gsplat.export
+```
+
+The answer is the `.spz` named after the entry (`site.spz`), with range requests. `404` says to
+run the export first when the entry has no `gsplat.export` yet. A rebuild of the splat removes
+the file. The same query with `role=gsplat.lod` downloads `site.rad`.
+
+### splat-training-export
+
+Exports the ODM project in a folder of the dataset as the training data of a Gaussian splat: a
+COLMAP sparse model in metres, the images and the georeference, in one ZIP. See
+[Training data from an ODM project](./cli/cookbook.mdx#training-data-from-an-odm-project).
+
+```json
+{
+  "toolId": "splat-training-export",
+  "path": "odm_project",
+  "params": { "maxImageSize": 1600, "maxPoints": 100000, "fileName": "site-training-data.zip" },
+  "force": true
+}
+```
+
+`path` is the folder of the project; empty or missing for the root. A folder that is not in the
+dataset is `404`; a file is `400`.
+
+| Parameter | Meaning |
+|---|---|
+| `maxImageSize` | The longest side of the images in pixels; `0` or missing keeps the originals. 0 to 1048576. |
+| `maxPoints` | The most points of the sparse model; `100000` when missing, `0` writes none. 0 to 10000000. |
+| `fileName` | The ZIP name. Default `<folder>-training-data.zip` (`<dataset>-training-data.zip` for the root); `.zip` is added when missing. |
+
+A negative value or one above its limit is a `400` before the task is queued. `progress.phase`
+is `cameras`, `points`, `images`, `model`, then `archiving`. `GET …/tasks/{id}/result` downloads
+the ZIP: `sparse/0/cameras.bin`, `images.bin`, `points3D.bin`, `images/` and `georef.json` at its
+root. Each warning (images left out, an approximated lens, no point cloud, nadir images) is a
+`Warning: …` line of the log: read them from `logTail` or the log endpoint.
+
+## Other processing endpoints
+
+Some quick operations are plain endpoints of a dataset, not tasks:
+
+| Request | What it does |
+|---|---|
+| `POST …/mask-borders` | Starts a background job that writes `<name>_masked.tif` next to a GeoRaster. Body `{ "path", "near": 15, "white": false }`. Needs write access. |
+| `POST …/mask-borders/check` | Whether the masked file exists already, and its path |
+| `POST …/contours` | Contour lines of a raster, as GeoJSON |
+| `POST …/raster-profile`, `GET …/raster-area-stats`, `GET …/raster-point-value` | Values of a raster along a line, in an area, at a point |
+| `POST …/stockpile/detect`, `…/stockpile/detect-all`, `…/stockpile/calculate` | Stockpile footprint and volume on an elevation model |
+
+Their parameters are in the [API reference](./api/reference.mdx) of the server.

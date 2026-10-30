@@ -1,10 +1,97 @@
 ---
-title: "REST API: authentication"
-description: "Get a token and call the Registry REST API."
+title: "Authentication & tokens"
+description: "Sign in to the Registry REST API, send the JWT token, refresh it, and use HTTP Basic with GIS clients."
 ---
 
-:::info
+The Registry API (also on [hub.dronedb.app](https://hub.dronedb.app)) uses JSON Web Tokens
+(JWT). Public datasets can be read without a token. Everything else needs one.
 
-This page is being written.
+## Get a token
 
-:::
+Send the user name and the password as form fields to `POST /users/authenticate`:
+
+```bash
+curl -X POST https://hub.dronedb.app/users/authenticate \
+     -F username=survey-bot -F password='…'
+```
+
+```json
+{
+  "username": "survey-bot",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9…",
+  "expires": 1793995200
+}
+```
+
+`expires` is a time in Unix seconds. A token is valid for the number of days the Registry
+sets (7 by default, `TokenExpirationInDays` in the
+[configuration](/docs/self-hosting/configuration)).
+
+Wrong credentials answer `401`. A deactivated account cannot sign in. When the Registry checks
+users against LDAP, send the LDAP user name and password the same way. When the Registry uses an
+external authentication service, that service decides, and the form field `token` can replace
+the user name and the password.
+
+## Send the token
+
+Put the token in the `Authorization` header of every request:
+
+```bash
+TOKEN=$(curl -s -X POST https://hub.dronedb.app/users/authenticate \
+        -F username=survey-bot -F password='…' | jq -r .token)
+
+curl -H "Authorization: Bearer $TOKEN" https://hub.dronedb.app/orgs
+```
+
+The Hub web app keeps the token in a cookie (`jwtToken` by default, `AuthCookieName` in the
+configuration). A request with this cookie and no `Authorization` header is authenticated with
+the cookie.
+
+## Refresh and sign out
+
+| Request | What it does |
+|---|---|
+| `POST /users/authenticate/refresh` | Returns a new token, with a new `expires`, for the token in the request. Call it before the token expires. |
+| `POST /users/logout` | Deletes the auth cookie. The token itself stays valid until it expires. |
+
+An administrator can block a token before it expires with the `RevokedTokens` setting of the
+configuration.
+
+## HTTP Basic for GIS clients
+
+GIS software often cannot send a bearer token. These endpoints also accept HTTP Basic
+credentials (`Authorization: Basic base64(user:password)`):
+
+- the OGC services: WMS, WFS, WMTS, WCS and OGC API;
+- the vector tiles (`…/mvt/…`);
+- the build files (`GET` and `HEAD` of `…/build/{hash}/…`), for example a COG or a COPC that
+  QGIS opens.
+
+Wrong or missing Basic credentials leave the request anonymous, so public data stays readable.
+When an anonymous request is denied, the answer is `401` with a `WWW-Authenticate: Basic`
+challenge, so the client asks for credentials. A signed-in user without access gets `403`.
+
+```bash
+curl -u survey-bot:'…' \
+  "https://hub.dronedb.app/orgs/my-org/ds/my-dataset/wms?service=WMS&request=GetCapabilities&version=1.3.0"
+```
+
+## 401 or 403
+
+| Status | Meaning |
+|---|---|
+| `401 Unauthorized` | You are not signed in, or the token is no longer valid. Sign in again. |
+| `403 Forbidden` | You are signed in, but you do not have the permission. Before Registry 3.0 this was also a `401`. |
+
+Errors are `ProblemDetails`: see [Errors](./reference.mdx#errors).
+
+## Health checks
+
+`/health` and `/quickhealth` need an administrator, or the `MonitorToken` of the configuration
+as a bearer token or as `?token=`. `/health/live` and `/version` need nothing.
+
+## The CLI
+
+`ddb login` saves the credentials of a server for `ddb push`, `ddb pull`, `ddb clone` and
+`ddb share`. Scripts can use `ddb share --non-interactive` with `DDB_USERNAME` and
+`DDB_PASSWORD`. See the [CLI cookbook](../cli/cookbook.mdx#share-from-a-script).

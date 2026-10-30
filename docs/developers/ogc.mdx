@@ -1,10 +1,318 @@
 ---
 title: "OGC services reference"
-description: "WMS, WFS, WMTS, WCS and OGC API endpoints, with client examples."
+description: "WMS, WFS, WMTS, WCS, OGC API – Features and Tiles, and vector tiles of each Registry dataset: endpoints, parameters, styles, errors, caching and web map examples."
 ---
 
-:::info
+Registry publishes every dataset through the standard OGC web services. QGIS, ArcGIS,
+GeoServer, MapServer, OpenLayers, MapLibre and other OGC clients can then read the rasters and
+vectors of a dataset directly. For the steps in QGIS, see
+[Open Hub data in QGIS](/docs/hub-guide/sharing/qgis).
 
-This page is being written.
+The services are per dataset, below `/orgs/{orgSlug}/ds/{dsSlug}`. They publish the
+**GeoRaster** and **Vector** entries of the dataset. A CAD drawing without a coordinate system
+is not published.
 
-:::
+## Supported standards
+
+| Standard | Versions | Endpoint | Notes |
+|---|---|---|---|
+| WMS | 1.1.1, 1.3.0 | `/wms` | Several layers in one image, transparent background, spectral index styles |
+| WFS | 2.0.0 (1.1.0 alias) | `/wfs` | GeoJSON and GML, BBOX and FES 2.0 filters, paging with `count` and `startIndex` |
+| WMTS | 1.0.0 | `/wmts` | KVP and RESTful tiles: MVT for vectors, PNG or JPEG for rasters |
+| WCS | 1.0.0, 1.1.x, 2.0.1 | `/wcs` | `GetCoverage` as GeoTIFF, PNG or JPEG |
+| OGC API – Features | 1.0 | `/ogcapi` | Landing page, conformance, collections, items |
+| OGC API – Tiles | 1.0 | `/ogcapi/collections/{collectionId}/tiles` | MVT tiles for vectors, PNG tiles for rasters |
+| Vector tiles | — | `/mvt/{hash}/{z}/{x}/{y}.pbf` | The tile pyramid that the Hub map uses |
+
+## Access
+
+Public datasets work without credentials. For other datasets, send a JWT bearer token or HTTP
+Basic credentials, which most GIS clients support. See [Authentication](./api/authentication.mdx#http-basic-for-gis-clients).
+
+## Try it
+
+The examples use two public datasets of Hub:
+
+```bash
+RASTER=https://hub.dronedb.app/orgs/odm/ds/brighton-beach   # an orthophoto
+VECTOR=https://hub.dronedb.app/orgs/odm/ds/vector           # KML, KMZ and Shapefile layers
+```
+
+The layer name of a file is its path in the dataset, for example
+`odm_orthophoto/odm_orthophoto.tif` or `world/ita.shp`.
+
+## WMS
+
+```bash
+curl "$RASTER/wms?service=WMS&request=GetCapabilities&version=1.3.0"
+
+curl -G "$RASTER/wms" -o ortho.png \
+     --data-urlencode service=WMS --data-urlencode request=GetMap --data-urlencode version=1.3.0 \
+     --data-urlencode layers=odm_orthophoto/odm_orthophoto.tif --data-urlencode styles= \
+     --data-urlencode crs=EPSG:3857 \
+     --data-urlencode bbox=-10240779,5916355,-10240659,5916475 \
+     --data-urlencode width=512 --data-urlencode height=512 --data-urlencode format=image/png
+```
+
+`/wms/p/{folder}` publishes only the files of one folder.
+
+### Styles
+
+| Style | Formula | Use |
+|---|---|---|
+| (default) | The bands of the raster | Natural-colour orthophotos, elevation, thermal |
+| `NDVI` | `(NIR − Red) / (NIR + Red)` | Vegetation health |
+| `NDRE` | `(NIR − RedEdge) / (NIR + RedEdge)` | Crop stress, late-season chlorophyll |
+| `NDWI` | `(Green − NIR) / (Green + NIR)` | Water |
+| `SAVI` | `1.5 × (NIR − Red) / (NIR + Red + 0.5)` | Sparse vegetation (reflectance rasters only) |
+| `EVI` | `2.5 × (NIR − Red) / (NIR + 6 × Red − 7.5 × Blue + 1)` | Dense canopies (reflectance rasters only) |
+
+An index is drawn with a red-yellow-green ramp from −1 to 1.
+
+Each raster layer lists in `GetCapabilities` only the styles that the DroneDB library can render
+for it, and `GetMap` accepts the same list. Another style answers `400` with
+`StyleNotDefined`.
+
+- **The bands come from the sensor profile** (band names, descriptions, colour
+  interpretation). This gives the right bands on MicaSense RedEdge and Altum and on DJI P4
+  Multispectral, and the indices that 4-band sensors allow (Mavic 3M, Parrot Sequoia have no
+  Blue band, so no EVI).
+- **A fixed order is the fallback.** A raster without named bands and with five data bands or
+  more is read as R=1, G=2, B=3, RedEdge=4, NIR=5. Any other raster has no spectral style.
+- **SAVI and EVI need reflectance.** They are offered only for floating-point rasters. 8- and
+  16-bit rasters offer NDVI, NDRE and NDWI only.
+
+The style list is read once per raster version and kept for a day.
+
+### Transparency
+
+Pixels with no data stay transparent: the alpha band, the nodata value of a band that the index
+reads, or a NaN value. The edge of the alpha band is anti-aliased. Outside a raster without an
+alpha band and without a nodata value, the image is transparent too.
+
+When the library cannot read the style list now (a busy index, a build, a full disk, a server
+that stops), `GetCapabilities` and `GetMap` answer `503` with `Retry-After` and the code
+`ServiceUnavailable`. Ask again after the delay. A raster that the library cannot read at all
+offers the default style only.
+
+## WFS
+
+```bash
+curl "$VECTOR/wfs?service=WFS&request=GetCapabilities&version=2.0.0"
+
+curl -G "$VECTOR/wfs" -o italy.geojson \
+     --data-urlencode service=WFS --data-urlencode request=GetFeature --data-urlencode version=2.0.0 \
+     --data-urlencode typeNames=world/ita.shp --data-urlencode count=500 \
+     --data-urlencode outputFormat=application/json
+```
+
+Add `bbox=minx,miny,maxx,maxy,EPSG:4326` to read an area. `/wfs/p/{folder}` publishes one
+folder.
+
+### Feature ids
+
+Each feature has a stable id, `<typeName>.<fid>`: the type name as an XML name, and the feature
+id of the layer's GeoPackage. It is the same on every page. Read features by id with
+`RESOURCEID` or the `GetFeatureById` stored query; both read by id instead of scanning the
+layer. In the examples, `$DATASET` is one of your datasets and `contours.gpkg` a contour layer
+in it, with an `elevation` field.
+
+```bash
+curl -G "$DATASET/wfs" --data-urlencode service=WFS --data-urlencode request=GetFeature \
+     --data-urlencode version=2.0.0 --data-urlencode typeNames=contours.gpkg \
+     --data-urlencode resourceId=contours.gpkg.12,contours.gpkg.40
+
+curl -G "$DATASET/wfs" --data-urlencode service=WFS --data-urlencode request=GetFeature \
+     --data-urlencode version=2.0.0 \
+     --data-urlencode storedQuery_Id=urn:ogc:def:query:OGC-WFS::GetFeatureById \
+     --data-urlencode id=contours.gpkg.12
+```
+
+The ids change when the layer is built again. `numberMatched` is the number of features that
+match before paging. In OGC API – Features, the item id is the feature id.
+
+### Filters
+
+`GetFeature` accepts a FES 2.0 `FILTER` (key-value, or in a POST `wfs:Query`) for GML and
+GeoJSON output, and pages the matching features with `count` and `startIndex`. These filters
+run in the GeoPackage of the layer, at any size: `And`, `Or`, `Not`, the comparisons,
+`PropertyIsBetween`, `PropertyIsLike`, `PropertyIsNull` and `PropertyIsNil` on the fields of the
+layer, and one `BBOX` alone or in the top-level `And`. A value compares as the type of its field.
+`matchCase="false"` works for equality with ASCII text.
+
+Other filters (`ResourceId` mixed with other operators, functions, `matchAction="All"`, the
+synthetic `ddbSeq` property) run in Registry on the first 10,000 features of the layer.
+
+```bash
+curl -G "$DATASET/wfs" --data-urlencode service=WFS --data-urlencode request=GetFeature \
+     --data-urlencode version=2.0.0 --data-urlencode typeNames=contours.gpkg \
+     --data-urlencode outputFormat=application/json \
+     --data-urlencode 'filter=<fes:Filter xmlns:fes="http://www.opengis.net/fes/2.0"><fes:PropertyIsGreaterThan><fes:ValueReference>elevation</fes:ValueReference><fes:Literal>1200</fes:Literal></fes:PropertyIsGreaterThan></fes:Filter>'
+```
+
+## WMTS
+
+```bash
+curl "$RASTER/wmts?service=WMTS&request=GetCapabilities&version=1.0.0"
+```
+
+`SECTIONS` asks for a part of the document, for example `&SECTIONS=Contents`.
+
+RESTful tiles:
+
+```text
+{dataset}/wmts/1.0.0/{layer}/{style}/{tileMatrixSet}/{z}/{y}/{x}.{ext}
+```
+
+| `{ext}` | Media type | Layers |
+|---|---|---|
+| `pbf` | `application/vnd.mapbox-vector-tile` | Vector |
+| `png` | `image/png` | Raster |
+| `jpg`, `jpeg` | `image/jpeg` | Raster |
+
+Another extension (for example `.webp`) answers `404`. Percent-encode a `{layer}` with a path
+separator (`folder%2Ffile.shp`). KVP `GetTile` takes `layer`, `style`, `format`,
+`tileMatrixSet` (`WebMercatorQuad`), `tileMatrix`, `tileRow` and `tileCol`.
+
+## WCS
+
+WCS negotiates the version for each request:
+
+- `VERSION` (WCS 1.0 and 1.1): an exact match, else the highest supported version below it.
+- `ACCEPTVERSIONS` (comma-separated, OWS Common 2.0): the first version in the client's list
+  that the server supports.
+- Neither: the highest version, `2.0.1`.
+
+No match answers an `ows:ExceptionReport` with `VersionNegotiationFailed`.
+
+```bash
+curl "$RASTER/wcs?service=WCS&request=GetCapabilities&acceptversions=1.1.1,2.0.1"
+
+curl -G "$RASTER/wcs" -o ortho-part.tif \
+     --data-urlencode service=WCS --data-urlencode request=GetCoverage --data-urlencode version=2.0.1 \
+     --data-urlencode coverageId=odm_orthophoto_odm_orthophoto.tif --data-urlencode format=image/tiff \
+     --data-urlencode 'subset=Long(-91.9945,-91.9935)' --data-urlencode 'subset=Lat(46.8422,46.8429)'
+```
+
+`format` is `image/tiff` (GeoTIFF), `image/png` or `image/jpeg`. Read the coverage id from
+`GetCapabilities` (the path with `_` for `/`) and the axis names from `DescribeCoverage`
+(`Long` and `Lat`, in CRS84).
+
+## OGC API – Features and Tiles
+
+| Request | Answer |
+|---|---|
+| `GET /ogcapi` | Landing page |
+| `GET /ogcapi/conformance` | Conformance classes |
+| `GET /ogcapi/collections` | The collections: one per vector layer |
+| `GET /ogcapi/collections/{collectionId}` | One collection |
+| `GET /ogcapi/collections/{collectionId}/items` | Features as GeoJSON (`application/geo+json`): `bbox`, `limit` (at most 1000), `offset` |
+| `GET /ogcapi/collections/{collectionId}/items/{featureId}` | One feature |
+| `GET /ogcapi/collections/{collectionId}/tiles` | The tile sets of the collection |
+| `GET /ogcapi/collections/{collectionId}/tiles/{tileMatrixSet}/{z}/{y}/{x}` | One tile: MVT for a vector, PNG for a raster |
+
+A collection id is `<path>:<layer>`, URL-encoded. Read it from `/ogcapi/collections`:
+
+```bash
+curl "$VECTOR/ogcapi/collections"
+curl "$VECTOR/ogcapi/collections/world%2Fita.shp%3Aita/items?limit=10"
+```
+
+## Vector tiles in web maps
+
+The vector tiles of an entry are at `{dataset}/mvt/{hash}/{z}/{x}/{y}.pbf`, where `{hash}` is
+the `hash` of the entry in `GET {dataset}/list`. The layer names of the tiles (the
+`source-layer`) are the `vector_layers` of `{dataset}/mvt/{hash}/metadata.json`; for a
+Shapefile it is the name of the file without its extension.
+
+MapLibre GL JS:
+
+```js
+const base = 'https://hub.dronedb.app/orgs/odm/ds/vector';
+const hash = '…'; // the hash of world/ita.shp from /list
+
+map.addSource('ddb', {
+  type: 'vector',
+  tiles: [`${base}/mvt/${hash}/{z}/{x}/{y}.pbf`],
+  minzoom: 0,
+  maxzoom: 18,
+});
+map.addLayer({
+  id: 'ddb-fill', type: 'fill', source: 'ddb', 'source-layer': 'ita',
+  paint: { 'fill-color': '#36c', 'fill-opacity': 0.4 },
+});
+```
+
+OpenLayers:
+
+```js
+import VectorTileLayer from 'ol/layer/VectorTile.js';
+import VectorTileSource from 'ol/source/VectorTile.js';
+import MVT from 'ol/format/MVT.js';
+
+const layer = new VectorTileLayer({
+  declutter: true,
+  source: new VectorTileSource({
+    format: new MVT(),
+    url: `${base}/mvt/${hash}/{z}/{x}/{y}.pbf`,
+    minZoom: 0,
+    maxZoom: 18,
+  }),
+});
+```
+
+For rasters, use the WMTS RESTful template or the map tiles of the dataset
+(`{dataset}/tiles/{z}/{x}/{y}.png?path=…`; also `.webp` and `.jpg`, and `{y}@2x` for high-DPI
+tiles).
+
+## Endpoint summary
+
+All routes are below `{dataset}` = `/orgs/{orgSlug}/ds/{dsSlug}`.
+
+| Service | Routes |
+|---|---|
+| WMS | `GET {dataset}/wms`, `GET {dataset}/wms/p/{folder}` |
+| WFS | `GET {dataset}/wfs`, `GET {dataset}/wfs/p/{folder}` |
+| WMTS | `GET {dataset}/wmts`, `GET {dataset}/wmts/p/{folder}`, `GET {dataset}/wmts/1.0.0/{layer}/{style}/{tileMatrixSet}/{z}/{y}/{x}.{ext}` |
+| WCS | `GET {dataset}/wcs` |
+| OGC API | `GET {dataset}/ogcapi`, `…/conformance`, `…/collections…` |
+| Vector tiles | `GET {dataset}/mvt/{hash}/{z}/{x}/{y}.pbf` |
+
+## Errors
+
+An OGC error uses the exception format of the service and its version, also for sign-in and
+permission failures:
+
+| Service and version | Format |
+|---|---|
+| WMS 1.1.1 | `ServiceExceptionReport` 1.1.1 |
+| WMS 1.3.0 | `ServiceExceptionReport` (namespace `http://www.opengis.net/ogc`) |
+| WCS 1.0.0 | `ServiceExceptionReport` 1.2.0 |
+| WCS 2.0 | `ows:ExceptionReport` (OWS 2.0) |
+| WFS 2.0, WMTS 1.0, WCS 1.1 | `ows:ExceptionReport` (OWS 1.1) |
+
+| Case | Status | Code |
+|---|---|---|
+| Anonymous request to a private dataset | `401`, with a `WWW-Authenticate: Basic` challenge | `AuthenticationFailed` |
+| Signed in without access (since Registry 3.0; a `401` before) | `403` | `AccessDenied` |
+| Dataset not found | `404` | `NotFound` |
+| Invalid organization or dataset slug | `400` | `InvalidParameterValue` |
+| The server cancels or cannot serve now | `503`, with `Retry-After` | `ServiceUnavailable` |
+
+Other codes: `MissingParameterValue`, `InvalidParameterValue`, `LayerNotDefined`,
+`StyleNotDefined`, `OperationNotSupported`, `InvalidFormat`, `VersionNegotiationFailed`. A
+client that disconnects stops its render and gets no answer (`499` in the server log).
+
+## Caching
+
+- WMS and WCS answers: `Cache-Control: public, max-age=300`.
+- MVT and WMTS tiles: `Cache-Control: public, max-age=86400, immutable`. They are build
+  products keyed by the entry hash.
+- The layer list is kept for 5 minutes per organization, dataset and folder.
+- WMS `GetMap` images are kept on the server for 10 minutes after their last use. The `BBOX` is
+  snapped to the pixel grid of the request, so requests that differ by less than half a pixel
+  share an image.
+- Raster tiles of WMTS and OGC API – Tiles share the tile cache of the Hub map.
+- The raster information that WMS and WCS read from the library (styles, size, bands, CRS) is
+  kept for a day per file content and library version. A failed read is not kept.
+- These server caches are cleared when the dataset changes or is built again.

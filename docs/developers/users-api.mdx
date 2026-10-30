@@ -1,10 +1,180 @@
 ---
 title: "Users & organizations API"
-description: "Manage users and organizations through the API."
+description: "Manage users, roles, storage quotas, organizations and their members through the Registry API."
 ---
 
-:::info
+These endpoints manage the accounts of a Registry. Most of them need an administrator. For the
+same tasks in the admin pages of Hub, see [Users, organizations & roles](/docs/self-hosting/users).
+To sign in and get a token, see [Authentication](./api/authentication.mdx).
 
-This page is being written.
+The examples use a self-hosted Registry:
 
-:::
+```bash
+REG=http://localhost:5000
+AUTH="Authorization: Bearer $ADMIN_TOKEN"
+```
+
+## Users
+
+| Request | Access | What it does |
+|---|---|---|
+| `GET /users` | Admin | All users: `userName`, `email`, `roles`, `organizations` |
+| `GET /users/detailed` | Admin | All users with storage, organization and dataset counts |
+| `POST /users` | Admin | Create a user (JSON) |
+| `PUT /users/{userName}` | Admin | Change the e-mail and the roles (JSON) |
+| `DELETE /users/{userName}` | Admin | Delete a user (query `successor`, `conflictResolution`) |
+| `DELETE /users` | Admin | The same, with a form body (`UserName`, `Successor`, `ConflictResolution`) |
+| `POST /users/changepwd` | Signed in | Change your own password (form `oldPassword`, `newPassword`). Returns a new token. |
+| `PUT /users/{userName}/changepwd` | Signed in | Change a password (JSON `currentPassword`, `newPassword`). Only an administrator may omit `currentPassword`, to reset the password of a user. |
+
+### Create a user
+
+```bash
+curl -X POST -H "$AUTH" -H "Content-Type: application/json" $REG/users -d '{
+  "userName": "jdoe",
+  "email": "jdoe@example.com",
+  "password": "a-long-password",
+  "roles": ["user"]
+}'
+```
+
+`userName` and `password` are required. User names may hold letters, digits and `-._@+`. The
+password must follow the password policy of the server (`passwordPolicy` in
+`GET /sys/features`). The answer is the new user.
+
+When Registry creates a user, it also creates a personal organization with the user name as its
+slug, unless `EnableDefaultUserOrganization` is off in the configuration.
+
+### Change e-mail and roles
+
+```bash
+curl -X PUT -H "$AUTH" -H "Content-Type: application/json" $REG/users/jdoe -d '{
+  "email": "jdoe@example.com",
+  "roles": ["user", "editor"]
+}'
+```
+
+Both fields are required. `roles` replaces the roles of the user.
+
+### Delete a user
+
+```bash
+curl -X DELETE -H "$AUTH" "$REG/users/jdoe?successor=archive&conflictResolution=2"
+```
+
+| Parameter | Description |
+|---|---|
+| `successor` | The user who gets the organizations, datasets and upload batches. Without it, all the data of the user is deleted. |
+| `conflictResolution` | When a dataset name exists in the organization of the successor: `0` stop, `1` overwrite, `2` rename (default) |
+
+The answer says how many organizations and datasets were transferred or deleted, and how many
+batches were deleted.
+
+## Roles
+
+| Request | Access | What it does |
+|---|---|---|
+| `GET /users/roles` | Signed in | The role names |
+| `POST /users/roles` | Admin | Create a role: JSON `{ "roleName": "editor" }` |
+| `DELETE /users/roles/{roleName}` | Admin | Delete a role (`204`). The `admin` role cannot be deleted. |
+
+`admin` is the system administrator. A role can also limit who may use a processing tool (see
+[Feature gating](./processing-api.mdx#feature-gating)).
+
+## Storage and user metadata
+
+| Request | Access | What it does |
+|---|---|---|
+| `GET /users/storage` | Signed in | Your storage: `{ "total", "used" }` in bytes. `total` is `null` without a limit. |
+| `GET /users/{userName}/storage` | Admin | The storage of a user |
+| `GET /users/meta` | Signed in | Your metadata |
+| `GET /users/{userName}/meta` | Admin | The metadata of a user |
+| `POST /users/{userName}/meta` | Admin | Set the metadata of a user (a JSON object) |
+
+The storage limit of a user is the metadata key `maxStorageMB`. It applies when the storage
+limiter is on (`storageLimiter` in `GET /sys/features`). An upload over the limit answers `507`.
+
+```bash
+curl -X POST -H "$AUTH" -H "Content-Type: application/json" $REG/users/jdoe/meta \
+     -d '{ "maxStorageMB": 10240 }'
+```
+
+## Preferences and notifications
+
+These act on the signed-in user.
+
+| Request | What it does |
+|---|---|
+| `GET /users/preferences` | The Hub preferences, one property per section (`{}` when none) |
+| `PATCH /users/preferences` | Set the sections in the JSON body and keep the others. A section set to `null` goes back to the defaults. The `notifications` section has one field, `builds`: `none`, `all` or `failed`. |
+| `GET /users/notifications/status` | `{ canReceiveEmail, reason }`: `reason` is `emailDisabled` (the server sends no e-mail), `noAddress` (the account has no valid address) or `null` |
+
+## Organizations
+
+| Request | Access | What it does |
+|---|---|---|
+| `GET /orgs` | Signed in | The organizations you can see, by name then slug |
+| `GET /orgs/public` | Anyone | The public organizations |
+| `GET /orgs/{orgSlug}` | Read access | One organization |
+| `POST /orgs` | Signed in | Create an organization (form fields) |
+| `PUT /orgs/{orgSlug}` | Write access | Change it (form fields). Only an administrator may change the owner. |
+| `DELETE /orgs/{orgSlug}` | Delete access | Delete it **and all its datasets** |
+| `GET /orgs/{orgSlug}/locations` | Read access | `[{ "slug", "name", "bbox" }]`, one per dataset: `bbox` is `[minLon, minLat, maxLon, maxLat]` in WGS84, or `null` |
+
+```bash
+curl -X POST -H "$AUTH" $REG/orgs \
+     -F slug=project-alpha -F name="Project Alpha" -F description="Main project" -F isPublic=true
+```
+
+| Field | Description |
+|---|---|
+| `slug` | Required. 2 to 128 lowercase letters, digits, `_` and `-`; starts with a letter or digit; no `--`. |
+| `name` | Required |
+| `description` | Optional |
+| `isPublic` | Whether the organization is listed publicly |
+| `owner` | A user id. Only an administrator may set an owner other than the caller. |
+
+An organization has `slug`, `name`, `description`, `creationDate`, `owner`, `isPublic`,
+`datasetCount` and `lastModified`. `datasetCount` and `lastModified` are `null` for callers who
+are not the owner, a member or an administrator, and in `GET /orgs/public`. `/locations` hides
+unlisted datasets from those callers.
+
+## Organization members
+
+The owner, a member with the `Admin` permission, or a system administrator manages the members.
+These endpoints work when organization member management is on
+(`organizationMemberManagement` in `GET /sys/features`).
+
+| Request | What it does |
+|---|---|
+| `GET /orgs/{orgSlug}/members` | The members and their permissions |
+| `POST /orgs/{orgSlug}/members` | Add a member: JSON `{ "userName": "jdoe", "permissions": 1 }` |
+| `PUT /orgs/{orgSlug}/members/{userName}` | Change the permission: JSON `{ "permissions": 2 }` |
+| `DELETE /orgs/{orgSlug}/members/{userName}` | Remove a member |
+
+| `permissions` | Name | Can |
+|---|---|---|
+| `0` | ReadOnly | Read the datasets and the organization |
+| `1` | ReadWrite (default) | Also upload, change and build |
+| `2` | ReadWriteDelete | Also delete datasets |
+| `3` | Admin | Also manage the members |
+
+### The organizations of a user
+
+Administrators can manage memberships from the user side too:
+
+| Request | What it does |
+|---|---|
+| `GET /users/{userName}/orgs` | The organizations of a user, with `isOwner`, `permissions`, `grantedAt`, `grantedBy` |
+| `POST /users/{userName}/orgs` | Add the user to an organization: JSON `{ "orgSlug": "project-alpha", "permissions": 1 }` |
+| `PUT /users/{userName}/orgs/{orgSlug}` | Change the permission: JSON `{ "permissions": 3 }` |
+| `DELETE /users/{userName}/orgs/{orgSlug}` | Remove the user from the organization. The owner cannot be removed. |
+
+## External authentication and LDAP
+
+When the Registry signs users in through LDAP or an external authentication service, the
+identities belong to that service. Local user management is then off (`userManagement: false`
+in `GET /sys/features`): users are not created, changed or deleted locally, passwords cannot be
+changed through the API (`403`), and roles and profile come from the service at each sign-in. See
+[LDAP / Active Directory](/docs/self-hosting/ldap) and the
+[configuration](/docs/self-hosting/configuration).
