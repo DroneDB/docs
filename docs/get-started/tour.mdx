@@ -1,10 +1,78 @@
 ---
 title: "5-minute tour"
 description: "Explore a public dataset without an account: files, map, point cloud, 3D model and sharing."
+datasets: [odm/brighton-beach]
+requires: { access: none }
 ---
 
-:::info
+<LiveEmbed org="odm" ds="brighton-beach" path="odm_orthophoto/odm_orthophoto.tif" view="map"
+           poster="get-started/tour--ortho-map" title="Brighton Beach orthophoto on DroneDB Hub" />
 
-This page is being written.
+<Requires />
 
-:::
+This tour uses **Brighton Beach**, a public dataset in the `odm` organization. It is a small
+drone survey of a beach on Lake Superior: 18 drone photos and the orthophoto, point cloud and
+textured 3D model made from them. You do not need an account. Open Hub in a second browser tab
+and follow the steps.
+
+<TryLive org="odm" ds="brighton-beach" label="Open Brighton Beach on Hub"
+         hint="Keep this page open next to Hub." />
+
+## Steps
+
+<Steps>
+
+1. **Look at the files.** The dataset opens on the **Files** tab. The **Folders** tree is on the
+   left, and the files of the open folder are in the middle. Click a file to see its properties
+   in the panel on the right: its type, size, location and more.
+
+   <Screenshot id="get-started/tour--files" />
+
+2. **See the dataset on a map.** Click the **Map** tab. Hub puts every file that has a location
+   on the map: the orthophoto and the positions of the 18 drone photos. Click a photo marker to
+   see a preview of the photo.
+
+   <Screenshot id="get-started/tour--dataset-map" />
+
+3. **Open the orthophoto.** Go back to the **Files** tab. Double-click the folder
+   `odm_orthophoto`, then double-click `odm_orthophoto.tif`. The orthophoto opens on its own
+   map. Zoom in to see the detail. The measurements that were saved with the orthophoto show on
+   it.
+
+   <Screenshot id="get-started/tour--ortho-map" />
+
+4. **Open the point cloud.** In the folder `odm_georeferencing`, double-click
+   `odm_georeferenced_model.laz`. The point cloud viewer opens. Drag to turn the view and use
+   the mouse wheel to zoom.
+
+   <Screenshot id="get-started/tour--point-cloud" />
+
+5. **Open the 3D model.** In the folder `odm_texturing`, double-click
+   `odm_textured_model_geo.obj`. The 3D model viewer opens the textured model. Drag to turn it.
+
+   <Screenshot id="get-started/tour--model" />
+
+6. **Share what you see.** Go back to `odm_orthophoto.tif` and click it once to select it.
+   Right-click it and click **Share/Embed**. Copy the **Share link** and open it in a new tab:
+   it opens the same map. Select **Embed** in the **Share** list to get the code that puts the
+   map in a web page. The map at the top of this page is such an embed.
+
+   <Screenshot id="get-started/tour--share" />
+
+</Steps>
+
+## What you saw
+
+- A **dataset** holds the files of one survey, in folders.
+- Hub knows the **type** of each file and opens it in the correct viewer.
+- A **public** dataset is open to everyone. Your own datasets are private until you share them.
+
+[Key concepts](./key-concepts.mdx) explains these words.
+
+## Next
+
+- [Create an account and your first dataset](./first-dataset.mdx)
+- [Map viewer](../hub-guide/viewing/map.mdx), [Point cloud viewer](../hub-guide/viewing/point-cloud.mdx),
+  [3D model viewer](../hub-guide/viewing/3d-model.mdx)
+- [Measurements on the map](../hub-guide/measure/map.mdx)
+- [Share links & embeds](../hub-guide/sharing/links-embeds.mdx)

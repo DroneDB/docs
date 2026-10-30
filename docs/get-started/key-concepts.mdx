@@ -1,10 +1,88 @@
 ---
 title: "Key concepts"
 description: "Organizations, datasets, entries, entry types, builds, visibility and tasks."
+datasets: [odm/brighton-beach]
 ---
 
-:::info
+<Screenshot id="get-started/key-concepts--dataset-page" />
 
-This page is being written.
+Hub uses a small number of words for how it keeps your data. This page explains them. The
+[Glossary](../reference/glossary.mdx) has the other terms.
 
-:::
+## Organization
+
+An **organization** holds datasets. It belongs to its owner, and other users can be members of
+it. When you register, Hub makes a **personal organization** with the name of your username.
+Use more organizations to keep the work of different teams or customers apart.
+
+The address of an organization is `/r/<organization>`, for example
+[hub.dronedb.app/r/odm](https://hub.dronedb.app/r/odm).
+
+## Dataset
+
+A **dataset** holds the files of one project or survey, in folders, like a folder on your
+computer. A dataset has a name, a short **tagline**, an optional cover image and an optional
+`README.md` that describes it. Its address is `/r/<organization>/<dataset>`, for example
+[hub.dronedb.app/r/odm/brighton-beach](https://hub.dronedb.app/r/odm/brighton-beach). The last
+part of the address is the **slug**: Hub makes it from the dataset name.
+
+## Entry
+
+Each file and folder in a dataset is an **entry**. When a file arrives, Hub reads it: its
+location, its size, the camera and the date of a photo, the bands of a raster and more. Click a
+file to see these **properties**.
+
+## Entry type
+
+Hub gives each entry a **type** from its content, not only from its file extension. The type
+decides which viewer opens the file and what Hub can do with it.
+
+| Type | What it is | Opens in |
+|---|---|---|
+| GeoImage | A photo with a GPS position | Photo preview, and a marker on the map |
+| Image | A photo without a position | Photo preview |
+| GeoRaster | A raster with a coordinate system: orthophoto, elevation model, multispectral or thermal map | Map |
+| PointCloud | A set of 3D points (LAS, LAZ and others) | Point cloud viewer |
+| Model | A textured 3D mesh (OBJ, PLY, STL and others) | 3D model viewer |
+| GaussianSplat | A photorealistic 3D scene made of many small coloured blobs | Splat viewer |
+| Tiles3D | A large 3D model already split into OGC 3D Tiles | 3D viewer |
+| Vector | Points, lines and polygons (GeoJSON, KML, Shapefile, GPX, DXF and others) | Map |
+| Panorama, GeoPanorama | A 360° photo, without or with a position | Panorama viewer |
+| Video, GeoVideo | A video, without or with a position | Video player |
+| Markdown | A text document in Markdown | Markdown viewer |
+| Generic | A file that Hub keeps but does not read, for example a PDF | Download; PDF and text files also open in Hub |
+| Directory | A folder | File browser |
+
+The full list of file formats is in [Supported formats & entry types](../reference/formats.mdx).
+If Hub reads a file with the wrong type, you can change it: see
+[File properties & entry types](../hub-guide/files/properties.mdx).
+
+## Build
+
+A **build** is a copy of a file that Hub makes so that the viewers can stream it. Hub builds
+orthophotos and other rasters, point clouds, 3D models, vector files and Gaussian splats after
+the upload. Your original file does not change. You can download it at any time. See
+[Builds](../hub-guide/processing/builds.mdx).
+
+## Visibility
+
+The **visibility** of a dataset decides who can see it:
+
+- **Private**: only you and the people in your organization. This is the default.
+- **Unlisted**: anybody who has the link.
+- **Public**: everybody, and people can find it without the link.
+
+See [Visibility](../hub-guide/sharing/visibility.mdx).
+
+## Task
+
+A **task** is work that Hub does in the background: a build, a
+[photogrammetry](../hub-guide/processing/photogrammetry.mdx) run, a raster export, a ZIP
+download, the extraction of an archive or an import. The **Tasks** tab of a dataset shows its
+tasks, their progress and their logs. See [Tasks panel & logs](../hub-guide/processing/tasks.mdx).
+
+## Hub and Registry
+
+**DroneDB Registry** is the server software. **DroneDB Hub** is its web interface, and also the
+name of the service at [hub.dronedb.app](https://hub.dronedb.app). You can run Registry on your
+own server: see [Self-hosting](/docs/self-hosting).

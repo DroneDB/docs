@@ -1,10 +1,86 @@
 ---
 title: "Share your first map"
-description: "Make a dataset visible and share a link or an embedded map."
+description: "Make a dataset visible, then share a link to a map or embed the map in a web page."
+datasets: [odm/brighton-beach]
+requires: { access: write, data: An orthophoto in your dataset }
 ---
 
-:::info
+<Screenshot id="get-started/share-first-map--embed" />
 
-This page is being written.
+<Requires />
 
-:::
+## When to use it
+
+You uploaded an orthophoto and want a customer or a colleague to see it. They do not need an
+account. You send them a link, or you put the map in your web page.
+
+## Who can see a dataset
+
+Each dataset has a **visibility**:
+
+| Visibility | Who can see and download the data |
+|---|---|
+| **Private** (the default) | Only you and the people in your organization. |
+| **Unlisted** | Anybody who has the link. The dataset does not show in lists or searches. |
+| **Public** | Everybody. People can also find the dataset without the link. |
+
+To share a map with people outside your organization, the dataset must be **Unlisted** or
+**Public**. For a customer, **Unlisted** is usually correct.
+
+## Steps
+
+<Steps>
+
+1. Open your dataset on the **Files** tab and click the orthophoto once to select it.
+
+2. Right-click the orthophoto and click **Share/Embed**. You can also click the share button at
+   the top right of the page.
+
+3. If the dataset is private, the **Share / Embed** window shows
+   **Allow access to anyone with the link**. Click it. This makes the dataset **Unlisted**.
+
+   <Screenshot id="get-started/share-first-map--private" />
+
+4. In the **Share** list, keep **Link**. Click **Copy to clipboard** next to the
+   **Share link** and send the link. It opens the orthophoto on the map.
+
+   <Screenshot id="get-started/share-first-map--link" />
+
+5. To show the map in a web page, select **Embed** in the **Share** list. Copy the code and
+   paste it into the HTML of your page. The code is an `iframe` of 600 × 400 pixels; change
+   `width` and `height` in the code to change its size.
+
+   The embedded map shows the orthophoto without the Hub header. Visitors can zoom and pan.
+
+</Steps>
+
+## Change the visibility later
+
+<Steps>
+
+1. Open the dataset and click **Settings** (the wrench at the top right).
+
+2. In **Sharing**, select **Private**, **Unlisted** or **Public** in **Visibility**. Hub saves
+   the change at once.
+
+   <Screenshot id="get-started/share-first-map--settings" />
+
+</Steps>
+
+When you make a dataset private again, links and embeds stop working for people outside your
+organization.
+
+## Try it on a public dataset
+
+The orthophoto of Brighton Beach is public. Open it, right-click `odm_orthophoto.tif` and click
+**Share/Embed** to see the window without changing anything.
+
+<TryLive org="odm" ds="brighton-beach" path="odm_orthophoto/odm_orthophoto.tif" view="map" />
+
+## Related
+
+- [Visibility: public, unlisted, private](../hub-guide/sharing/visibility.mdx)
+- [Share links & embeds](../hub-guide/sharing/links-embeds.mdx): links to other views, point
+  clouds and 3D models
+- [Open Hub data in QGIS](../hub-guide/sharing/qgis.mdx)
+- [OGC services from the Share dialog](../hub-guide/sharing/ogc.mdx)

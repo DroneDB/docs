@@ -1,10 +1,78 @@
 ---
 title: "Create an account & first dataset"
-description: "Sign up on DroneDB Hub and create your first dataset."
+description: "Sign up for DroneDB Hub, sign in and create your first dataset."
+hub_feature: [route:Login, route:LoginHome]
 ---
 
-:::info
+<Screenshot id="get-started/first-dataset--create-dialog" />
 
-This page is being written.
+You need an account to upload data. With an account you get your own organization, where you
+create datasets. This page takes about 3 minutes.
+
+## Steps
+
+<Steps>
+
+1. **Register.** Go to [dronedb.app/register](https://dronedb.app/register/). Type a
+   **Username**, your **E-mail** and a **Password**. The username can have lowercase letters,
+   numbers, dashes and underscores. Accept the terms and click **Register**.
+
+   Plans, the free trial and prices are on [dronedb.app/plans](https://dronedb.app/plans).
+
+2. **Sign in to Hub.** Go to [hub.dronedb.app](https://hub.dronedb.app). Type the same
+   username and password, and click **Login**. Hub opens the **Organizations** page.
+
+   <Screenshot id="get-started/first-dataset--sign-in" />
+
+3. **Open your organization.** Click the user icon at the top right, then click
+   **My Datasets**. This is the page of your personal organization. It has the same name as
+   your username, and only you can see it.
+
+   <Screenshot id="get-started/first-dataset--my-datasets" />
+
+4. **Create a dataset.** Click **Create Dataset**. In the **Create new dataset** window:
+
+   - Type a **Dataset Name**, for example `Quarry survey 2026`. Hub makes the
+     **Dataset Slug** from the name. The slug is the part of the dataset address that comes
+     after your organization, for example `/r/<username>/quarry-survey-2026`. If you rename
+     the dataset later, the slug changes too, and links to the old address stop working.
+   - Keep **Visibility** at **Private** for now. You can change it at any time.
+   - Optionally, type a **Tagline**: a short description that shows in the list of datasets.
+   - Keep **Open dataset after creation** selected.
+
+   Click **Create**.
+
+5. **Your dataset is open.** It is empty. Continue with [Upload your data](./upload.mdx).
+
+   <Screenshot id="get-started/first-dataset--empty-dataset" />
+
+</Steps>
+
+:::tip Quick upload without a dataset
+
+**Upload Files** in the user menu makes a new dataset for you. Hub puts the dataset in your
+personal organization, uploads the files to it and opens it.
 
 :::
+
+## Limits & requirements
+
+- The storage of your account depends on your plan. The user menu shows how much you use. See
+  [Plans & limits](../hub-guide/account/plans.mdx).
+- A dataset name must give a slug that no other dataset in the organization has. If it does,
+  the window shows an error and **Create** stays off.
+
+## Related
+
+- [Create & configure a dataset](../hub-guide/datasets/create.mdx): tagline, cover image,
+  README and settings
+- [Browse organizations & datasets](../hub-guide/datasets/browse.mdx)
+- [Account & storage](../hub-guide/account/account.mdx)
+- [Key concepts](./key-concepts.mdx)
+
+<ForDevelopers>
+
+You can also make a dataset from a folder on your computer with the `ddb` command-line tool and
+push it to Hub. See the [CLI quick start](/docs/developers/cli/quick-start).
+
+</ForDevelopers>

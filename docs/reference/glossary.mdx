@@ -1,10 +1,116 @@
 ---
 title: "Glossary"
-description: "Terms used in DroneDB and Hub."
+description: "Terms used in DroneDB and Hub, from build and entry type to COG, COPC and NDVI."
 ---
 
-:::info
+The words that Hub shows, and the terms of drone mapping that this documentation uses. The
+main Hub concepts have more detail in [Key concepts](../get-started/key-concepts.mdx).
 
-This page is being written.
+**3D Tiles** — An OGC standard that splits a large 3D model into tiles, so that a viewer loads
+only the part in view. A `.3tz` file holds a 3D Tiles set in one archive. Hub opens it in the
+[3D viewer](../hub-guide/viewing/3d-viewer.mdx).
 
-:::
+**Artifact** — One file that a build makes, for example the streaming copy of a point
+cloud.
+
+**bm3d** — The format of DroneDB for 3D models with more than one level of detail. Hub builds
+it from a 3D model, and the [3D model viewer](../hub-guide/viewing/3d-model.mdx) streams it.
+
+**Build** — A copy of a file that Hub makes after the upload, so that the viewers can
+stream the file. The original file does not change. See [Builds](../hub-guide/processing/builds.mdx).
+
+**COG (Cloud Optimized GeoTIFF)** — A GeoTIFF arranged so that a program can read only the
+part and the zoom level that it needs. Hub builds a COG from each orthophoto and elevation
+model.
+
+**Coordinate system (CRS)** — The system that ties the coordinates of a file to places on the
+Earth. An **EPSG code**, for example EPSG:4326, identifies a coordinate system.
+
+**COPC (Cloud Optimized Point Cloud)** — A LAZ file arranged so that a viewer can stream it.
+Hub builds a COPC from each point cloud.
+
+**Dataset** — The files of one project or survey, in folders. A dataset belongs to an
+organization.
+
+**DEM, DSM, DTM** — Elevation models: rasters where each pixel holds a height. A **DSM**
+(digital surface model) includes buildings and trees. A **DTM** (digital terrain model) is the
+bare ground. **DEM** (digital elevation model) is the general term.
+
+**DroneDB** — The open-source software under Hub: a library and the `ddb` command-line tool
+that index, read and convert drone data. See [Developers](/docs/developers).
+
+**Embed** — A Hub view in another web page, with an `iframe`. See
+[Share links & embeds](../hub-guide/sharing/links-embeds.mdx).
+
+**Entry** — A file or a folder in a dataset, with the properties that Hub read from it.
+
+**Entry type** — The kind of an entry (GeoImage, GeoRaster, PointCloud, Model, Vector and
+others). It decides which viewer opens the file. See
+[Supported formats & entry types](./formats.mdx).
+
+**Gaussian splat** — A photorealistic 3D scene made of millions of small coloured blobs. Hub
+opens it in the [splat viewer](../hub-guide/viewing/splats.mdx).
+
+**Georeferenced** — Tied to places on the Earth. A georeferenced file has coordinates, so Hub can
+put it on the map.
+
+**GeoTIFF** — A TIFF image with a coordinate system. Orthophotos and elevation models are
+usually GeoTIFF files.
+
+**Hub** — The web interface of DroneDB Registry, and the service at
+[hub.dronedb.app](https://hub.dronedb.app).
+
+**LAS, LAZ** — The usual file formats for point clouds. LAZ is compressed LAS.
+
+**Multispectral** — Imagery with bands outside visible light, for example near-infrared and red
+edge. Hub uses it for [plant health](../hub-guide/analyse/plant-health.mdx).
+
+**NDVI** — Normalized Difference Vegetation Index: a value from −1 to 1, computed from the red and
+near-infrared bands, that shows how green and healthy plants are.
+
+**OGC services** — Standard web services for maps and features (WMS, WMTS, WFS, WCS, OGC API).
+GIS programs such as QGIS read them. See [OGC services](../hub-guide/sharing/ogc.mdx).
+
+**Organization** — A group of datasets that belongs to a user. Other users can
+be members. Each user has a personal organization.
+
+**Orthophoto** — An aerial image corrected so that the scale is the same everywhere, like a
+map. Photogrammetry makes it from many overlapping drone photos.
+
+**Panorama** — A 360° or wide photo. Hub opens it in the
+[panorama viewer](../hub-guide/viewing/panoramas.mdx).
+
+**Photogrammetry** — Making orthophotos, elevation models, point clouds and 3D models from
+overlapping photos. See [Photogrammetry](../hub-guide/processing/photogrammetry.mdx).
+
+**Point cloud** — A set of 3D points, often millions, that samples the shape of the terrain and
+the objects on it.
+
+**Processing node** — A server that runs photogrammetry (NodeODX). Hub sends the photos to it
+and puts the results in the dataset.
+
+**Registry** — The DroneDB server software. Hub is its web interface. You can
+[host it yourself](/docs/self-hosting).
+
+**Sidecar file** — A file that belongs to another file and has the same base name, for example
+the `.mtl` file of an `.obj` model, or the `_measurements.geojson` file of an orthophoto.
+
+**Slug** — The short name of an organization or dataset in its web address, for example
+`brighton-beach` in `/r/odm/brighton-beach`.
+
+**STAC** — SpatioTemporal Asset Catalog: a standard catalog of geospatial data. Public datasets
+are in the STAC catalog of Hub. See [STAC catalog](../hub-guide/sharing/stac.mdx).
+
+**Tagline** — The short description of a dataset that shows under its name in lists.
+
+**Task** — Work that Hub does in the background: a build, a photogrammetry run, an export or an
+import. See [Tasks panel & logs](../hub-guide/processing/tasks.mdx).
+
+**Thermal imagery** — Images where each pixel holds a temperature. See
+[Thermal imagery](../hub-guide/analyse/thermal.mdx).
+
+**Vector** — Geographic shapes: points, lines and polygons with attributes, for example
+GeoJSON, KML, Shapefile, GPX and DXF files.
+
+**Visibility** — Who can see a dataset: **Private**, **Unlisted** or **Public**. See
+[Visibility](../hub-guide/sharing/visibility.mdx).

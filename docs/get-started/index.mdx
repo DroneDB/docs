@@ -1,11 +1,65 @@
 ---
 title: "What is DroneDB Hub"
-description: "DroneDB Hub stores, shows and shares drone data in the browser."
+description: "DroneDB Hub stores, shows and shares drone data in the browser: orthophotos, elevation models, point clouds, 3D models, splats and photos."
 slug: /get-started
+datasets: [odm/brighton-beach]
+requires: { access: none }
 ---
 
-:::info
+<Clip id="get-started/tour--overview" caption="A 30-second tour of a public dataset on DroneDB Hub" />
 
-This page is being written.
+DroneDB Hub is a web application for drone data. You upload your files, and Hub shows them on a
+map or in 3D in your browser. You then measure, analyse and share them with a link. You do not
+install anything.
+
+<TryLive org="odm" ds="brighton-beach" label="Explore a dataset on Hub"
+         hint="A public survey of Brighton Beach. You do not need an account." />
+
+## What Hub does with your data
+
+- **Stores** your survey: photos, orthophotos, elevation models, point clouds, 3D models,
+  Gaussian splats, vector files, videos, panoramas and documents, in folders you choose.
+- **Shows** each file in the correct viewer: a map, a point cloud viewer, a 3D model viewer, a
+  splat viewer or a 360° panorama. Large files open fast, because Hub prepares a streaming copy
+  of them after the upload.
+- **Measures and analyses**: distances, areas and volumes, elevation profiles, contour lines,
+  plant health indices and thermal values.
+- **Shares**: you decide who sees a dataset. Send a link, embed a map in your web page, or open
+  the data in QGIS.
+
+Ordinary cloud storage keeps your files, but it cannot show an orthophoto on a map or a point
+cloud in 3D. Hub can.
+
+Hub does not make orthophotos from your photos by itself. For that, use
+[photogrammetry](../hub-guide/processing/photogrammetry.mdx) on Hub, or process the photos in
+[WebODM](https://docs.webodm.org) and upload the results.
+
+## Who uses it
+
+Surveyors, farmers, inspectors, GIS analysts and drone pilots who want to check a survey, keep
+it in one place and show it to a customer or a colleague.
+
+## Start here
+
+1. [Take the 5-minute tour](./tour.mdx). You do not need an account.
+2. [Create an account and your first dataset](./first-dataset.mdx).
+3. [Upload your data](./upload.mdx).
+4. [Share your first map](./share-first-map.mdx).
+
+Read [Key concepts](./key-concepts.mdx) for the words that Hub uses. The
+[Hub guide](../hub-guide/index.mdx) has one page for each task.
+
+:::tip Run your own Hub
+
+DroneDB Hub runs on [hub.dronedb.app](https://hub.dronedb.app). You can also run the same
+software on your own server: see [Self-hosting](/docs/self-hosting). Plans and prices are on
+[dronedb.app](https://dronedb.app/plans).
 
 :::
+
+<ForDevelopers>
+
+DroneDB also has a command-line tool (`ddb`), a C library and a REST API. See
+[Developers](/docs/developers).
+
+</ForDevelopers>

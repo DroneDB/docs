@@ -1,11 +1,107 @@
 ---
 title: "Hub guide"
-description: "Task-oriented guide to every feature of DroneDB Hub."
+description: "Task-oriented guide to every feature of DroneDB Hub: one page for each task."
 slug: /hub-guide
 ---
 
-:::info
+This guide has one page for each task in DroneDB Hub. Each page starts with a picture or a short
+video and a **Try it live** button that opens a public dataset on
+[hub.dronedb.app](https://hub.dronedb.app). New to Hub? Start with the
+[5-minute tour](../get-started/tour.mdx) and [Key concepts](../get-started/key-concepts.mdx).
 
-This page is being written.
+## Organizations & datasets
 
-:::
+| I want to… | Page |
+|---|---|
+| Find organizations and datasets, sort and search them | [Browse organizations & datasets](./datasets/browse.mdx) |
+| Create a dataset and set its name, cover, README and visibility | [Create & configure a dataset](./datasets/create.mdx) |
+| Give other people access to an organization | [Organization members & roles](./datasets/members.mdx) |
+| Remove a dataset or an organization | [Delete a dataset or organization](./datasets/delete.mdx) |
+
+## Managing files
+
+| I want to… | Page |
+|---|---|
+| Move around the files of a dataset | [File browser](./files/browser.mdx) |
+| See the details of a file or change its type | [File properties & entry types](./files/properties.mdx) |
+| Create folders, rename or delete files | [Folders, rename & delete](./files/folders.mdx) |
+| Copy or move files, also to another dataset | [Copy, cut, paste & transfer](./files/copy-paste.mdx) |
+| Add files from a web address or another Registry | [Import from a URL or another Registry](./files/import.mdx) |
+| Unpack a ZIP file | [Extract ZIP archives](./files/archives.mdx) |
+| Download files or a whole folder | [Download files & ZIP export](./files/download.mdx) |
+| Write a README or edit a text file | [Edit text & Markdown](./files/edit-text.mdx) |
+| Make Hub read the files again | [Rescan a dataset](./files/rescan.mdx) |
+| Put a CAD drawing without coordinates on the map | [Set a coordinate system (CAD)](./files/coordinate-system.mdx) |
+
+## Viewing data
+
+| I want to… | Page |
+|---|---|
+| See orthophotos, photos and vector files on a map | [Map viewer](./viewing/map.mdx) |
+| Look at a point cloud | [Point cloud viewer](./viewing/point-cloud.mdx) |
+| Look at a textured 3D model | [3D model viewer](./viewing/3d-model.mdx) |
+| Look at 3D Tiles | [3D viewer (3D Tiles)](./viewing/3d-viewer.mdx) |
+| Look at a Gaussian splat | [Gaussian splats](./viewing/splats.mdx) |
+| Put a splat on the map with real coordinates | [Georeferenced splats](./viewing/splats-georeferenced.mdx) |
+| Download a splat for another program | [Splat downloads](./viewing/splat-downloads.mdx) |
+| Look around in a 360° photo | [Panoramas (360°)](./viewing/panoramas.mdx) |
+| Play a drone video | [Videos & geo-videos](./viewing/videos.mdx) |
+| Read a README or a PDF report | [Markdown & PDF](./viewing/markdown-pdf.mdx) |
+
+## Measure & annotate
+
+| I want to… | Page |
+|---|---|
+| Measure distances, areas and points on the map | [Measurements on the map](./measure/map.mdx) |
+| Measure in a point cloud or in 3D | [Measurements in 3D](./measure/3d.mdx) |
+| Measure a splat or add pins to it | [Measure & pin a splat](./measure/splat.mdx) |
+| Add notes to points on the map | [Point annotations](./measure/annotations.mdx) |
+
+## Analyse rasters
+
+| I want to… | Page |
+|---|---|
+| Change the colours, bands or value range of a raster | [Colormaps, bands & histogram](./analyse/colormaps.mdx) |
+| Compare two layers with a swipe bar | [Compare layers (split / swipe)](./analyse/compare-layers.mdx) |
+| Show up to 6 rasters side by side and save the comparison | [Compare view & saved comparisons](./analyse/compare-view.mdx) |
+| See plant health (NDVI and other indices) | [Plant health](./analyse/plant-health.mdx) |
+| Read temperatures | [Thermal imagery](./analyse/thermal.mdx) |
+| See the elevation along a line | [Elevation profile](./analyse/elevation-profile.mdx) |
+| Make contour lines | [Contour lines](./analyse/contours.mdx) |
+| Compute the volume, weight and cost of a pile | [Stockpile volume](./analyse/stockpile.mdx) |
+| Get the statistics of a raster in an area | [Raster area statistics](./analyse/area-statistics.mdx) |
+
+## Processing
+
+| I want to… | Page |
+|---|---|
+| Know what Hub builds from my files, or rebuild a file | [Builds](./processing/builds.mdx) |
+| Make an orthophoto, elevation model or 3D model from drone photos | [Photogrammetry](./processing/photogrammetry.mdx) |
+| Join single-band rasters into one multispectral raster | [Merge multispectral bands](./processing/merge-multispectral.mdx) |
+| Make the empty borders of an orthophoto transparent | [Mask orthophoto borders](./processing/mask-borders.mdx) |
+| Align a raster to another one | [Align a raster to a reference](./processing/align-raster.mdx) |
+| Save a raster as a GeoTIFF with its colours | [Export a raster (GeoTIFF)](./processing/export-raster.mdx) |
+| Follow running tasks and read their logs | [Tasks panel & logs](./processing/tasks.mdx) |
+
+## Sharing & integration
+
+| I want to… | Page |
+|---|---|
+| Decide who can see a dataset | [Visibility: public, unlisted, private](./sharing/visibility.mdx) |
+| Send a link or embed a view in a web page | [Share links & embeds](./sharing/links-embeds.mdx) |
+| Open Hub data in QGIS | [Open Hub data in QGIS](./sharing/qgis.mdx) |
+| Use WMS, WFS and other OGC services | [OGC services from the Share dialog](./sharing/ogc.mdx) |
+| Find public datasets through STAC | [STAC catalog](./sharing/stac.mdx) |
+
+## Organizations & account
+
+| I want to… | Page |
+|---|---|
+| Change my password or see my storage | [Account & storage](./account/account.mdx) |
+| Set units, map, list and viewer defaults | [Preferences](./account/preferences.mdx) |
+| Get an e-mail when a build fails | [Build notification e-mails](./account/build-notifications.mdx) |
+| Know what my plan includes | [Plans & limits](./account/plans.mdx) |
+| Download all my data or delete my account | [Export your data & delete your account](./account/export-delete.mdx) |
+
+Run your own Hub? See [Self-hosting](/docs/self-hosting). Want the command line or the API?
+See [Developers](/docs/developers).

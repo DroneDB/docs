@@ -1,10 +1,93 @@
 ---
 title: "Upload your data"
 description: "Upload files and folders, large uploads, and what Hub builds after an upload."
+hub_feature: [route:Upload]
+requires: { access: write }
 ---
 
-:::info
+<Clip id="get-started/upload--drag-drop" caption="Drag a folder into a dataset and watch the upload" />
 
-This page is being written.
+<Requires />
 
-:::
+## When to use it
+
+Upload the results of a survey to a dataset: photos, orthophotos, elevation models, point
+clouds, 3D models, splats, vector files and reports. You need a dataset first: see
+[Create an account & first dataset](./first-dataset.mdx). All supported file types are in
+[Supported formats](../reference/formats.mdx).
+
+## Steps
+
+<Steps>
+
+1. Open your dataset on the **Files** tab. Double-click a folder if the files must go into it.
+   The upload goes to the folder that is open.
+
+2. Drag files or folders from your computer onto the file area. Hub keeps the folder structure
+   of a folder that you drop.
+
+   Or click **Upload** (the **+** button) in the toolbar. In the **Upload** window, click
+   **Select Files** or **Select Folder**.
+
+   <Screenshot id="get-started/upload--dialog" />
+
+3. The **Upload Progress** window shows each file, the speed and the time left. Click
+   **In Progress**, **Done** or **Errors** to show only those files. When all files are sent,
+   the window shows **Processing on server...** while Hub adds them to the dataset.
+
+   <Screenshot id="get-started/upload--progress" />
+
+4. When the upload is complete, click **Close**. If some files failed, click
+   **Retry Failed** first.
+
+5. The new files show in the dataset. A spinning icon on a file means that Hub is still
+   building it (see below). When the icon goes away, the file is ready.
+
+   <Screenshot id="get-started/upload--building" />
+
+</Steps>
+
+You can also paste files with **Ctrl+V** (**Cmd+V** on a Mac) on the dataset page, or add a file
+from a web address with **Import from URL**. **Upload Files** in the user menu (the user icon at
+the top right) opens an upload page: drop files there, and Hub puts them in a new dataset of
+your personal organization and opens it.
+
+## Big uploads
+
+- Keep the browser tab open until the upload is complete. If you close the tab, the upload
+  stops.
+- Hub sends a large file in parts. After a network error, it sends again only the part that
+  failed, not the whole file. It tries again by itself after short network problems.
+- **Cancel Upload** stops the files that are not sent. The files that the server already has
+  are still added to the dataset.
+- If uploads are slower than you expect, click **Uploads slower than expected? Test the
+  connection** at the end of an upload. It opens a connection test on your account page.
+
+## What happens after the upload: builds
+
+Large files cannot go to the browser as they are. After the upload, Hub makes a copy of each
+orthophoto, elevation model, point cloud, 3D model, vector file and Gaussian splat in a format
+that the viewers can stream. This copy is a **build**. Small builds take seconds. Large point
+clouds and 3D models can take many minutes.
+
+- You can work while Hub builds. Follow the builds on the **Tasks** tab of the dataset.
+- If you open a file before its build is complete, Hub tells you that the file is being
+  processed. Click **Wait and Open**, and the viewer opens when the build is complete.
+- Some files need other files. For example, a 3D model (`.obj`) needs its `.mtl` file and its
+  textures, and a shapefile needs its `.shx` and `.dbf` files. If one is missing, the file shows
+  **Waiting for files** and the names of the missing files. Upload them to the same folder, and
+  the build starts by itself. To prevent this, upload these files together.
+
+## Related
+
+- [Builds](../hub-guide/processing/builds.mdx): build status, failed builds and rebuilds
+- [Import from a URL or another Registry](../hub-guide/files/import.mdx)
+- [Folders, rename & delete](../hub-guide/files/folders.mdx)
+- [Share your first map](./share-first-map.mdx)
+
+<ForDevelopers api="/docs/developers/api/workflows" apiLabel="Upload with the REST API">
+
+The `ddb` command-line tool uploads a folder from a script: see the
+[CLI quick start](/docs/developers/cli/quick-start).
+
+</ForDevelopers>

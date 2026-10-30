@@ -1,0 +1,383 @@
+# Shots of the Get started section (docs/get-started/*).
+#
+# Demo inputs that reset-demo.mjs must create (auth: demo, user docs-demo):
+#   - Personal organization `docs-demo` (made with the user): no datasets, so "My Datasets"
+#     shows the empty list with the Create Dataset button.
+#   - acme-surveys/getting-started: private, empty (the dataset "just created" in first-dataset
+#     and the target of the upload shots).
+#   - acme-surveys/first-map: private, holds odm_orthophoto/odm_orthophoto.tif (8.5 MB, a copy
+#     of odm/brighton-beach odm_orthophoto/odm_orthophoto.tif), built. The share shots set it to
+#     Unlisted; the reset sets it back to Private.
+# Local files the upload shots drop or pick (not in a dataset): a folder `brighton-beach/` with
+#   images/DJI_0018.JPG … (the 18 photos of odm/brighton-beach images/) and
+#   odm_orthophoto/odm_orthophoto.tif, so the upload shows photos and one file that builds.
+#
+# Upload shots need two actions that the format does not have yet (see the lines marked
+# "needs capture action"): drop local files on an element, and set the files of a file input.
+
+# ---- What is DroneDB Hub / 5-minute tour (odm/brighton-beach, no account) ----
+
+- id: get-started/tour--overview
+  type: clip
+  alt: A tour of a public dataset on Hub, from the files to the map and the orthophoto
+  page: get-started/index            # also the hero clip of the home page
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: none
+  waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1500 }
+  actions:
+    - wait: 1500
+    - click: "[role='option']:has-text('brighton_beach.jpg')"
+    - wait: 2000
+    - click: "[role='tab']:has-text('Map')"
+    - wait: 4000
+    - mouse: { click: [720, 450] }   # a photo marker near the centre: its popup (adjust after the first run)
+    - wait: 2500
+    - click: "[role='tab']:has-text('Files')"
+    - click: "[role='option']:text-is('odm_orthophoto')"
+    - press: Enter                   # opens the folder (Enter = double-click on a tile)
+    - wait: 1500
+    - click: "[role='option']:has-text('odm_orthophoto.tif')"
+    - press: Enter                   # opens the orthophoto on its map
+    - wait: 5000
+    - scroll: { selector: "canvas", y: -600 }   # zoom in (mouse wheel)
+    - wait: 3000
+  highlight: null
+  crop: null
+  maxSeconds: 32
+  blocked: null
+  youtubeId: null
+
+- id: get-started/tour--files
+  type: screenshot
+  alt: The Files tab of a dataset with the folder tree, the files and the properties of a photo
+  page: get-started/tour
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: none
+  waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[role='option']:has-text('brighton_beach.jpg')"
+    - wait: 1500
+  highlight: "[role='option']:has-text('brighton_beach.jpg')"
+  crop: null
+  blocked: null
+
+- id: get-started/tour--dataset-map
+  type: screenshot
+  alt: The Map tab of a dataset with the orthophoto and the positions of the drone photos
+  page: get-started/tour
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: none
+  waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: "[role='tab']:has-text('Map')"
+    - wait: "canvas"
+    - wait: 4000
+  highlight: "[role='tab']:has-text('Map')"
+  crop: null
+  blocked: null
+
+- id: get-started/tour--ortho-map
+  type: screenshot
+  alt: The orthophoto of Brighton Beach on the map, with its saved measurements
+  page: get-started/tour             # also the poster of the live embed on the same page
+  open:
+    org: odm
+    ds: brighton-beach
+    path: odm_orthophoto/odm_orthophoto.tif
+    view: map
+  base: hub
+  auth: none
+  waitFor: { selector: "canvas", networkIdle: true, extraMs: 3000 }
+  actions: []
+  highlight: null
+  crop: null
+  blocked: null
+
+- id: get-started/tour--point-cloud
+  type: screenshot
+  alt: The point cloud of Brighton Beach in the point cloud viewer
+  page: get-started/tour
+  open:
+    org: odm
+    ds: brighton-beach
+    path: odm_georeferencing/odm_georeferenced_model.laz
+    view: pointcloud
+  base: hub
+  auth: none
+  waitFor: { selector: "canvas", networkIdle: true, extraMs: 6000 }   # WebGL: wait for the points to load
+  actions: []
+  highlight: null
+  crop: null
+  blocked: null
+
+- id: get-started/tour--model
+  type: screenshot
+  alt: The textured 3D model of Brighton Beach in the 3D model viewer
+  page: get-started/tour
+  open:
+    org: odm
+    ds: brighton-beach
+    path: odm_texturing/odm_textured_model_geo.obj
+    view: model
+  base: hub
+  auth: none
+  waitFor: { selector: "canvas", networkIdle: true, extraMs: 8000 }   # WebGL: wait for the textures
+  actions: []
+  highlight: null
+  crop: null
+  blocked: null                      # bm3d viewer: capture after the model rebuild of the showcase data
+
+- id: get-started/tour--share
+  type: screenshot
+  alt: The Share / Embed window of an orthophoto with its share link
+  page: get-started/tour
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: none
+  waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: "[role='option']:text-is('odm_orthophoto')"
+    - press: Enter
+    - wait: "[role='option']:has-text('odm_orthophoto.tif')"
+    - click: "[role='option']:has-text('odm_orthophoto.tif')"
+    - click: "[title='Share odm_orthophoto.tif']"   # the share button of the header
+    - wait: "[aria-label='Share link']"
+    - wait: 500
+  highlight: "[aria-label='Share link']"
+  crop: "[role='dialog']"
+  blocked: null
+
+# ---- Create an account & first dataset ----
+
+- id: get-started/first-dataset--sign-in
+  type: screenshot
+  alt: The sign-in page of Hub
+  page: get-started/first-dataset
+  url: /login
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Username']", networkIdle: true, extraMs: 500 }
+  actions: []
+  highlight: "text=Login"
+  crop: null
+  blocked: null
+
+- id: get-started/first-dataset--my-datasets
+  type: screenshot
+  alt: The user menu with My Datasets, over the empty page of the personal organization
+  page: get-started/first-dataset
+  url: /r/docs-demo
+  base: hub
+  auth: demo
+  waitFor: { selector: "text=Create Dataset", networkIdle: true, extraMs: 500 }
+  actions:
+    - click: "[aria-controls='user_menu']"
+    - wait: "#user_menu"
+  highlight: "#user_menu >> text=My Datasets"
+  crop: null
+  blocked: null
+
+- id: get-started/first-dataset--create-dialog
+  type: screenshot
+  alt: The Create new dataset window with a name, the slug made from it, the visibility and a tagline
+  page: get-started/first-dataset
+  url: /r/docs-demo
+  base: hub
+  auth: demo
+  waitFor: { selector: "text=Create Dataset", networkIdle: true, extraMs: 500 }
+  actions:
+    - click: "button:has-text('Create Dataset')"
+    - wait: "#dataset-dialog-dataset-name"
+    - fill: { selector: "#dataset-dialog-dataset-name", value: Quarry survey 2026 }
+    - fill: { selector: "#dataset-dialog-tagline", value: Monthly volume survey of the north quarry }
+  highlight: "#dataset-dialog-dataset-name"
+  crop: "[role='dialog']"
+  blocked: null                      # the shot does not click Create
+
+- id: get-started/first-dataset--empty-dataset
+  type: screenshot
+  alt: A new, empty dataset on the Files tab
+  page: get-started/first-dataset
+  url: /r/acme-surveys/getting-started
+  base: hub
+  auth: demo
+  waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
+  actions: []
+  highlight: "[aria-label='Upload']"
+  crop: null
+  blocked: null
+
+# ---- Upload your data ----
+
+- id: get-started/upload--drag-drop
+  type: clip
+  alt: A folder dragged into a dataset, the upload progress and the files that appear
+  page: get-started/upload
+  url: /r/acme-surveys/getting-started
+  base: hub
+  auth: demo
+  waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
+  actions:
+    # needs capture action: drop the local folder brighton-beach/ on the file area
+    # (dropFiles: { selector: "[role='tabpanel']", files: [brighton-beach/] })
+    - wait: "text=Upload Progress"
+    - wait: "text=Close"             # the upload is complete
+    - click: "button:has-text('Close')"
+    - wait: 4000
+  highlight: null
+  crop: null
+  maxSeconds: 30
+  blocked: null
+  youtubeId: null
+
+- id: get-started/upload--dialog
+  type: screenshot
+  alt: The Upload window with Select Files, Select Folder and Import from URL
+  page: get-started/upload
+  url: /r/acme-surveys/getting-started
+  base: hub
+  auth: demo
+  waitFor: { selector: "[aria-label='Upload']", networkIdle: true, extraMs: 500 }
+  actions:
+    - click: "[aria-label='Upload']"
+    - wait: "text=Select files to upload"
+  highlight: "button:has-text('Select Folder')"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: get-started/upload--progress
+  type: screenshot
+  alt: The Upload Progress window with the files, the speed and the time left
+  page: get-started/upload
+  url: /r/acme-surveys/getting-started
+  base: hub
+  auth: demo
+  waitFor: { selector: "[aria-label='Upload']", networkIdle: true, extraMs: 500 }
+  actions:
+    - click: "[aria-label='Upload']"
+    - wait: "text=Select Folder"
+    # needs capture action: set the files of the folder input to the local folder brighton-beach/
+    # (setFiles: { trigger: "button:has-text('Select Folder')", files: [brighton-beach/] })
+    - wait: "text=In Progress"
+    - wait: 1500                     # shoot while files are still uploading
+  highlight: null
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: get-started/upload--building
+  type: screenshot
+  alt: Uploaded files in a dataset; the orthophoto shows a spinning icon while Hub builds it
+  page: get-started/upload
+  url: /r/acme-surveys/getting-started
+  base: hub
+  auth: demo
+  waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 500 }
+  actions:
+    # Shoot right after upload--drag-drop, while the build of odm_orthophoto.tif runs
+    - click: "[role='option']:text-is('odm_orthophoto')"
+    - press: Enter
+    - wait: "[role='option']:has-text('odm_orthophoto.tif') .fa-spin"
+  highlight: "[role='option']:has-text('odm_orthophoto.tif')"
+  crop: null
+  blocked: null
+
+# ---- Share your first map ----
+
+- id: get-started/share-first-map--embed
+  type: screenshot
+  alt: The Share / Embed window with Embed selected and the iframe code of the map
+  page: get-started/share-first-map
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: none
+  waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: "[role='option']:text-is('odm_orthophoto')"
+    - press: Enter
+    - wait: "[role='option']:has-text('odm_orthophoto.tif')"
+    - click: "[role='option']:has-text('odm_orthophoto.tif')"
+    - click: "[title='Share odm_orthophoto.tif']"
+    - wait: "#share-mode"
+    - click: "#share-mode"
+    - click: ".p-select-overlay [role='option']:has-text('Embed')"   # PrimeVue overlay of the Share list
+    - wait: "[aria-label='Embed code']"
+  highlight: "[aria-label='Embed code']"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: get-started/share-first-map--private
+  type: screenshot
+  alt: The Share / Embed window of a private dataset with Allow access to anyone with the link
+  page: get-started/share-first-map
+  url: /r/acme-surveys/first-map
+  base: hub
+  auth: demo
+  waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: "[role='option']:text-is('odm_orthophoto')"
+    - press: Enter
+    - wait: "[role='option']:has-text('odm_orthophoto.tif')"
+    - click: "[role='option']:has-text('odm_orthophoto.tif')"
+    - click: "[title='Share odm_orthophoto.tif']"
+    - wait: "text=Allow access to anyone with the link"
+  highlight: "button:has-text('Allow access to anyone with the link')"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: get-started/share-first-map--link
+  type: screenshot
+  alt: The share link of the orthophoto after the dataset became unlisted
+  page: get-started/share-first-map
+  url: /r/acme-surveys/first-map
+  base: hub
+  auth: demo
+  waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: "[role='option']:text-is('odm_orthophoto')"
+    - press: Enter
+    - wait: "[role='option']:has-text('odm_orthophoto.tif')"
+    - click: "[role='option']:has-text('odm_orthophoto.tif')"
+    - click: "[title='Share odm_orthophoto.tif']"
+    - click: "button:has-text('Allow access to anyone with the link')"   # sets the dataset to Unlisted
+    - wait: "[aria-label='Share link']"
+  highlight: "[role='dialog'] [aria-label='Copy to clipboard']"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: get-started/share-first-map--settings
+  type: screenshot
+  alt: The Dataset Settings window with the Visibility list in the Sharing group
+  page: get-started/share-first-map
+  url: /r/acme-surveys/first-map
+  base: hub
+  auth: demo
+  waitFor: { selector: "[title='Settings']", networkIdle: true, extraMs: 500 }
+  actions:
+    - click: "[title='Settings']"
+    - wait: "#settings-visibility"
+  highlight: "#settings-visibility"
+  crop: "[role='dialog']"
+  blocked: null
+
+# ---- Key concepts ----
+
+- id: get-started/key-concepts--dataset-page
+  type: screenshot
+  alt: A dataset with its folders, its files and the properties of the selected orthophoto
+  page: get-started/key-concepts
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: none
+  waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: "[role='option']:text-is('odm_orthophoto')"
+    - press: Enter
+    - wait: "[role='option']:has-text('odm_orthophoto.tif')"
+    - click: "[role='option']:has-text('odm_orthophoto.tif')"
+    - wait: 1500
+  highlight: null
+  crop: null
+  blocked: null
