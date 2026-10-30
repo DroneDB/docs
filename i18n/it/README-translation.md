@@ -38,7 +38,7 @@ pagina di destinazione è ancora in inglese.
 | organization | organizzazione | personal organization → organizzazione personale |
 | entry | elemento | prima occorrenza: "elemento (in Hub: *entry*)" |
 | entry type | tipo di elemento | |
-| build (nome e verbo) | **generazione** | definita in Concetti chiave: indica sia la copia ottimizzata sia il lavoro che la produce. "Hub esegue la generazione di…", "la generazione è completa". La pagina *Builds* è "Generazioni (build)". Scelto "generazione" e non "elaborazione" perché "elaborazione" traduce già *processing* (categoria della barra laterale, fotogrammetria, nodo di elaborazione) |
+| build (nome e verbo) | **build** (invariato, femminile: "la build", "le build") | scelta del proprietario: resta in inglese come in Hub. "Hub esegue la build di…", "la build è completa". |
 | processing | elaborazione | categoria "Elaborazione"; "file in elaborazione" |
 | task | attività | prima occorrenza: "attività (in Hub: *task*)"; la scheda resta **Tasks** |
 | visibility | visibilità | |
@@ -74,9 +74,7 @@ pagina di destinazione è ancora in inglese.
 
 ## Da rivedere
 
-- Scelta di **generazione** per *build*: va bene per un pubblico non tecnico? Alternativa:
-  lasciare "build" con spiegazione. Va applicata in modo coerente anche alle pagine future
-  (Builds, Build notification e-mails, colonna "Generazione in Hub" della tabella dei formati).
+- *build* resta in inglese (decisione del proprietario, 2026-10-30).
 - **Self-hosting** non tradotto nel menu: valutare "Installazione sul tuo server".
 - "Provalo dal vivo su Hub": alternativa "Prova subito su Hub".
 - Le traduzioni tra parentesi delle etichette di Hub sono indicative (Hub non ha una versione

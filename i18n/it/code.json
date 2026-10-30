@@ -60,7 +60,7 @@
     "message": "Si apre in"
   },
   "component.formats.builds": {
-    "message": "Generazione in Hub"
+    "message": "Build in Hub"
   },
   "component.formats.notes": {
     "message": "Note"

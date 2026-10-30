@@ -43,7 +43,7 @@ in [Formati supportati](/reference/formats.mdx).
    stati caricati, fai prima clic su **Retry Failed** (Riprova i non riusciti).
 
 5. I nuovi file compaiono nel dataset. Un'icona che gira su un file significa che Hub ne sta
-   ancora facendo la generazione (vedi sotto). Quando l'icona sparisce, il file è pronto.
+   ancora facendo la build (vedi sotto). Quando l'icona sparisce, il file è pronto.
 
    <Screenshot id="get-started/upload--building" />
 
@@ -52,7 +52,8 @@ in [Formati supportati](/reference/formats.mdx).
 Puoi anche incollare file con **Ctrl+V** (**Cmd+V** su Mac) nella pagina del dataset, oppure
 aggiungere un file da un indirizzo web con **Import from URL** (Importa da URL). **Upload Files**
 nel menu utente (l'icona utente in alto a destra) apre una pagina di caricamento: trascina lì i
-file e Hub li mette in un nuovo dataset della tua organizzazione personale e lo apre.
+file e Hub li mette in un nuovo dataset della tua organizzazione personale e lo apre. Quel dataset è **Public**
+(pubblico) e ha uno slug generato: cambia la sua visibilità in **Settings** se i dati non sono per tutti.
 
 ## Caricamenti grandi
 
@@ -66,29 +67,29 @@ file e Hub li mette in un nuovo dataset della tua organizzazione personale e lo 
   the connection** alla fine di un caricamento. Si apre un test della connessione nella pagina del
   tuo account.
 
-## Cosa succede dopo il caricamento: la generazione
+## Cosa succede dopo il caricamento: la build
 
 I file grandi non possono arrivare al browser così come sono. Dopo il caricamento, Hub crea una
 copia di ogni ortofoto, modello di elevazione, nuvola di punti, modello 3D, file vettoriale e
 splat gaussiano in un formato che i visualizzatori possono trasmettere in streaming. Questa copia
-si chiama **generazione** (in Hub: *build*). Le generazioni piccole richiedono pochi secondi.
+si chiama **build**. Le build piccole richiedono pochi secondi.
 Nuvole di punti e modelli 3D grandi possono richiedere molti minuti.
 
-- Puoi continuare a lavorare durante la generazione. Segui le generazioni nella scheda **Tasks**
+- Puoi continuare a lavorare durante la build. Segui le build nella scheda **Tasks**
   (Attività) del dataset.
-- Se apri un file prima che la sua generazione sia completa, Hub ti avvisa che il file è in
+- Se apri un file prima che la sua build sia completa, Hub ti avvisa che il file è in
   elaborazione. Fai clic su **Wait and Open** (Attendi e apri): il visualizzatore si apre quando
-  la generazione è completa.
+  la build è completa.
 - Alcuni file hanno bisogno di altri file. Per esempio, un modello 3D (`.obj`) ha bisogno del
   suo file `.mtl` e delle sue texture, e uno shapefile ha bisogno dei suoi file `.shx` e `.dbf`.
   Se ne manca uno, il file mostra **Waiting for files** (In attesa di file) e i nomi dei file
-  mancanti. Caricali nella stessa cartella e la generazione parte da sola. Per evitare questa
+  mancanti. Caricali nella stessa cartella e la build parte da sola. Per evitare questa
   attesa, carica questi file tutti insieme.
 
 ## Pagine correlate
 
-- [Generazioni (build)](/hub-guide/processing/builds.mdx): stato della generazione,
-  generazioni non riuscite e nuove generazioni
+- [Build](/hub-guide/processing/builds.mdx): stato della build,
+  build non riuscite e nuove build
 - [Importa da un URL o da un altro Registry](/hub-guide/files/import.mdx)
 - [Cartelle, rinomina ed elimina](/hub-guide/files/folders.mdx)
 - [Condividi la tua prima mappa](/get-started/share-first-map.mdx)

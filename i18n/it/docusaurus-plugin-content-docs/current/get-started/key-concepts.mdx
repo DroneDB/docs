@@ -1,6 +1,6 @@
 ---
 title: "Concetti chiave"
-description: "Organizzazioni, dataset, elementi, tipi di elemento, generazioni, visibilità e attività."
+description: "Organizzazioni, dataset, elementi, tipi di elemento, build, visibilità e attività."
 datasets: [odm/brighton-beach]
 ---
 
@@ -63,14 +63,14 @@ L'elenco completo dei formati di file è in
 tipo sbagliato, puoi cambiarlo: vedi
 [Proprietà dei file e tipi di elemento](/hub-guide/files/properties.mdx).
 
-## Generazione
+## Build
 
-Una **generazione** (in Hub: *build*) è una copia di un file che Hub crea perché i
-visualizzatori possano trasmetterlo in streaming. In questa guida "generazione" indica sia la
-copia sia il lavoro che la produce. Dopo il caricamento, Hub esegue la generazione di ortofoto e
+Una **build** è una copia di un file che Hub crea perché i
+visualizzatori possano trasmetterlo in streaming. In questa guida "build" indica sia la
+copia sia il lavoro che la produce. Dopo il caricamento, Hub esegue la build di ortofoto e
 altri raster, nuvole di punti, modelli 3D, file vettoriali e splat gaussiani. Il tuo file
 originale non cambia e puoi scaricarlo in qualsiasi momento. Vedi
-[Generazioni (build)](/hub-guide/processing/builds.mdx).
+[Build](/hub-guide/processing/builds.mdx).
 
 ## Visibilità
 
@@ -85,7 +85,7 @@ Vedi [Visibilità](/hub-guide/sharing/visibility.mdx).
 
 ## Attività
 
-Un'**attività** (in Hub: *task*) è un lavoro che Hub svolge in background: una generazione,
+Un'**attività** (in Hub: *task*) è un lavoro che Hub svolge in background: una build,
 un'elaborazione di [fotogrammetria](/hub-guide/processing/photogrammetry.mdx),
 un'esportazione di raster, un download ZIP, l'estrazione di un archivio o un'importazione. La
 scheda **Tasks** di un dataset mostra le sue attività, il loro avanzamento e i loro log. Vedi
