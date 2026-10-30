@@ -1,4 +1,5 @@
 import React from 'react';
+import {translate} from '@docusaurus/Translate';
 import styles from './styles.module.css';
 
 // Placeholder for a screenshot or clip that the capture pipeline has not produced yet.
@@ -11,7 +12,7 @@ export default function MediaPending({kind, id, caption}) {
   return (
     <figure className={styles.pending}>
       <div className={styles.box}>
-        <span>{kind} pending</span>
+        <span>{kind} · {translate({id: 'component.media.pending', message: 'not captured yet'})}</span>
         <code>{id}</code>
       </div>
       {caption && <figcaption>{caption}</figcaption>}

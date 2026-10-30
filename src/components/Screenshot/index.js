@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {translate} from '@docusaurus/Translate';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import media from '@site/src/data/media.json';
 import MediaPending from '@site/src/components/MediaPending';
@@ -31,7 +32,7 @@ export default function Screenshot({id, alt, caption, zoomable = true}) {
   return (
     <figure className={styles.figure}>
       {zoomable ? (
-        <button type="button" className={styles.zoom} onClick={() => setOpen(true)} aria-label={`Enlarge: ${text}`}>
+        <button type="button" className={styles.zoom} onClick={() => setOpen(true)} aria-label={`${translate({id: 'component.screenshot.enlarge', message: 'Enlarge'})}: ${text}`}>
           {img}
         </button>
       ) : img}
