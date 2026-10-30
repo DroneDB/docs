@@ -1,10 +1,93 @@
 ---
 title: "Colormaps, bands & histogram"
-description: "Change the colours, bands and value range of a raster."
+description: "Choose which bands of a multispectral raster show as red, green and blue, paint a single-band raster with a colormap, and set the range of values with the histogram."
+hub_feature: [map:band-selector, map:colormap, map:histogram, map:raster-analysis]
+datasets: [odx/micasense]
+requires: { access: read, data: "A multispectral raster, or a raster with one band (for example a DSM)" }
 ---
 
-:::info
+<Clip id="analyse/colormaps--bands-histogram" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odx" ds="micasense" path="odm_orthophoto/odm_orthophoto.tif" view="map"
+         hint="Click the leaf button (Plant Health). Keep Formula at None (bands only) and change the bands." />
+
+## When to use it
+
+A multispectral orthophoto has more bands than a screen has colours. Select which three bands
+show as red, green and blue to make a false-colour image. A raster with one band, such as an
+elevation model, has no colours of its own: Hub paints it with a colormap, and you choose the
+colormap and the range of values.
+
+## Steps
+
+### Bands of a multispectral raster
+
+<Steps>
+
+1. Open the multispectral orthophoto on the map. Click the **Plant Health** button (a leaf) next to
+   the opacity slider.
+
+2. Keep **Formula** at **None (bands only)**. Under **Bands (R,G,B)**, select the band for each
+   of **R**, **G** and **B**.
+
+   <Screenshot id="analyse/colormaps--bands" />
+
+3. Drag the handles of the **Histogram** to set the range of values. Hub stretches the colours
+   over that range.
+
+   <Screenshot id="analyse/colormaps--histogram" />
+
+</Steps>
+
+### Colormap of a single-band raster
+
+<Steps>
+
+1. Open a raster with one band on the map, for example a DSM. Click **Raster Analysis** in the
+   toolbar at the top right.
+
+2. Select a **Colormap**. Type a **Rescale** range, for example `0,50`, or leave it empty for the
+   range of the raster.
+
+   <Screenshot id="analyse/colormaps--colormap-dropdown" />
+
+3. Click **Reset** to put all settings back to their defaults.
+
+</Steps>
+
+## Options
+
+| Option | Panel | What it does | Default |
+|---|---|---|---|
+| **Bands (R,G,B)** | Plant Health | The band that shows as red, green and blue. It shows for rasters with more than three bands. | The bands Hub matched to the camera |
+| **Histogram** | Plant Health | The values of the first band, with two handles that set the range. | — |
+| **Colormap** | Plant Health (with a formula), Raster Analysis | The colours of the values. | Red-Yellow-Green (index), Viridis (raster), Ironbow (thermal) |
+| **Rescale** | Both | The lowest and the highest value of the colormap. Empty: automatic. | Automatic |
+| **Unit** | Raster Analysis | The unit that the panel shows with the values, for example `m`. | Read from the file, else `m` |
+| **Reset** | Both | Puts every setting back to its default. | — |
+| **Original** | Both | Shows the raster without the styling. Click **Hide Orig.** to go back. | — |
+| **Export** | Both | Downloads the raster as you see it, as a GeoTIFF. | — |
+
+### Colormaps
+
+| Raster | Colormaps |
+|---|---|
+| Vegetation index | Red-Yellow-Green, Contrast NDVI, Spectral, Viridis, Plasma, Inferno, Magma, Grayscale, Ironbow, Rainbow, Blue-Green, White Hot, Black Hot, Arctic, Lava |
+| Single band (elevation, values) | Viridis, Terrain, Magma, Plasma, Inferno, Greys |
+| Thermal | Ironbow, White Hot, Black Hot, Arctic, Lava, Inferno, Magma, Plasma |
+
+## Limits & requirements
+
+- **Raster Analysis** shows in the toolbar when the map shows exactly one raster with one data
+  band, or one thermal image. With more rasters on the map, the button is not available.
+- **Export** is not available when the result is larger than the export limit of the Hub.
+- The settings apply to what you see. They do not change the file.
+
+## Related
+
+- [Plant health](./plant-health.mdx)
+- [Thermal imagery](./thermal.mdx)
+- [Compare layers](./compare-layers.mdx)
+- [Export a raster](../processing/export-raster.mdx)

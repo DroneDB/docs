@@ -1,0 +1,572 @@
+# Shots of the Analyse rasters pages (docs/hub-guide/analyse/).
+#
+# Demo inputs (reset-demo.mjs) for the shots with `auth: demo`, in the org acme-surveys:
+# - dataset `sheffield-park` (shared with measure.yaml): the orthophotos of odm/sheffield-park-1
+#   and odm/sheffield-park-2 as `park-1.tif` and `park-2.tif`, built.
+# - in that dataset, one saved comparison named "Park 1 and 2" of park-1.tif and park-2.tif,
+#   split on (the dataset meta list `comparisons`), for the list under the folder tree.
+#
+# Public data: odx/micasense (6-band orthophoto and odm_dem/dsm.tif), odx/hat-creek (two thermal
+# mosaics of 24 and 25 August 2018 at the root of the dataset). The stockpile shots that need
+# piles wait for a DSM of odm/caliterra (not there yet): blocked: data.
+#
+# The compare URLs use base64url of the paths (no padding):
+#   08242018 mosaic: QWlyYm9ybmVfdGhlcm1hbF9pbmZyYXJlZF9tb3NhaWNfSGF0X0NyZWVrX0NhbGlmb3JuaWFfMDgyNDIwMThfMTZiaXQudGlm
+#   08252018 mosaic: QWlyYm9ybmVfdGhlcm1hbF9pbmZyYXJlZF9tb3NhaWNfSGF0X0NyZWVrX0NhbGlmb3JuaWFfMDgyNTIwMThfMTZiaXQudGlm
+
+# ---- Colormaps, bands & histogram ------------------------------------------------------------
+
+- id: analyse/colormaps--bands-histogram
+  type: clip
+  alt: Bands of a multispectral orthophoto changed, then the histogram range dragged
+  page: hub-guide/analyse/colormaps
+  open: { org: odx, ds: micasense, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Plant Health']"
+    - wait: "text=Bands (R,G,B)"
+    - select: { selector: "[aria-labelledby='plant-health-panel-bands-label'] select >> nth=0", value: "4" }   # R = band 4
+    - wait: 2500
+    - drag: { from: [1290, 520], to: [1250, 520] }   # the Range maximum handle of the histogram
+    - wait: 2500
+  highlight: null
+  crop: null
+  maxSeconds: 20
+  blocked: null
+  youtubeId: null
+
+- id: analyse/colormaps--bands
+  type: screenshot
+  alt: The Bands (R,G,B) selector of a multispectral orthophoto in the Plant Health panel
+  page: hub-guide/analyse/colormaps
+  open: { org: odx, ds: micasense, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Plant Health']"
+    - wait: "text=Bands (R,G,B)"
+    - wait: 2000
+  highlight: "[aria-labelledby='plant-health-panel-bands-label']"
+  crop: null
+  blocked: null
+
+- id: analyse/colormaps--histogram
+  type: screenshot
+  alt: The histogram of a raster with its two range handles
+  page: hub-guide/analyse/colormaps
+  open: { org: odx, ds: micasense, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Plant Health']"
+    - wait: "[aria-label='Range maximum']"
+  highlight: "[aria-label='Range maximum']"   # the box should cover the whole histogram
+  crop: "text=Histogram"                       # needs a selector for the histogram section (no label on the section)
+  blocked: null
+
+- id: analyse/colormaps--colormap-dropdown
+  type: screenshot
+  alt: The colormaps of a single-band elevation raster in the Raster Analysis panel
+  page: hub-guide/analyse/colormaps
+  open: { org: odx, ds: micasense, path: odm_dem/dsm.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Raster Analysis']"
+    - wait: "#raster-analysis-controls-colormap"
+    - click: "#raster-analysis-controls-colormap"
+    - wait: 500
+  highlight: "#raster-analysis-controls-colormap"
+  crop: null
+  blocked: null
+
+# ---- Compare layers -------------------------------------------------------------------------
+
+- id: analyse/compare-layers--swipe
+  type: clip
+  alt: Two thermal mosaics split side by side, the divider dragged across the map
+  page: hub-guide/analyse/compare-layers
+  url: /r/odx/hat-creek
+  base: hub
+  auth: none
+  waitFor: { selector: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08242018_16bit.tif", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: "role=tab[name='Map']"              # the Map tab of the dataset page
+    - wait: "[aria-label='Compare georasters side by side']"
+    - wait: 2000
+    - click: "[aria-label='Compare georasters side by side']"
+    - wait: 1500
+    - drag: { from: [720, 600], to: [480, 600] }
+    - drag: { from: [480, 600], to: [960, 600] }
+  highlight: null
+  crop: null
+  maxSeconds: 20
+  blocked: null
+  youtubeId: null
+
+- id: analyse/compare-layers--opacity-panel
+  type: screenshot
+  alt: The layer opacity panel of the Map tab with two thermal mosaics
+  page: hub-guide/analyse/compare-layers
+  url: /r/odx/hat-creek
+  base: hub
+  auth: none
+  waitFor: { selector: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08242018_16bit.tif", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: "role=tab[name='Map']"
+    - wait: "[aria-label='Move layer down']"
+    - wait: 2000
+  highlight: "[aria-label='Move layer down']"   # the box should cover the whole opacity panel (no label on the panel)
+  crop: null
+  blocked: null
+
+- id: analyse/compare-layers--split
+  type: screenshot
+  alt: Two thermal mosaics side by side on the map, with the divider between them
+  page: hub-guide/analyse/compare-layers
+  url: /r/odx/hat-creek
+  base: hub
+  auth: none
+  waitFor: { selector: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08242018_16bit.tif", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: "role=tab[name='Map']"
+    - wait: "[aria-label='Compare georasters side by side']"
+    - click: "[aria-label='Compare georasters side by side']"
+    - wait: 2500
+  highlight: "[aria-label='Compare georasters side by side']"
+  crop: null
+  blocked: null
+
+# ---- Compare view ---------------------------------------------------------------------------
+
+- id: analyse/compare-view--compare-to-add-save
+  type: clip
+  alt: Compare to... on an orthophoto, a second orthophoto added, the comparison saved
+  page: hub-guide/analyse/compare-view
+  url: /r/acme-surveys/sheffield-park
+  base: hub
+  auth: demo
+  waitFor: { selector: "text=park-1.tif", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: { selector: "text=park-1.tif", button: right }   # needs right click in the pipeline (opens the context menu)
+    - click: "text=Compare to..."
+    - wait: 2500                                 # the compare view opens in a new tab: the pipeline follows it
+    - click: "text=park-2.tif"                   # in the Add raster to compare dialog
+    - click: "[role='dialog'] >> text=Confirm"
+    - wait: 2500
+    - drag: { from: [720, 600], to: [520, 600] }
+    - click: "text=Save"
+    - fill: { selector: "[role='dialog'] input", value: Spring survey }
+    - press: Enter
+    - wait: 1500
+  highlight: null
+  crop: null
+  maxSeconds: 30
+  blocked: null
+  youtubeId: null
+
+- id: analyse/compare-view--menu
+  type: screenshot
+  alt: Compare in Map in the context menu of two selected georasters
+  page: hub-guide/analyse/compare-view
+  url: /r/odx/hat-creek
+  base: hub
+  auth: none
+  waitFor: { selector: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08242018_16bit.tif", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08242018_16bit.tif"
+    - click: { selector: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08252018_16bit.tif", modifiers: [Control] }   # needs click modifiers in the pipeline
+    - click: { selector: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08252018_16bit.tif", button: right }    # needs right click in the pipeline
+    - wait: "text=Compare in Map"
+  highlight: "text=Compare in Map"
+  crop: null
+  blocked: null
+
+- id: analyse/compare-view--picker
+  type: screenshot
+  alt: The Add raster to compare dialog of the compare view
+  page: hub-guide/analyse/compare-view
+  url: /r/odx/hat-creek/compare?p=QWlyYm9ybmVfdGhlcm1hbF9pbmZyYXJlZF9tb3NhaWNfSGF0X0NyZWVrX0NhbGlmb3JuaWFfMDgyNDIwMThfMTZiaXQudGlm&pick=1
+  base: hub
+  auth: none
+  waitFor: { selector: "text=Add raster to compare", networkIdle: true, extraMs: 1000 }
+  actions: []
+  highlight: null
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: analyse/compare-view--bar
+  type: screenshot
+  alt: The compare view with two thermal mosaics side by side and the compare bar
+  page: hub-guide/analyse/compare-view
+  url: /r/odx/hat-creek/compare?p=QWlyYm9ybmVfdGhlcm1hbF9pbmZyYXJlZF9tb3NhaWNfSGF0X0NyZWVrX0NhbGlmb3JuaWFfMDgyNDIwMThfMTZiaXQudGlm&p=QWlyYm9ybmVfdGhlcm1hbF9pbmZyYXJlZF9tb3NhaWNfSGF0X0NyZWVrX0NhbGlmb3JuaWFfMDgyNTIwMThfMTZiaXQudGlm
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Comparison']", networkIdle: true, extraMs: 2500 }
+  actions: []
+  highlight: "[aria-label='Comparison']"
+  crop: null
+  blocked: null
+
+- id: analyse/compare-view--saved-list
+  type: screenshot
+  alt: A saved comparison under the folder tree of a dataset, with its context menu
+  page: hub-guide/analyse/compare-view
+  url: /r/acme-surveys/sheffield-park
+  base: hub
+  auth: demo
+  waitFor: { selector: "[aria-label='Saved comparisons']", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: { selector: "[aria-label='Saved comparisons'] >> text=Park 1 and 2", button: right }   # needs right click in the pipeline
+    - wait: "text=Copy Link"
+  highlight: "[aria-label='Saved comparisons']"
+  crop: null
+  blocked: null
+
+# ---- Plant health ---------------------------------------------------------------------------
+
+- id: analyse/plant-health--index-switching
+  type: clip
+  alt: NDVI, NDRE and GNDVI of a multispectral orthophoto, one after the other
+  page: hub-guide/analyse/plant-health
+  open: { org: odx, ds: micasense, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Plant Health']"
+    - wait: "#plant-health-panel-formula"
+    - select: { selector: "#plant-health-panel-formula", value: NDVI }
+    - wait: 3000
+    - select: { selector: "#plant-health-panel-formula", value: NDRE }
+    - wait: 3000
+    - select: { selector: "#plant-health-panel-formula", value: GNDVI }
+    - wait: 3000
+  highlight: null
+  crop: null
+  maxSeconds: 20
+  blocked: null
+  youtubeId: null
+
+- id: analyse/plant-health--ndvi
+  type: screenshot
+  alt: NDVI of a multispectral orthophoto with the Plant Health panel
+  page: hub-guide/analyse/plant-health
+  open: { org: odx, ds: micasense, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Plant Health']"
+    - wait: "#plant-health-panel-formula"
+    - select: { selector: "#plant-health-panel-formula", value: NDVI }
+    - wait: 3000
+  highlight: "#plant-health-panel-formula"
+  crop: null
+  blocked: null
+
+- id: analyse/plant-health--formulas-dialog
+  type: screenshot
+  alt: The Vegetation index formulas dialog
+  page: hub-guide/analyse/plant-health
+  open: { org: odx, ds: micasense, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Plant Health']"
+    - click: "[aria-label='Learn more about each vegetation index']"
+    - wait: "text=Vegetation index formulas"
+  highlight: null
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: analyse/plant-health--poster
+  type: screenshot
+  alt: NDVI of a multispectral orthophoto on the map (poster of the live viewer)
+  page: hub-guide/analyse/plant-health
+  open: { org: odx, ds: micasense, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  viewport: { width: 1280, height: 720 }
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Plant Health']"
+    - wait: "#plant-health-panel-formula"
+    - select: { selector: "#plant-health-panel-formula", value: NDVI }
+    - wait: 3000
+    - click: "[aria-label='Close']"             # the panel closes; the map keeps the index
+    - wait: 1000
+  highlight: null
+  crop: null
+  blocked: null
+
+# ---- Thermal --------------------------------------------------------------------------------
+
+- id: analyse/thermal--panel
+  type: screenshot
+  alt: A thermal mosaic with the Raster Analysis panel and a thermal colormap
+  page: hub-guide/analyse/thermal
+  open: { org: odx, ds: hat-creek, path: Airborne_thermal_infrared_mosaic_Hat_Creek_California_08242018_16bit.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Raster Analysis']"
+    - wait: "#raster-analysis-controls-colormap"
+    - click: "#raster-analysis-controls-colormap"
+    - click: "text=Inferno"
+    - wait: 3000
+  highlight: "[aria-label='Raster Analysis']"
+  crop: null
+  blocked: null
+
+- id: analyse/thermal--inspect
+  type: screenshot
+  alt: The value of a point of a thermal mosaic, read with Inspect
+  page: hub-guide/analyse/thermal
+  open: { org: odx, ds: hat-creek, path: Airborne_thermal_infrared_mosaic_Hat_Creek_California_08242018_16bit.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Raster Analysis']"
+    - click: "text=Inspect"
+    - mouse: { click: [700, 460] }              # on the river
+    - wait: 1500
+  highlight: "text=Inspect"
+  crop: null
+  blocked: null
+
+# ---- Elevation profile ----------------------------------------------------------------------
+
+- id: analyse/elevation-profile--draw
+  type: clip
+  alt: A profile line drawn across a DSM, then the pointer moved along the chart
+  page: hub-guide/analyse/elevation-profile
+  open: { org: odx, ds: micasense, path: odm_dem/dsm.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Raster Analysis']"
+    - click: "text=Profile"
+    - mouse: { click: [480, 440] }
+    - mouse: { click: [900, 460] }
+    - mouse: { click: [900, 460] }
+    - wait: "[aria-label='Profile position']"
+    - hover: "[aria-label='Profile position']"
+    - wait: 2000
+  highlight: null
+  crop: null
+  maxSeconds: 20
+  blocked: null
+  youtubeId: null
+
+- id: analyse/elevation-profile--panel
+  type: screenshot
+  alt: The Raster Analysis panel of a DSM with the Profile button
+  page: hub-guide/analyse/elevation-profile
+  open: { org: odx, ds: micasense, path: odm_dem/dsm.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Raster Analysis']"
+    - wait: "text=Value Range"
+  highlight: "text=Profile"
+  crop: null
+  blocked: null
+
+- id: analyse/elevation-profile--chart
+  type: screenshot
+  alt: The value profile of a DSM along a line, with the chart in the panel
+  page: hub-guide/analyse/elevation-profile
+  open: { org: odx, ds: micasense, path: odm_dem/dsm.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Raster Analysis']"
+    - click: "text=Profile"
+    - mouse: { click: [480, 440] }
+    - mouse: { click: [900, 460] }
+    - mouse: { click: [900, 460] }
+    - wait: "[aria-label='Export CSV']"
+  highlight: "[aria-label='Export CSV']"
+  crop: null
+  blocked: null
+
+# ---- Contours -------------------------------------------------------------------------------
+
+- id: analyse/contours--generate
+  type: clip
+  alt: Contour lines generated from a DSM every metre
+  page: hub-guide/analyse/contours
+  open: { org: odx, ds: micasense, path: odm_dem/dsm.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Raster Analysis']"
+    - click: "text=Contours"
+    - wait: "text=Generate Contour Lines"
+    - fill: { selector: "#contour-options-dialog-interval", value: "1" }
+    - click: "text=Generate"
+    - wait: 5000
+  highlight: null
+  crop: null
+  maxSeconds: 20
+  blocked: null
+  youtubeId: null
+
+- id: analyse/contours--dialog
+  type: screenshot
+  alt: The Generate Contour Lines dialog
+  page: hub-guide/analyse/contours
+  open: { org: odx, ds: micasense, path: odm_dem/dsm.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Raster Analysis']"
+    - click: "text=Contours"
+    - wait: "text=Generate Contour Lines"
+  highlight: null
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: analyse/contours--result
+  type: screenshot
+  alt: Contour lines of a DSM on the map, coloured from low to high
+  page: hub-guide/analyse/contours
+  open: { org: odx, ds: micasense, path: odm_dem/dsm.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Raster Analysis']"
+    - click: "text=Contours"
+    - wait: "text=Generate Contour Lines"
+    - fill: { selector: "#contour-options-dialog-interval", value: "1" }
+    - click: "text=Generate"
+    - wait: 5000
+    - click: "[aria-label='Close']"             # closes the Raster Analysis panel
+  highlight: null
+  crop: null
+  blocked: null
+
+# ---- Stockpile volume -----------------------------------------------------------------------
+
+- id: analyse/stockpile--detect-material
+  type: clip
+  alt: A pile detected on a DSM with a click, then a material selected for its weight and cost
+  page: hub-guide/analyse/stockpile
+  open: { org: odm, ds: caliterra, path: odm_dem/dsm.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Stockpile Volume']"
+    - click: "button[title='Click on the map to detect a pile at that point']"
+    - mouse: { click: [720, 450] }              # on a pile: to set once the DSM exists
+    - wait: "text=Net volume"
+    - select: { selector: "#stockpile-volume-panel-material", value: gravel }
+    - wait: 1500
+  highlight: null
+  crop: null
+  maxSeconds: 20
+  blocked: data
+  youtubeId: null
+
+- id: analyse/stockpile--panel
+  type: screenshot
+  alt: The Stockpile Volume panel open on a DSM
+  page: hub-guide/analyse/stockpile
+  open: { org: odx, ds: micasense, path: odm_dem/dsm.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Stockpile Volume']"
+    - wait: "text=Base Plane Method"
+  highlight: "[aria-label='Stockpile Volume']"
+  crop: null
+  blocked: null
+
+- id: analyse/stockpile--detect
+  type: screenshot
+  alt: A pile detected with a click, with its outline on the map and its volumes in the panel
+  page: hub-guide/analyse/stockpile
+  open: { org: odm, ds: caliterra, path: odm_dem/dsm.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Stockpile Volume']"
+    - click: "button[title='Click on the map to detect a pile at that point']"
+    - mouse: { click: [720, 450] }              # on a pile: to set once the DSM exists
+    - wait: "text=Net volume"
+  highlight: "button[title='Click on the map to detect a pile at that point']"
+  crop: null
+  blocked: data
+
+- id: analyse/stockpile--material-cost
+  type: screenshot
+  alt: The weight and the estimated cost of a pile of gravel
+  page: hub-guide/analyse/stockpile
+  open: { org: odm, ds: caliterra, path: odm_dem/dsm.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Stockpile Volume']"
+    - click: "button[title='Click on the map to detect a pile at that point']"
+    - mouse: { click: [720, 450] }
+    - wait: "text=Net volume"
+    - select: { selector: "#stockpile-volume-panel-material", value: gravel }
+    - wait: "text=Est. cost"
+  highlight: "#stockpile-volume-panel-material"
+  crop: null
+  blocked: data
+
+- id: analyse/stockpile--base-methods
+  type: screenshot
+  alt: The Base plane methods dialog of the stockpile panel
+  page: hub-guide/analyse/stockpile
+  open: { org: odx, ds: micasense, path: odm_dem/dsm.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Stockpile Volume']"
+    - click: "[data-testid='stockpile-base-method-info']"   # its aria-label is the long method tooltip
+    - wait: "text=Base plane methods"
+  highlight: null
+  crop: "[role='dialog']"
+  blocked: null
+
+# ---- Raster statistics ----------------------------------------------------------------------
+
+- id: analyse/area-statistics--value-range
+  type: screenshot
+  alt: The value range of a DSM and the value of a point read with Inspect
+  page: hub-guide/analyse/area-statistics
+  open: { org: odx, ds: micasense, path: odm_dem/dsm.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Raster Analysis']"
+    - wait: "text=Value Range"
+    - click: "text=Inspect"
+    - mouse: { click: [700, 460] }
+    - wait: 1500
+  highlight: "text=Value Range"
+  crop: null
+  blocked: null

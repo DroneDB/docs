@@ -1,10 +1,83 @@
 ---
 title: "Thermal imagery"
-description: "Read temperatures from thermal rasters."
+description: "Show a thermal raster with a thermal colormap, read temperatures in °C or K, and draw a temperature profile."
+hub_feature: [map:thermal]
+datasets: [odx/hat-creek]
+requires: { access: read, data: "A thermal GeoTIFF: an orthophoto, or a photo with a location" }
 ---
 
-:::info
+<Screenshot id="analyse/thermal--panel" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odx" ds="hat-creek" path="Airborne_thermal_infrared_mosaic_Hat_Creek_California_08242018_16bit.tif" view="map"
+         hint="Click Raster Analysis at the top right, then Inspect, then click on the river." />
+
+## When to use it
+
+Use the thermal tools to find hot and cold spots: a leak in a roof, a failed solar panel, cold
+water flowing into a river. Hub paints the thermal raster with a thermal colormap, shows the
+temperature range and tells you the temperature of any point you click.
+
+## Steps
+
+<Steps>
+
+1. Open the thermal raster on the map. Click **Raster Analysis** in the toolbar at the top right.
+   For a thermal raster, the panel is named **Thermal**.
+
+2. Read the **Temperature Range** of the raster. Select the **Unit**: **Celsius (°C)** or
+   **Kelvin (K)**.
+
+3. Select a thermal **Colormap**. Type a **Rescale** range, for example `10,40`, to give all the
+   colours to the temperatures you care about.
+
+4. Click **Inspect**, then click on the map. A label shows the value at that point. Press `Esc` to
+   stop.
+
+   <Screenshot id="analyse/thermal--inspect" />
+
+5. Click **Profile** and draw a line to see the temperatures along it. See
+   [Elevation profile](./elevation-profile.mdx); the chart is the **Thermal Profile**.
+
+</Steps>
+
+## Options
+
+| Option | What it does | Default |
+|---|---|---|
+| **Unit** | **Celsius (°C)** or **Kelvin (K)**. | Celsius |
+| **Colormap** | Ironbow, White Hot, Black Hot, Arctic, Lava, Inferno, Magma, Plasma. | Ironbow |
+| **Rescale** | The lowest and the highest value of the colormap. Empty: the range of the raster. | Automatic |
+| **Inspect** | Shows the value at the point you click. | — |
+| **Original** | Shows the raster without the colormap. | — |
+| **Export** | Downloads the raster as you see it, as a GeoTIFF. | — |
+
+## How Hub finds the temperatures
+
+Hub treats a raster as thermal when it matches a thermal camera profile (for example FLIR or DJI
+thermal cameras), or when the file holds temperature values. Hub converts the raw values of the
+camera to temperatures with the calibration data of the file. If the file has no calibration data,
+the panel says **No thermal calibration data: Showing raw values.**
+
+A thermal mosaic that Hub does not recognise as thermal opens as a value raster. The panel is then
+**Raster Analysis**, with the colormaps of other single-band rasters, and the values are those of
+the file. The Hat Creek mosaics of the example open like this: their values are the raw 16-bit
+values of the survey, not degrees.
+
+{/* TODO verify: whether Registry 3.0 recognises the odx/hat-creek mosaics as thermal (production 2.7.1 does not: raster-value-info isThermal false). */}
+
+## Limits & requirements
+
+- **Raster Analysis** works on one raster at a time. With more rasters on the map, the button is
+  not available.
+- A thermal photo (a radiometric JPEG) has no **Raster Analysis** on the map. Process the photos
+  into a thermal orthophoto first.
+- **Export** is not available when the result is larger than the export limit of the Hub.
+
+## Related
+
+- [Colormaps, bands & histogram](./colormaps.mdx)
+- [Elevation profile](./elevation-profile.mdx)
+- [Compare layers](./compare-layers.mdx)
+- [Photogrammetry](../processing/photogrammetry.mdx)

@@ -1,10 +1,72 @@
 ---
-title: "Raster area statistics"
-description: "Statistics of the raster values inside an area."
+title: "Raster statistics"
+description: "Read the range of values of a raster and the value at a point, and get the statistics of a rectangle of a raster."
+hub_feature: [map:raster-statistics, map:raster-inspect]
+datasets: [odx/micasense]
+requires: { access: read, data: "A raster with one band, for example a DSM" }
 ---
 
-:::info
+<Screenshot id="analyse/area-statistics--value-range" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odx" ds="micasense" path="odm_dem/dsm.tif" view="map"
+         hint="Click Raster Analysis at the top right. The panel shows the value range; click Inspect to read a point." />
+
+## When to use it
+
+Use the statistics of a raster to know its values before you work with it: the lowest and the
+highest elevation of a site, the temperature range of a thermal mosaic, the value at one point.
+
+## Steps
+
+<Steps>
+
+1. Open the raster on the map. Click **Raster Analysis** in the toolbar at the top right.
+
+2. Read the **Value Range** (the **Temperature Range** for a thermal raster): the lowest and the
+   highest value of the raster.
+
+3. Click **Inspect**, then click on the map. A label shows the value at that point. Press `Esc` to
+   stop.
+
+4. For a raster with two or more bands, open [Plant health](./plant-health.mdx). Its
+   **Statistics** show the minimum, the maximum, the mean and the standard deviation of the first
+   band, and its **Histogram** shows how the values spread.
+
+</Steps>
+
+## Options
+
+| Statistic | Where | What it is |
+|---|---|---|
+| **Value Range** / **Temperature Range** | Raster Analysis | The lowest and the highest value of the whole raster. |
+| **Inspect** | Raster Analysis | The value of the pixel you click. |
+| **Statistics** | Plant Health | Min, Max, Mean and StdDev of the first band of the whole raster. |
+| **Histogram** | Plant Health | How many pixels have each value. |
+
+### Statistics of a rectangle
+
+The Hub server computes the statistics of a rectangle of pixels of any single-band raster: Min,
+Max, Mean, StdDev, Median and the number of pixels. The Hub pages do not have a tool to draw the
+rectangle: use the API (see **For developers** below).
+
+## Limits & requirements
+
+- **Raster Analysis** shows when the map has exactly one raster with one band, or one thermal
+  raster.
+- Pixels with the nodata value of the band do not count in the statistics of a rectangle.
+
+## Related
+
+- [Colormaps, bands & histogram](./colormaps.mdx)
+- [Elevation profile](./elevation-profile.mdx)
+- [Thermal imagery](./thermal.mdx)
+
+<ForDevelopers api="/docs/developers/api/workflows">
+
+`GET /orgs/{org}/ds/{ds}/raster-area-stats?path=…&x0=…&y0=…&x1=…&y1=…` returns `min`, `max`,
+`mean`, `stddev`, `median` and `pixelCount` of the rectangle between the pixels (`x0`, `y0`) and
+(`x1`, `y1`) of the raster.
+
+</ForDevelopers>

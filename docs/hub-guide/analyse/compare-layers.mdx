@@ -1,10 +1,71 @@
 ---
 title: "Compare layers (split / swipe)"
-description: "Compare two layers on the map with a swipe bar."
+description: "Show two or more rasters of a folder side by side on the Map tab, drag the dividers between them, and set the opacity and the order of each layer."
+hub_feature: [map:split-compare, map:layer-opacity-panel]
+datasets: [odx/hat-creek]
+requires: { access: read, data: "Two or more georasters in the same folder" }
 ---
 
-:::info
+<Clip id="analyse/compare-layers--swipe" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odx" ds="hat-creek"
+         hint="Open the Map tab. It shows the two thermal mosaics of 24 and 25 August 2018." />
+
+## When to use it
+
+Compare two rasters of the same place to see what changed: two flights on different dates, an
+orthophoto and its elevation model, a raster before and after processing. Split the map into
+bands, one raster in each, and drag the dividers to swipe between them. Or keep the rasters on top
+of each other and change their opacity.
+
+## Steps
+
+<Steps>
+
+1. Open the dataset and go to the folder with the rasters. Click the **Map** tab. The map shows
+   all the files of the folder that have a location.
+
+2. With two or more rasters, the layer opacity panel shows at the bottom. Drag the slider of a
+   layer to change its opacity. Use **Move layer up** and **Move layer down** to change which
+   raster is on top.
+
+   <Screenshot id="analyse/compare-layers--opacity-panel" />
+
+3. Click **Compare georasters side by side** at the top of the map. Each raster gets its own
+   band, with its name at the top.
+
+4. Drag a divider to the left or to the right to move the edge between two rasters. Use
+   **Move left** and **Move right** on the name of a raster to change the order of the bands.
+
+   <Screenshot id="analyse/compare-layers--split" />
+
+5. Click **Compare georasters side by side** again to put the rasters back on top of each other.
+
+</Steps>
+
+## Options
+
+| Control | What it does |
+|---|---|
+| Opacity slider | The opacity of one raster, from 0% to 100%. With one raster on the map, there is one slider. |
+| **Move layer up** / **Move layer down** | Changes the order of the rasters. |
+| **Plant Health** | Opens [Plant health](./plant-health.mdx) for a raster with two or more bands. |
+| **Compare georasters side by side** | Splits the map into one band for each raster, with equal widths. |
+| Divider | Drag it to change the width of the bands next to it. |
+| **Move left** / **Move right** | Moves a raster one band to the left or to the right. The widths of the bands stay. |
+| **Compare to another georaster** | Shows when the map has only one raster. It opens the [compare view](./compare-view.mdx) to pick a second raster. |
+
+## Limits & requirements
+
+- The compare button shows on the **Map** tab of a dataset, when the map shows a raster.
+- The map compares the rasters of the folder on show. To compare rasters from different folders,
+  to save a comparison or to share it as a link, use the [compare view](./compare-view.mdx).
+- **Raster Analysis** and **Stockpile Volume** need exactly one raster on the map.
+
+## Related
+
+- [Compare view & saved comparisons](./compare-view.mdx)
+- [Colormaps, bands & histogram](./colormaps.mdx)
+- [Map viewer](../viewing/map.mdx)

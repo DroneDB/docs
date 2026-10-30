@@ -1,10 +1,105 @@
 ---
 title: "Stockpile volume"
-description: "Find a pile and compute its volume, weight and cost from a DSM."
+description: "Find a pile on an elevation model, compute its volume, and get its weight and cost from the material it is made of."
+hub_feature: [map:stockpile, map:stockpile-base-methods]
+datasets: [odx/micasense]
+requires: { access: read, data: "A DSM (elevation model) of the pile" }
 ---
 
-:::info
+<Clip id="analyse/stockpile--detect-material" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odx" ds="micasense" path="odm_dem/dsm.tif" view="map"
+         hint="Click Stockpile Volume at the top right, then Draw, and draw a polygon around a tree or a building." />
+
+## When to use it
+
+Use the stockpile tool to measure how much material a pile holds: gravel, sand, soil, coal.
+Hub computes the volume from a surface model (DSM) of the pile. Select the material, and Hub
+also gives the weight and the cost of the pile.
+
+## Steps
+
+<Steps>
+
+1. Open the DSM on the map. Click **Stockpile Volume** in the toolbar at the top right.
+
+   <Screenshot id="analyse/stockpile--panel" />
+
+2. Select the **Base Plane Method**. The information button next to it explains each method.
+
+3. Click **Click map**, then click on the pile. Hub finds the edge of the pile and computes its
+   volume. If Hub does not find the right edge, click **Draw** and draw a polygon around the pile.
+   Double-click to finish.
+
+   <Screenshot id="analyse/stockpile--detect" />
+
+4. Select a **Material**. The panel shows the **Weight** and the **Est. cost** of the pile.
+
+   <Screenshot id="analyse/stockpile--material-cost" />
+
+5. Type a title and a description under **Identification**. Click **Save Measurements** in the
+   measure toolbar to save the pile, or **Export GeoJSON** to download its outline.
+
+</Steps>
+
+## Options
+
+| Option | What it does | Default |
+|---|---|---|
+| **Base Plane Method** | The surface under the pile. See the table below. | Lowest perimeter |
+| **Detection Sensitivity** | How easily the detection separates the pile from the ground, from 0 to 1. Higher values find lower piles, but can take in nearby ground. | 0.50 |
+| **Search Radius (m)** | How far from your click Hub looks for the edge of the pile. Make it larger for a large pile. | 50 |
+| **Material (optional)** | The material that gives the weight and the cost. **+ Custom…** lets you type a density and a cost for this pile only. | none |
+
+<Screenshot id="analyse/stockpile--base-methods" />
+
+| Base plane method | What it is | Use it for |
+|---|---|---|
+| **Lowest perimeter** | A flat plane at the lowest point of the outline. Fill is always 0. | A pile on uneven ground. |
+| **Average perimeter** | A flat plane at the mean elevation of the outline. | A pile on level ground. |
+| **Best-fit plane** | A tilted plane fitted to the outline. | A pile on a slope. |
+| **Flat (elevation = 0)** | A plane at elevation 0. | A raster of heights above the ground only. |
+
+### Results
+
+| Result | What it is |
+|---|---|
+| **Cut volume** | The material above the base plane. |
+| **Fill volume** | The space below the base plane. It is not shown when the method makes it 0. |
+| **Net volume** | Cut minus fill. |
+| **2D area** / **3D surface** | The area of the outline on the map, and of the surface of the pile. |
+| **Base elevation** | The elevation of the base plane. |
+| **Confidence** | For a detected pile: how sure Hub is of the outline. |
+| **Weight** | The larger of the cut and the net volume, times the density of the material. |
+| **Est. cost** | The weight times the price of the material. |
+
+## Materials, units and currency
+
+The materials are yours. Click **Edit materials…** in the panel to open the **Stockpiles** tab of
+the [preferences](/docs/hub-guide/account/preferences). There you change the density and the price
+of each material, hide the ones you do not use and add your own. The prices are in the currency
+of the **Units** tab. The currency is a label: Hub does not convert prices.
+
+With imperial units, volumes are in yd³, weights in short tons and prices per short ton. Areas
+follow the same scale as the [measurements](../measure/map.mdx#units). A saved pile keeps the
+material it was weighed with.
+
+## Limits & requirements
+
+- **Stockpile Volume** shows when the map has exactly one raster with one band.
+- **Edit materials…** needs a signed-in account.
+- Saving the pile needs write access to the dataset.
+- Hub detects one pile for each click.
+
+{/* TODO data: no public showcase dataset has a DSM of a pile site yet (odm/caliterra has no DSM); the detect and material shots wait for it. */}
+
+## Related
+
+- [Elevation profile](./elevation-profile.mdx)
+- [Contour lines](./contours.mdx)
+- [Measurements on the map](../measure/map.mdx)
+- [Preferences](/docs/hub-guide/account/preferences)
+
+<ForDevelopers api="/docs/developers/api/workflows" />

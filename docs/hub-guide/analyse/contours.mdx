@@ -1,10 +1,71 @@
 ---
 title: "Contour lines"
-description: "Make contour lines from an elevation model."
+description: "Generate contour lines from an elevation model on the map, and save them with the measurements."
+hub_feature: [map:contours]
+datasets: [odx/micasense]
+requires: { access: read, data: "An elevation model (DSM or DTM) or another single-band raster" }
 ---
 
-:::info
+<Clip id="analyse/contours--generate" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odx" ds="micasense" path="odm_dem/dsm.tif" view="map"
+         hint="Click Raster Analysis at the top right, then Contours, then Generate." />
+
+## When to use it
+
+Contour lines show the shape of the ground on a flat map: each line joins the points at the same
+elevation. Use them to read the slope of a site, to plan drainage, or to give the terrain to
+someone who works in a drawing program.
+
+## Steps
+
+<Steps>
+
+1. Open the elevation model on the map. Click **Raster Analysis** in the toolbar at the top
+   right.
+
+2. Click **Contours**. The **Generate Contour Lines** dialog opens.
+
+   <Screenshot id="analyse/contours--dialog" />
+
+3. Select the **Spacing**: a **Fixed interval** between the lines, or a **Target count** of
+   lines. Set the other options if you need them. Click **Generate**.
+
+4. The lines show on the map, coloured from low (blue) to high (white).
+
+   <Screenshot id="analyse/contours--result" />
+
+5. Click **Save Measurements** in the measure toolbar to keep the lines in the dataset, or
+   **Export Measurements** to download them as GeoJSON.
+
+</Steps>
+
+## Options
+
+| Option | What it does | Default |
+|---|---|---|
+| **Fixed interval** / **Interval** | The difference in elevation between two lines, in the units of the raster. | 1 |
+| **Target count** / **Number of levels** | The number of lines, from 2 to 500. Hub shows the spacing this gives. | 20 |
+| **Base elevation** | The elevation that the lines count from. With an interval of 5 and a base of 2, the lines are at 2, 7, 12 … | 0 |
+| **Min elevation** / **Max elevation** | Only lines between these elevations. Empty: the range of the raster. | Empty |
+| **Simplification tolerance** | Makes the lines simpler, in the units of the coordinate system of the raster. 0 disables it. | 0 |
+
+When you open the dialog again, it shows the options you used last.
+
+## Limits & requirements
+
+- **Raster Analysis** shows when the map has exactly one raster with one band. The **Contours**
+  button is not there for thermal rasters.
+- Contours are measurements: they are saved, listed and exported with the other
+  [measurements on the map](../measure/map.mdx). Saving needs write access to the dataset.
+- **Generate** again replaces the contours that you did not save.
+
+## Related
+
+- [Elevation profile](./elevation-profile.mdx)
+- [Stockpile volume](./stockpile.mdx)
+- [Measurements on the map](../measure/map.mdx)
+
+<ForDevelopers cli="ddb contour odm_dem/dsm.tif -i 1 -o contours.geojson" api="/docs/developers/cli/cookbook" apiLabel="CLI cookbook" />

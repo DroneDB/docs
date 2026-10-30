@@ -1,10 +1,98 @@
 ---
-title: "Plant health"
-description: "Vegetation indices such as NDVI from multispectral imagery."
+title: "Plant health (vegetation indices)"
+description: "Show NDVI, NDRE and other vegetation indices of a multispectral orthophoto on the map, with a colormap and a histogram."
+hub_feature: ["menu:Plant Health", map:plant-health, map:plant-health-formulas]
+datasets: [odx/micasense]
+requires: { access: read, data: "A raster with two or more bands, for example a multispectral orthophoto" }
 ---
 
-:::info
+<Clip id="analyse/plant-health--index-switching" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odx" ds="micasense" path="odm_orthophoto/odm_orthophoto.tif" view="map"
+         hint="Click the leaf button (Plant Health) next to the opacity slider, then select NDVI." />
+
+## When to use it
+
+Use Plant Health to see how healthy a crop or a field is. Hub computes a vegetation index from
+the bands of the raster, for example NDVI from the red and near-infrared bands, and paints it with
+a colormap. Nothing is processed in advance: you can change the index at any time.
+
+## Steps
+
+<Steps>
+
+1. Open the multispectral orthophoto on the map. Click the **Plant Health** button (a leaf) next
+   to the opacity slider. You can also right-click the file in the dataset and select
+   **Plant Health**.
+
+2. In the **Plant Health** panel, select a **Formula**, for example **NDVI**.
+
+   <Screenshot id="analyse/plant-health--ndvi" />
+
+3. Select a **Colormap** and a **Stretch**. Drag the handles of the **Histogram** to set the range
+   of values the colormap covers.
+
+4. To learn what each index shows, click the information button next to **Formula**. The
+   **Vegetation index formulas** dialog shows the formula, the bands it needs and when to use it.
+
+   <Screenshot id="analyse/plant-health--formulas-dialog" />
+
+5. Click **Copy Link** to copy a link that opens the map with the same settings, or **Export** to
+   download the result as a GeoTIFF.
+
+</Steps>
+
+<LiveEmbed org="odx" ds="micasense" path="odm_orthophoto/odm_orthophoto.tif" view="map"
+           poster="analyse/plant-health--poster" />
+
+## Options
+
+| Option | What it does | Default |
+|---|---|---|
+| **Preset** | A band combination or an index made for the camera that took the images. It shows when Hub knows the camera. | — |
+| **Formula** | The vegetation index. **None (bands only)** shows the bands; see [Colormaps, bands & histogram](./colormaps.mdx). | None |
+| **Colormap** | The colours of the index. | Red-Yellow-Green |
+| **Stretch** | How Hub maps the values to the colours: **Percentile (2%-98%)**, **Min / Max**, **Std Dev (±2σ)** or **Custom**. | Percentile |
+| **Rescale** | The minimum and the maximum value, for example `-1,1`. Empty: automatic. | Automatic |
+| **Reset** | Puts all options back to their defaults. | — |
+| **Original** | Shows the raster without the index. | — |
+
+### Indices
+
+| Bands | Indices |
+|---|---|
+| Red, green, blue | VARI, EXG, GLI, vNDVI |
+| Near-infrared and visible bands | NDVI, NDWI, GNDVI, GRVI, ENDVI, ARVI, SAVI, OSAVI, EVI |
+| Red edge, near-infrared | NDRE |
+| Visible bands only | NDYI, MPRI |
+
+The list shows every index. An index that the raster cannot compute has a ✗. Its tooltip, and
+the formulas dialog, give the reason:
+
+- **A band is missing**: the message names the bands the index needs.
+- **The raster is not reflectance**: SAVI, OSAVI and EVI need values from 0 to 1 (a
+  floating-point raster). On 8-bit or 16-bit rasters they give wrong values, so Hub does not offer
+  them. Use NDVI, NDRE or another ratio index on such rasters.
+
+Hub reads the bands from the camera profile it matched to the file, so each index uses the right
+band whatever the band order of the camera.
+
+## Limits & requirements
+
+- Plant Health needs a georaster with two or more data bands, or a GeoTIFF photo with a
+  footprint. A raster with one band per file needs
+  [Merge multispectral bands](../processing/merge-multispectral.mdx) first.
+- **Export** is not available when the result is larger than the export limit of the Hub.
+- When the map shows two or more rasters, each raster with bands has its own leaf button in the
+  layer opacity panel.
+
+## Related
+
+- [Colormaps, bands & histogram](./colormaps.mdx)
+- [Thermal imagery](./thermal.mdx)
+- [Merge multispectral bands](../processing/merge-multispectral.mdx)
+- [Export a raster](../processing/export-raster.mdx)
+
+<ForDevelopers api="/docs/developers/api/workflows" />

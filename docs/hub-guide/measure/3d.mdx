@@ -1,10 +1,102 @@
 ---
 title: "Measurements in 3D"
-description: "Measure in the point cloud viewer and in the 3D viewer."
+description: "Measure points, distances, heights, angles, areas and volumes on a point cloud, and points, distances and areas in the 3D viewer."
+hub_feature: [pointcloud:measure, unified:measure]
+datasets: [odm/brighton-beach]
+requires: { access: read, data: "A point cloud, or a file the 3D viewer opens" }
 ---
 
-:::info
+<Clip id="measure/3d--pointcloud-distance" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="brighton-beach" path="odm_georeferencing/odm_georeferenced_model.laz" view="pointcloud"
+         hint="The point cloud opens with its saved measurements. Click the menu button to see the tools." />
+
+## When to use it
+
+Measure in 3D when the height matters: the height of a building, the slope of a roof, the
+distance between two points at different heights. The point cloud viewer has the most tools and
+saves its measurements in the dataset. The 3D viewer measures points, distances and areas on
+any data it shows, for the session only.
+
+## Steps
+
+### Point cloud viewer
+
+<Steps>
+
+1. Open a point cloud. Saved measurements of the point cloud show automatically.
+
+2. Click the menu button of the viewer. The menu opens on the **Tools** section. Click a
+   measurement tool, for example **Distance measurement**.
+
+   <Screenshot id="measure/3d--pointcloud-tools" />
+
+3. Click the points on the point cloud. Right-click to finish.
+
+4. Double-click a measurement to give it a name and a description, or to change its colours.
+   Click **Save**.
+
+5. Click **Save Measurements** to save the measurements in the dataset.
+
+   <Screenshot id="measure/3d--pointcloud-saved" />
+
+</Steps>
+
+### 3D viewer
+
+<Steps>
+
+1. Right-click a point cloud, a georaster, a vector file, a 3D model or a 3D Tiles file. Select
+   **Experimental**, then **Unified Viewer**.
+
+2. Click **Measure point**, **Measure distance** or **Measure area** at the top left. Click on
+   the scene. Right-click to finish a shape.
+
+   <Screenshot id="measure/3d--unified-area" />
+
+3. Click **Clear measurements** to remove them.
+
+</Steps>
+
+## Options
+
+### Point cloud viewer
+
+| Control | What it does |
+|---|---|
+| Point, distance, height, circle, angle, area measurement | The measurements that **Save Measurements** saves. |
+| Volume measurement, height profile | Work in the viewer. They are not saved. |
+| **Annotation** | A labelled 3D point with a name and a description. Double-click it to edit it or to copy its position. It is saved with the measurements. |
+| **Undo** / **Redo** | Undo or redo the delete of a measurement (`Ctrl+Z`, `Ctrl+Y`). |
+| **Delete measurement tool** | Click a measurement to delete it. |
+| **Units** | **Metric (m)** or **Imperial (ft)**. The same setting as the **Measurement Units** of the map and the **Units** tab of the [preferences](/docs/hub-guide/account/preferences). |
+| **Save Measurements** | Makes the saved file the same as the viewer. |
+| **Delete Saved** | Deletes the saved 3D measurements from the dataset. |
+
+### 3D viewer
+
+| Control | What it does |
+|---|---|
+| **Measure point** | The position of a point. |
+| **Measure distance** | A line through two or more points, with the length of each segment. |
+| **Measure area** | A polygon and its area. |
+| **Clear measurements** | Removes all measurements. |
+
+## Limits & requirements
+
+- **Save Measurements** shows only for users with write access to the dataset.
+  **Delete Saved** shows only for users who can delete in the dataset.
+- The point cloud viewer saves next to the point cloud, with `_measurements.geojson` in place of
+  the extension. The [map](./map.mdx) uses the same file when it shows the point cloud. Each
+  view saves and deletes only its own measurements; the other view's stay in the file.
+- The 3D viewer does not save its measurements, and it shows them in metres only.
+- The 3D viewer is experimental.
+
+## Related
+
+- [Point cloud viewer](../viewing/point-cloud.mdx)
+- [3D viewer](../viewing/3d-viewer.mdx)
+- [Measurements on the map](./map.mdx)
+- [Measure & pin a splat](./splat.mdx)

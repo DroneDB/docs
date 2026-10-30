@@ -1,0 +1,300 @@
+# Shots of the Measure & annotate pages (docs/hub-guide/measure/).
+#
+# Demo inputs (reset-demo.mjs) for the shots with `auth: demo`, in the org acme-surveys:
+# - dataset `sheffield-park`: the two orthophotos of odm/sheffield-park-1 and odm/sheffield-park-2
+#   (odm_orthophoto/odm_orthophoto.tif of each) as `park-1.tif` and `park-2.tif`, built, with no
+#   measurements file. The analyse shots use the same dataset.
+# - dataset `splats`: a copy of odx/splats `train.ply` (built), with no `train_cameras.json`
+#   (no pins, no scale, no measurements).
+#
+# Map canvases: the coordinates of `mouse` actions are CSS pixels of the default 1440x900
+# viewport, on the orthophoto as the map fits it on open. A later pass checks them on screen.
+# OpenLayers ends a line when the last point is clicked again and a polygon when the first
+# point is clicked again, so no double click is needed.
+
+- id: measure/map--length-area-save
+  type: clip
+  alt: A length and an area measured on an orthophoto, then saved in the dataset
+  page: hub-guide/measure/map
+  open: { org: acme-surveys, ds: sheffield-park, path: park-1.tif, view: map }
+  base: hub
+  auth: demo
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "button[title^='Measure Length']"
+    - mouse: { click: [560, 420] }
+    - mouse: { click: [760, 380] }
+    - mouse: { click: [760, 380] }
+    - wait: 800
+    - click: "button[title^='Measure Area']"
+    - mouse: { click: [820, 480] }
+    - mouse: { click: [960, 470] }
+    - mouse: { click: [940, 600] }
+    - mouse: { click: [820, 480] }
+    - wait: 800
+    - click: "button[title^='Save Measurements']"
+    - wait: 2000
+  highlight: null
+  crop: null
+  maxSeconds: 25
+  blocked: null
+  youtubeId: null
+
+- id: measure/map--toolbar
+  type: screenshot
+  alt: The measure toolbar on an orthophoto with its two saved measurements
+  page: hub-guide/measure/map
+  open: { org: odm, ds: brighton-beach, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions: []
+  highlight: "button[title^='Measure Length']"   # needs aria-label (the toolbar buttons have a title only); the box should cover the whole measure toolbar
+  crop: null
+  blocked: null
+
+- id: measure/map--area
+  type: screenshot
+  alt: An area drawn on an orthophoto, with its size in the polygon
+  page: hub-guide/measure/map
+  open: { org: odm, ds: brighton-beach, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "button[title^='Measure Area']"
+    - mouse: { click: [640, 380] }
+    - mouse: { click: [820, 360] }
+    - mouse: { click: [860, 540] }
+    - mouse: { click: [660, 560] }
+    - mouse: { click: [640, 380] }
+    - wait: 800
+  highlight: "button[title^='Measure Area']"
+  crop: null
+  blocked: null
+
+- id: measure/map--properties
+  type: screenshot
+  alt: The properties of a measurement - name, description, colours, line width and group
+  page: hub-guide/measure/map
+  open: { org: odm, ds: brighton-beach, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "button[title^='Measurement List']"
+    - click: "[aria-label='Edit']"            # the first row: opens the properties dialog
+    - fill: { selector: "#mp-name", value: Beach access }
+    - fill: { selector: "#mp-description", value: Width of the access path at high tide }
+  highlight: null
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: measure/map--list
+  type: screenshot
+  alt: The Measurements list with a group and the ungrouped measurements
+  page: hub-guide/measure/map
+  open: { org: odm, ds: brighton-beach, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "button[title^='Measurement List']"
+    - click: "text=New Group"
+    - fill: { selector: "#mg-name", value: North beach }
+    - click: "text=Create"
+    - wait: 500
+  highlight: "[aria-label='Move to group']"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: measure/annotations--dialog
+  type: screenshot
+  alt: The Point Annotation dialog with a colour and a description
+  page: hub-guide/measure/annotations
+  open: { org: odm, ds: brighton-beach, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "button[title^='Point Annotation']"
+    - mouse: { click: [720, 450] }
+    - wait: "#pa-description"
+    - fill: { selector: "#pa-description", value: Erosion at the foot of the dune }
+  highlight: null
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: measure/annotations--popup
+  type: screenshot
+  alt: A point annotation on the map with its coordinates and description
+  page: hub-guide/measure/annotations
+  open: { org: odm, ds: brighton-beach, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "button[title^='Point Annotation']"
+    - mouse: { click: [720, 450] }
+    - wait: "#pa-description"
+    - fill: { selector: "#pa-description", value: Erosion at the foot of the dune }
+    - click: "[role='dialog'] >> text=Save"
+    - press: Escape
+    - wait: 500
+  highlight: null
+  crop: { x: 470, y: 250, width: 500, height: 280 }
+  blocked: null
+
+- id: measure/3d--pointcloud-distance
+  type: clip
+  alt: A distance measured on a point cloud
+  page: hub-guide/measure/3d
+  open: { org: odm, ds: brighton-beach, path: odm_georeferencing/odm_georeferenced_model.laz, view: pointcloud }
+  base: hub
+  auth: none
+  waitFor: { selector: "#potree_render_area canvas", networkIdle: true, extraMs: 4000 }
+  actions:
+    - click: "img.potree_menu_toggle"           # needs aria-label (Potree's menu button is an image with no label)
+    - click: "img[title='Distance measurement']"
+    - mouse: { click: [640, 460] }
+    - mouse: { click: [820, 420] }
+    - mouse: { click: [820, 420], button: right }   # needs right click in the pipeline (Potree ends a measurement on right click)
+    - wait: 1500
+  highlight: null
+  crop: null
+  maxSeconds: 20
+  blocked: null
+  youtubeId: null
+
+- id: measure/3d--pointcloud-tools
+  type: screenshot
+  alt: The Tools section of the point cloud viewer menu, with the measurement tools
+  page: hub-guide/measure/3d
+  open: { org: odm, ds: brighton-beach, path: odm_georeferencing/odm_georeferenced_model.laz, view: pointcloud }
+  base: hub
+  auth: none
+  waitFor: { selector: "#potree_render_area canvas", networkIdle: true, extraMs: 4000 }
+  actions:
+    - click: "img.potree_menu_toggle"           # needs aria-label
+    - wait: 800
+  highlight: "img[title='Distance measurement']"
+  crop: null
+  blocked: null
+
+- id: measure/3d--pointcloud-saved
+  type: screenshot
+  alt: The saved measurements of a point cloud and the Units selector
+  page: hub-guide/measure/3d
+  open: { org: odm, ds: brighton-beach, path: odm_georeferencing/odm_georeferenced_model.laz, view: pointcloud }
+  base: hub
+  auth: none
+  waitFor: { selector: "#potree_render_area canvas", networkIdle: true, extraMs: 5000 }
+  actions: []
+  highlight: "[aria-label='Units']"
+  crop: null
+  blocked: null
+
+- id: measure/3d--unified-area
+  type: screenshot
+  alt: An area measured on a point cloud in the 3D viewer
+  page: hub-guide/measure/3d
+  open: { org: odm, ds: brighton-beach, path: odm_georeferencing/odm_georeferenced_model.laz, view: unified }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Measure area']", networkIdle: true, extraMs: 5000 }
+  actions:
+    - click: "[aria-label='Measure area']"
+    - mouse: { click: [620, 420] }
+    - mouse: { click: [820, 400] }
+    - mouse: { click: [840, 560] }
+    - mouse: { click: [640, 580], button: right }   # needs right click in the pipeline (ends the shape)
+    - wait: 1000
+  highlight: "[aria-label='Measure area']"
+  crop: null
+  blocked: null
+
+- id: measure/splat--distance-height-pin
+  type: clip
+  alt: A distance and a height measured on a splat, then a pin added and saved
+  page: hub-guide/measure/splat
+  open: { org: acme-surveys, ds: splats, path: train.ply, view: splat }
+  base: hub
+  auth: demo
+  waitFor: { selector: "[aria-label='Measure a distance']", networkIdle: true, extraMs: 4000 }
+  actions:
+    # the splat quality must be High (README): the pipeline sets the Quality preference before the run
+    - click: "[aria-label='Measure a distance']"
+    - mouse: { click: [600, 520] }
+    - mouse: { click: [860, 520] }
+    - press: Enter
+    - click: "[aria-label='Measure a height']"
+    - mouse: { click: [700, 600] }
+    - mouse: { click: [700, 380] }
+    - wait: 800
+    - click: "[aria-label='Pins']"
+    - click: "text=Add a pin"
+    - mouse: { click: [760, 440] }
+    - fill: { selector: "[aria-label='Name of pin 1']", value: Locomotive }
+    - fill: { selector: "textarea", value: "**Steam engine**, restored in 2012." }
+    - click: "text=Save"
+    - wait: 1500
+  highlight: null
+  crop: null
+  maxSeconds: 30
+  blocked: null
+  youtubeId: null
+
+- id: measure/splat--distance
+  type: screenshot
+  alt: A distance measured on a Gaussian splat, with the measure toolbar at the top left
+  page: hub-guide/measure/splat
+  open: { org: odx, ds: splats, path: train.ply, view: splat }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Measure a distance']", networkIdle: true, extraMs: 4000 }
+  actions:
+    - click: "[aria-label='Measure a distance']"
+    - mouse: { click: [600, 520] }
+    - mouse: { click: [860, 520] }
+    - press: Enter
+    - wait: 800
+  highlight: "[aria-label='Measure a distance']"
+  crop: null
+  blocked: null
+
+- id: measure/splat--set-scale
+  type: screenshot
+  alt: The Set the scale dialog with the real length of two picked points
+  page: hub-guide/measure/splat
+  open: { org: acme-surveys, ds: splats, path: train.ply, view: splat }
+  base: hub
+  auth: demo
+  waitFor: { selector: "[aria-label='Set the scale']", networkIdle: true, extraMs: 4000 }
+  actions:
+    - click: "[aria-label='Set the scale']"
+    - mouse: { click: [600, 520] }
+    - mouse: { click: [860, 520] }
+    - wait: "#splat-scale-length"
+    - fill: { selector: "#splat-scale-length", value: "12.5" }
+  highlight: null
+  crop: null
+  blocked: null
+
+- id: measure/splat--pins
+  type: screenshot
+  alt: The Pins panel with a pin and its Markdown text, link and image
+  page: hub-guide/measure/splat
+  open: { org: acme-surveys, ds: splats, path: train.ply, view: splat }
+  base: hub
+  auth: demo
+  waitFor: { selector: "[aria-label='Pins']", networkIdle: true, extraMs: 4000 }
+  actions:
+    - click: "[aria-label='Pins']"
+    - click: "text=Add a pin"
+    - mouse: { click: [760, 440] }
+    - fill: { selector: "[aria-label='Name of pin 1']", value: Locomotive }
+    - fill: { selector: "textarea", value: "**Steam engine**, restored in 2012." }
+    - fill: { selector: "input[type='url']", value: "https://example.org/locomotive" }
+  highlight: "[aria-label='Pins']"
+  crop: null
+  blocked: null

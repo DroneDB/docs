@@ -1,10 +1,94 @@
 ---
 title: "Measure & pin a splat"
-description: "Measure points, distances, heights and areas on a splat and add pins."
+description: "Measure points, distances, heights and areas on a Gaussian splat, set its scale, and add pins with Markdown text."
+hub_feature: [splat:measure, splat:scale, splat:pins]
+datasets: [odx/splats]
+requires: { access: read, data: "A Gaussian splat" }
 ---
 
-:::info
+<Clip id="measure/splat--distance-height-pin" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odx" ds="splats" path="train.ply" view="splat"
+         hint="Click Measure a distance at the top left, then click two points of the train." />
+
+## When to use it
+
+Measure a splat to get the size of an object in the scene: the length of a wall, the height of a
+door, the area of a floor. Add pins to explain what a visitor sees: a pin has a title, a text in
+Markdown, a link and a picture. Measurements, pins and the scale are saved with the splat, next to
+its camera views.
+
+## Steps
+
+<Steps>
+
+1. Open a Gaussian splat. The measure toolbar is at the top left.
+
+2. Click **Measure a distance**. Click the points of the line. Press `Enter` or right-click to
+   finish. Press `Escape` to cancel. On a screen without a right click, use **Done** and
+   **Cancel** under the toolbar.
+
+   <Screenshot id="measure/splat--distance" />
+
+3. Click **Measure a height** and click two points. The height is the difference between them
+   along the up direction of the scene.
+
+4. If the values are in the units of the file, set the scale. Click **Set the scale**. Click the
+   two ends of something whose length you know. In **Set the scale**, type its **Real length
+   (metres)** and click **Set scale**. All values are then in metres.
+
+   <Screenshot id="measure/splat--set-scale" />
+
+5. To add a pin, click **Pins**, then **Add a pin**. Click where the pin goes in the scene. Give
+   it a name, a **Text** in Markdown, a **Link** and an **Image**.
+
+   <Screenshot id="measure/splat--pins" />
+
+6. Click **Save** in the **Pins** panel. This saves the pins, the measurements, the scale and the
+   camera views.
+
+</Steps>
+
+## Options
+
+| Control | What it does |
+|---|---|
+| **Measure a point** | Shows the position of a point: from the origin of the file, in file units or in metres. |
+| **Measure a distance** | A line through any number of points. |
+| **Measure a height** | The difference between two points along the up direction of the scene. |
+| **Measure an area** | A polygon of three or more points. |
+| **Clear measurements** | Removes all measurements. |
+| **Set the scale** | Sets how many metres a unit of the file is, from two points and a real length. Setting it again replaces it. |
+| Coordinates button | On a [georeferenced splat](../viewing/splats-georeferenced.mdx) only: shows a point in the coordinate system of the splat or in WGS84. |
+
+A pin has these fields:
+
+| Field | What it does |
+|---|---|
+| Name | The title of the pin card. |
+| **Text** | Markdown text in the card. |
+| **Link** | A web address. It opens in a new tab. |
+| **Image** | The path of a picture in the same dataset, for example `photos/gate.jpg`. |
+
+In the **Pins** panel you can show a pin, save the current view with a pin, reorder the pins and
+remove them. Clicking a pin in the scene opens its card and flies to its saved view. The tour of
+the splat visits the pins that have a view, in the order of the list.
+
+## Limits & requirements
+
+- Anyone who can open the splat sees its saved pins and measurements, and can measure.
+  What a user without write access measures is not saved.
+- Only users with write access can add and edit pins, set the scale and save.
+- Until the scene has a scale, values are in the units of the file. A note under the toolbar
+  says so.
+- A georeferenced splat is in metres already: **Set the scale** does not show.
+- If the saved views of the splat cannot be read, the viewer warns you. Saving then asks before
+  it replaces them.
+
+## Related
+
+- [Gaussian splats](../viewing/splats.mdx)
+- [Georeferenced splats](../viewing/splats-georeferenced.mdx)
+- [Measurements in 3D](./3d.mdx)

@@ -1,10 +1,73 @@
 ---
 title: "Point annotations"
-description: "Add notes to points on the map."
+description: "Put a point with a colour and a description on the map, read its coordinates and save it with the measurements."
+hub_feature: [map:point-annotation]
+datasets: [odm/brighton-beach]
+requires: { access: read }
 ---
 
-:::info
+<Screenshot id="measure/annotations--popup" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="brighton-beach" path="odm_orthophoto/odm_orthophoto.tif" view="map"
+         hint="Click Point Annotation in the measure toolbar, then click on the map." />
+
+## When to use it
+
+Use a point annotation to mark a place on the map: a defect, a ground control point, a tree to
+check. The annotation has a colour and a description, and it shows the coordinates of the point.
+It is a measurement, so you save, list and export it with the other
+[measurements on the map](./map.mdx).
+
+## Steps
+
+<Steps>
+
+1. Open an orthophoto on the map, or open the **Map** tab of a dataset.
+
+2. Click **Point Annotation** in the measure toolbar. Click the point on the map.
+
+3. In the **Point Annotation** dialog, select a **Color** and type a **Description**. Click
+   **Save**. **Discard** removes the point.
+
+   <Screenshot id="measure/annotations--dialog" />
+
+4. The label of the point shows its coordinates and the description. To add more points, click
+   on the map again. Press `Esc` to stop.
+
+5. Click **Save Measurements** in the toolbar to save the annotations in the dataset.
+
+</Steps>
+
+## Options
+
+| Option | What it does |
+|---|---|
+| **Color** | The colour of the point and of its label. |
+| **Description** | Free text that shows in the label. |
+| Name | Double-click the point to open its properties: a name, which shows as the title of the label, and a group. |
+
+The label of a saved point has three buttons:
+
+| Button | What it does |
+|---|---|
+| **Edit annotation** | Opens the **Point Annotation** dialog again. |
+| **Copy coordinates** | Copies `latitude, longitude` in decimal degrees. |
+| **Delete point** | Removes the point from the map. Save to remove it from the dataset. |
+
+The coordinates are WGS84, in degrees, minutes and seconds and in decimal degrees (6 decimals).
+
+## Limits & requirements
+
+- Anyone who can open the map can add points. Only users with write access to the dataset can
+  save them.
+- Point annotations are saved in the same file as the other measurements of the map. See
+  [Measurements on the map](./map.mdx#limits--requirements).
+- The [point cloud viewer](./3d.mdx) has its own annotations, in 3D.
+
+## Related
+
+- [Measurements on the map](./map.mdx)
+- [Measurements in 3D](./3d.mdx)
+- [Map viewer](../viewing/map.mdx)

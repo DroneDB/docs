@@ -1,10 +1,109 @@
 ---
 title: "Measurements on the map"
-description: "Measure distances, areas and points on the map, save them and export them."
+description: "Measure lengths, areas and points on the map, put them in groups, save them in the dataset and export them as GeoJSON."
+hub_feature: [map:measure, map:measurement-list, map:measurement-groups, map:measurement-units]
+datasets: [odm/brighton-beach]
+requires: { access: read }
 ---
 
-:::info
+<Clip id="measure/map--length-area-save" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="brighton-beach" path="odm_orthophoto/odm_orthophoto.tif" view="map"
+         hint="The orthophoto opens with its two saved measurements: a line and an area." />
+
+## When to use it
+
+Use the measure tools to get a length, an area or the position of a point from an orthophoto or
+from any other data on the map. Anyone who can open the map can measure. Users with write access
+save the measurements in the dataset, so the next visitor sees them too.
+
+## Steps
+
+<Steps>
+
+1. Open an orthophoto on the map, or open the **Map** tab of a dataset. The measure toolbar is on
+   the map. Saved measurements of the file show automatically.
+
+   <Screenshot id="measure/map--toolbar" />
+
+2. Click **Measure Length**. Click the points of the line on the map. Double-click to finish.
+   Press `Esc` to cancel.
+
+3. Click **Measure Area**. Click the corners of the area. Double-click to finish. The area shows
+   in the middle of the polygon.
+
+   <Screenshot id="measure/map--area" />
+
+4. Double-click a measurement to open its properties. Give it a name and a description, change
+   its colours, its line width and its fill opacity, or put it in a group. Click **Save**.
+
+   <Screenshot id="measure/map--properties" />
+
+5. Click **Measurement List** to see all the measurements. Click **New Group** to make a group
+   with a name and a colour. Use **Move to group** on a row to put a measurement in a group. The
+   eye button of a group hides or shows its measurements.
+
+   <Screenshot id="measure/map--list" />
+
+6. Click **Save Measurements** to save them in the dataset.
+
+</Steps>
+
+## Options
+
+The first row of the toolbar has the drawing tools. The second row shows when there are
+measurements.
+
+| Button | What it does |
+|---|---|
+| **Point Annotation** | Puts a point with a description on the map. See [Point annotations](./annotations.mdx). |
+| **Measure Length** | Draws a line through two or more points and shows its length. |
+| **Measure Area** | Draws a polygon and shows its area. |
+| **Erase Measurement** | Deletes the measurement you click. |
+| **Edit/Move Measurements** | Drag a point to move it. `Shift`+drag moves the whole measurement. Double-click opens the properties. `Ctrl+Z` undoes. `Esc` exits. |
+| **Stop Measuring** | Cancels the current tool (`Esc`). |
+| **Measurement List** | Opens the list of measurements and groups. |
+| **Save Measurements** | Makes the saved file the same as the map. With nothing left on the map, it removes the saved measurements. |
+| **Clear All Measurements** | Removes all measurements from the map. The saved file does not change until you save again. |
+| **Export Measurements** | Downloads the measurements as a GeoJSON file. |
+| **Delete Saved Measurements** | Deletes the saved measurements from the dataset. |
+
+### Units
+
+| Value | Metric | Imperial |
+|---|---|---|
+| Length | m up to 100 m, then km | ft |
+| Area | m² below 1 ha, ha below 100 km², then km² | ft² below 1 acre, then acres |
+
+To change the units, click **Map Settings** on the map and select **Measurement Units**:
+**Metric** or **Imperial**. If there are measurements on the map, the **Change Units** dialog asks
+first. Click **Convert** to show all measurements in the new units; Hub then saves them. The units
+are the same setting as the **Units** tab of the [preferences](/docs/hub-guide/account/preferences),
+so they follow your account. Saved lengths and areas show in your current units when they load.
+
+### Coordinates of a point
+
+The label of a point shows its position in WGS84 in two formats: degrees, minutes and seconds,
+and decimal degrees (6 decimals). The properties of a point have a button that copies the
+coordinates as `latitude, longitude`.
+
+## Limits & requirements
+
+- **Save Measurements** shows only for users with write access to the dataset.
+  **Delete Saved Measurements** shows only for users who can delete in the dataset.
+- The measurements belong to a file. Hub saves them next to it, with `_measurements.geojson` in
+  place of the extension: `odm_orthophoto.tif` saves `odm_orthophoto_measurements.geojson`. On
+  the **Map** tab, they belong to the first orthophoto, raster or point cloud on show; with none,
+  to a `measurements.geojson` file in the folder.
+- The map and the [point cloud viewer](./3d.mdx) use the same file for the same point cloud.
+  Each view saves and deletes only its own measurements.
+- When the map changes to another file, unsaved changes are lost. Hub shows a warning.
+
+## Related
+
+- [Point annotations](./annotations.mdx)
+- [Measurements in 3D](./3d.mdx)
+- [Stockpile volume](../analyse/stockpile.mdx)
+- [Map viewer](../viewing/map.mdx)

@@ -1,10 +1,70 @@
 ---
 title: "Elevation profile"
-description: "Draw a line on an elevation model and see its profile."
+description: "Draw a line on an elevation model or another single-band raster and see a chart of the values along it."
+hub_feature: [map:raster-profile]
+datasets: [odx/micasense]
+requires: { access: read, data: "A raster with one band: a DSM, a DTM or a thermal raster" }
 ---
 
-:::info
+<Clip id="analyse/elevation-profile--draw" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odx" ds="micasense" path="odm_dem/dsm.tif" view="map"
+         hint="Click Raster Analysis at the top right, then Profile, and draw a line across the field." />
+
+## When to use it
+
+Draw a profile to see how the ground rises and falls along a line: the slope of a road, the
+height of a bank, the shape of a ditch. On a thermal raster, the same tool shows the temperatures
+along the line.
+
+## Steps
+
+<Steps>
+
+1. Open the elevation model on the map. Click **Raster Analysis** in the toolbar at the top
+   right.
+
+   <Screenshot id="analyse/elevation-profile--panel" />
+
+2. Click **Profile**. Click the points of the line on the map. Double-click to finish. Press
+   `Esc` or click **Stop** to cancel.
+
+3. The **Value Profile** chart shows the values along the line, from its start. Move the pointer
+   over the chart: a dot shows the same place on the map.
+
+   <Screenshot id="analyse/elevation-profile--chart" />
+
+4. Click **Export CSV** under the chart to download the samples.
+
+5. Click **Redraw** to draw a new line. The eraser button removes the chart and the line.
+
+</Steps>
+
+## Options
+
+| Option | What it does | Default |
+|---|---|---|
+| **Unit** | The unit the chart shows with the values, for example `m`. | Read from the file, else `m` |
+| **Profile** / **Redraw** | Draws a new line. The current line goes. | — |
+| **Export CSV** | Downloads the samples as `raster-profile.csv`. | — |
+
+The line is also a measurement. It shows in the **Measurement List**, and **Save Measurements**
+saves it with the other [measurements on the map](../measure/map.mdx).
+
+## Limits & requirements
+
+- The profile works on a raster with one band. **Raster Analysis** shows when the map has exactly
+  one such raster.
+- Hub samples the line at 256 evenly spaced points.
+- The distances on the chart are in metres and kilometres, also with imperial units.
+
+## Related
+
+- [Contour lines](./contours.mdx)
+- [Stockpile volume](./stockpile.mdx)
+- [Thermal imagery](./thermal.mdx)
+- [Measurements in 3D](../measure/3d.mdx)
+
+<ForDevelopers api="/docs/developers/api/workflows" />
