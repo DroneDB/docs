@@ -1,18 +1,18 @@
 ---
 sidebar_position: 5
 sidebar_label: Preferences
-description: The Preferences window of the DroneDB Hub, and the e-mails about your builds
+description: The User preferences window of the DroneDB Hub, and the e-mails about your builds
 ---
 
 # Preferences
 
-In the Hub, open the user menu at the top right and click **Preferences**. The window has one tab for each group of
-settings:
+In the Hub, open the user menu at the top right and click **Preferences**. The **User preferences** window opens. It
+has one tab for each group of settings:
 
 | Tab | Settings |
 |-----|----------|
 | **Units** | Metric or imperial measurement units, and the currency of prices |
-| **Map** | The default basemap, the flight path and the direction indicators, and the custom basemap |
+| **Map** | The default basemap and its custom source, the flight path, the direction indicators, and the dataset names on the datasets map |
 | **Files** | The default view of the files (grid or table) and the sort order |
 | **Lists** | How many datasets and organizations a page shows, and how the organizations are sorted |
 | **Viewers** | The navigation mode and the quality of Gaussian splats, and the lighting of the 3D viewers |
@@ -30,6 +30,32 @@ the settings of the tab back to their defaults.
 | **Currency** | Any ISO 4217 currency (default **USD**) | The currency of the prices in the Hub, for example the cost of a stockpile. The list has a search box, with the common currencies first |
 
 The currency is a label: a change does not convert the prices. For example, a price of 15 USD becomes 15 EUR.
+
+## Map
+
+| Setting | Values | What it does |
+|---------|--------|--------------|
+| **Default basemap** | **Satellite** (default), **Hybrid**, **OpenStreetMap**, **Custom** | The basemap of every map. **Custom** draws a tile source of your choice (see below) |
+| **Show flight path** | On (default), off | The flight path of the drone on the map |
+| **Show direction indicators** | Off (default), on | The direction and speed indicators on the flight path |
+| **Show dataset names on the datasets map** | Off (default), on | The names of the datasets under their pins, in the Map view of the Organizations and Datasets pages. The tag button of that map changes the same setting |
+
+### Custom basemap
+
+Choose **Custom** in **Default basemap** to set up the source. The **Custom basemap** fields open under the settings:
+
+1. Select the **Source type**: **XYZ tiles** or **WMS**.
+2. Type the **URL**. It must start with `http://` or `https://`. An XYZ URL has the `{z}`, `{x}` and `{y}`
+   placeholders, for example `https://tiles.example.com/{z}/{x}/{y}.png`.
+3. For a WMS source, click the refresh button next to **Layer**. The Hub reads the layers of the server and selects
+   the first one. Select the layer to show, then the **Tile size** (256 × 256 or 512 × 512).
+4. Click **Apply**. The Hub loads one tile to check the source. When the tile loads, it saves the source and the maps
+   change to it. When the tile does not load, the window shows an error and nothing changes.
+
+The maps keep their basemap until the source is saved. **Clear** removes the source; when **Custom** is selected, the
+basemap changes back to **Satellite**.
+
+The map settings of a map (the gear button) have the same fields. A source saved there is the same setting.
 
 ## Lists
 
