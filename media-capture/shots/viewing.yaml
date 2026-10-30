@@ -1,0 +1,609 @@
+# Shots of the Hub guide pages under docs/hub-guide/viewing/.
+#
+# Demo inputs (acme-surveys): none. Every shot here is read-only and uses the public odm/odx
+# datasets with auth none, except the training-data export dialog, which uses auth demo only
+# because the export is a task (it opens the dialog on the public odm/brighton-beach and does not
+# start the export).
+#
+# Notes for the capture pass:
+# - The file list opens a folder or a file with Enter on a focused tile (EntryThumbnail), so
+#   "click the tile, press Enter" stands for a double click.
+# - The context menu (Tools ›) needs a right click: `rightClick` below is not in the format yet.
+# - The splat viewer is set to Quality High in each shot (README rule).
+# - blocked: data = the showcase data is missing: 3D Tiles (.3tz), video / geo-video,
+#   geo-panorama, georeferenced splat.
+
+# ---------------------------------------------------------------- map
+- id: viewing/map--zoom-opacity
+  type: clip
+  alt: Zooming into the odm/zoo orthophoto and dragging the opacity slider
+  page: hub-guide/viewing/map
+  open: { org: odm, ds: zoo, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 2000 }
+  actions:
+    - mouse: { click: [720, 450] }
+    - press: "+"
+    - wait: 1500
+    - press: "+"
+    - wait: 2000
+    - drag: { from: [720, 860], to: [640, 860] }   # the Layer opacity slider: adjust after the first run
+    - wait: 1500
+    - drag: { from: [640, 860], to: [760, 860] }
+  highlight: "[aria-label='Layer opacity']"
+  maxSeconds: 20
+  blocked: null
+  youtubeId: null
+
+- id: viewing/map--embed
+  type: screenshot
+  alt: The odm/zoo orthophoto on the map
+  page: hub-guide/viewing/map
+  open: { org: odm, ds: zoo, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 2000 }
+  blocked: null
+
+- id: viewing/map--flight-shots
+  type: screenshot
+  alt: The Map tab of a dataset with geotagged photos and the flight path
+  page: hub-guide/viewing/map
+  url: /r/odm/zoo
+  base: hub
+  auth: none
+  waitFor: { selector: "role=tab[name='Map']", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: 'text="images"'
+    - press: Enter
+    - wait: 2000
+    - click: "role=tab[name='Map']"
+    - wait: "[aria-label='Map'] canvas"
+    - wait: 3000
+  highlight: "[aria-label='Show drone flight path']"
+  blocked: null
+
+- id: viewing/map--photo-popup
+  type: screenshot
+  alt: The popup of a photo on the map, with its preview, coordinates and footprint
+  page: hub-guide/viewing/map
+  url: /r/odm/zoo
+  base: hub
+  auth: none
+  waitFor: { selector: "role=tab[name='Map']", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: 'text="images"'
+    - press: Enter
+    - wait: 2000
+    - click: "role=tab[name='Map']"
+    - wait: "[aria-label='Map'] canvas"
+    - wait: 3000
+    - mouse: { click: [720, 450] }   # a photo marker: pick a pixel on a marker after the first run
+    - wait: "[aria-label='Copy coordinates']"
+    - wait: 2000
+  highlight: "[aria-label='Copy coordinates']"
+  blocked: null
+
+- id: viewing/map--custom-basemap
+  type: screenshot
+  alt: Map Settings with the Custom basemap and its editor
+  page: hub-guide/viewing/map
+  open: { org: odm, ds: zoo, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[title^='Map Settings']"
+    - wait: "#map-settings-dialog-basemap"
+    - click: "#map-settings-dialog-basemap"
+    - click: "role=option[name='Custom']"
+    - wait: "#map-settings-dialog-custom-url"
+    - fill: { selector: "#map-settings-dialog-custom-url", value: "https://tile.openstreetmap.org/{z}/{x}/{y}.png" }
+  highlight: "#map-settings-dialog-custom-url"
+  crop: "#map-settings"
+  blocked: null
+
+- id: viewing/map--vector-features
+  type: screenshot
+  alt: A KMZ file of vector features on the map
+  page: hub-guide/viewing/map
+  open: { org: odm, ds: vector, path: civil_war/civil_war_by_campaign.kmz, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 2500 }
+  blocked: null
+
+# ---------------------------------------------------------------- point cloud
+- id: viewing/point-cloud--orbit
+  type: clip
+  alt: Orbiting the odm/waterbury point cloud
+  page: hub-guide/viewing/point-cloud
+  open: { org: odm, ds: waterbury, path: odm_georeferencing/odm_georeferenced_model.laz, view: pointcloud }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Units']", networkIdle: true, extraMs: 5000 }
+  actions:
+    - drag: { from: [620, 450], to: [900, 430] }
+    - wait: 1500
+    - drag: { from: [900, 430], to: [700, 500] }
+    - wait: 1500
+  maxSeconds: 15
+  blocked: null
+  youtubeId: null
+
+- id: viewing/point-cloud--embed
+  type: screenshot
+  alt: The odm/waterbury point cloud in the point cloud viewer
+  page: hub-guide/viewing/point-cloud
+  open: { org: odm, ds: waterbury, path: odm_georeferencing/odm_georeferenced_model.laz, view: pointcloud }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Units']", networkIdle: true, extraMs: 5000 }
+  blocked: null
+
+- id: viewing/point-cloud--overview
+  type: screenshot
+  alt: A point cloud in the point cloud viewer, with the Units selector at the top left
+  page: hub-guide/viewing/point-cloud
+  open: { org: odm, ds: waterbury, path: odm_georeferencing/odm_georeferenced_model.laz, view: pointcloud }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Units']", networkIdle: true, extraMs: 5000 }
+  actions:
+    - drag: { from: [620, 450], to: [760, 420] }
+    - wait: 2500
+  highlight: "[aria-label='Units']"
+  blocked: null
+
+- id: viewing/point-cloud--menu
+  type: screenshot
+  alt: The side menu of the point cloud viewer with its sections
+  page: hub-guide/viewing/point-cloud
+  open: { org: odm, ds: waterbury, path: odm_georeferencing/odm_georeferenced_model.laz, view: pointcloud }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Units']", networkIdle: true, extraMs: 5000 }
+  actions:
+    - click: ".potree_menu_toggle"   # needs aria-label (Potree's menu button is an <img>)
+    - wait: "#menu_appearance"
+    - wait: 800
+  highlight: ".potree_menu_toggle"   # needs aria-label
+  blocked: null
+
+- id: viewing/point-cloud--attribute
+  type: screenshot
+  alt: The point cloud coloured by elevation, from the Attribute list of the Scene section
+  page: hub-guide/viewing/point-cloud
+  open: { org: odm, ds: waterbury, path: odm_georeferencing/odm_georeferenced_model.laz, view: pointcloud }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Units']", networkIdle: true, extraMs: 5000 }
+  actions:
+    - click: ".potree_menu_toggle"   # needs aria-label
+    - wait: "#menu_scene"
+    - click: "#menu_scene"
+    - click: 'text="odm_georeferenced_model.laz"'
+    - wait: "#optMaterial"
+    - select: { selector: "#optMaterial", value: Elevation }
+    - wait: 2500
+  highlight: "#optMaterial"
+  blocked: null
+
+# ---------------------------------------------------------------- 3D model
+- id: viewing/3d-model--orbit
+  type: clip
+  alt: Rotating the textured model of odm/wietrznia
+  page: hub-guide/viewing/3d-model
+  open: { org: odm, ds: wietrznia, path: odm_texturing/odm_textured_model_geo.obj, view: model }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Lighting']", networkIdle: true, extraMs: 5000 }
+  actions:
+    - drag: { from: [600, 450], to: [880, 440] }
+    - wait: 1500
+    - drag: { from: [880, 440], to: [700, 380] }
+    - wait: 1500
+  maxSeconds: 15
+  blocked: null
+  youtubeId: null
+
+- id: viewing/3d-model--embed
+  type: screenshot
+  alt: The textured model of odm/wietrznia in the 3D model viewer
+  page: hub-guide/viewing/3d-model
+  open: { org: odm, ds: wietrznia, path: odm_texturing/odm_textured_model_geo.obj, view: model }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Lighting']", networkIdle: true, extraMs: 5000 }
+  blocked: null
+
+- id: viewing/3d-model--overview
+  type: screenshot
+  alt: A textured 3D model in the 3D model viewer
+  page: hub-guide/viewing/3d-model
+  open: { org: odm, ds: wietrznia, path: odm_texturing/odm_textured_model_geo.obj, view: model }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Lighting']", networkIdle: true, extraMs: 5000 }
+  actions:
+    - drag: { from: [600, 450], to: [700, 420] }
+    - wait: 2500
+  blocked: null
+
+- id: viewing/3d-model--lighting
+  type: screenshot
+  alt: The Lighting window of the 3D model viewer
+  page: hub-guide/viewing/3d-model
+  open: { org: odm, ds: wietrznia, path: odm_texturing/odm_textured_model_geo.obj, view: model }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Lighting']", networkIdle: true, extraMs: 5000 }
+  actions:
+    - click: "[aria-label='Lighting']"
+    - wait: "#model-lighting"
+    - wait: 800
+  highlight: "[aria-label='Lighting']"
+  blocked: null
+
+# ---------------------------------------------------------------- 3D viewer
+- id: viewing/3d-viewer--tiles-orbit
+  type: clip
+  alt: A georeferenced 3D Tiles archive on the globe of the 3D viewer
+  page: hub-guide/viewing/3d-viewer
+  url: /r/odx/3d-tiles   # dataset to be created with a .3tz; replace with `open:` to the file
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Home']", networkIdle: true, extraMs: 5000 }
+  actions:
+    - drag: { from: [600, 450], to: [850, 430] }
+    - wait: 2000
+    - click: "[aria-label='Home']"
+    - wait: 2000
+  maxSeconds: 20
+  blocked: data
+  youtubeId: null
+
+- id: viewing/3d-viewer--3d-tiles
+  type: screenshot
+  alt: A 3D Tiles archive in the 3D viewer, with the Layers panel and the measure toolbar
+  page: hub-guide/viewing/3d-viewer
+  url: /r/odx/3d-tiles   # dataset to be created with a .3tz; replace with `open:` to the file
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Home']", networkIdle: true, extraMs: 5000 }
+  highlight: "[aria-label='Measure distance']"
+  blocked: data
+
+- id: viewing/3d-viewer--point-cloud
+  type: screenshot
+  alt: A point cloud on its basemap in the 3D viewer
+  page: hub-guide/viewing/3d-viewer
+  open: { org: odm, ds: brighton-beach, path: odm_georeferencing/odm_georeferenced_model.laz, view: unified }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Home']", networkIdle: true, extraMs: 5000 }
+  highlight: "[aria-label='Home']"
+  blocked: null
+
+# ---------------------------------------------------------------- splats
+- id: viewing/splats--fly-cameras-quality
+  type: clip
+  alt: Flying through the train splat, jumping to its camera views and setting the quality
+  page: hub-guide/viewing/splats
+  open: { org: odx, ds: splats, path: train.ply, view: splat }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
+  actions:
+    - click: "[aria-label='View settings']"
+    - click: "role=combobox[name='Quality']"
+    - click: "role=option[name='High']"
+    - click: "[aria-label='View settings']"
+    - drag: { from: [720, 450], to: [820, 440] }
+    - press: KeyW
+    - wait: 1500
+    - press: Digit1
+    - wait: 2500
+    - press: Digit2
+    - wait: 2500
+    - click: "[aria-label='Start cycling']"
+    - wait: 6000
+  maxSeconds: 30
+  blocked: null
+  youtubeId: null
+
+- id: viewing/splats--embed
+  type: screenshot
+  alt: The train splat in the splat viewer
+  page: hub-guide/viewing/splats
+  open: { org: odx, ds: splats, path: train.ply, view: splat }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
+  actions:
+    - click: "[aria-label='View settings']"
+    - click: "role=combobox[name='Quality']"
+    - click: "role=option[name='High']"
+    - click: "[aria-label='View settings']"
+    - wait: 3000
+  blocked: null
+
+- id: viewing/splats--overview
+  type: screenshot
+  alt: A Gaussian splat with the navigation buttons, the camera rail and the movement pad
+  page: hub-guide/viewing/splats
+  open: { org: odx, ds: splats, path: train.ply, view: splat }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
+  actions:
+    - click: "[aria-label='View settings']"
+    - click: "role=combobox[name='Quality']"
+    - click: "role=option[name='High']"
+    - click: "[aria-label='View settings']"
+    - press: Digit1
+    - wait: 3000
+  highlight: "[aria-label='Fly navigation']"
+  blocked: null
+
+- id: viewing/splats--camera-views
+  type: screenshot
+  alt: The Camera views window of the splat viewer
+  page: hub-guide/viewing/splats
+  open: { org: odx, ds: splats, path: train.ply, view: splat }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
+  actions:
+    - click: "[aria-label='View settings']"
+    - click: "role=combobox[name='Quality']"
+    - click: "role=option[name='High']"
+    - click: "[aria-label='View settings']"
+    - click: "[aria-label='Manage camera views']"
+    - wait: "#splat-cameras"
+    - wait: 800
+  highlight: "[aria-label='Manage camera views']"
+  blocked: null
+
+- id: viewing/splats--settings
+  type: screenshot
+  alt: The View settings of the splat viewer with the up axis, quality, point size and calibration
+  page: hub-guide/viewing/splats
+  open: { org: odx, ds: splats, path: train.ply, view: splat }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
+  actions:
+    - click: "[aria-label='View settings']"
+    - click: "role=combobox[name='Quality']"
+    - click: "role=option[name='High']"
+    - wait: 1500
+  highlight: "role=combobox[name='Quality']"
+  crop: "#splat-settings"
+  blocked: null
+
+- id: viewing/splats--about
+  type: screenshot
+  alt: The About this splat panel with the splat count, size, streaming state and quality
+  page: hub-guide/viewing/splats
+  open: { org: odx, ds: splats, path: train.ply, view: splat }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
+  actions:
+    - click: "[aria-label='View settings']"
+    - click: "role=combobox[name='Quality']"
+    - click: "role=option[name='High']"
+    - click: "[aria-label='View settings']"
+    - click: "button[aria-label='About this splat']"
+    - wait: "section[aria-label='About this splat']"
+    - wait: 1500
+  highlight: "button[aria-label='About this splat']"
+  blocked: null
+
+# ---------------------------------------------------------------- georeferenced splats
+- id: viewing/splats-georeferenced--map-footprint
+  type: screenshot
+  alt: The footprint of a georeferenced splat on the Map tab of its dataset
+  page: hub-guide/viewing/splats-georeferenced
+  url: /r/odx/splats-geo   # a splat trained from the odm/brighton-beach training data, with its georef.json
+  base: hub
+  auth: none
+  waitFor: { selector: "role=tab[name='Map']", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: "role=tab[name='Map']"
+    - wait: "[aria-label='Map'] canvas"
+    - wait: 3000
+  blocked: data
+
+- id: viewing/splats-georeferenced--coordinates
+  type: screenshot
+  alt: A measured point of a georeferenced splat in WGS84, with the coordinate format button
+  page: hub-guide/viewing/splats-georeferenced
+  url: /r/odx/splats-geo   # replace with `open:` to the georeferenced splat (view splat)
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
+  actions:
+    - click: "[aria-label='View settings']"
+    - click: "role=combobox[name='Quality']"
+    - click: "role=option[name='High']"
+    - click: "[aria-label='View settings']"
+    - click: "[aria-label='Measure a point']"
+    - mouse: { click: [720, 450] }
+    - click: "[aria-label^='Coordinates are shown in']"
+    - wait: 1000
+  highlight: "[aria-label^='Coordinates are shown in']"
+  blocked: data
+
+# ---------------------------------------------------------------- splat downloads
+- id: viewing/splat-downloads--about-panel
+  type: screenshot
+  alt: The downloads at the bottom of the About this splat panel
+  page: hub-guide/viewing/splat-downloads
+  open: { org: odx, ds: splats, path: train.ply, view: splat }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
+  actions:
+    - click: "[aria-label='View settings']"
+    - click: "role=combobox[name='Quality']"
+    - click: "role=option[name='High']"
+    - click: "[aria-label='View settings']"
+    - click: "button[aria-label='About this splat']"
+    - wait: "[role='group'][aria-label='Downloads']"
+  highlight: "[role='group'][aria-label='Downloads']"
+  crop: "section[aria-label='About this splat']"
+  blocked: null
+
+- id: viewing/splat-downloads--tools-menu
+  type: screenshot
+  alt: The splat downloads in the Tools menu of the file list
+  page: hub-guide/viewing/splat-downloads
+  url: /r/odx/splats
+  base: hub
+  auth: none
+  waitFor: { selector: 'text="train.ply"', networkIdle: true, extraMs: 1000 }
+  actions:
+    - rightClick: 'text="train.ply"'   # needs a right-click action in the capture format
+    - hover: "text=Tools"
+    - wait: "text=Download original"
+  highlight: "text=Download level-of-detail (.rad)"
+  blocked: null
+
+- id: viewing/splat-downloads--training-export
+  type: screenshot
+  alt: The Export Splat Training Data dialog with its options
+  page: hub-guide/viewing/splat-downloads
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: demo   # the export is a task; the shot only opens the dialog and starts nothing
+  waitFor: { selector: 'text="odm_report"', networkIdle: true, extraMs: 1000 }
+  actions:
+    - rightClick: "[role='tree'] >> text=brighton-beach"   # the dataset root in the folder tree; needs a right-click action
+    - hover: "text=Tools"
+    - click: "text=Export splat training data"
+    - wait: "#splatTrainingExportDialog"
+    - wait: 1000
+  crop: "#splatTrainingExportDialog"
+  blocked: null
+
+# ---------------------------------------------------------------- panoramas
+- id: viewing/panoramas--drag-look
+  type: clip
+  alt: Dragging to look around the odm/copr panorama
+  page: hub-guide/viewing/panoramas
+  open: { org: odm, ds: copr, path: copr.png, view: panorama }
+  base: hub
+  auth: none
+  waitFor: { selector: "[title='Fullscreen']", networkIdle: true, extraMs: 2000 }
+  actions:
+    - drag: { from: [900, 450], to: [500, 430] }
+    - wait: 1000
+    - drag: { from: [500, 430], to: [800, 520] }
+    - wait: 1000
+    - click: "[title='Zoom in']"
+    - wait: 1500
+  maxSeconds: 15
+  blocked: null
+  youtubeId: null
+
+- id: viewing/panoramas--embed
+  type: screenshot
+  alt: The odm/langley panorama in the panorama viewer
+  page: hub-guide/viewing/panoramas
+  open: { org: odm, ds: langley, path: langley.png, view: panorama }
+  base: hub
+  auth: none
+  waitFor: { selector: "[title='Fullscreen']", networkIdle: true, extraMs: 2000 }
+  blocked: null
+
+- id: viewing/panoramas--viewer
+  type: screenshot
+  alt: A 360° panorama in the panorama viewer, with its bar at the bottom
+  page: hub-guide/viewing/panoramas
+  open: { org: odm, ds: copr, path: copr.png, view: panorama }
+  base: hub
+  auth: none
+  waitFor: { selector: "[title='Fullscreen']", networkIdle: true, extraMs: 2000 }
+  highlight: "[title='Automatic rotation']"
+  blocked: null
+
+- id: viewing/panoramas--map-marker
+  type: screenshot
+  alt: The marker of a geotagged panorama on the Map tab of its dataset
+  page: hub-guide/viewing/panoramas
+  url: /r/odx/panoramas   # a dataset with a 360° photo that has GPS tags (to be created)
+  base: hub
+  auth: none
+  waitFor: { selector: "role=tab[name='Map']", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: "role=tab[name='Map']"
+    - wait: "[aria-label='Map'] canvas"
+    - wait: 3000
+  blocked: data
+
+# ---------------------------------------------------------------- videos
+- id: viewing/videos--player
+  type: screenshot
+  alt: A video playing in the video player of the dataset page
+  page: hub-guide/viewing/videos
+  url: /r/odx/video   # a dataset with a DJI clip and its telemetry (to be created)
+  base: hub
+  auth: none
+  waitFor: { selector: "role=tab[name='Map']", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: "text=.MP4"   # the video tile: use its exact name once the dataset exists
+    - press: Enter
+    - wait: "video"
+    - wait: 2000
+  highlight: "[aria-label='Open in new tab']"
+  blocked: data
+
+- id: viewing/videos--map-popup
+  type: screenshot
+  alt: The popup of a geo-video on the map, with Play video
+  page: hub-guide/viewing/videos
+  url: /r/odx/video
+  base: hub
+  auth: none
+  waitFor: { selector: "role=tab[name='Map']", networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: "role=tab[name='Map']"
+    - wait: "[aria-label='Map'] canvas"
+    - wait: 3000
+    - mouse: { click: [720, 450] }   # the video marker
+    - wait: "[aria-label='Play video']"
+  highlight: "[aria-label='Play video']"
+  blocked: data
+
+# ---------------------------------------------------------------- Markdown & PDF
+- id: viewing/markdown-pdf--readme
+  type: screenshot
+  alt: The README.md of odm/aukerman in the Markdown viewer
+  page: hub-guide/viewing/markdown-pdf
+  open: { org: odm, ds: aukerman, path: README.md, view: markdown }
+  base: hub
+  auth: none
+  waitFor: { selector: ".content", networkIdle: true, extraMs: 800 }   # the rendered Markdown; no label
+  blocked: null
+
+- id: viewing/markdown-pdf--pdf
+  type: screenshot
+  alt: The ODM report PDF of odm/brighton-beach in the PDF window
+  page: hub-guide/viewing/markdown-pdf
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: none
+  waitFor: { selector: 'text="odm_report"', networkIdle: true, extraMs: 1000 }
+  actions:
+    - click: 'text="odm_report"'
+    - press: Enter
+    - wait: 'text="report.pdf"'
+    - click: 'text="report.pdf"'
+    - press: Enter
+    - wait: "#pdfViewerDialog iframe"
+    - wait: 3000
+  crop: "#pdfViewerDialog"
+  blocked: null

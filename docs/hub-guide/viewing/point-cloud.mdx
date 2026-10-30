@@ -1,10 +1,81 @@
 ---
 title: "Point cloud viewer"
-description: "Navigate, colour and measure point clouds."
+description: "Navigate, colour and measure point clouds in the Potree viewer."
+hub_feature: [route:PointCloud, menu:Open Point Cloud]
+datasets: [odm/waterbury]
+requires: { access: read, data: "A point cloud (LAS, LAZ or a point-cloud PLY)" }
 ---
 
-:::info
+<Clip id="viewing/point-cloud--orbit" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="waterbury" path="odm_georeferencing/odm_georeferenced_model.laz" view="pointcloud"
+         hint="Drag to orbit, right-drag to pan, scroll to zoom." />
+
+## When to use it
+
+Use the point cloud viewer to look at a point cloud in 3D, change how its points are coloured and measure it. Hub streams the points: it loads the coarse points first and adds detail where you look, so a large cloud opens quickly.
+
+<LiveEmbed org="odm" ds="waterbury" path="odm_georeferencing/odm_georeferenced_model.laz" view="pointcloud"
+           poster="viewing/point-cloud--embed" />
+
+## Steps
+
+<Steps>
+
+1. In the file list, double-click a point cloud, or right-click it and choose **Open Point Cloud**. The viewer opens in a new browser tab.
+
+   <Screenshot id="viewing/point-cloud--overview" />
+
+2. Move around the cloud:
+   - Drag with the left mouse button to orbit.
+   - Drag with the right mouse button to pan.
+   - Turn the mouse wheel to zoom.
+   - Double-click a point to fly to it.
+
+3. Click the menu button (top left) to open the side menu. Its sections are **Appearance**, **Tools**, **Scene**, **Filters** and **About**.
+
+   <Screenshot id="viewing/point-cloud--menu" />
+
+4. To colour the points, open **Scene** and click the point cloud in the tree. Under **Attribute**, choose how to colour it, for example by its colour (RGB), its elevation or its classification. The list shows only the attributes that the file has.
+
+   <Screenshot id="viewing/point-cloud--attribute" />
+
+5. To change the navigation, open **Tools**. Under **Navigation**, choose orbit, fly, helicopter or earth controls.
+
+6. To measure, open **Tools** and choose a tool under **Measurement**. See [Measurements in 3D](../measure/3d.mdx).
+
+</Steps>
+
+## Options
+
+| Option | Where | What it does |
+|---|---|---|
+| **Units** | Top left | **Metric (m)** or **Imperial (ft)** for the measurements. The map uses the same setting |
+| **Point budget** | **Appearance** | The most points drawn at one time. A lower value is faster |
+| **Field of view** | **Appearance** | The angle of the camera |
+| **Eye-Dome-Lighting** | **Appearance** | Shading that makes the shape of the points easier to see. Off when the viewer opens |
+| **Point size**, **Opacity** | **Scene**, point cloud | The size and the transparency of the points |
+| **Attribute** | **Scene**, point cloud | How the points are coloured |
+| **Clipping** | **Tools** | Shows only the points inside or outside a box or a polygon |
+| **Classification**, **Returns** | **Filters** | Shows or hides the classes and the returns of a LiDAR cloud |
+
+## Limits & requirements
+
+- The point cloud opens after its build is done. Until then the viewer says that the file is still being processed. See [Builds](../processing/builds.mdx).
+- The viewer needs a browser with WebGL. On phones and tablets it draws fewer points.
+- Everyone who can read the dataset can measure. To save measurements you need write access.
+
+## Related
+
+- [Measurements in 3D](../measure/3d.mdx)
+- [3D viewer](./3d-viewer.mdx): the same point cloud on a globe, with rasters and vectors
+- [Map viewer](./map.mdx)
+- [Open Hub data in QGIS](../sharing/qgis.mdx)
+
+<ForDevelopers api="/docs/developers/api/workflows">
+
+Hub builds a COPC file (`copc/cloud.copc.laz`) from each point cloud and the viewer reads it with HTTP range requests. The viewer is Potree 1.8.
+
+</ForDevelopers>

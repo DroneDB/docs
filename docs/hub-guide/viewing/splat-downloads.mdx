@@ -1,10 +1,99 @@
 ---
 title: "Splat downloads"
-description: "Download a splat as the original file, level of detail, .spz or training data."
+description: "Download a splat as the original file, the level-of-detail .rad or a .spz for other tools, and export splat training data from an ODM project."
+hub_feature:
+  - "menu:Download original"
+  - "menu:Download level-of-detail (.rad)"
+  - "menu:Download .spz"
+  - "menu:Download .spz (for other tools)"
+  - "menu:Export splat training data"
+datasets: [odx/splats, odm/brighton-beach]
+requires: { access: read }
 ---
 
-:::info
+<Screenshot id="viewing/splat-downloads--about-panel" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odx" ds="splats" path="train.ply" view="splat"
+         hint="Click the (i) button at the right edge: the downloads are at the bottom of the panel." />
+
+## When to use it
+
+Download a splat to open it in another tool, such as a splat editor or a game engine, or to keep the streamed file that Hub built. Export the training data of an ODM project to train a splat that has a place on the map.
+
+## Steps
+
+<Steps>
+
+1. Open the downloads in one of two places:
+   - In the splat viewer, click **About this splat** (the (i) button). The downloads are at the bottom of the panel.
+   - In the file list, right-click the splat and open **Tools**.
+
+   <Screenshot id="viewing/splat-downloads--tools-menu" />
+
+2. Click the download you need. The file has the name of the splat, for example `train.rad`.
+
+3. For **Download .spz (for other tools)**, Hub first converts the splat. A notice says that the file is being prepared. The browser downloads it when it is ready. The next download of the same file starts at once.
+
+</Steps>
+
+## Options
+
+| Download | What you get | When it is there |
+|---|---|---|
+| **Download original** | The file that was uploaded | Always |
+| **Download level-of-detail (.rad)** | The streamed file that Hub built. Viewers that read Spark's RAD format open it | The build is done |
+| **Download .spz** | The compressed file of a splat that Hub built before the level-of-detail format existed | Only until the splat is built again |
+| **Download .spz (for other tools)** | A compressed `.spz` made from the uploaded file, for an editor or a viewer that reads SPZ | The build is done, the file is a PLY, SPLAT or SPZ, and the server offers the conversion |
+
+A splat that is not built, or that is being built, offers only **Download original**.
+
+## Export splat training data
+
+Hub can turn the outputs of an ODM project into the input of a splat trainer. A splat trained from it, in the same coordinates, is [georeferenced](./splats-georeferenced.mdx).
+
+<Steps>
+
+1. In the file list, select the folder of the ODM project. If the project is at the root of the dataset, select the dataset itself in the folder tree.
+
+2. Right-click it and choose **Tools** › **Export splat training data**.
+
+3. Check the options, then click **Export**. A progress bar shows the steps.
+
+   <Screenshot id="viewing/splat-downloads--training-export" />
+
+4. Read the warnings, if any. They say, for example, that most images look straight down or that some images were left out.
+
+5. Click **Download** to save the ZIP.
+
+</Steps>
+
+| Field | What it does | Default |
+|---|---|---|
+| **Largest image side (pixels)** | Resizes the images to this longest side. 0 keeps the original images | 1600 |
+| **Most points** | The most points of the sparse model. 0 writes none | 100000 |
+| **File name** | The name of the ZIP | `<folder>-training-data.zip` |
+
+The ZIP holds a COLMAP sparse model (`sparse/0/`), the `images/` folder and a `georef.json` file. Train the splat with any trainer that reads a COLMAP model, then upload it next to `georef.json`.
+
+## Limits & requirements
+
+- The dialog warns when the folder does not look like an ODM project. The project needs `cameras.json`, `odm_report/shots.geojson`, the `images/` folder and `odm_georeferencing/coords.txt`. Without its point cloud, the model has no points.
+- With 0 as the largest image side, the original images go into the ZIP, which can be large.
+- **Download .spz (for other tools)** and **Export splat training data** run as background tasks. They are there only when the server offers them.
+- The conversion to `.spz` reads the whole splat in memory, so a large splat takes some time.
+
+## Related
+
+- [Gaussian splats](./splats.mdx)
+- [Georeferenced splats](./splats-georeferenced.mdx)
+- [Download files](../files/download.mdx)
+- [Tasks panel & logs](../processing/tasks.mdx)
+
+<ForDevelopers cli={`ddb gsplat scene.ply scene.spz
+ddb gsplat --training-data ./training --max-image-size 1600 ./odm_project`} api="/docs/developers/cli/cookbook" apiLabel="CLI cookbook">
+
+The same conversion and export without Hub. The tasks are `splat-spz-export` and `splat-training-export` of the processing platform.
+
+</ForDevelopers>

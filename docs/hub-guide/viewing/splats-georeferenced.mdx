@@ -1,10 +1,59 @@
 ---
 title: "Georeferenced splats"
-description: "What a georeferenced splat shows on the map and in measurements."
+description: "What a georeferenced splat shows on the map and in measurements, and how to make one."
+hub_feature: []
+datasets: []
+requires: { access: read, data: "A Gaussian splat uploaded with its georeference file" }
 ---
 
-:::info
+<Screenshot id="viewing/splats-georeferenced--map-footprint" />
 
-This page is being written.
+<Requires />
 
-:::
+{/* TODO: add a <TryLive> when a georeferenced splat is public on hub.dronedb.app (showcase data gap). */}
+
+## When to use it
+
+A splat is stored in the coordinates of the program that trained it. These coordinates do not say where the scene is on the Earth. A **georeferenced** splat comes with a small file that gives its place, so Hub knows where it is and how large it is. Use one when you want the scene on the map and measurements in metres.
+
+## What a georeferenced splat gets
+
+- **A place on the map.** The **Map** tab of the dataset shows the splat as a point. After the build, the point becomes the outline of the ground that the scene covers. Hold the pointer on it to see its name, and double-click it to open the splat. A splat without a georeference is not on the map.
+- **The right way up.** The splat opens upright. The **Up axis** in **View settings** shows **Auto (georeferenced)**.
+- **Metres, without a scale.** Distances, heights and areas are in metres. You do not need to set the scale, so the **Set the scale** button is not there.
+- **Earth coordinates.** A measured point shows where it is on the Earth. The last button of the measure toolbar changes the format: the coordinate system of the splat (the button shows its name, for example `EPSG:32632`) or **WGS84** (latitude, longitude and height). The card of a pin shows its coordinates the same way.
+- **About this splat** says **Georeferenced: Yes**, with the coordinate system.
+
+<Screenshot id="viewing/splats-georeferenced--coordinates" />
+
+## How to make one
+
+<Steps>
+
+1. Upload the ODM project of your drone flight to a dataset. Select its folder, then choose **Tools** › **Export splat training data**. See [Splat downloads](./splat-downloads.mdx).
+
+2. Train the splat outside DroneDB with a 3DGS trainer that reads a COLMAP model. Keep the coordinates of the training data: a trainer or an editor that moves, turns or scales the scene removes the georeference, and nothing in the file says so.
+
+3. Upload the splat to one folder of a dataset together with the `georef.json` file from the ZIP. Upload `georef.json` first or at the same time.
+
+</Steps>
+
+Other ways to give a splat its place, for example with ODM's `coords.txt` or a latitude and a longitude, are in the [CLI cookbook](/docs/developers/cli/cookbook).
+
+## Limits & requirements
+
+- Hub reads the georeference when it indexes the splat. A splat uploaded before its georeference file is not georeferenced until the dataset is [rescanned](../files/rescan.mdx).
+- WGS84 coordinates are offered when Hub can convert the coordinate system of the splat: the UTM zones of WGS84, and a system given as a PROJ string or WKT. For other EPSG codes the coordinates stay in the coordinate system of the splat.
+
+## Related
+
+- [Gaussian splats](./splats.mdx)
+- [Measure & pin a splat](../measure/splat.mdx)
+- [Map viewer](./map.mdx)
+- [Splat downloads](./splat-downloads.mdx)
+
+<ForDevelopers cli="ddb gsplat --training-data ./training ./odm_project" api="/docs/developers/cli/cookbook" apiLabel="CLI cookbook: georeferencing sidecars">
+
+A georeferenced splat has a local frame with X to the East, Y to the North and Z up, in metres. The build writes the ground footprint as `wgs84Footprint` in `bounds.json`.
+
+</ForDevelopers>

@@ -1,10 +1,91 @@
 ---
 title: "Map viewer"
-description: "Basemaps, layers, opacity, flight shots, photo popups and vector features on the map."
+description: "Basemaps, layers, opacity, flight shots, photo popups, vector features and splat footprints on the map."
+hub_feature: [route:SingleMap, menu:Open Map]
+datasets: [odm/zoo, odm/vector]
+requires: { access: read }
 ---
 
-:::info
+<Clip id="viewing/map--zoom-opacity" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="zoo" path="odm_orthophoto/odm_orthophoto.tif" view="map"
+         hint="Zoom in, then drag the opacity slider at the bottom." />
+
+## When to use it
+
+Use the map to see the files of a dataset that have a position: orthophotos, elevation models, photos, videos, panoramas, vector files and georeferenced splats. There are two maps:
+
+- The **Map** tab of a dataset shows every file with a position in the folder on show.
+- The map of one file opens in a new browser tab when you double-click a georaster or a vector file, or when you choose **Open Map** in its context menu.
+
+<LiveEmbed org="odm" ds="zoo" path="odm_orthophoto/odm_orthophoto.tif" view="map" poster="viewing/map--embed" />
+
+## Steps
+
+<Steps>
+
+1. Open a dataset and click the **Map** tab. Hub draws the files of the folder on show.
+
+   Geotagged photos are blue dots. The line between them is the flight path, from the start flag to the finish flag.
+
+   <Screenshot id="viewing/map--flight-shots" />
+
+2. Hold the pointer on a photo to see its name. Click it to open its popup: a preview, **Open in new tab**, **Download** and **Copy coordinates**. Hub also draws the ground footprint of the photo.
+
+   <Screenshot id="viewing/map--photo-popup" />
+
+3. Click **Show direction and speed indicators** (top center) to draw each photo that records its camera direction as an arrow. The tooltip then also shows the speed.
+
+4. Drag the opacity slider at the bottom to see the basemap through a raster. With more than one raster, a layer panel sets the opacity and the order of each one (see [Compare layers](../analyse/compare-layers.mdx)).
+
+5. Click the gear button (bottom left) to open **Map Settings**. Choose a **Basemap** and the **Measurement Units**.
+
+6. To use your own basemap, choose **Custom** as the basemap. Set the **Source type** (**XYZ tiles** or **WMS**) and the **URL**. For WMS, click **Fetch layers**, then choose the **Layer** and the **Tile size**. Click **Apply**. Hub loads one tile to check the source, then saves it to your account.
+
+   <Screenshot id="viewing/map--custom-basemap" />
+
+7. Hold the pointer on a vector feature to see its name. Double-click the feature to open **Feature Properties**, a table of its attributes. GeoJSON, KML/KMZ, GeoPackage, Shapefile, GPX tracks and DXF/DWG drawings with a coordinate system all show this way.
+
+   <Screenshot id="viewing/map--vector-features" />
+
+</Steps>
+
+## Options
+
+| Control | What it does | Default |
+|---|---|---|
+| **Basemap** | **Satellite**, **Hybrid**, **OpenStreetMap** or **Custom** (an XYZ or WMS source) | Satellite |
+| **Measurement Units** | **Metric** or **Imperial**, for measurements and speeds | Metric |
+| **Show drone flight path** | The path through the timed photos, with start and finish flags | On |
+| **Show direction and speed indicators** | Photos as arrows; speed in the tooltip | Off |
+| **Reset View** (or the `H` key) | Zooms back to the first view of the files | — |
+| **Fullscreen** | The map fills the screen | — |
+| **Rectangle Selection**, **Polygon Selection** (top left, **Map** tab only) | Select the files inside a shape in the file list. `Ctrl`+click selects one file | — |
+
+The basemap, the custom basemap, the flight path and the direction indicators are [preferences](../account/preferences.mdx): they follow your account.
+
+Other items on the map:
+
+- **Panoramas** are a separate marker. Click one to open the [panorama viewer](./panoramas.mdx).
+- **Geotagged videos** open a popup with **Play video**. See [Videos](./videos.mdx).
+- **Georeferenced splats** show as a point, then as their ground footprint after the build. Double-click one to open it. See [Georeferenced splats](./splats-georeferenced.mdx).
+
+## Limits & requirements
+
+- A file shows on the map only when it has a position. A drawing without a coordinate system opens in the [3D viewer](./3d-viewer.mdx) instead.
+- Rasters and vector files show after their build is done. See [Builds](../processing/builds.mdx).
+
+## Related
+
+- [Measurements on the map](../measure/map.mdx)
+- [Colormaps, bands & histogram](../analyse/colormaps.mdx)
+- [Compare layers](../analyse/compare-layers.mdx)
+- [Preferences](../account/preferences.mdx)
+
+<ForDevelopers api="/docs/developers/ogc">
+
+The tiles that the map draws are also available as XYZ, WMS and WMTS services for other GIS tools.
+
+</ForDevelopers>

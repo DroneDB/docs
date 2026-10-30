@@ -1,10 +1,61 @@
 ---
 title: "Panoramas (360°)"
-description: "Look around in 360° panoramas."
+description: "Look around in 360° panoramas and find geotagged panoramas on the map."
+hub_feature: [route:Panorama, menu:Open Panorama]
+datasets: [odm/copr, odm/langley]
+requires: { access: read, data: "A 360° photo (an image twice as wide as it is high)" }
 ---
 
-:::info
+<Clip id="viewing/panoramas--drag-look" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="copr" path="copr.png" view="panorama"
+         hint="Drag to look around, scroll to zoom." />
+
+## When to use it
+
+Use the panorama viewer to look around a 360° photo as if you stand where it was taken. Hub finds panoramas by themselves: an image that is at least twice as wide as it is high is a panorama. You upload it like any other photo.
+
+<LiveEmbed org="odm" ds="langley" path="langley.png" view="panorama" poster="viewing/panoramas--embed" />
+
+## Steps
+
+<Steps>
+
+1. In the file list, double-click a panorama, or right-click it and choose **Open Panorama**. The viewer opens in a new browser tab.
+
+   <Screenshot id="viewing/panoramas--viewer" />
+
+2. Drag to look around. Turn the mouse wheel, or pinch on a touch screen, to zoom.
+
+3. Use the bar at the bottom of the viewer:
+   - **Automatic rotation** turns the view slowly.
+   - **Zoom out**, the zoom slider and **Zoom in** change the zoom.
+   - **Move** turns the view up, down, left or right.
+   - **Fullscreen** fills the screen.
+
+4. If the panorama has a GPS position, open the **Map** tab of the dataset. The panorama is a marker of its own. Click the marker to open the panorama.
+
+   <Screenshot id="viewing/panoramas--map-marker" />
+
+</Steps>
+
+## Limits & requirements
+
+- The viewer shows equirectangular panoramas: the usual format of 360° cameras and of stitching software.
+- A panorama with GPS tags in its file (a geo-panorama) is also on the map. A panorama without them is only in the file list.
+- The viewer uses the orientation that the camera wrote in the file (heading, pitch and roll), when there is one.
+- To download the original image, use **Download** in the file list. See [Download files](../files/download.mdx).
+
+## Related
+
+- [Map viewer](./map.mdx)
+- [File browser](../files/browser.mdx)
+- [Supported formats](/docs/reference/formats)
+
+<ForDevelopers api="/docs/developers/api/workflows">
+
+The viewer is Photo Sphere Viewer. DroneDB indexes the image as a `Panorama` entry, or `GeoPanorama` when it has GPS tags, and reads the crop and the pose from its XMP tags.
+
+</ForDevelopers>

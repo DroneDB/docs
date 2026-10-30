@@ -1,10 +1,74 @@
 ---
 title: "3D model viewer"
-description: "View textured OBJ, PLY and STL models."
+description: "View textured OBJ, PLY and STL models and set their lighting."
+hub_feature: [route:Model, menu:Open 3D Model]
+datasets: [odm/wietrznia]
+requires: { access: read, data: "A 3D model (OBJ with its .mtl and textures, a mesh PLY, STL, glTF or GLB)" }
 ---
 
-:::info
+<Clip id="viewing/3d-model--orbit" />
 
-This page is being written.
+<Requires />
 
-:::
+<TryLive org="odm" ds="wietrznia" path="odm_texturing/odm_textured_model_geo.obj" view="model"
+         hint="Drag to rotate, right-drag to pan, scroll to zoom." />
+
+## When to use it
+
+Use the 3D model viewer to look at a textured mesh, for example the 3D model of a photogrammetry project. Hub streams the model: the coarse shape shows first and the detail loads where you look, so a model with many textures opens quickly.
+
+<LiveEmbed org="odm" ds="wietrznia" path="odm_texturing/odm_textured_model_geo.obj" view="model"
+           poster="viewing/3d-model--embed" />
+
+## Steps
+
+<Steps>
+
+1. In the file list, double-click a 3D model, or right-click it and choose **Open 3D Model**. The viewer opens in a new browser tab.
+
+   <Screenshot id="viewing/3d-model--overview" />
+
+2. Move around the model:
+   - Drag with the left mouse button to rotate.
+   - Drag with the right mouse button to pan.
+   - Turn the mouse wheel to zoom.
+
+3. Click the **Lighting** button (the gear, bottom left) to change the light. Move the **Ambient** and **Directional** sliders. A model without a texture also has **Shininess**. Click **Reset** to go back to the defaults.
+
+   <Screenshot id="viewing/3d-model--lighting" />
+
+</Steps>
+
+## Options
+
+| Option | What it does |
+|---|---|
+| **Ambient** | Light that falls on every side of the model the same way |
+| **Directional** | Light from one direction, which shows the shape |
+| **Shininess** | How shiny a model without a texture looks |
+| **Reset** | Sets the three values back to the defaults |
+
+The lighting is a preference: it applies to every model you open. You can also set it on the **Viewers** tab of the [Preferences](../account/preferences.mdx).
+
+## Models built before Registry 3.0
+
+Registry 3.0 builds 3D models in a new format. A model that an earlier version built opens in the previous viewer until Hub rebuilds it in the new format. The rebuild runs in the background and needs nothing from you. The lighting settings are the same in both viewers.
+
+## Limits & requirements
+
+- The model opens after its build is done. See [Builds](../processing/builds.mdx). An OBJ needs its `.mtl` file and its textures in the same folder. When the `.mtl` is missing, the build waits until you upload it.
+- The viewer needs a browser with WebGL.
+- The viewer has no measurement tools. To measure a model, open it in the [3D viewer](./3d-viewer.mdx).
+
+## Related
+
+- [3D viewer](./3d-viewer.mdx): the model on a globe, with measurements
+- [Builds](../processing/builds.mdx)
+- [Download files](../files/download.mdx): the 3D Tiles of a model as a ZIP
+- [Supported formats](/docs/reference/formats)
+
+<ForDevelopers cli="ddb build -p odm_texturing/odm_textured_model_geo.obj" api="/docs/developers/cli/cookbook" apiLabel="CLI cookbook">
+
+The build writes a bm3d file (`bm3d/model.bm3d`), a multiresolution format that the viewer reads with HTTP range requests, and a 3D Tiles tileset for the 3D viewer. A model built before DroneDB 2.0 has a Nexus file (`nxs/model.nxz`) until the background rebuild replaces it.
+
+</ForDevelopers>

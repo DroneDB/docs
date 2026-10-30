@@ -1,10 +1,54 @@
 ---
 title: "Videos & geo-videos"
-description: "Play videos and follow the flight path of a geo-video on the map."
+description: "Play videos in the browser and find geotagged videos on the map."
+hub_feature: []
+datasets: []
+requires: { access: read, data: "A video (MP4, MOV, WEBM, M4V, AVI or MKV)" }
 ---
 
-:::info
+<Screenshot id="viewing/videos--player" />
 
-This page is being written.
+<Requires />
 
-:::
+{/* TODO: add a <TryLive> when a public video and geo-video dataset exists on hub.dronedb.app (showcase data gap). */}
+
+## When to use it
+
+Hub plays the videos of a dataset in the browser, so you can check a flight or an inspection clip without a download. A video with a GPS position in its file is a **geo-video**: it also shows on the map of the dataset.
+
+## Steps
+
+<Steps>
+
+1. In the file list, double-click a video. It plays in a player over the page.
+
+2. Use the controls of the player to pause, seek, change the volume or go full screen. Click **Open in new tab** to play the video in its own browser tab.
+
+3. Click **Close**, press `Escape` or click beside the video to close the player.
+
+4. For a geo-video, open the **Map** tab of the dataset. The video is a marker, like a photo. Click the marker to see its popup: the name, the resolution, the date, **Download**, the coordinates and **Play video**.
+
+   <Screenshot id="viewing/videos--map-popup" />
+
+5. Click **Play video** in the popup, or double-click the marker, to play the video.
+
+</Steps>
+
+## Limits & requirements
+
+- The browser plays the video. Most browsers play MP4 (H.264) and WEBM. AVI, MKV and some MOV files may not play. The player then says "Could not play video". Click **Download** in the file list and play the file on your computer.
+- A geo-video shows as one marker, at the position in its file. Hub does not draw the track of the video.
+- Hub makes no thumbnail of a video.
+
+## Related
+
+- [Map viewer](./map.mdx)
+- [File browser](../files/browser.mdx)
+- [Download files](../files/download.mdx)
+- [Supported formats](/docs/reference/formats)
+
+<ForDevelopers api="/docs/developers/api/workflows">
+
+DroneDB indexes a video as a `Video` entry, or `GeoVideo` when its metadata has a GPS position. The player streams the file from the download endpoint with `inline=1`.
+
+</ForDevelopers>
