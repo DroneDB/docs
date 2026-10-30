@@ -8,7 +8,6 @@
 # Notes for the capture pass:
 # - The file list opens a folder or a file with Enter on a focused tile (EntryThumbnail), so
 #   "click the tile, press Enter" stands for a double click.
-# - The context menu (Tools ›) needs a right click: `rightClick` below is not in the format yet.
 # - The splat viewer is set to Quality High in each shot (README rule).
 # - blocked: data = the showcase data is missing: 3D Tiles (.3tz), video / geo-video,
 #   geo-panorama, georeferenced splat.
@@ -23,14 +22,13 @@
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 2000 }
   actions:
-    - mouse: { click: [720, 450] }
-    - press: "+"
+    - wait: 1000
+    - scroll: { selector: "[aria-label='Map'] canvas", y: -300 }   # zoom in at the centre (mouse wheel)
+    - wait: 2500
+    - drag: { selector: "[aria-label='Layer opacity']", from: [0.97, 0.5], to: [0.25, 0.5] }
     - wait: 1500
-    - press: "+"
-    - wait: 2000
-    - drag: { from: [720, 860], to: [640, 860] }   # the Layer opacity slider: adjust after the first run
+    - drag: { selector: "[aria-label='Layer opacity']", from: [0.25, 0.5], to: [0.8, 0.5] }
     - wait: 1500
-    - drag: { from: [640, 860], to: [760, 860] }
   highlight: "[aria-label='Layer opacity']"
   maxSeconds: 20
   blocked: null
@@ -50,15 +48,15 @@
   type: screenshot
   alt: The Map tab of a dataset with geotagged photos and the flight path
   page: hub-guide/viewing/map
-  url: /r/odm/zoo
+  url: /r/odm/brighton-beach   # 18 photos: the flight path reads clearly (odm/zoo has hundreds and a saved point)
   base: hub
   auth: none
-  waitFor: { selector: "role=tab[name='Map']", networkIdle: true, extraMs: 1000 }
+  waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
   actions:
     - click: 'text="images"'
     - press: Enter
-    - wait: 2000
-    - click: "role=tab[name='Map']"
+    - wait: 'text="DJI_0018.JPG"'
+    - click: "[role='tab']:has-text('Map')"
     - wait: "[aria-label='Map'] canvas"
     - wait: 3000
   highlight: "[aria-label='Show drone flight path']"
@@ -68,18 +66,18 @@
   type: screenshot
   alt: The popup of a photo on the map, with its preview, coordinates and footprint
   page: hub-guide/viewing/map
-  url: /r/odm/zoo
+  url: /r/odm/brighton-beach
   base: hub
   auth: none
-  waitFor: { selector: "role=tab[name='Map']", networkIdle: true, extraMs: 1000 }
+  waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
   actions:
     - click: 'text="images"'
     - press: Enter
-    - wait: 2000
-    - click: "role=tab[name='Map']"
+    - wait: 'text="DJI_0018.JPG"'
+    - click: "[role='tab']:has-text('Map')"
     - wait: "[aria-label='Map'] canvas"
     - wait: 3000
-    - mouse: { click: [720, 450] }   # a photo marker: pick a pixel on a marker after the first run
+    - mouse: { click: [874, 522] }   # the marker of DJI_0027.JPG, where the map fits the flight
     - wait: "[aria-label='Copy coordinates']"
     - wait: 2000
   highlight: "[aria-label='Copy coordinates']"
@@ -124,9 +122,13 @@
   auth: none
   waitFor: { selector: "[aria-label='Units']", networkIdle: true, extraMs: 5000 }
   actions:
-    - drag: { from: [620, 450], to: [900, 430] }
+    - scroll: { selector: "#potree_render_area canvas", y: -300 }   # zoom in on the centre
     - wait: 1500
-    - drag: { from: [900, 430], to: [700, 500] }
+    - drag: { from: [960, 800], to: [960, 750] }    # tilt (1920x1200 clip viewport)
+    - wait: 1500
+    - drag: { from: [960, 750], to: [1260, 750] }   # orbit
+    - wait: 1500
+    - drag: { from: [1260, 750], to: [1060, 750] }
     - wait: 1500
   maxSeconds: 15
   blocked: null
@@ -151,7 +153,9 @@
   auth: none
   waitFor: { selector: "[aria-label='Units']", networkIdle: true, extraMs: 5000 }
   actions:
-    - drag: { from: [620, 450], to: [760, 420] }
+    - scroll: { selector: "#potree_render_area canvas", y: -300 }   # zoom in on the centre
+    - wait: 1500
+    - drag: { from: [720, 600], to: [770, 565] }   # orbit and tilt a little: the cloud in 3D
     - wait: 2500
   highlight: "[aria-label='Units']"
   blocked: null
@@ -182,12 +186,14 @@
   actions:
     - click: "#potree_render_area [aria-label='Menu']"
     - wait: "#menu_scene"
+    - click: "#menu_tools"           # folds Tools (open by default), so Scene has the room
     - click: "#menu_scene"
     - click: 'text="odm_georeferenced_model.laz"'
-    - wait: "#optMaterial"
-    - select: { selector: "#optMaterial", value: Elevation }
+    - wait: "#optMaterial-button"    # a jQuery UI list over a hidden <select>: open it, pick the item
+    - click: "#optMaterial-button"
+    - click: "#optMaterial-menu [role='option']:text-is('elevation')"
     - wait: 2500
-  highlight: "#optMaterial"
+  highlight: "#optMaterial-button"
   blocked: null
 
 # ---------------------------------------------------------------- 3D model
@@ -200,10 +206,12 @@
   auth: none
   waitFor: { selector: "[aria-label='Lighting']", networkIdle: true, extraMs: 5000 }
   actions:
-    - drag: { from: [600, 450], to: [880, 440] }
+    - drag: { from: [960, 760], to: [960, 520] }    # tilt the model towards the viewer (1920x1200)
     - wait: 1500
-    - drag: { from: [880, 440], to: [700, 380] }
+    - drag: { from: [760, 640], to: [1160, 640] }   # rotate
     - wait: 1500
+    - scroll: { selector: "#model canvas", y: -300 }   # zoom in
+    - wait: 2000
   maxSeconds: 15
   blocked: null
   youtubeId: null
@@ -227,7 +235,7 @@
   auth: none
   waitFor: { selector: "[aria-label='Lighting']", networkIdle: true, extraMs: 5000 }
   actions:
-    - drag: { from: [600, 450], to: [700, 420] }
+    - drag: { from: [720, 620], to: [720, 440] }    # tilt: the relief of the model shows
     - wait: 2500
   blocked: null
 
@@ -379,7 +387,7 @@
     - click: "role=combobox[name='Quality']"
     - click: "role=option[name='High']"
     - wait: 1500
-  highlight: "role=combobox[name='Quality']"
+  highlight: "role=combobox[name='Quality'] >> xpath=.."   # the whole list (the combobox is its label part)
   crop: "#splat-settings"
   blocked: null
 
@@ -410,9 +418,9 @@
   url: /r/odx/splats-geo   # a splat trained from the odm/brighton-beach training data, with its georef.json
   base: hub
   auth: none
-  waitFor: { selector: "role=tab[name='Map']", networkIdle: true, extraMs: 1000 }
+  waitFor: { selector: "[role='tab']:has-text('Map')", networkIdle: true, extraMs: 1000 }
   actions:
-    - click: "role=tab[name='Map']"
+    - click: "[role='tab']:has-text('Map')"
     - wait: "[aria-label='Map'] canvas"
     - wait: 3000
   blocked: data
@@ -466,7 +474,7 @@
   auth: none
   waitFor: { selector: 'text="train.ply"', networkIdle: true, extraMs: 1000 }
   actions:
-    - rightClick: 'text="train.ply"'   # needs a right-click action in the capture format
+    - rightClick: 'text="train.ply"'
     - hover: "text=Tools"
     - wait: "text=Download original"
   highlight: "text=Download level-of-detail (.rad)"
@@ -481,7 +489,7 @@
   auth: demo   # the export is a task; the shot only opens the dialog and starts nothing
   waitFor: { selector: 'text="odm_report"', networkIdle: true, extraMs: 1000 }
   actions:
-    - rightClick: "[role='tree'] >> text=brighton-beach"   # the dataset root in the folder tree; needs a right-click action
+    - rightClick: "[role='tree'][aria-label='Folders'] >> text=Brighton Beach"   # the dataset root in the folder tree
     - hover: "text=Tools"
     - click: "text=Export splat training data"
     - wait: "#splatTrainingExportDialog"
@@ -537,9 +545,9 @@
   url: /r/odx/panoramas   # a dataset with a 360° photo that has GPS tags (to be created)
   base: hub
   auth: none
-  waitFor: { selector: "role=tab[name='Map']", networkIdle: true, extraMs: 1000 }
+  waitFor: { selector: "[role='tab']:has-text('Map')", networkIdle: true, extraMs: 1000 }
   actions:
-    - click: "role=tab[name='Map']"
+    - click: "[role='tab']:has-text('Map')"
     - wait: "[aria-label='Map'] canvas"
     - wait: 3000
   blocked: data
@@ -552,7 +560,7 @@
   url: /r/odx/video   # a dataset with a DJI clip and its telemetry (to be created)
   base: hub
   auth: none
-  waitFor: { selector: "role=tab[name='Map']", networkIdle: true, extraMs: 1000 }
+  waitFor: { selector: "[role='tab']:has-text('Map')", networkIdle: true, extraMs: 1000 }
   actions:
     - click: "text=.MP4"   # the video tile: use its exact name once the dataset exists
     - press: Enter
@@ -568,9 +576,9 @@
   url: /r/odx/video
   base: hub
   auth: none
-  waitFor: { selector: "role=tab[name='Map']", networkIdle: true, extraMs: 1000 }
+  waitFor: { selector: "[role='tab']:has-text('Map')", networkIdle: true, extraMs: 1000 }
   actions:
-    - click: "role=tab[name='Map']"
+    - click: "[role='tab']:has-text('Map')"
     - wait: "[aria-label='Map'] canvas"
     - wait: 3000
     - mouse: { click: [720, 450] }   # the video marker
@@ -581,12 +589,12 @@
 # ---------------------------------------------------------------- Markdown & PDF
 - id: viewing/markdown-pdf--readme
   type: screenshot
-  alt: The README.md of odm/aukerman in the Markdown viewer
+  alt: The README.md of odm/langley in the Markdown viewer
   page: hub-guide/viewing/markdown-pdf
-  open: { org: odm, ds: aukerman, path: README.md, view: markdown }
+  open: { org: odm, ds: langley, path: README.md, view: markdown }   # a heading, credits, links and an image
   base: hub
   auth: none
-  waitFor: { selector: ".content", networkIdle: true, extraMs: 800 }   # the rendered Markdown; no label
+  waitFor: { networkIdle: true, extraMs: 800 }
   blocked: null
 
 - id: viewing/markdown-pdf--pdf

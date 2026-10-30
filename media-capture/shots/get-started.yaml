@@ -25,21 +25,22 @@
   auth: none
   waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1500 }
   actions:
-    - wait: 1500
-    - click: "[role='option']:has-text('brighton_beach.jpg')"
+    # One tab only (a clip records one page): the orthophoto is shown on the Map tab of its folder,
+    # not opened on its own map (that opens a new tab)
+    - wait: 1000
+    - click: "[role='option']:has-text('brighton_beach.jpg')"   # its properties
     - wait: 2000
-    - click: "[role='tab']:has-text('Map')"
-    - wait: 4000
-    - mouse: { click: [720, 450] }   # a photo marker near the centre: its popup (adjust after the first run)
-    - wait: 2500
-    - click: "[role='tab']:has-text('Files')"
-    - click: "[role='option']:text-is('odm_orthophoto')"
+    - click: 'text="images"'
     - press: Enter                   # opens the folder (Enter = double-click on a tile)
     - wait: 1500
-    - click: "[role='option']:has-text('odm_orthophoto.tif')"
-    - press: Enter                   # opens the orthophoto on its map
-    - wait: 5000
-    - scroll: { selector: "canvas", y: -600 }   # zoom in (mouse wheel)
+    - click: "[role='tab']:has-text('Map')"
+    - wait: 3500
+    - mouse: { click: [1170, 672] }  # the marker of a photo where the map fits the flight: its popup
+    - wait: 2500
+    - click: "[aria-label='Map'] [aria-label='Close']"   # the popup stays open on another folder
+    - click: "[role='tree'][aria-label='Folders'] >> text=odm_orthophoto"   # the orthophoto on the map
+    - wait: 3500
+    - scroll: { selector: "[aria-label='Map'] canvas", y: -200 }   # zoom in (mouse wheel)
     - wait: 3000
   highlight: null
   crop: null
@@ -58,22 +59,29 @@
   actions:
     - click: "[role='option']:has-text('brighton_beach.jpg')"
     - wait: 1500
+    - hover: "[role='option']:has-text('brighton_beach.jpg')"   # the panel moved the tiles: no stale hover
   highlight: "[role='option']:has-text('brighton_beach.jpg')"
   crop: null
   blocked: null
 
 - id: get-started/tour--dataset-map
   type: screenshot
-  alt: The Map tab of a dataset with the orthophoto and the positions of the drone photos
+  alt: The Map tab of the images folder with the positions of the drone photos and the preview of one
   page: get-started/tour
   url: /r/odm/brighton-beach
   base: hub
   auth: none
   waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
   actions:
+    - click: 'text="images"'
+    - press: Enter
+    - wait: 'text="DJI_0018.JPG"'
     - click: "[role='tab']:has-text('Map')"
-    - wait: "canvas"
-    - wait: 4000
+    - wait: "[aria-label='Map'] canvas"
+    - wait: 3000
+    - mouse: { click: [874, 522] }   # the marker of DJI_0027.JPG, where the map fits the flight
+    - wait: "[aria-label='Copy coordinates']"
+    - wait: 1500
   highlight: "[role='tab']:has-text('Map')"
   crop: null
   blocked: null
@@ -89,8 +97,10 @@
     view: map
   base: hub
   auth: none
-  waitFor: { selector: "canvas", networkIdle: true, extraMs: 3000 }
-  actions: []
+  waitFor: { networkIdle: true, extraMs: 3000 }   # the map's own ready state (capture.mjs)
+  actions:
+    - scroll: { selector: "[aria-label='Map'] canvas", y: -100 }   # zoom in one step
+    - wait: 2500
   highlight: null
   crop: null
   blocked: null
@@ -106,8 +116,10 @@
     view: pointcloud
   base: hub
   auth: none
-  waitFor: { selector: "canvas", networkIdle: true, extraMs: 6000 }   # WebGL: wait for the points to load
-  actions: []
+  waitFor: { networkIdle: true, extraMs: 6000 }   # the viewer's ready state, then the points stream in
+  actions:
+    - scroll: { selector: "#potree_render_area canvas", y: -300 }   # zoom in on the centre
+    - wait: 3000
   highlight: null
   crop: null
   blocked: null
@@ -123,11 +135,13 @@
     view: model
   base: hub
   auth: none
-  waitFor: { selector: "canvas", networkIdle: true, extraMs: 8000 }   # WebGL: wait for the textures
-  actions: []
+  waitFor: { networkIdle: true, extraMs: 8000 }   # the viewer's ready state, then the textures stream in
+  actions:
+    - scroll: { selector: "#model canvas", y: -200 }   # zoom in
+    - wait: 3000
   highlight: null
   crop: null
-  blocked: null                      # bm3d viewer: capture after the model rebuild of the showcase data
+  blocked: null
 
 - id: get-started/tour--share
   type: screenshot
@@ -138,7 +152,7 @@
   auth: none
   waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
   actions:
-    - click: "[role='option']:text-is('odm_orthophoto')"
+    - click: "[role='option']:has-text('odm_orthophoto')"
     - press: Enter
     - wait: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "[role='option']:has-text('odm_orthophoto.tif')"
@@ -160,7 +174,7 @@
   auth: none
   waitFor: { selector: "[aria-label='Username']", networkIdle: true, extraMs: 500 }
   actions: []
-  highlight: "text=Login"
+  highlight: "role=button[name='Login']"
   crop: null
   blocked: null
 
@@ -218,13 +232,15 @@
   url: /r/acme-surveys/getting-started
   base: hub
   auth: demo
+  uploadKBps: 8000                   # the 70 MB take about 9 s, as on a fast connection
   waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
   actions:
     - setFiles: { selector: "[aria-label='Files']", files: [brighton-beach] }   # the file list is the drop zone
     - wait: "text=Upload Progress"
-    - wait: "text=Close"             # the upload is complete
-    - click: "button:has-text('Close')"
-    - wait: 4000
+    - wait: "[role='dialog'] >> text=uploaded successfully"   # the upload is complete
+    - wait: 1500
+    - click: "[role='dialog'] >> role=button[name='Close'] >> nth=-1"   # Close at the bottom (a toast has one too)
+    - wait: 2000
   highlight: null
   crop: null
   maxSeconds: 30
@@ -253,13 +269,15 @@
   url: /r/acme-surveys/getting-started
   base: hub
   auth: demo
-  waitFor: { selector: "[aria-label='Upload']", networkIdle: true, extraMs: 500 }
+  uploadKBps: 2000                   # slow enough to show files still uploading
+  # The upload keeps the network busy and the window changing: no idle network, no stable frames
+  waitFor: { selector: "[aria-label='Upload']", networkIdle: false, stable: false, extraMs: 1500 }
   actions:
     - click: "[aria-label='Upload']"
     - click: "button:has-text('Select Folder')"   # creates the hidden folder input
     - setFiles: { selector: "input[type='file'][webkitdirectory]", files: [brighton-beach] }
     - wait: "text=In Progress"
-    - wait: 1500                     # shoot while files are still uploading
+    - wait: 4000                     # shoot while files are still uploading, once the speed is known
   highlight: null
   crop: "[role='dialog']"
   blocked: null
@@ -274,7 +292,7 @@
   waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 500 }
   actions:
     # Shoot right after upload--drag-drop, while the build of odm_orthophoto.tif runs
-    - click: "[role='option']:text-is('odm_orthophoto')"
+    - click: "[role='option']:has-text('odm_orthophoto')"
     - press: Enter
     - wait: "[role='option']:has-text('odm_orthophoto.tif') .fa-spin"
   highlight: "[role='option']:has-text('odm_orthophoto.tif')"
@@ -292,7 +310,7 @@
   auth: none
   waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
   actions:
-    - click: "[role='option']:text-is('odm_orthophoto')"
+    - click: "[role='option']:has-text('odm_orthophoto')"
     - press: Enter
     - wait: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "[role='option']:has-text('odm_orthophoto.tif')"
@@ -305,26 +323,26 @@
   crop: "[role='dialog']"
   blocked: null
 
-- id: get-started/share-first-map--private
+- id: get-started/share-first-map--private   # needs a Hub with the Make Unlisted confirmation
   type: screenshot
-  alt: The Share / Embed window of a private dataset with Allow access to anyone with the link
+  alt: The Share / Embed window of a private dataset with the button that makes it Unlisted
   page: get-started/share-first-map
   url: /r/acme-surveys/first-map
   base: hub
   auth: demo
   waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
   actions:
-    - click: "[role='option']:text-is('odm_orthophoto')"
+    - click: "[role='option']:has-text('odm_orthophoto')"
     - press: Enter
     - wait: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "[aria-label='Share']"
-    - wait: "text=Allow access to anyone with the link"
-  highlight: "button:has-text('Allow access to anyone with the link')"
+    - wait: "role=button[name=/^Make the dataset Unlisted/]"
+  highlight: "role=button[name=/^Make the dataset Unlisted/]"
   crop: "[role='dialog']"
   blocked: null
 
-- id: get-started/share-first-map--link
+- id: get-started/share-first-map--link   # needs a Hub with the Make Unlisted confirmation
   type: screenshot
   alt: The share link of the orthophoto after the dataset became unlisted
   page: get-started/share-first-map
@@ -333,12 +351,13 @@
   auth: demo
   waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
   actions:
-    - click: "[role='option']:text-is('odm_orthophoto')"
+    - click: "[role='option']:has-text('odm_orthophoto')"
     - press: Enter
     - wait: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "[aria-label='Share']"
-    - click: "button:has-text('Allow access to anyone with the link')"   # sets the dataset to Unlisted
+    - click: "role=button[name=/^Make the dataset Unlisted/]"   # asks for a confirmation
+    - click: "role=button[name='Make Unlisted']"                 # sets the dataset to Unlisted
     - wait: "[aria-label='Share link']"
   highlight: "[role='dialog'] [aria-label='Copy to clipboard']"
   crop: "[role='dialog']"
@@ -351,11 +370,12 @@
   url: /r/acme-surveys/first-map
   base: hub
   auth: demo
+  viewport: { width: 1440, height: 1000 }   # the whole window, down to Close, without its scroll bar
   waitFor: { selector: "[aria-label='Settings']", networkIdle: true, extraMs: 500 }
   actions:
     - click: "[aria-label='Settings']"
     - wait: "#settings-visibility"
-  highlight: "#settings-visibility"
+  highlight: "#settings-visibility >> xpath=.."   # the whole list (the combobox is its label part)
   crop: "[role='dialog']"
   blocked: null
 
@@ -370,7 +390,7 @@
   auth: none
   waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
   actions:
-    - click: "[role='option']:text-is('odm_orthophoto')"
+    - click: "[role='option']:has-text('odm_orthophoto')"
     - press: Enter
     - wait: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "[role='option']:has-text('odm_orthophoto.tif')"

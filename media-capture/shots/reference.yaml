@@ -1,0 +1,30 @@
+# Shots of the Reference pages (docs/reference/*).
+#
+# Demo inputs: none. Read-only shots of the public odm datasets with auth none.
+# The phone shots use a 390×844 viewport: the capture gives the page a screen of the same size,
+# and Hub picks its phone layout from the screen width (767 pixels or less).
+
+# ---------------------------------------------------------------- FAQ: phones and tablets
+- id: reference/faq--phone-dataset
+  type: screenshot
+  alt: A dataset on a phone, with the Browser, Files, Properties, Map and Tasks tabs
+  page: reference/faq
+  url: /r/odm/brighton-beach
+  base: hub
+  auth: none
+  viewport: { width: 390, height: 844 }
+  waitFor: { selector: "[role='tab']:has-text('Files')", networkIdle: true, extraMs: 1000 }
+  actions: []
+  highlight: "[role='tablist']"
+  blocked: null
+
+- id: reference/faq--phone-map
+  type: screenshot
+  alt: The orthophoto of a dataset on the map of a phone
+  page: reference/faq
+  open: { org: odm, ds: brighton-beach, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  viewport: { width: 390, height: 844 }
+  waitFor: { networkIdle: true, extraMs: 2000 }
+  blocked: null

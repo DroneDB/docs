@@ -69,14 +69,23 @@
   }
 
   window.__ddbCapture = {
-    /** Red rounded box around a rect in CSS pixels of the viewport ({ x, y, width, height }). */
-    highlight(rect, pad = 6) {
+    /**
+     * Red rounded box around a rect in CSS pixels of the viewport ({ x, y, width, height }), kept
+     * inside the viewport so the whole box shows for a control at its edge.
+     */
+    highlight(rect, pad = 9) {   // 6 px between the control and the 3 px line
       const box = document.createElement('div');
       box.className = 'ddb-highlight';
-      box.style.left = `${rect.x - pad}px`;
-      box.style.top = `${rect.y - pad}px`;
-      box.style.width = `${rect.width + 2 * pad}px`;
-      box.style.height = `${rect.height + 2 * pad}px`;
+      const edge = 3; // the border width: the line stays on screen
+      const left = Math.max(edge, rect.x - pad);
+      const top = Math.max(edge, rect.y - pad);
+      const right = Math.min(window.innerWidth - edge, rect.x + rect.width + pad);
+      const bottom = Math.min(window.innerHeight - edge, rect.y + rect.height + pad);
+      box.style.boxSizing = 'border-box';
+      box.style.left = `${left}px`;
+      box.style.top = `${top}px`;
+      box.style.width = `${right - left}px`;
+      box.style.height = `${bottom - top}px`;
       ensureLayer().appendChild(box);
     },
     clearHighlight() {

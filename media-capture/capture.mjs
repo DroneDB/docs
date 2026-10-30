@@ -41,23 +41,29 @@ const MAX_BYTES = 250 * 1024;
 // data (made during the reset) shows "1 hour ago" while a reset takes less than 30 minutes
 const CLOCK_AFTER_RESET_MS = 90 * 60e3;
 
-/** Shown while the Hub loads something: a shot waits until none of them is visible. */
-const BUSY = ['.loading-spinner', '.p-progressspinner', '.p-skeleton', '.viewer-loading'];
+/**
+ * Shown while the Hub loads something: a shot waits until none of them is visible. The panorama
+ * viewer (Photo Sphere Viewer) shows its own loader while it downloads the photo.
+ */
+const BUSY = ['.loading-spinner', '.p-progressspinner', '.p-skeleton', '.viewer-loading', '.psv-loader-container'];
 /** Error messages of the Hub: a shot that shows one has failed. */
 const ERRORS = ['.p-toast-message-error', '.viewer-shell .p-message-error'];
 
 /**
  * What each viewer shows once its data is loaded, used when a shot of that view has no
- * waitFor.selector. The splat and point cloud viewers render their toolbars only when loaded.
+ * waitFor.selector. A bare canvas is not enough: the 3D viewers add theirs before anything is
+ * loaded. The splat, model (bm3d and the legacy Nexus viewer) and 3D viewers (Giro3D) render their
+ * buttons only once the first data is in; the point cloud viewer (Potree) adds its toolbar then;
+ * the panorama viewer hides its loader (BUSY) when the photo is drawn.
  */
 const VIEW_READY = {
-  map: '.ol-viewport canvas',
-  pointcloud: '.top-left-toolbar',
+  map: "[aria-label='Map'] canvas",
+  pointcloud: "[aria-label='Units']",
   splat: "[aria-label='View settings']",
-  model: 'canvas',
-  unified: 'canvas',
-  panorama: '.psv-canvas, canvas',
-  markdown: '.markdown-body, article'
+  model: "#model [aria-label='Lighting']",
+  unified: "#unified-viewer [aria-label='Home']",
+  panorama: '#panorama .psv-canvas',
+  markdown: '.markdown .content'   // the rendered Markdown (no accessible name)
 };
 
 const SPLAT_QUALITY_KEY = 'ddb.splat.quality';
@@ -275,9 +281,11 @@ async function captureOnce(browser, shot, tmp) {
   const fixSplat = shot.open?.view === 'splat' && !setsSplatQuality(shot);
 
   // Screenshots at device pixel ratio 2; a clip at ratio 1, because the recording has the CSS size
-  // of the viewport (encode.sh scales it to 1920x1200 when the shot sets another viewport)
+  // of the viewport (encode.sh scales it to 1920x1200 when the shot sets another viewport). The
+  // screen is the viewport: the Hub picks its phone, tablet or computer layout from screen.width
   const options = {
-    viewport: shot.viewport, deviceScaleFactor: isClip ? 1 : DPR, locale: 'en-US', timezoneId: 'UTC', colorScheme: 'light'
+    viewport: shot.viewport, screen: shot.viewport, deviceScaleFactor: isClip ? 1 : DPR, locale: 'en-US',
+    timezoneId: 'UTC', colorScheme: 'light'
   };
   if (shot.auth !== 'none') options.storageState = await storageState(browser, shot.auth, base);
   if (isClip) options.recordVideo = {dir: tmp, size: shot.viewport};
@@ -297,6 +305,7 @@ async function captureOnce(browser, shot, tmp) {
     if (resetAt) await context.clock.install({time: resetAt + CLOCK_AFTER_RESET_MS});
 
     let page = await context.newPage();
+    await throttleUploads(page, shot.uploadKBps);
     video = page.video();
     const t0 = Date.now();
     let net = watchNetwork(page, new URL(base).origin);
@@ -322,6 +331,7 @@ async function captureOnce(browser, shot, tmp) {
       if (opened) {
         // The shot goes on in the page the click opened (a new tab)
         page = opened;
+        await throttleUploads(page, shot.uploadKBps);
         net = watchNetwork(page, new URL(base).origin);
         await page.waitForLoadState('domcontentloaded');
       }
@@ -356,6 +366,18 @@ async function captureOnce(browser, shot, tmp) {
     await context.close().catch(() => {});
     if (video) await video.delete().catch(() => {});
   }
+}
+
+/**
+ * Slows the uploads of a page down to kbps KB/s (uploadKBps of the shot), through the network
+ * emulation of Chromium; downloads keep their speed. Nothing happens without a speed.
+ */
+async function throttleUploads(page, kbps) {
+  if (!kbps) return;
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Network.enable');
+  await cdp.send('Network.emulateNetworkConditions',
+    {offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: kbps * 1024});
 }
 
 /**
@@ -535,13 +557,20 @@ async function runAction(page, action, isClip) {
       else await page.mouse[kind](x, y, {button: v.button});
       break;
     }
-    case 'drag':
-      await pointTo(page, ...v.from, isClip);
-      await page.mouse.move(...v.from);
+    case 'drag': {
+      let {from, to} = v;
+      if (v.selector) {
+        const box = await visibleBox(page, v.selector);
+        const at = ([fx, fy]) => [box.x + fx * box.width, box.y + fy * box.height];
+        [from, to] = [at(from), at(to)];
+      }
+      await pointTo(page, ...from, isClip);
+      await page.mouse.move(...from);
       await page.mouse.down();
-      await page.mouse.move(...v.to, {steps: isClip ? 40 : 12});
+      await page.mouse.move(...to, {steps: isClip ? 40 : 12});
       await page.mouse.up();
       break;
+    }
     case 'scroll': {
       await center(page, v.selector, isClip);
       // In small steps: a map zooms and a list scrolls the same way on each run

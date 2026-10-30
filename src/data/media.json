@@ -34,6 +34,125 @@
     "alt": "The Maintenance section of the Dataset Settings window with Rescan Dataset",
     "youtubeId": null
   },
+  "get-started/first-dataset--create-dialog": {
+    "type": "screenshot",
+    "width": 956,
+    "height": 1028,
+    "alt": "The Create new dataset window with a name, the slug made from it, the visibility and a tagline",
+    "youtubeId": null
+  },
+  "get-started/first-dataset--empty-dataset": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A new, empty dataset on the Files tab",
+    "youtubeId": null
+  },
+  "get-started/first-dataset--my-datasets": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The user menu with My Datasets, over the empty page of the personal organization",
+    "youtubeId": null
+  },
+  "get-started/first-dataset--sign-in": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The sign-in page of Hub",
+    "youtubeId": null
+  },
+  "get-started/key-concepts--dataset-page": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A dataset with its folders, its files and the properties of the selected orthophoto",
+    "youtubeId": null
+  },
+  "get-started/share-first-map--embed": {
+    "type": "screenshot",
+    "width": 988,
+    "height": 700,
+    "alt": "The Share / Embed window with Embed selected and the iframe code of the map",
+    "youtubeId": null
+  },
+  "get-started/share-first-map--settings": {
+    "type": "screenshot",
+    "width": 1248,
+    "height": 1728,
+    "alt": "The Dataset Settings window with the Visibility list in the Sharing group",
+    "youtubeId": null
+  },
+  "get-started/tour--dataset-map": {
+    "type": "screenshot",
+    "width": 2160,
+    "height": 1350,
+    "alt": "The Map tab of the images folder with the positions of the drone photos and the preview of one",
+    "youtubeId": null
+  },
+  "get-started/tour--files": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Files tab of a dataset with the folder tree, the files and the properties of a photo",
+    "youtubeId": null
+  },
+  "get-started/tour--model": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The textured 3D model of Brighton Beach in the 3D model viewer",
+    "youtubeId": null
+  },
+  "get-started/tour--ortho-map": {
+    "type": "screenshot",
+    "width": 1928,
+    "height": 1206,
+    "alt": "The orthophoto of Brighton Beach on the map, with its saved measurements",
+    "youtubeId": null
+  },
+  "get-started/tour--overview": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "A tour of a public dataset on Hub, from the files to the map and the orthophoto",
+    "youtubeId": null
+  },
+  "get-started/tour--point-cloud": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The point cloud of Brighton Beach in the point cloud viewer",
+    "youtubeId": null
+  },
+  "get-started/tour--share": {
+    "type": "screenshot",
+    "width": 988,
+    "height": 608,
+    "alt": "The Share / Embed window of an orthophoto with its share link",
+    "youtubeId": null
+  },
+  "get-started/upload--dialog": {
+    "type": "screenshot",
+    "width": 1516,
+    "height": 884,
+    "alt": "The Upload window with Select Files, Select Folder and Import from URL",
+    "youtubeId": null
+  },
+  "get-started/upload--drag-drop": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "A folder dragged into a dataset, the upload progress and the files that appear",
+    "youtubeId": null
+  },
+  "get-started/upload--progress": {
+    "type": "screenshot",
+    "width": 1148,
+    "height": 1372,
+    "alt": "The Upload Progress window with the files, the speed and the time left",
+    "youtubeId": null
+  },
   "measure/3d--pointcloud-tools": {
     "type": "screenshot",
     "width": 2880,
@@ -55,11 +174,193 @@
     "alt": "Details panel of an OBJ whose build waits for its .mtl file",
     "youtubeId": null
   },
+  "reference/faq--phone-dataset": {
+    "type": "screenshot",
+    "width": 780,
+    "height": 1688,
+    "alt": "A dataset on a phone, with the Browser, Files, Properties, Map and Tasks tabs",
+    "youtubeId": null
+  },
+  "reference/faq--phone-map": {
+    "type": "screenshot",
+    "width": 780,
+    "height": 1688,
+    "alt": "The orthophoto of a dataset on the map of a phone",
+    "youtubeId": null
+  },
   "self-hosting/processing-nodes--tool-gating": {
     "type": "screenshot",
     "width": 2880,
     "height": 1800,
     "alt": "The Tool Gating section of the Configuration page",
+    "youtubeId": null
+  },
+  "viewing/3d-model--embed": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The textured model of odm/wietrznia in the 3D model viewer",
+    "youtubeId": null
+  },
+  "viewing/3d-model--lighting": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Lighting window of the 3D model viewer",
+    "youtubeId": null
+  },
+  "viewing/3d-model--orbit": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "Rotating the textured model of odm/wietrznia",
+    "youtubeId": null
+  },
+  "viewing/3d-model--overview": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A textured 3D model in the 3D model viewer",
+    "youtubeId": null
+  },
+  "viewing/map--custom-basemap": {
+    "type": "screenshot",
+    "width": 848,
+    "height": 1084,
+    "alt": "Map Settings with the Custom basemap and its editor",
+    "youtubeId": null
+  },
+  "viewing/map--embed": {
+    "type": "screenshot",
+    "width": 1440,
+    "height": 900,
+    "alt": "The odm/zoo orthophoto on the map",
+    "youtubeId": null
+  },
+  "viewing/map--flight-shots": {
+    "type": "screenshot",
+    "width": 2160,
+    "height": 1350,
+    "alt": "The Map tab of a dataset with geotagged photos and the flight path",
+    "youtubeId": null
+  },
+  "viewing/map--photo-popup": {
+    "type": "screenshot",
+    "width": 2160,
+    "height": 1350,
+    "alt": "The popup of a photo on the map, with its preview, coordinates and footprint",
+    "youtubeId": null
+  },
+  "viewing/map--vector-features": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A KMZ file of vector features on the map",
+    "youtubeId": null
+  },
+  "viewing/map--zoom-opacity": {
+    "type": "clip",
+    "width": 1286,
+    "height": 804,
+    "alt": "Zooming into the odm/zoo orthophoto and dragging the opacity slider",
+    "youtubeId": null
+  },
+  "viewing/markdown-pdf--pdf": {
+    "type": "screenshot",
+    "width": 2496,
+    "height": 1668,
+    "alt": "The ODM report PDF of odm/brighton-beach in the PDF window",
+    "youtubeId": null
+  },
+  "viewing/point-cloud--attribute": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The point cloud coloured by elevation, from the Attribute list of the Scene section",
+    "youtubeId": null
+  },
+  "viewing/point-cloud--embed": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The odm/waterbury point cloud in the point cloud viewer",
+    "youtubeId": null
+  },
+  "viewing/point-cloud--menu": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The side menu of the point cloud viewer with its sections",
+    "youtubeId": null
+  },
+  "viewing/point-cloud--orbit": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "Orbiting the odm/waterbury point cloud",
+    "youtubeId": null
+  },
+  "viewing/point-cloud--overview": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A point cloud in the point cloud viewer, with the Units selector at the top left",
+    "youtubeId": null
+  },
+  "viewing/splat-downloads--about-panel": {
+    "type": "screenshot",
+    "width": 816,
+    "height": 704,
+    "alt": "The downloads at the bottom of the About this splat panel",
+    "youtubeId": null
+  },
+  "viewing/splat-downloads--tools-menu": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The splat downloads in the Tools menu of the file list",
+    "youtubeId": null
+  },
+  "viewing/splats--about": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The About this splat panel with the splat count, size, streaming state and quality",
+    "youtubeId": null
+  },
+  "viewing/splats--camera-views": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Camera views window of the splat viewer",
+    "youtubeId": null
+  },
+  "viewing/splats--embed": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The train splat in the splat viewer",
+    "youtubeId": null
+  },
+  "viewing/splats--fly-cameras-quality": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "Flying through the train splat, jumping to its camera views and setting the quality",
+    "youtubeId": null
+  },
+  "viewing/splats--overview": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A Gaussian splat with the navigation buttons, the camera rail and the movement pad",
+    "youtubeId": null
+  },
+  "viewing/splats--settings": {
+    "type": "screenshot",
+    "width": 608,
+    "height": 1528,
+    "alt": "The View settings of the splat viewer with the up axis, quality, point size and calibration",
     "youtubeId": null
   }
 }

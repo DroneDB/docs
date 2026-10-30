@@ -2,7 +2,8 @@
 
 Every screenshot and clip of the documentation is defined here, one YAML file per docs section
 (`get-started.yaml`, `datasets.yaml`, `files.yaml`, `viewing.yaml`, `measure.yaml`,
-`analyse.yaml`, `processing.yaml`, `sharing.yaml`, `account.yaml`, `self-hosting.yaml`).
+`analyse.yaml`, `processing.yaml`, `sharing.yaml`, `account.yaml`, `self-hosting.yaml`,
+`reference.yaml`).
 `npm run media` captures them; nobody makes docs images by hand.
 
 ## Entry
@@ -25,6 +26,9 @@ Every screenshot and clip of the documentation is defined here, one YAML file pe
   base: hub                          # hub | local (local = always the throwaway local Registry)
   auth: none                         # none | demo | admin
   viewport: { width: 1440, height: 900 }   # optional; screenshots 1440×900 at device pixel ratio 2, clips 1920×1200 at 1
+                                     # the screen has the same size: 390×844 gives the phone layout
+  uploadKBps: 4000                   # optional; the page uploads at most this fast (KB/s), so an
+                                     # upload to a local Registry shows its progress
   waitFor:                           # the page is ready when all of these hold
     selector: ".ol-layer canvas"
     networkIdle: true
@@ -45,6 +49,8 @@ Every screenshot and clip of the documentation is defined here, one YAML file pe
     - wait: 1000                     # milliseconds, or a selector to wait for
     - mouse: { click: [720, 450] }   # CSS pixels in the viewport (map and 3D canvases)
     - drag: { from: [600, 400], to: [800, 400] }
+    - drag: { selector: "[aria-label='Layer opacity']", from: [0.95, 0.5], to: [0.4, 0.5] }   # fractions
+                                     # of the element's box: a slider, wherever the Hub puts it
     - scroll: { selector: ".file-list", y: 600 }   # mouse wheel over it: a list scrolls, a map zooms (y < 0 in)
     - mouse: { dblclick: [720, 450] }              # also { move: [x, y] }; click/dblclick take button: right
     - setFiles: { selector: "input[type=file]", files: [brighton-beach/images/DJI_0018.JPG] }
@@ -77,8 +83,9 @@ Every screenshot and clip of the documentation is defined here, one YAML file pe
 - Notifications that come and go (`.p-toast`) are hidden in the image, unless a selector of the
   shot names a toast.
 - A screenshot is at most 250 KB: the WebP quality goes down from 85 to 60, then the image is
-  scaled down (full-screen aerial imagery). The capture prints when it scaled an image; crop the
-  shot to the panel that matters to keep the full resolution.
+  scaled down, at most to half its size (full-screen aerial imagery: the CSS size of the
+  viewport). The capture prints when it scaled an image; crop the shot to the panel that matters
+  to keep the full resolution.
 
 ## Shots made by hand
 
@@ -92,10 +99,12 @@ and reports whether its image is there. Its image (screenshot, or clip poster) i
 
 - `id` is unique across all files. The section is the first part of the docs path of the page
   that shows it (`get-started`, `datasets`, `files`, `viewing`, `measure`, `analyse`,
-  `processing`, `sharing`, `account`, `self-hosting`).
+  `processing`, `sharing`, `account`, `self-hosting`, `reference`).
 - Select controls by `aria-label` first (`[aria-label='Settings']`), then a button with a visible
   text by role and name (`role=button[name='Create Dataset']`: it skips hidden copies), then by an
   existing `title`, then by visible text (`text=Share`). Avoid CSS classes of the Hub: they change.
+  `role=…[name='…']` must match the whole accessible name, and the tabs and file tiles of the
+  dataset page have their icon glyph in it: select those with `[role='tab']:has-text('Map')`.
   A control without a name gets one in the Hub, not a class selector here.
 - Shots of data that changes (upload, rename, paste, build, settings) use `auth: demo` and the
   demo organization `acme-surveys`, which `reset-demo.mjs` puts back in the same state before

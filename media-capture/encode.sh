@@ -3,8 +3,9 @@
 #
 #   encode.sh webp <in.png> <out.webp> [max-bytes] [width]
 #       WebP at quality 85; when the file is larger than max-bytes (default 256000 = 250 KB) the
-#       quality goes down in steps to 60, then the image is scaled down to 85, 75 and 67 % at
-#       quality 70 (full-screen aerial imagery). Exit 3, and no output file, when it is still too
+#       quality goes down in steps to 60, then the image is scaled down to 85, 75, 67, 60 and 50 %
+#       at quality 70, then 50 % at 60 (full-screen aerial imagery: a screenshot at device pixel
+#       ratio 2 then keeps at least its CSS size). Exit 3, and no output file, when it is still too
 #       large (crop the shot to the panel that matters). With a width the image is scaled to it.
 #
 #   encode.sh clip <in.webm> <out.mp4> <start-seconds> <seconds> <poster.png> <poster.webp>
@@ -21,16 +22,22 @@ command -v ffmpeg >/dev/null || die "ffmpeg not found"
 
 FF=(ffmpeg -hide_banner -loglevel error -nostdin -y)
 
+# The temporary outputs are removed on any exit: die (an image still too large) exits from inside
+# a function, where a RETURN trap does not run, and would leave the file next to the images
+TMPS=()
+trap 'rm -f "${TMPS[@]}"' EXIT
+trap 'exit 130' INT TERM
+
 webp() {
     local in="$1" out="$2" max="${3:-256000}" width="${4:-}" in_w q w tmp size=0 step
     [[ -s "$in" ]] || die "no input $in"
     mkdir -p "$(dirname "$out")"
     tmp="$(mktemp "${out%.webp}.XXXXXX.webp")"
-    trap 'rm -f "$tmp"' RETURN
+    TMPS+=("$tmp")
     in_w="$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 "$in")"
     [[ -n "$width" ]] || width="$in_w"
     # Quality first, at full size; then smaller sizes at quality 70 (full-screen aerial images)
-    for step in "1 85" "1 80" "1 75" "1 70" "1 65" "1 60" "0.85 70" "0.75 70" "0.67 70"; do
+    for step in "1 85" "1 80" "1 75" "1 70" "1 65" "1 60" "0.85 70" "0.75 70" "0.67 70" "0.6 70" "0.5 70" "0.5 60"; do
         read -r scale q <<<"$step"
         w=$(awk -v w="$width" -v s="$scale" 'BEGIN { printf "%d", int(w * s / 2) * 2 }')
         "${FF[@]}" -i "$in" -vf "scale=${w}:-2:flags=lanczos" -c:v libwebp -quality "$q" -compression_level 6 \
@@ -52,7 +59,7 @@ clip() {
     [[ -s "$in" ]] || die "no recording $in"
     mkdir -p "$(dirname "$out")"
     tmp="$(mktemp "${out%.mp4}.XXXXXX.mp4")"
-    trap 'rm -f "$tmp"' RETURN
+    TMPS+=("$tmp")
     "${FF[@]}" -ss "$start" -i "$in" -t "$secs" -an \
         -vf "scale=1920:1200:force_original_aspect_ratio=decrease:flags=lanczos,pad=1920:1200:(ow-iw)/2:(oh-ih)/2,fps=30,format=yuv420p" \
         -c:v libx264 -preset slow -crf 20 -profile:v high -movflags +faststart "$tmp"

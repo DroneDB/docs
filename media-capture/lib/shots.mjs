@@ -12,7 +12,7 @@ export const SHOTS_DIR = path.join(CAPTURE_DIR, 'shots');
 export const MEDIA_DIR = path.join(REPO_ROOT, 'static', 'media');
 
 export const SECTIONS = ['get-started', 'datasets', 'files', 'viewing', 'measure', 'analyse',
-  'processing', 'sharing', 'account', 'self-hosting'];
+  'processing', 'sharing', 'account', 'self-hosting', 'reference'];
 export const TYPES = ['screenshot', 'clip'];
 export const BASES = ['hub', 'local'];
 export const AUTHS = ['none', 'demo', 'admin'];
@@ -25,7 +25,7 @@ export const MAX_CLIP_SECONDS = 60;
 
 const ID_RE = /^([a-z0-9]+(?:-[a-z0-9]+)*)\/([a-z0-9]+(?:-[a-z0-9]+)*)--([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 const YOUTUBE_RE = /^[A-Za-z0-9_-]{11}$/;
-const KEYS = ['id', 'type', 'alt', 'page', 'open', 'url', 'base', 'auth', 'viewport', 'waitFor', 'actions',
+const KEYS = ['id', 'type', 'alt', 'page', 'open', 'url', 'base', 'auth', 'viewport', 'uploadKBps', 'waitFor', 'actions',
   'highlight', 'crop', 'maxSeconds', 'blocked', 'youtubeId', 'desktop'];
 const OPEN_KEYS = ['org', 'ds', 'path', 'view', 'compare'];
 const WAIT_KEYS = ['selector', 'networkIdle', 'extraMs', 'stable', 'timeout'];
@@ -61,8 +61,12 @@ export const ACTIONS = {
       isButton(v.button) && !(keys[0] === 'move' && v.button !== undefined)
       ? null : 'mouse: { click | dblclick | move: [x, y] } (click and dblclick take button: left | right | middle)';
   },
-  drag: v => isObj(v) && isPoint(v.from) && isPoint(v.to) && !unknownKeys(v, ['from', 'to']).length
-    ? null : 'drag: { from: [x, y], to: [x, y] }',
+  // With a selector, from and to are fractions of the element's box (0 = left or top, 1 = right or
+  // bottom): a slider is dragged the same way wherever the Hub puts it
+  drag: v => isObj(v) && isPoint(v.from) && isPoint(v.to) && (v.selector === undefined || isStr(v.selector)) &&
+    (v.selector === undefined || [...v.from, ...v.to].every(n => n >= 0 && n <= 1)) &&
+    !unknownKeys(v, ['selector', 'from', 'to']).length
+    ? null : 'drag: { from: [x, y], to: [x, y] } in CSS pixels, or { selector, from, to } in fractions (0–1) of its box',
   setFiles: v => isObj(v) && isStr(v.selector) && Array.isArray(v.files) && v.files.length && v.files.every(isStr) &&
     !unknownKeys(v, ['selector', 'files']).length ? null : 'setFiles: { selector, files: [paths under the demo inputs root] }',
   scroll: v => isObj(v) && isStr(v.selector) && (Number.isFinite(v.y) || Number.isFinite(v.x)) &&
@@ -123,6 +127,11 @@ export function checkShot(raw) {
     } else viewport = {width: v.width, height: v.height};
   }
 
+  // The local Registry takes an upload at disk speed: an upload shot slows the page's uploads down
+  // to show the progress a user sees
+  const uploadKBps = raw.uploadKBps ?? null;
+  if (uploadKBps !== null && !isInt(uploadKBps, 1)) err('uploadKBps: the upload speed of the page in KB/s (a whole number)');
+
   const waitFor = raw.waitFor ?? {};
   if (!isObj(waitFor)) err('waitFor: a mapping');
   else {
@@ -175,7 +184,7 @@ export function checkShot(raw) {
   if (errors.length) return [errors, null];
   return [[], {
     id: raw.id, section: m[1], type: raw.type, alt: raw.alt.trim(), page: raw.page,
-    open: raw.open ?? null, url: url ?? null, desktop, base, auth, viewport,
+    open: raw.open ?? null, url: url ?? null, desktop, base, auth, viewport, uploadKBps,
     waitFor: {...waitFor}, actions, highlight: raw.highlight ?? null, crop,
     maxSeconds: isClip ? raw.maxSeconds ?? DEFAULT_CLIP_SECONDS : null,
     blocked: raw.blocked ?? null, youtubeId: isClip ? raw.youtubeId ?? null : null
