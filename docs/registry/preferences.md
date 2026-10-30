@@ -14,7 +14,7 @@ settings:
 | **Units** | Metric or imperial measurement units, and the currency of prices |
 | **Map** | The default basemap, the flight path and the direction indicators, and the custom basemap |
 | **Files** | The default view of the files (grid or table) and the sort order |
-| **Lists** | How many datasets and organizations a page shows |
+| **Lists** | How many datasets and organizations a page shows, and how the organizations are sorted |
 | **Viewers** | The navigation mode and the quality of Gaussian splats, and the lighting of the 3D viewers |
 | **Stockpiles** | The materials that weigh and price a stockpile |
 | **Notifications** | The e-mails about your builds (only on a server that sends e-mail) |
@@ -30,6 +30,15 @@ the settings of the tab back to their defaults.
 | **Currency** | Any ISO 4217 currency (default **USD**) | The currency of the prices in the Hub, for example the cost of a stockpile. The list has a search box, with the common currencies first |
 
 The currency is a label: a change does not convert the prices. For example, a price of 15 USD becomes 15 EUR.
+
+## Lists
+
+| Setting | Values | What it does |
+|---------|--------|--------------|
+| **Sort organizations by** | **Name** (default), **Creation date**, **Last modified**, **Number of datasets** | How the Organizations page sorts its list. See [Sorting](./datasets.md#sorting) |
+| **Organizations order** | **Ascending** (default), **Descending** | The direction of that sort |
+
+The sort control on the Organizations page changes the same settings.
 
 ## Viewers
 

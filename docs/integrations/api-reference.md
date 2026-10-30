@@ -43,12 +43,17 @@ Authorization: Bearer <token>
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/orgs` | List all organizations |
+| GET | `/orgs` | List all organizations, ordered by name then slug |
 | GET | `/orgs/public` | List public organizations (no auth required) |
 | GET | `/orgs/{orgSlug}` | Get organization details |
 | POST | `/orgs` | Create organization |
 | PUT | `/orgs/{orgSlug}` | Update organization |
 | DELETE | `/orgs/{orgSlug}` | Delete organization |
+| GET | `/orgs/{orgSlug}/locations` | Locations of the datasets of an organization (see below) |
+
+`OrganizationDto` has two fields that show how much an organization holds: `datasetCount` (integer) and `lastModified` (date, the newest `lastModified` of its datasets, or the creation date when it has none). Both are `null` for callers who are not the owner, a member or an administrator, and in `GET /orgs/public`.
+
+**Dataset locations.** `GET /orgs/{orgSlug}/locations` returns an array of `{ "slug", "name", "bbox" }`, one per dataset. `bbox` is `[minLon, minLat, maxLon, maxLat]` in WGS84, or `null` when the dataset has no georeferenced file. It has the same access as listing the datasets of the organization, except that callers who are not the owner, a member or an administrator do not get unlisted datasets. The value of a dataset is cached and computed again when its index changes.
 
 ## Datasets
 
@@ -74,9 +79,11 @@ matching datasets in the `X-Total-Count` response header.
 |-----------|-------------|
 | `skip`, `take` | Page offset and size (`take` at most 500). |
 | `q` | Case-insensitive search in the dataset name, slug and tagline. |
-| `sort` | `name` (default), `creationDate`, `entries`, `size` or `visibility`; `desc=true` reverses it. |
+| `sort` | `name` (default), `creationDate`, `lastModified`, `entries`, `size` or `visibility`; `desc=true` reverses it. |
 | `slugs` | Comma-separated slugs: only these datasets. |
 | `includeThumbnailCheck` | Also report whether each dataset of the page has a thumbnail (works without paging too). |
+
+`DatasetDto` has `lastModified`: the last time the dataset index changed (files added, removed, moved or renamed, metadata or visibility changed). Builds do not change it, and it can trail a change by a short time.
 
 ## Objects
 

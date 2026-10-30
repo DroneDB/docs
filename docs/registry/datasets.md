@@ -104,6 +104,54 @@ For large files, Registry supports chunked uploads:
 
 The DroneDB CLI (`ddb push`) handles chunked uploads automatically.
 
+## Organizations Page
+
+The **Organizations** page lists the organizations you can see. Type in the search box to filter the list, and switch between **List** and **Map** with the toggle next to it.
+
+### Sorting
+
+The sort control next to the search box sorts the organizations by:
+
+| Sort by | Order |
+|---------|-------|
+| **Name** (default) | Alphabetical, ignoring case and accents. Numbers in names are compared as numbers, so "Client 2" comes before "Client 10" |
+| **Creation date** | When the organization was created |
+| **Last modified** | When a dataset of the organization last changed (see [Last modified](#last-modified)) |
+| **Number of datasets** | How many datasets the organization has |
+
+The arrow button next to it switches between ascending and descending. Organizations with an unknown value sort last.
+
+The sort and the List/Map view are remembered, and saved to your account. Set the default sort in [Preferences](./preferences.md) > **Lists**: **Sort organizations by** and **Organizations order**.
+
+Each card shows the number of datasets and **Modified** with the time since the last change (hover for the exact date). They show only for organizations you own or are a member of, or for any organization if you are an administrator. The shared public organization and anonymous visitors do not see them.
+
+### Map
+
+The **Map** shows one pin per dataset of every organization in the list. It follows the search box and **Show all**. Pins are coloured by organization, with a legend, and appear as each organization loads. See [Dataset Map](#dataset-map) for how the pins work.
+
+## Datasets Page
+
+The datasets page of an organization sorts by name, creation date, files, size, visibility and **Modified**. The **Modified** column is sortable and shows on wide screens (from 1200 px). The **List** and **Map** toggle is remembered, and saved to your account.
+
+### Last modified
+
+The **last modified** time of a dataset is the last time its index changed: adding, removing, moving or renaming files, and changing metadata or visibility. Builds (tiles, COG, point cloud processing) do not count.
+
+It is read from the index files, so it can trail a change by a short time: pending changes are written to the index file a little later, for example when the dataset has been idle for about a minute or the server restarts.
+
+The value of an organization is the newest of its datasets. An organization without datasets uses its creation date.
+
+### Dataset Map
+
+The **Map** view shows one pin per dataset, at the centre of its area.
+
+- **Clusters**: nearby pins group into a numbered cluster. Click it to zoom in.
+- **Area**: hover over a pin, or select it, to draw the area of the dataset on the map.
+- **Popup**: click a pin for a popup with the dataset name, its organization and an **Open** button.
+- **Without a location**: the list **N datasets without a location** (collapsible) shows the datasets that have no pin. Each one links to the dataset.
+
+The location of a dataset is the area of its georeferenced files: orthophotos, DEMs, point clouds, vectors and geotagged images. Images that have only a GPS position, with no footprint, still give a location. A dataset has no location when none of its files carries coordinates, for example when it has only plain photos or documents. You cannot place a dataset by hand.
+
 ## Dataset Thumbnail & Tagline
 
 Datasets can have a **custom thumbnail** and a **tagline** (short description) to make them easier to identify in the datasets list.
