@@ -28,7 +28,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
-import {CAPTURE_DIR, REPO_ROOT, credentialsOf, inputPath, loadCredentials, parseArgs, resolveBase} from './lib/env.mjs';
+import {CAPTURE_DIR, REPO_ROOT, credentialsOf, demoResetTime, inputPath, loadCredentials, parseArgs, resolveBase} from './lib/env.mjs';
 import {MEDIA_DIR, SHOTS_DIR, loadShots, matchesPrefix, mediaPath, shotUrl} from './lib/shots.mjs';
 
 const run = promisify(execFile);
@@ -37,6 +37,9 @@ const OVERLAY = path.join(CAPTURE_DIR, 'overlay.js');
 const AUTH_DIR = path.join(CAPTURE_DIR, '.auth');
 const DPR = 2;
 const MAX_BYTES = 250 * 1024;
+// The page clock of a page that is not a viewer starts this long after the last demo reset: the demo
+// data (made during the reset) shows "1 hour ago" while a reset takes less than 30 minutes
+const CLOCK_AFTER_RESET_MS = 90 * 60e3;
 
 /** Shown while the Hub loads something: a shot waits until none of them is visible. */
 const BUSY = ['.loading-spinner', '.p-progressspinner', '.p-skeleton', '.viewer-loading'];
@@ -58,6 +61,8 @@ const VIEW_READY = {
 };
 
 const SPLAT_QUALITY_KEY = 'ddb.splat.quality';
+/** Whether an element (in the page) is a file input. */
+const isFileInput = el => el.tagName === 'INPUT' && el.type === 'file';
 
 class Transient extends Error {}
 
@@ -286,6 +291,10 @@ async function captureOnce(browser, shot, tmp) {
       await context.addInitScript({content: `try { localStorage.setItem('${SPLAT_QUALITY_KEY}', 'high'); } catch {}`});
     }
     await context.addInitScript({path: OVERLAY});
+    // Relative times ("1 hour ago") stay the same on each run: the page clock of a page that is not a
+    // viewer starts at a fixed time after the last demo reset of its Hub and runs on from there
+    const resetAt = shot.open?.view ? null : demoResetTime(base);
+    if (resetAt) await context.clock.install({time: resetAt + CLOCK_AFTER_RESET_MS});
 
     let page = await context.newPage();
     video = page.video();
@@ -504,10 +513,14 @@ async function runAction(page, action, isClip) {
       }
       break;
     }
-    case 'setFiles':
-      await center(page, v.selector, isClip);
+    case 'setFiles': {
+      // A file input is often hidden (a picker button creates it): only a drop zone is pointed at
+      const loc = page.locator(v.selector).first();
+      await loc.waitFor({state: 'attached'});
+      if (!await loc.evaluate(isFileInput)) await center(page, v.selector, isClip);
       await setFiles(page, v.selector, v.files.map(inputPath));
       break;
+    }
     case 'press':
       await page.keyboard.press(v);
       break;
@@ -547,28 +560,29 @@ async function runAction(page, action, isClip) {
 /**
  * Gives files to a file input (setInputFiles) or drops them on a drop zone: the files go through a
  * hidden file input of the page, then a drop with their DataTransfer is dispatched on the zone,
- * the way a browser delivers a drag from the desktop.
+ * the way a browser delivers a drag from the desktop. A single folder keeps its structure: each
+ * file carries its path in the folder (webkitRelativePath), as a folder input or a folder drag does.
  */
 async function setFiles(page, selector, files) {
+  const fatal = msg => Object.assign(new Error(`setFiles: ${msg}`), {fatal: true});
   const missing = files.filter(f => !fs.existsSync(f));
-  if (missing.length) {
-    const e = new Error(`setFiles: missing input file(s) ${missing.join(', ')} (set DDB_DOCS_INPUTS)`);
-    e.fatal = true;
-    throw e;
-  }
+  if (missing.length) throw fatal(`missing input file(s) ${missing.join(', ')} (set DDB_DOCS_INPUTS)`);
+  const folder = files.some(f => fs.statSync(f).isDirectory());
+  if (folder && files.length > 1) throw fatal(`give one folder or only files, not ${files.join(', ')}`);
   const target = page.locator(selector).first();
-  if (await target.evaluate(e => e.tagName === 'INPUT' && e.type === 'file')) {
+  if (await target.evaluate(isFileInput)) {
     await target.setInputFiles(files);
     return;
   }
-  const input = await page.evaluateHandle(() => {
+  const input = await page.evaluateHandle(folder => {
     const el = document.createElement('input');
     el.type = 'file';
     el.multiple = true;
+    el.webkitdirectory = folder;
     el.style.display = 'none';
     document.body.appendChild(el);
     return el;
-  });
+  }, folder);
   await input.asElement().setInputFiles(files);
   const dataTransfer = await page.evaluateHandle(el => {
     const dt = new DataTransfer();

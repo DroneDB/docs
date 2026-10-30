@@ -63,9 +63,10 @@
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
     - click: "[aria-label='Plant Health']"
+    - select: { selector: "#plant-health-panel-formula", value: NDVI }   # the histogram is the one of a formula
     - wait: "[aria-label='Range maximum']"
-  highlight: "[aria-label='Range maximum']"   # the box should cover the whole histogram
-  crop: "text=Histogram"                       # needs a selector for the histogram section (no label on the section)
+  highlight: null
+  crop: "[aria-label='Histogram']"
   blocked: null
 
 - id: analyse/colormaps--colormap-dropdown
@@ -153,7 +154,7 @@
   auth: demo
   waitFor: { selector: "text=park-1.tif", networkIdle: true, extraMs: 1000 }
   actions:
-    - click: { selector: "text=park-1.tif", button: right }   # needs right click in the pipeline (opens the context menu)
+    - rightClick: "text=park-1.tif"
     - click: "text=Compare to..."
     - wait: 2500                                 # the compare view opens in a new tab: the pipeline follows it
     - click: "text=park-2.tif"                   # in the Add raster to compare dialog
@@ -180,8 +181,8 @@
   waitFor: { selector: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08242018_16bit.tif", networkIdle: true, extraMs: 1000 }
   actions:
     - click: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08242018_16bit.tif"
-    - click: { selector: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08252018_16bit.tif", modifiers: [Control] }   # needs click modifiers in the pipeline
-    - click: { selector: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08252018_16bit.tif", button: right }    # needs right click in the pipeline
+    - click: { selector: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08252018_16bit.tif", modifiers: [Control] }
+    - rightClick: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08252018_16bit.tif"
     - wait: "text=Compare in Map"
   highlight: "text=Compare in Map"
   crop: null
@@ -222,7 +223,7 @@
   auth: demo
   waitFor: { selector: "[aria-label='Saved comparisons']", networkIdle: true, extraMs: 1000 }
   actions:
-    - click: { selector: "[aria-label='Saved comparisons'] >> text=Park 1 and 2", button: right }   # needs right click in the pipeline
+    - rightClick: "[aria-label='Saved comparisons'] >> text=Park 1 and 2"
     - wait: "text=Copy Link"
   highlight: "[aria-label='Saved comparisons']"
   crop: null

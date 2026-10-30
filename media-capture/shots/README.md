@@ -48,6 +48,7 @@ Every screenshot and clip of the documentation is defined here, one YAML file pe
     - scroll: { selector: ".file-list", y: 600 }   # mouse wheel over it: a list scrolls, a map zooms (y < 0 in)
     - mouse: { dblclick: [720, 450] }              # also { move: [x, y] }; click/dblclick take button: right
     - setFiles: { selector: "input[type=file]", files: [brighton-beach/images/DJI_0018.JPG] }
+    - setFiles: { selector: "[aria-label='Files']", files: [brighton-beach] }   # one folder: a folder drop
   highlight: "[aria-label='Plant Health']"   # red rounded box around the control that matters
   crop: null                         # null | a selector | { x, y, width, height } in CSS pixels
   maxSeconds: 20                     # clips only: the recording stops after this
@@ -63,6 +64,15 @@ Every screenshot and clip of the documentation is defined here, one YAML file pe
 - `setFiles` gives files to a file input, or drops them on a drop zone (any other element) the way a
   drag from the desktop does. A relative path is read from the demo inputs root (`DDB_DOCS_INPUTS`,
   default `/mnt/data/datasets`, the same root as `demo-inputs.yaml`); input files are never committed.
+  One folder instead of files keeps its structure: each file has its path in the folder, as with a
+  folder input or a folder dragged from the desktop; the folder must hold real files (Playwright
+  skips symbolic links in it). A file input may be hidden: a picker button
+  that creates one (Select Folder) is clicked first, then `setFiles` names the input
+  (`input[type='file'][webkitdirectory]`).
+- Relative times ("1 hour ago") are the same on each run: on a page that is not a viewer, the
+  page clock starts 90 minutes after the last `reset-demo` of the shot's Hub and runs on from
+  there. The demo data, made during the reset, shows "1 hour ago"; other data shows its age at the
+  time of that reset. Without a reset of that Hub the clock is the real one.
 - In a clip, the cursor moves to each control before it acts, and actions are 0.5 s apart.
 - Notifications that come and go (`.p-toast`) are hidden in the image, unless a selector of the
   shot names a toast.
@@ -83,8 +93,10 @@ and reports whether its image is there. Its image (screenshot, or clip poster) i
 - `id` is unique across all files. The section is the first part of the docs path of the page
   that shows it (`get-started`, `datasets`, `files`, `viewing`, `measure`, `analyse`,
   `processing`, `sharing`, `account`, `self-hosting`).
-- Select controls by `aria-label` first, then by an existing `title`, then by visible text
-  (`text=Share`). Avoid CSS classes of the Hub: they change.
+- Select controls by `aria-label` first (`[aria-label='Settings']`), then a button with a visible
+  text by role and name (`role=button[name='Create Dataset']`: it skips hidden copies), then by an
+  existing `title`, then by visible text (`text=Share`). Avoid CSS classes of the Hub: they change.
+  A control without a name gets one in the Hub, not a class selector here.
 - Shots of data that changes (upload, rename, paste, build, settings) use `auth: demo` and the
   demo organization `acme-surveys`, which `reset-demo.mjs` puts back in the same state before
   each run. Read-only shots use the public `odm` and `odx` datasets with `auth: none`.

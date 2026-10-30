@@ -1,6 +1,6 @@
 # Shots of the Hub guide → Sharing & integration pages (docs/hub-guide/sharing/*.mdx).
 #
-# Demo inputs that reset-demo.mjs must create in the organization acme-surveys (private, owner docs-demo):
+# Demo inputs that reset-demo.mjs must create in the organization acme-surveys (private, owner docsdemo):
 #   share-demo      (dataset, visibility PRIVATE)  orthophoto.tif   a copy of odm/brighton-beach
 #                                                                   odm_orthophoto/odm_orthophoto.tif (built)
 #   The visibility shots must never click "Allow access to anyone with the link" or change the visibility:
@@ -22,10 +22,10 @@
   base: hub
   auth: demo
   waitFor:
-    selector: "[title='Settings']"
+    selector: "[aria-label='Settings']"
     networkIdle: true
   actions:
-    - click: "[title='Settings']"
+    - click: "[aria-label='Settings']"
     - wait: "#settings"
     - click: "[aria-labelledby='settings-visibility-label']"
     - wait: "role=option[name='Unlisted']"

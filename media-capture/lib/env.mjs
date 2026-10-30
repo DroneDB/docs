@@ -13,6 +13,32 @@ export const CAPTURE_DIR = path.join(REPO_ROOT, 'media-capture');
 /** Working folder of the local Registry (start.sh writes credentials.env there). */
 export const DOCS_HOME = process.env.DDB_DOCS_HOME || '/mnt/data/docs-capture';
 
+/** When reset-demo last finished on each Hub: { "<base URL>": "<ISO time>" }. */
+const DEMO_RESETS = path.join(DOCS_HOME, 'demo-resets.json');
+
+/** The time (ms) reset-demo last finished on the Hub at base, or null when it never ran there. */
+export function demoResetTime(base) {
+  try {
+    const at = JSON.parse(fs.readFileSync(DEMO_RESETS, 'utf8'))[base];
+    return at ? Date.parse(at) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Records that reset-demo finished on the Hub at base, now. */
+export function recordDemoReset(base) {
+  let all = {};
+  try {
+    all = JSON.parse(fs.readFileSync(DEMO_RESETS, 'utf8'));
+  } catch {
+    // first reset, or an unreadable file: start again
+  }
+  all[base] = new Date().toISOString();
+  fs.mkdirSync(DOCS_HOME, {recursive: true});
+  fs.writeFileSync(DEMO_RESETS, JSON.stringify(all, null, 2) + '\n');
+}
+
 /**
  * Reads KEY=value lines of the credentials file into process.env. A variable that is already set
  * wins, so the environment can point the tools at another Hub (production) with other accounts.

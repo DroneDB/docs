@@ -94,7 +94,7 @@
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
-    - click: "[title^='Map Settings']"
+    - click: "[aria-label='Map Settings']"
     - wait: "#map-settings-dialog-basemap"
     - click: "#map-settings-dialog-basemap"
     - click: "role=option[name='Custom']"
@@ -165,10 +165,10 @@
   auth: none
   waitFor: { selector: "[aria-label='Units']", networkIdle: true, extraMs: 5000 }
   actions:
-    - click: ".potree_menu_toggle"   # needs aria-label (Potree's menu button is an <img>)
+    - click: "#potree_render_area [aria-label='Menu']"
     - wait: "#menu_appearance"
     - wait: 800
-  highlight: ".potree_menu_toggle"   # needs aria-label
+  highlight: "#potree_render_area [aria-label='Menu']"
   blocked: null
 
 - id: viewing/point-cloud--attribute
@@ -180,7 +180,7 @@
   auth: none
   waitFor: { selector: "[aria-label='Units']", networkIdle: true, extraMs: 5000 }
   actions:
-    - click: ".potree_menu_toggle"   # needs aria-label
+    - click: "#potree_render_area [aria-label='Menu']"
     - wait: "#menu_scene"
     - click: "#menu_scene"
     - click: 'text="odm_georeferenced_model.laz"'

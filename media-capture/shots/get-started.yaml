@@ -1,7 +1,7 @@
 # Shots of the Get started section (docs/get-started/*).
 #
-# Demo inputs that reset-demo.mjs must create (auth: demo, user docs-demo):
-#   - Personal organization `docs-demo` (made with the user): no datasets, so "My Datasets"
+# Demo inputs that reset-demo.mjs must create (auth: demo, user docsdemo):
+#   - Personal organization `docsdemo` (made with the user): no datasets, so "My Datasets"
 #     shows the empty list with the Create Dataset button.
 #   - acme-surveys/getting-started: private, empty (the dataset "just created" in first-dataset
 #     and the target of the upload shots).
@@ -11,9 +11,8 @@
 # Local files the upload shots drop or pick (not in a dataset): a folder `brighton-beach/` with
 #   images/DJI_0018.JPG … (the 18 photos of odm/brighton-beach images/) and
 #   odm_orthophoto/odm_orthophoto.tif, so the upload shows photos and one file that builds.
-#
-# Upload shots need two actions that the format does not have yet (see the lines marked
-# "needs capture action"): drop local files on an element, and set the files of a file input.
+# The upload shots give that folder to the page with setFiles (a drop on the file area, or the
+# folder input of Select Folder); the files keep their paths in the folder.
 
 # ---- What is DroneDB Hub / 5-minute tour (odm/brighton-beach, no account) ----
 
@@ -143,7 +142,7 @@
     - press: Enter
     - wait: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "[role='option']:has-text('odm_orthophoto.tif')"
-    - click: "[title='Share odm_orthophoto.tif']"   # the share button of the header
+    - click: "[aria-label='Share']"   # the share button of the header
     - wait: "[aria-label='Share link']"
     - wait: 500
   highlight: "[aria-label='Share link']"
@@ -169,7 +168,7 @@
   type: screenshot
   alt: The user menu with My Datasets, over the empty page of the personal organization
   page: get-started/first-dataset
-  url: /r/docs-demo
+  url: /r/docsdemo
   base: hub
   auth: demo
   waitFor: { selector: "text=Create Dataset", networkIdle: true, extraMs: 500 }
@@ -184,7 +183,7 @@
   type: screenshot
   alt: The Create new dataset window with a name, the slug made from it, the visibility and a tagline
   page: get-started/first-dataset
-  url: /r/docs-demo
+  url: /r/docsdemo
   base: hub
   auth: demo
   waitFor: { selector: "text=Create Dataset", networkIdle: true, extraMs: 500 }
@@ -221,8 +220,7 @@
   auth: demo
   waitFor: { selector: "[role='tree'][aria-label='Folders']", networkIdle: true, extraMs: 1000 }
   actions:
-    # needs capture action: drop the local folder brighton-beach/ on the file area
-    # (dropFiles: { selector: "[role='tabpanel']", files: [brighton-beach/] })
+    - setFiles: { selector: "[aria-label='Files']", files: [brighton-beach] }   # the file list is the drop zone
     - wait: "text=Upload Progress"
     - wait: "text=Close"             # the upload is complete
     - click: "button:has-text('Close')"
@@ -258,9 +256,8 @@
   waitFor: { selector: "[aria-label='Upload']", networkIdle: true, extraMs: 500 }
   actions:
     - click: "[aria-label='Upload']"
-    - wait: "text=Select Folder"
-    # needs capture action: set the files of the folder input to the local folder brighton-beach/
-    # (setFiles: { trigger: "button:has-text('Select Folder')", files: [brighton-beach/] })
+    - click: "button:has-text('Select Folder')"   # creates the hidden folder input
+    - setFiles: { selector: "input[type='file'][webkitdirectory]", files: [brighton-beach] }
     - wait: "text=In Progress"
     - wait: 1500                     # shoot while files are still uploading
   highlight: null
@@ -299,7 +296,7 @@
     - press: Enter
     - wait: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "[role='option']:has-text('odm_orthophoto.tif')"
-    - click: "[title='Share odm_orthophoto.tif']"
+    - click: "[aria-label='Share']"
     - wait: "#share-mode"
     - click: "#share-mode"
     - click: ".p-select-overlay [role='option']:has-text('Embed')"   # PrimeVue overlay of the Share list
@@ -321,7 +318,7 @@
     - press: Enter
     - wait: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "[role='option']:has-text('odm_orthophoto.tif')"
-    - click: "[title='Share odm_orthophoto.tif']"
+    - click: "[aria-label='Share']"
     - wait: "text=Allow access to anyone with the link"
   highlight: "button:has-text('Allow access to anyone with the link')"
   crop: "[role='dialog']"
@@ -340,7 +337,7 @@
     - press: Enter
     - wait: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "[role='option']:has-text('odm_orthophoto.tif')"
-    - click: "[title='Share odm_orthophoto.tif']"
+    - click: "[aria-label='Share']"
     - click: "button:has-text('Allow access to anyone with the link')"   # sets the dataset to Unlisted
     - wait: "[aria-label='Share link']"
   highlight: "[role='dialog'] [aria-label='Copy to clipboard']"
@@ -354,9 +351,9 @@
   url: /r/acme-surveys/first-map
   base: hub
   auth: demo
-  waitFor: { selector: "[title='Settings']", networkIdle: true, extraMs: 500 }
+  waitFor: { selector: "[aria-label='Settings']", networkIdle: true, extraMs: 500 }
   actions:
-    - click: "[title='Settings']"
+    - click: "[aria-label='Settings']"
     - wait: "#settings-visibility"
   highlight: "#settings-visibility"
   crop: "[role='dialog']"

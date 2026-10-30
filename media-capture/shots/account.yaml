@@ -1,15 +1,15 @@
 # Shots of the Hub guide → Organizations & account pages (docs/hub-guide/account/*.mdx).
 #
 # Demo inputs that reset-demo.mjs must create or set:
-#   - the account docs-demo with its e-mail address (docs-demo@example.com) and a storage quota (user metadata
-#     maxStorageMB, for example 10240) so the Account page and Storage Info show a used / total bar;
-#   - the Preferences of docs-demo reset to the defaults before each run (the shots open the window as it is);
+#   - the account docsdemo with its e-mail address (docsdemo@example.com) and a storage quota of 10 GB (user
+#     metadata maxStorageMB 10240, in demo-inputs.yaml) so the Account page and Storage Info show a used / total bar;
+#   - the Preferences of docsdemo reset to the defaults before each run (the shots open the window as it is);
 #   - acme-surveys/share-demo (see sharing.yaml) for the dataset download shot.
 #
 # Build notification shots use the local Registry with MailHog (media-capture/local/start.sh): Smtp points at
 # MailHog, so the Notifications tab is there. The e-mail shot needs one finished digest in MailHog: before it,
-# set docs-demo's "Send build notifications" to All, upload a file to a dataset of docs-demo on the local
-# Registry, and wait for the digest (BuildNotifications.DigestMinutes, 5 minutes by default; lower it locally).
+# set docsdemo's "Send build notifications" to All, upload a file to a dataset of docsdemo on the local
+# Registry, and wait for the digest (BuildNotifications.DigestMinutes: 1 minute on the local Registry).
 # The MailHog web UI is http://localhost:5181 (DDB_DOCS_MAIL_PORT), not a Registry page: the runner must accept
 # an absolute `url`.
 
@@ -203,10 +203,10 @@
   base: local
   auth: none
   waitFor:
-    selector: "text=docs-demo@example.com"
+    selector: "text=docsdemo@example.com"
     networkIdle: true
   actions:
-    - click: "text=docs-demo@example.com >> nth=0"   # the newest message
+    - click: "text=docsdemo@example.com >> nth=0"   # the newest message
     - wait: 1500
   highlight: null
   crop: null
@@ -226,7 +226,7 @@
     networkIdle: true
   actions:
     - click: "[aria-controls='user_menu']"
-    - click: "role=menuitem >> text=%"     # the storage row shows the used percentage; needs aria-label
+    - click: "[role='menuitem'][aria-label^='Storage:']"   # named "Storage: <used> % used"
     - wait: "role=dialog[name='Storage Info']"
   highlight: null
   crop: "role=dialog[name='Storage Info']"
@@ -242,10 +242,10 @@
   base: hub
   auth: demo
   waitFor:
-    selector: "[title='Download']"
+    selector: "[aria-label='Download']"
     networkIdle: true
   actions:
-    - click: "[title='Download']"
+    - click: "[aria-label='Download']"
     - wait: "role=dialog[name='Download']"   # never confirm
   highlight: "role=button[name='Download']"
   crop: null

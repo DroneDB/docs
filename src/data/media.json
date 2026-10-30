@@ -1,1 +1,65 @@
-{}
+{
+  "account/plans--storage-info": {
+    "type": "screenshot",
+    "width": 748,
+    "height": 700,
+    "alt": "The Storage Info window with the total, used and free space",
+    "youtubeId": null
+  },
+  "datasets/browse--organizations": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Organizations page with the organizations of the signed-in user, the search box and the sort control",
+    "youtubeId": null
+  },
+  "files/browser--context-menu": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The context menu of a file with the open, edit, download, tools, copy and delete actions",
+    "youtubeId": null
+  },
+  "files/edit-text--editor": {
+    "type": "screenshot",
+    "width": 2352,
+    "height": 1488,
+    "alt": "The text editor with a JSON file, the Format button and the Save button",
+    "youtubeId": null
+  },
+  "files/rescan--settings": {
+    "type": "screenshot",
+    "width": 1248,
+    "height": 1668,
+    "alt": "The Maintenance section of the Dataset Settings window with Rescan Dataset",
+    "youtubeId": null
+  },
+  "measure/3d--pointcloud-tools": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Tools section of the point cloud viewer menu, with the measurement tools",
+    "youtubeId": null
+  },
+  "measure/map--toolbar": {
+    "type": "screenshot",
+    "width": 1928,
+    "height": 1206,
+    "alt": "The measure toolbar on an orthophoto with its two saved measurements",
+    "youtubeId": null
+  },
+  "processing/builds--details-panel": {
+    "type": "screenshot",
+    "width": 684,
+    "height": 1612,
+    "alt": "Details panel of an OBJ whose build waits for its .mtl file",
+    "youtubeId": null
+  },
+  "self-hosting/processing-nodes--tool-gating": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Tool Gating section of the Configuration page",
+    "youtubeId": null
+  }
+}

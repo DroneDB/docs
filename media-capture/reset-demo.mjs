@@ -26,7 +26,7 @@ import path from 'node:path';
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import yaml from 'js-yaml';
-import {CAPTURE_DIR, DOCS_HOME, credentialsOf, inputPath, loadCredentials, parseArgs, resolveBase} from './lib/env.mjs';
+import {CAPTURE_DIR, DOCS_HOME, credentialsOf, inputPath, loadCredentials, parseArgs, recordDemoReset, resolveBase} from './lib/env.mjs';
 import {Registry} from './lib/registry.mjs';
 import {listApiUrl} from '../src/lib/hub.mjs';
 
@@ -89,11 +89,15 @@ async function main() {
   const org = spec.org.slug;
   const orgPath = `/orgs/${encodeURIComponent(org)}`;
 
+  // Created, or put back to the name and description of the demo inputs
+  const orgForm = () => new URLSearchParams({
+    slug: org, name: spec.org.name || org, description: spec.org.description || '', isPublic: 'false'
+  });
   if (!await reg.exists(orgPath)) {
-    await reg.request('POST', '/orgs', {body: new URLSearchParams({
-      slug: org, name: spec.org.name || org, description: spec.org.description || '', isPublic: 'false'
-    })});
+    await reg.request('POST', '/orgs', {body: orgForm()});
     console.log(`Created organization ${org}`);
+  } else {
+    await reg.request('PUT', orgPath, {body: orgForm()});
   }
 
   // Every dataset of the organization goes (also those a capture created), or only the --only ones
@@ -127,6 +131,9 @@ async function main() {
   if (spec.account?.meta) await setAccountMeta(username, spec.account.meta);
 
   if (!args['no-wait']) await waitForBuilds(reg, org, uploaded);
+  // The capture sets the page clock from it, so the relative times of the demo data stay the same;
+  // a reset of some datasets (--only) leaves the others with the times of the last full reset
+  if (!args.only) recordDemoReset(base);
   console.log(`Done in ${((Date.now() - t0) / 1000).toFixed(0)} s`);
 }
 
@@ -250,7 +257,10 @@ async function setAccountMeta(username, meta) {
   }
   const reg = new Registry(base);
   await reg.login(admin.username, admin.password);
-  await reg.request('POST', `/users/${encodeURIComponent(username)}/meta`, {json: meta});
+  // Registry replaces the whole metadata, which holds other keys too: merge into what is there
+  const metaPath = `/users/${encodeURIComponent(username)}/meta`;
+  const current = await reg.request('GET', metaPath) || {};
+  await reg.request('POST', metaPath, {json: {...current, ...meta}});
   console.log(`Account metadata of ${username}: ${JSON.stringify(meta)}`);
 }
 

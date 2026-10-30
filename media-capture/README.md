@@ -89,7 +89,8 @@ Photogrammetry shots use processing quota: capture them only when they change
 `node media-capture/capture.mjs --help` (and the other scripts) print all the options.
 
 What a capture does for each shot: it opens the page (signed in as the role of `auth`, cached in
-`.auth/`), waits for the viewer's loaded state or the shot's selector, an idle network (the
+`.auth/`; the page clock of a page that is not a viewer starts 90 minutes after the last `reset-demo`
+of that Hub, so relative times do not change between runs), waits for the viewer's loaded state or the shot's selector, an idle network (the
 server-sent events stream of a dataset page does not count), no spinner, the fonts and `extraMs`;
 it fails on a 5xx answer of the Hub or an error message on the page. Then it runs the actions,
 draws the highlight, waits until two frames in a row are the same and writes the image. A failed

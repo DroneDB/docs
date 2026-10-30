@@ -1,6 +1,6 @@
 # Shots of the Hub guide → Processing pages (docs/hub-guide/processing/*.mdx).
 #
-# Demo inputs that reset-demo.mjs must create in the organization acme-surveys (private, owner docs-demo):
+# Demo inputs that reset-demo.mjs must create in the organization acme-surveys (private, owner docsdemo):
 #   builds          (dataset)  orthophoto.tif           a copy of odm/brighton-beach odm_orthophoto/odm_orthophoto.tif (built)
 #                              house.obj                an OBJ uploaded WITHOUT its house.mtl (build "Waiting for files")
 #                              broken.laz               a few bytes that are not a LAZ file (build "Failed")
@@ -53,7 +53,7 @@
     - click: "text=house.obj"           # file browser items have no aria-label: visible text
     - wait: "text=Waiting for files"
   highlight: "text=Waiting for files"
-  crop: ".detail-panel"                 # needs aria-label: the details panel has no label, only a class
+  crop: "[aria-label='File details']"
   blocked: null
 
 - id: processing/builds--rebuild

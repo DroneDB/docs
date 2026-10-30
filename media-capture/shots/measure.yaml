@@ -21,18 +21,18 @@
   auth: demo
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
-    - click: "button[title^='Measure Length']"
+    - click: "[aria-label='Measure Length']"
     - mouse: { click: [560, 420] }
     - mouse: { click: [760, 380] }
     - mouse: { click: [760, 380] }
     - wait: 800
-    - click: "button[title^='Measure Area']"
+    - click: "[aria-label='Measure Area']"
     - mouse: { click: [820, 480] }
     - mouse: { click: [960, 470] }
     - mouse: { click: [940, 600] }
     - mouse: { click: [820, 480] }
     - wait: 800
-    - click: "button[title^='Save Measurements']"
+    - click: "[aria-label='Save Measurements']"
     - wait: 2000
   highlight: null
   crop: null
@@ -49,7 +49,7 @@
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions: []
-  highlight: "button[title^='Measure Length']"   # needs aria-label (the toolbar buttons have a title only); the box should cover the whole measure toolbar
+  highlight: "[aria-label='Measure Tools']"
   crop: null
   blocked: null
 
@@ -62,14 +62,14 @@
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
-    - click: "button[title^='Measure Area']"
+    - click: "[aria-label='Measure Area']"
     - mouse: { click: [640, 380] }
     - mouse: { click: [820, 360] }
     - mouse: { click: [860, 540] }
     - mouse: { click: [660, 560] }
     - mouse: { click: [640, 380] }
     - wait: 800
-  highlight: "button[title^='Measure Area']"
+  highlight: "[aria-label='Measure Area']"
   crop: null
   blocked: null
 
@@ -82,7 +82,7 @@
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
-    - click: "button[title^='Measurement List']"
+    - click: "[aria-label='Measurement List']"
     - click: "[aria-label='Edit']"            # the first row: opens the properties dialog
     - fill: { selector: "#mp-name", value: Beach access }
     - fill: { selector: "#mp-description", value: Width of the access path at high tide }
@@ -99,7 +99,7 @@
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
-    - click: "button[title^='Measurement List']"
+    - click: "[aria-label='Measurement List']"
     - click: "text=New Group"
     - fill: { selector: "#mg-name", value: North beach }
     - click: "text=Create"
@@ -117,7 +117,7 @@
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
-    - click: "button[title^='Point Annotation']"
+    - click: "[aria-label='Point Annotation']"
     - mouse: { click: [720, 450] }
     - wait: "#pa-description"
     - fill: { selector: "#pa-description", value: Erosion at the foot of the dune }
@@ -134,7 +134,7 @@
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
-    - click: "button[title^='Point Annotation']"
+    - click: "[aria-label='Point Annotation']"
     - mouse: { click: [720, 450] }
     - wait: "#pa-description"
     - fill: { selector: "#pa-description", value: Erosion at the foot of the dune }
@@ -154,11 +154,11 @@
   auth: none
   waitFor: { selector: "#potree_render_area canvas", networkIdle: true, extraMs: 4000 }
   actions:
-    - click: "img.potree_menu_toggle"           # needs aria-label (Potree's menu button is an image with no label)
+    - click: "#potree_render_area [aria-label='Menu']"
     - click: "img[title='Distance measurement']"
     - mouse: { click: [640, 460] }
     - mouse: { click: [820, 420] }
-    - mouse: { click: [820, 420], button: right }   # needs right click in the pipeline (Potree ends a measurement on right click)
+    - mouse: { click: [820, 420], button: right }   # Potree ends a measurement on right click
     - wait: 1500
   highlight: null
   crop: null
@@ -175,7 +175,7 @@
   auth: none
   waitFor: { selector: "#potree_render_area canvas", networkIdle: true, extraMs: 4000 }
   actions:
-    - click: "img.potree_menu_toggle"           # needs aria-label
+    - click: "#potree_render_area [aria-label='Menu']"
     - wait: 800
   highlight: "img[title='Distance measurement']"
   crop: null
@@ -207,7 +207,7 @@
     - mouse: { click: [620, 420] }
     - mouse: { click: [820, 400] }
     - mouse: { click: [840, 560] }
-    - mouse: { click: [640, 580], button: right }   # needs right click in the pipeline (ends the shape)
+    - mouse: { click: [640, 580], button: right }   # a right click ends the shape
     - wait: 1000
   highlight: "[aria-label='Measure area']"
   crop: null
