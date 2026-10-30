@@ -17,16 +17,24 @@ Every screenshot and clip of the documentation is defined here, one YAML file pe
     ds: micasense
     path: odm_orthophoto/odm_orthophoto.tif
     view: map                        # map | pointcloud | model | unified | splat | panorama | markdown
+    # compare: [a.tif, b.tif]        # instead of path and view: the compare view of 2+ rasters
   # url: /r/odm                      # any other Hub path (dataset list, /account, /admin/users …)
-  base: hub                          # hub | local (local = always the throwaway local Registry)
+  base: hub                          # hub | local (always the throwaway local Registry) | mail (its MailHog web UI, with `url`)
   auth: none                         # none | demo | admin
-  viewport: { width: 1440, height: 900 }   # optional; default 1440×900, device pixel ratio 2
+  viewport: { width: 1440, height: 900 }   # optional; screenshots 1440×900 at device pixel ratio 2, clips 1920×1200 at 1
   waitFor:                           # the page is ready when all of these hold
     selector: ".ol-layer canvas"
     networkIdle: true
     extraMs: 1500
+    # stable: true                   # screenshots: wait until two frames in a row are the same (default true)
+    # timeout: 60000                 # longest wait for the selector, the network and the spinners
   actions:                           # done in order before the shot (or recorded, for a clip)
     - click: "[aria-label='Plant Health']"
+    - rightClick: "text=odm_orthophoto.tif"   # opens the context menu of a file; the same as
+    - click: { selector: "text=odm_orthophoto.tif", button: right }   # button: left | right | middle
+    - click: { selector: "text=IMG_0180_2.tif", modifiers: [Control] } # Alt, Control, ControlOrMeta, Meta, Shift
+    - click: { selector: "role=menuitem[name='Compare in Map']", popup: true }  # the shot goes on in the
+                                     # tab the click opens (screenshots only)
     - select: { selector: "[aria-label='Index']", value: NDVI }
     - fill: { selector: "input[name='name']", value: Survey 2026 }
     - hover: "[aria-label='Layers']"
@@ -34,13 +42,30 @@ Every screenshot and clip of the documentation is defined here, one YAML file pe
     - wait: 1000                     # milliseconds, or a selector to wait for
     - mouse: { click: [720, 450] }   # CSS pixels in the viewport (map and 3D canvases)
     - drag: { from: [600, 400], to: [800, 400] }
-    - scroll: { selector: ".file-list", y: 600 }
+    - scroll: { selector: ".file-list", y: 600 }   # mouse wheel over it: a list scrolls, a map zooms (y < 0 in)
+    - mouse: { dblclick: [720, 450] }              # also { move: [x, y] }; click/dblclick take button: right
+    - setFiles: { selector: "input[type=file]", files: [brighton-beach/images/DJI_0018.JPG] }
   highlight: "[aria-label='Plant Health']"   # red rounded box around the control that matters
   crop: null                         # null | a selector | { x, y, width, height } in CSS pixels
   maxSeconds: 20                     # clips only: the recording stops after this
   blocked: null                      # null | data (the showcase data is missing) | release
   youtubeId: null                    # clips only: filled in by hand after the YouTube upload
 ```
+
+## Waits and actions
+
+- Without `waitFor.selector`, a shot of a viewer (`open.view`) waits for the loaded state of that
+  viewer (`VIEW_READY` in `capture.mjs`). Every shot also waits until no loading spinner is
+  visible. `networkIdle` is true when it is not set.
+- `setFiles` gives files to a file input, or drops them on a drop zone (any other element) the way a
+  drag from the desktop does. A relative path is read from the demo inputs root (`DDB_DOCS_INPUTS`,
+  default `/mnt/data/datasets`, the same root as `demo-inputs.yaml`); input files are never committed.
+- In a clip, the cursor moves to each control before it acts, and actions are 0.5 s apart.
+- Notifications that come and go (`.p-toast`) are hidden in the image, unless a selector of the
+  shot names a toast.
+- A screenshot is at most 250 KB: the WebP quality goes down from 85 to 60, then the image is
+  scaled down (full-screen aerial imagery). The capture prints when it scaled an image; crop the
+  shot to the panel that matters to keep the full resolution.
 
 ## Rules
 

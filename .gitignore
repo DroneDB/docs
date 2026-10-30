@@ -2,3 +2,7 @@ node_modules
 .docusaurus
 build
 test-data
+
+# Capture pipeline: recorded clips waiting for the YouTube upload, cached sign-ins
+media-capture/out
+media-capture/.auth

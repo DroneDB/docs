@@ -1,0 +1,57 @@
+# Shots that test the capture pipeline itself (not docs media). Capture them into a scratch folder,
+# never into static/media:
+#
+#   node media-capture/capture.mjs --shots media-capture/test --out /tmp/ddb-capture-test \
+#     --video-out /tmp/ddb-capture-test/out
+#
+# The ids use real sections because the format requires one; the suffix --pipeline-test marks them.
+
+- id: viewing/map--pipeline-test
+  type: screenshot
+  alt: Orthophoto of Brighton Beach on the map
+  page: hub-guide/viewing/map
+  open: { org: odm, ds: brighton-beach, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  waitFor: { networkIdle: true, extraMs: 500 }
+
+- id: files/browser--pipeline-test
+  type: screenshot
+  alt: Files of the Brighton Beach dataset
+  page: hub-guide/files/browser
+  url: /r/odm/brighton-beach
+  waitFor: { selector: "text=odm_orthophoto", networkIdle: true }
+
+- id: viewing/point-cloud--pipeline-test
+  type: screenshot
+  alt: Point cloud of Brighton Beach
+  page: hub-guide/viewing/point-cloud
+  open: { org: odm, ds: brighton-beach, path: odm_georeferencing/odm_georeferenced_model.laz, view: pointcloud }
+  waitFor: { networkIdle: true, extraMs: 1000 }
+
+- id: viewing/splats--pipeline-test
+  type: screenshot
+  alt: Gaussian splat of the train scene
+  page: hub-guide/viewing/splats
+  open: { org: odx, ds: splats, path: train.ply, view: splat }
+  waitFor: { networkIdle: false, extraMs: 1500 }
+
+- id: datasets/browse--pipeline-test
+  type: screenshot
+  alt: Datasets of the OpenDroneMap organization
+  page: hub-guide/datasets/browse
+  url: /r/odm
+  waitFor: { selector: "text=Brighton Beach", networkIdle: true }
+  highlight: "text=Brighton Beach"
+
+- id: viewing/map-zoom--pipeline-test
+  type: clip
+  alt: Zooming into the orthophoto of Brighton Beach
+  page: hub-guide/viewing/map
+  open: { org: odm, ds: brighton-beach, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  waitFor: { networkIdle: true, extraMs: 500 }
+  actions:
+    - mouse: { move: [720, 450] }
+    - scroll: { selector: ".ol-viewport", y: -600 }
+    - wait: 1500
+    - drag: { from: [720, 450], to: [560, 380] }
+    - wait: 1500
+  maxSeconds: 15
