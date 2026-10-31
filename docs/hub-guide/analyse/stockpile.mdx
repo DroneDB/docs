@@ -30,10 +30,14 @@ also gives the weight and the cost of the pile.
 2. Select the **Base Plane Method**. The information button next to it explains each method.
 
 3. Click **Click map**, then click on the pile. Hub finds the edge of the pile and computes its
-   volume. If Hub does not find the right edge, click **Draw** and draw a polygon around the pile.
-   Double-click to finish.
+   volume against the ground around it, so detection works on a slope too. A detected pile uses
+   **Best-fit plane** unless you choose another base. If Hub does not find the right edge, click
+   **Draw** and draw a polygon around the pile. Double-click to finish. A drawn polygon uses the
+   **Base Plane Method** of the panel: on a slope, choose **Best-fit plane**.
 
    <Screenshot id="analyse/stockpile--detect" />
+
+   <Screenshot id="analyse/stockpile--draw" />
 
 4. Select a **Material**. The panel shows the **Weight** and the **Est. cost** of the pile.
 
@@ -48,7 +52,7 @@ also gives the weight and the cost of the pile.
 
 | Option | What it does | Default |
 |---|---|---|
-| **Base Plane Method** | The surface under the pile. See the table below. | Lowest perimeter |
+| **Base Plane Method** | The surface under the pile. See the table below. | Lowest perimeter for a drawn polygon; Best-fit plane for a detected pile |
 | **Detection Sensitivity** | How easily the detection separates the pile from the ground, from 0 to 1. Higher values find lower piles, but can take in nearby ground. | 0.50 |
 | **Search Radius (m)** | How far from your click Hub looks for the edge of the pile. Make it larger for a large pile. | 50 |
 | **Material (optional)** | The material that gives the weight and the cost. **+ Custom…** lets you type a density and a cost for this pile only. | none |
@@ -93,7 +97,7 @@ material it was weighed with.
 - Saving the pile needs write access to the dataset.
 - Hub detects one pile for each click.
 
-{/* TODO data: no public showcase dataset has a DSM of a pile site yet (odm/caliterra has no DSM); the detect and material shots wait for it. */}
+{/* TODO data: the DSM of odm/caliterra used by the shots is local only; publish it on hub.dronedb.app before the re-capture from production. */}
 
 ## Related
 

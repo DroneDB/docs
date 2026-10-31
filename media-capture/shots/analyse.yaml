@@ -3,12 +3,16 @@
 # Demo inputs (reset-demo.mjs) for the shots with `auth: demo`, in the org acme-surveys:
 # - dataset `sheffield-park` (shared with measure.yaml): the orthophotos of odm/sheffield-park-1
 #   and odm/sheffield-park-2 as `park-1.tif` and `park-2.tif`, built.
-# - in that dataset, one saved comparison named "Park 1 and 2" of park-1.tif and park-2.tif,
-#   split on (the dataset meta list `comparisons`), for the list under the folder tree.
+# - the clip analyse/compare-view--compare-to-add-save saves the comparison "Park 1 and 2" of
+#   park-1.tif and park-2.tif (the dataset meta list `comparisons`); the saved-list shot shows it,
+#   so capture the two together, the clip first (--only analyse/compare-view).
 #
 # Public data: odx/micasense (6-band orthophoto and odm_dem/dsm.tif), odx/hat-creek (two thermal
-# mosaics of 24 and 25 August 2018 at the root of the dataset). The stockpile shots that need
-# piles wait for a DSM of odm/caliterra (not there yet): blocked: data.
+# mosaics of 24 and 25 August 2018 at the root of the dataset), odm/caliterra (odm_dem/dsm.tif, a
+# local-only DSM made by media-capture/local/generate-data.sh). The stockpile shots measure the sand
+# pile next to the culverts (the debris pile near the excavator is on interpolated DSM and cannot
+# be detected; Detect all does not find the sand pile). The click shots wait for the libddb and Hub
+# that detect a pile on a slope (blocked: release); the draw shot works now.
 #
 # The compare URLs use base64url of the paths (no padding):
 #   08242018 mosaic: QWlyYm9ybmVfdGhlcm1hbF9pbmZyYXJlZF9tb3NhaWNfSGF0X0NyZWVrX0NhbGlmb3JuaWFfMDgyNDIwMThfMTZiaXQudGlm
@@ -18,7 +22,7 @@
 
 - id: analyse/colormaps--bands-histogram
   type: clip
-  alt: Bands of a multispectral orthophoto changed, then the histogram range dragged
+  alt: Bands of a multispectral orthophoto changed, then NDVI selected and the range of its histogram dragged
   page: hub-guide/analyse/colormaps
   open: { org: odx, ds: micasense, path: odm_orthophoto/odm_orthophoto.tif, view: map }
   base: hub
@@ -29,7 +33,10 @@
     - wait: "text=Bands (R,G,B)"
     - select: { selector: "[aria-labelledby='plant-health-panel-bands-label'] select >> nth=0", value: "4" }   # R = band 4
     - wait: 2500
-    - drag: { from: [1290, 520], to: [1250, 520] }   # the Range maximum handle of the histogram
+    - select: { selector: "#plant-health-panel-formula", value: NDVI }   # bands only has no histogram
+    - wait: "[aria-label='Range maximum']"
+    - wait: 2000
+    - drag: { selector: "[aria-label='Histogram']", from: [0.96, 0.37], to: [0.8, 0.37] }   # the Range maximum handle
     - wait: 2500
   highlight: null
   crop: null
@@ -100,6 +107,9 @@
     - click: "role=tab[name='Map']"              # the Map tab of the dataset page
     - wait: "[aria-label='Compare georasters side by side']"
     - wait: 2000
+    - click: "[title='Zoom in']"   # the mosaics are a narrow strip along the creek, which crosses the centre:
+    - click: "[title='Zoom in']"   # zoom in on it (the mouse wheel does not zoom the Map tab in the capture)
+    - wait: 2500
     - click: "[aria-label='Compare georasters side by side']"
     - wait: 1500
     - drag: { from: [720, 600], to: [480, 600] }
@@ -122,6 +132,9 @@
     - click: "role=tab[name='Map']"
     - wait: "[aria-label='Move layer down']"
     - wait: 2000
+    - click: "[title='Zoom in']"   # the mosaics are a narrow strip along the creek, which crosses the centre:
+    - click: "[title='Zoom in']"   # zoom in on it (the mouse wheel does not zoom the Map tab in the capture)
+    - wait: 2500
   highlight: "[aria-label='Move layer down']"   # the box should cover the whole opacity panel (no label on the panel)
   crop: null
   blocked: null
@@ -137,6 +150,10 @@
   actions:
     - click: "role=tab[name='Map']"
     - wait: "[aria-label='Compare georasters side by side']"
+    - wait: 2000
+    - click: "[title='Zoom in']"   # the mosaics are a narrow strip along the creek, which crosses the centre:
+    - click: "[title='Zoom in']"   # zoom in on it (the mouse wheel does not zoom the Map tab in the capture)
+    - wait: 2500
     - click: "[aria-label='Compare georasters side by side']"
     - wait: 2500
   highlight: "[aria-label='Compare georasters side by side']"
@@ -147,22 +164,22 @@
 
 - id: analyse/compare-view--compare-to-add-save
   type: clip
-  alt: Compare to... on an orthophoto, a second orthophoto added, the comparison saved
+  alt: A second orthophoto added to the compare view, the divider dragged, the comparison saved
   page: hub-guide/analyse/compare-view
-  url: /r/acme-surveys/sheffield-park
+  # Compare to... opens the compare view in a new tab, which a clip cannot follow: the clip starts
+  # where that tab starts, on park-1.tif with the Add raster to compare dialog open (pick=1)
+  url: /r/acme-surveys/sheffield-park/compare?p=cGFyay0xLnRpZg&pick=1
   base: hub
   auth: demo
-  waitFor: { selector: "text=park-1.tif", networkIdle: true, extraMs: 1000 }
+  waitFor: { selector: "text=Add raster to compare", networkIdle: true, extraMs: 1500 }
   actions:
-    - rightClick: "text=park-1.tif"
-    - click: "text=Compare to..."
-    - wait: 2500                                 # the compare view opens in a new tab: the pipeline follows it
-    - click: "text=park-2.tif"                   # in the Add raster to compare dialog
+    - click: "[role='dialog'] >> text=park-2.tif"
     - click: "[role='dialog'] >> text=Confirm"
     - wait: 2500
-    - drag: { from: [720, 600], to: [520, 600] }
-    - click: "text=Save"
-    - fill: { selector: "[role='dialog'] input", value: Spring survey }
+    - drag: { from: [960, 700], to: [700, 700] }   # the divider (1920x1200 clip viewport)
+    - wait: 1000
+    - click: "role=button[name='Save']"
+    - fill: { selector: "[role='dialog'] input", value: Park 1 and 2 }
     - press: Enter
     - wait: 1500
   highlight: null
@@ -180,9 +197,10 @@
   auth: none
   waitFor: { selector: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08242018_16bit.tif", networkIdle: true, extraMs: 1000 }
   actions:
-    - click: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08242018_16bit.tif"
-    - click: { selector: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08252018_16bit.tif", modifiers: [Control] }
-    - rightClick: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08252018_16bit.tif"
+    # the tiles of the file list (a click on the long names of the folder tree scrolls it sideways)
+    - click: "[role='option'][title*='08242018_16bit.tif']"
+    - click: { selector: "[role='option'][title*='08252018_16bit.tif']", modifiers: [Control] }
+    - rightClick: "[role='option'][title*='08252018_16bit.tif']"
     - wait: "text=Compare in Map"
   highlight: "text=Compare in Map"
   crop: null
@@ -225,7 +243,7 @@
   actions:
     - rightClick: "[aria-label='Saved comparisons'] >> text=Park 1 and 2"
     - wait: "text=Copy Link"
-  highlight: "[aria-label='Saved comparisons']"
+  highlight: null   # the context menu opens over the list: a box would cut through it
   crop: null
   blocked: null
 
@@ -300,9 +318,7 @@
     - click: "[aria-label='Plant Health']"
     - wait: "#plant-health-panel-formula"
     - select: { selector: "#plant-health-panel-formula", value: NDVI }
-    - wait: 3000
-    - click: "[aria-label='Close']"             # the panel closes; the map keeps the index
-    - wait: 1000
+    - wait: 3000                                # the panel stays open: closing it resets the view to the bands
   highlight: null
   crop: null
   blocked: null
@@ -337,10 +353,10 @@
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
     - click: "[aria-label='Raster Analysis']"
-    - click: "text=Inspect"
-    - mouse: { click: [700, 460] }              # on the river
+    - click: "role=button[name='Inspect']"
+    - mouse: { click: [684, 490] }              # on the mosaic, a strip a few pixels wide along the creek
     - wait: 1500
-  highlight: "text=Inspect"
+  highlight: "role=button[name='Inspect']"
   crop: null
   blocked: null
 
@@ -356,7 +372,7 @@
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
     - click: "[aria-label='Raster Analysis']"
-    - click: "text=Profile"
+    - click: "role=button[name='Profile']"
     - mouse: { click: [480, 440] }
     - mouse: { click: [900, 460] }
     - mouse: { click: [900, 460] }
@@ -380,7 +396,7 @@
   actions:
     - click: "[aria-label='Raster Analysis']"
     - wait: "text=Value Range"
-  highlight: "text=Profile"
+  highlight: "role=button[name='Profile']"
   crop: null
   blocked: null
 
@@ -394,7 +410,7 @@
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
     - click: "[aria-label='Raster Analysis']"
-    - click: "text=Profile"
+    - click: "role=button[name='Profile']"
     - mouse: { click: [480, 440] }
     - mouse: { click: [900, 460] }
     - mouse: { click: [900, 460] }
@@ -418,7 +434,7 @@
     - click: "text=Contours"
     - wait: "text=Generate Contour Lines"
     - fill: { selector: "#contour-options-dialog-interval", value: "1" }
-    - click: "text=Generate"
+    - click: "role=button[name=/^Generate$/]"   # "text=Generate" matches the title Generate Contour Lines
     - wait: 5000
   highlight: null
   crop: null
@@ -455,9 +471,8 @@
     - click: "text=Contours"
     - wait: "text=Generate Contour Lines"
     - fill: { selector: "#contour-options-dialog-interval", value: "1" }
-    - click: "text=Generate"
-    - wait: 5000
-    - click: "[aria-label='Close']"             # closes the Raster Analysis panel
+    - click: "role=button[name=/^Generate$/]"   # "text=Generate" matches the title Generate Contour Lines
+    - wait: 5000                                # the panel stays open: closing it resets the view
   highlight: null
   crop: null
   blocked: null
@@ -473,16 +488,24 @@
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
+    # The sand pile next to the culverts (30.170892, -98.090734) is at (581, 590) in the default
+    # view: three double clicks there zoom in 8 times around it, and it is then at (583, 600)
+    - mouse: { dblclick: [581, 590] }
+    - wait: 1200
+    - mouse: { dblclick: [581, 590] }
+    - wait: 1200
+    - mouse: { dblclick: [581, 590] }
+    - wait: 2000
     - click: "[aria-label='Stockpile Volume']"
     - click: "button[title='Click on the map to detect a pile at that point']"
-    - mouse: { click: [720, 450] }              # on a pile: to set once the DSM exists
+    - mouse: { click: [583, 600] }              # the sand pile: about 8.7 m³ and 15 m², on a Best-fit plane
     - wait: "text=Net volume"
     - select: { selector: "#stockpile-volume-panel-material", value: gravel }
     - wait: 1500
   highlight: null
   crop: null
   maxSeconds: 20
-  blocked: data
+  blocked: release   # needs the libddb that detects piles on a slope (base fitted to the ground around the click) and the Hub that opens a detected pile on Best-fit plane
   youtubeId: null
 
 - id: analyse/stockpile--panel
@@ -509,13 +532,60 @@
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
+    # The sand pile next to the culverts (30.170892, -98.090734) is at (581, 590) in the default
+    # view: three double clicks there zoom in 8 times around it, and it is then at (583, 600)
+    - mouse: { dblclick: [581, 590] }
+    - wait: 1200
+    - mouse: { dblclick: [581, 590] }
+    - wait: 1200
+    - mouse: { dblclick: [581, 590] }
+    - wait: 2000
     - click: "[aria-label='Stockpile Volume']"
     - click: "button[title='Click on the map to detect a pile at that point']"
-    - mouse: { click: [720, 450] }              # on a pile: to set once the DSM exists
+    - mouse: { click: [583, 600] }              # the sand pile: about 8.7 m³ and 15 m², on a Best-fit plane
     - wait: "text=Net volume"
   highlight: "button[title='Click on the map to detect a pile at that point']"
   crop: null
-  blocked: data
+  blocked: release   # needs the libddb that detects piles on a slope (base fitted to the ground around the click) and the Hub that opens a detected pile on Best-fit plane
+
+- id: analyse/stockpile--draw
+  type: screenshot
+  alt: A polygon drawn around a small sand pile on a DSM, with its volume on a best-fit base plane
+  page: hub-guide/analyse/stockpile
+  open: { org: odm, ds: caliterra, path: odm_dem/dsm.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    # The sand pile next to the culverts (centre 30.170892, -98.090734, about 7 m across) is at
+    # (581, 590) in the default view: three double clicks there zoom in 8 times around it
+    - mouse: { dblclick: [581, 590] }
+    - wait: 1200
+    - mouse: { dblclick: [581, 590] }
+    - wait: 1200
+    - mouse: { dblclick: [581, 590] }
+    - wait: 2000
+    - click: "[aria-label='Stockpile Volume']"
+    - select: { selector: "#stockpile-volume-panel-base-plane-method", value: best_fit }   # the pile is on a slope
+    - click: "[data-testid='stockpile-draw-btn']"
+    # the 12 points of /mnt/data/docs-capture/inputs/caliterra-sand-pile-polygon.json (radius 3.5 m)
+    - mouse: { click: [657, 600] }
+    - mouse: { click: [647, 563] }
+    - mouse: { click: [620, 536] }
+    - mouse: { click: [584, 526] }
+    - mouse: { click: [547, 535] }
+    - mouse: { click: [519, 562] }
+    - mouse: { click: [509, 599] }
+    - mouse: { click: [519, 636] }
+    - mouse: { click: [546, 664] }
+    - mouse: { click: [582, 674] }
+    - mouse: { click: [619, 664] }
+    - mouse: { dblclick: [647, 637] }   # a double click finishes the polygon
+    - wait: "text=Net volume"
+    - wait: 1500
+  highlight: "[data-testid='stockpile-draw-btn']"
+  crop: null
+  blocked: null
 
 - id: analyse/stockpile--material-cost
   type: screenshot
@@ -526,15 +596,23 @@
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
+    # The sand pile next to the culverts (30.170892, -98.090734) is at (581, 590) in the default
+    # view: three double clicks there zoom in 8 times around it, and it is then at (583, 600)
+    - mouse: { dblclick: [581, 590] }
+    - wait: 1200
+    - mouse: { dblclick: [581, 590] }
+    - wait: 1200
+    - mouse: { dblclick: [581, 590] }
+    - wait: 2000
     - click: "[aria-label='Stockpile Volume']"
     - click: "button[title='Click on the map to detect a pile at that point']"
-    - mouse: { click: [720, 450] }
+    - mouse: { click: [583, 600] }              # the sand pile: about 8.7 m³ and 15 m², on a Best-fit plane
     - wait: "text=Net volume"
     - select: { selector: "#stockpile-volume-panel-material", value: gravel }
     - wait: "text=Est. cost"
   highlight: "#stockpile-volume-panel-material"
   crop: null
-  blocked: data
+  blocked: release   # needs the libddb that detects piles on a slope (base fitted to the ground around the click) and the Hub that opens a detected pile on Best-fit plane
 
 - id: analyse/stockpile--base-methods
   type: screenshot
@@ -565,7 +643,8 @@
   actions:
     - click: "[aria-label='Raster Analysis']"
     - wait: "text=Value Range"
-    - click: "text=Inspect"
+    - click: "role=button[name='Inspect']"
+    - wait: 800                                        # the map takes the click once Inspect is on
     - mouse: { click: [700, 460] }
     - wait: "[data-testid='raster-spot-value']"
     - wait: 1000
