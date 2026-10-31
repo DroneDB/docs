@@ -1,9 +1,93 @@
 {
+  "account/account--change-password": {
+    "type": "screenshot",
+    "width": 788,
+    "height": 1028,
+    "alt": "The Change Password window with the password rules",
+    "youtubeId": null
+  },
+  "account/account--upload-diagnostics": {
+    "type": "screenshot",
+    "width": 1648,
+    "height": 532,
+    "alt": "The Upload diagnostics card after a test, with the protocol, round trip and speeds",
+    "youtubeId": null
+  },
+  "account/build-notifications--email": {
+    "type": "screenshot",
+    "width": 2380,
+    "height": 1600,
+    "alt": "A build notification e-mail with a failed, a waiting and a completed build",
+    "youtubeId": null
+  },
+  "account/build-notifications--setting": {
+    "type": "screenshot",
+    "width": 1236,
+    "height": 1308,
+    "alt": "The Notifications tab with Send build notifications open",
+    "youtubeId": null
+  },
+  "account/export-delete--download-dataset": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The download button of a dataset with its confirmation window",
+    "youtubeId": null
+  },
   "account/plans--storage-info": {
     "type": "screenshot",
     "width": 748,
     "height": 700,
     "alt": "The Storage Info window with the total, used and free space",
+    "youtubeId": null
+  },
+  "account/preferences--custom-basemap": {
+    "type": "screenshot",
+    "width": 1236,
+    "height": 1308,
+    "alt": "The Custom basemap fields with Source type, URL and Apply",
+    "youtubeId": null
+  },
+  "account/preferences--files": {
+    "type": "screenshot",
+    "width": 1236,
+    "height": 1308,
+    "alt": "The Files tab of the User preferences",
+    "youtubeId": null
+  },
+  "account/preferences--lists": {
+    "type": "screenshot",
+    "width": 1236,
+    "height": 1308,
+    "alt": "The Lists tab of the User preferences with the Datasets and Organizations groups",
+    "youtubeId": null
+  },
+  "account/preferences--map": {
+    "type": "screenshot",
+    "width": 1236,
+    "height": 1308,
+    "alt": "The Map tab of the User preferences",
+    "youtubeId": null
+  },
+  "account/preferences--stockpiles": {
+    "type": "screenshot",
+    "width": 1236,
+    "height": 1308,
+    "alt": "The Stockpiles tab with the materials, their density and price",
+    "youtubeId": null
+  },
+  "account/preferences--units": {
+    "type": "screenshot",
+    "width": 1236,
+    "height": 1308,
+    "alt": "The User preferences window on the Units tab",
+    "youtubeId": null
+  },
+  "account/preferences--viewers": {
+    "type": "screenshot",
+    "width": 1236,
+    "height": 1308,
+    "alt": "The Viewers tab with the splat settings and the lighting of the 3D viewers",
     "youtubeId": null
   },
   "analyse/area-statistics--area": {

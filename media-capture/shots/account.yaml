@@ -8,8 +8,11 @@
 #
 # Build notification shots use the local Registry with MailHog (media-capture/local/start.sh): Smtp points at
 # MailHog, so the Notifications tab is there. The e-mail shot needs one finished digest in MailHog: before it,
-# set docsdemo's "Send build notifications" to All, upload a file to a dataset of docsdemo on the local
-# Registry, and wait for the digest (BuildNotifications.DigestMinutes: 1 minute on the local Registry).
+# set docsdemo's "Send build notifications" to All (PATCH /users/preferences {"notifications":{"builds":"all"}}),
+# then, as docsdemo, in acme-surveys/builds: upload house.obj with content the server has not seen (one more
+# comment line: a wait for files is told once per file content, also after a reset deleted the dataset), and
+# build broken.laz and orthophoto.tif again (POST .../build, force=true); wait for the digest
+# (BuildNotifications.DigestMinutes: 1 minute on the local Registry). The newest message to docsdemo is the shot.
 # The MailHog web UI is http://localhost:5181 (DDB_DOCS_MAIL_PORT), not a Registry page: the runner must accept
 # an absolute `url`.
 
@@ -28,7 +31,10 @@
   actions: []
   highlight: null
   crop: null
-  blocked: null
+  # Hub 1262443: the page reads the organizations and the storage of a user from /users/{name}/orgs and
+  # /users/{name}/storage, which answer 403 to a user who is not an administrator, and the e-mail only for
+  # an administrator: docsdemo shows 0 organizations, 0 B used, Unlimited and Email "Not set"
+  blocked: release
 
 - id: account/account--upload-diagnostics
   type: screenshot
@@ -37,12 +43,15 @@
   url: /account#upload-diagnostics
   base: hub
   auth: demo
+  uploadKBps: 6000                     # a real connection, not the speed of localhost
   waitFor:
     selector: "#upload-diagnostics"
-    networkIdle: true
+    # the Hub never reads the answers of the test uploads, so the browser never reports them finished
+    networkIdle: false
+    extraMs: 1000
   actions:
     - click: "role=button[name='Run test']"
-    - wait: "text=Six uploads at once"
+    - wait: "role=button[name='Run again']"
   highlight: "role=button[name='Run again']"
   crop: "#upload-diagnostics"
   blocked: null
@@ -112,7 +121,9 @@
     - click: "role=option[name='Custom']"
     - wait: "text=Custom basemap"
     - fill: { selector: "#pref-custom-basemap-url", value: "https://tile.openstreetmap.org/{z}/{x}/{y}.png" }   # never click Apply
-  highlight: "text=Custom basemap"
+    - scroll: { selector: "#pref-custom-basemap-url", y: 600 }   # the panel scrolls: the fields down to Apply
+    - wait: 500
+  highlight: "section:has(> h3:text-is('Custom basemap'))"
   crop: "#preferencesDialog"
   blocked: null
 
@@ -156,7 +167,8 @@
   waitFor:
     selector: "#preferencesDialog"
     networkIdle: true
-  actions: []
+  actions:
+    - click: "text=User preferences"   # the window focuses the first slider: a click on the title takes its focus ring away
   highlight: "role=tab[name='Viewers']"
   crop: "#preferencesDialog"
   blocked: null
@@ -171,7 +183,13 @@
   waitFor:
     selector: "#preferencesDialog"
     networkIdle: true
-  actions: []
+  actions:
+    # the tab list scrolled to its end: opened by the link, it stops with the tab under the Next button
+    - scroll: { selector: "role=tab[name='Lists']", x: 800 }
+    # the list scrolled to its end: Add material, and no intro text (Hub 1262443: the sticky column titles
+    # paint over the last line of the intro while the list is at its top)
+    - scroll: { selector: "text=Gravel", y: 1200 }
+    - wait: 500
   highlight: "role=tab[name='Stockpiles']"
   crop: "#preferencesDialog"
   blocked: null
@@ -189,9 +207,11 @@
     selector: "#preferencesDialog"
     networkIdle: true
   actions:
+    # the tab list scrolled to its end: opened by the link, it can stop with the tab under the Next button
+    - scroll: { selector: "role=tab[name='Lists']", x: 800 }
     - click: "[aria-labelledby='pref-build-notifications-label']"
     - wait: "role=option[name='Failed or waiting for files']"
-  highlight: "[aria-labelledby='pref-build-notifications-label']"
+  highlight: "div:has(> [aria-labelledby='pref-build-notifications-label'])"   # the whole select, with its arrow
   crop: "#preferencesDialog"
   blocked: null
 
@@ -203,13 +223,13 @@
   base: local
   auth: none
   waitFor:
-    selector: "text=docsdemo@example.com"
+    selector: "text=\"docsdemo\""                 # the list names the recipient, not the address
     networkIdle: true
   actions:
-    - click: "text=docsdemo@example.com >> nth=0"   # the newest message
+    - click: "text=\"docsdemo\" >> nth=0"         # the newest message to docsdemo
     - wait: 1500
   highlight: null
-  crop: null
+  crop: { x: 250, y: 100, width: 1190, height: 800 }   # the message (headers and HTML), not the MailHog side bar
   blocked: null
 
 # ---- Plans & limits -----------------------------------------------------------------------------------------
@@ -247,6 +267,6 @@
   actions:
     - click: "[aria-label='Download']"
     - wait: "role=dialog[name='Download']"   # never confirm
-  highlight: "role=button[name='Download']"
+  highlight: "[aria-label='Download']"   # the button of the header, which the step names
   crop: null
   blocked: null
