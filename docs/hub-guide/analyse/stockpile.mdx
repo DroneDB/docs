@@ -27,13 +27,15 @@ also gives the weight and the cost of the pile.
 
    <Screenshot id="analyse/stockpile--panel" />
 
-2. Select the **Base Plane Method**. The information button next to it explains each method.
+2. Optional: choose the base in **Base Plane Method**. The information button next to it explains
+   each method. Until you choose one, a clicked pile uses **Best-fit plane** and a drawn polygon
+   uses **Lowest perimeter**. After you choose one, every next pile uses it, and the pile on screen
+   is measured again with it.
 
 3. Click **Click map**, then click on the pile. Hub finds the edge of the pile and computes its
-   volume against the ground around it, so detection works on a slope too. A detected pile uses
-   **Best-fit plane** unless you choose another base. If Hub does not find the right edge, click
-   **Draw** and draw a polygon around the pile. Double-click to finish. A drawn polygon uses the
-   **Base Plane Method** of the panel: on a slope, choose **Best-fit plane**.
+   volume against the ground around it, so detection works on a slope too. If Hub does not find
+   the right edge, click **Draw** and draw a polygon around the pile. Double-click to finish. On a
+   slope, choose **Best-fit plane** for a drawn polygon.
 
    <Screenshot id="analyse/stockpile--detect" />
 
