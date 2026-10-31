@@ -170,12 +170,6 @@ and before the next one, which uploads the results.
   9 to 10.5 m³ with the Best-fit plane base; the default Lowest perimeter base of a drawn polygon
   gives 80 to 180 m³, because the pile is on the slope. The debris pile near the excavator is in a
   part of the DSM that ODX filled by interpolation and is not detected.
-- WMS of odx/micasense: GetCapabilities answers OGC XML, but GetMap of the six-band Float32
-  orthophoto gives a transparent image (`Cannot encode the render of …/cog.tif` in the log); its DSM
-  and DTM render.
-- The textured models of odx/micasense and odx/sequoia (5 + 6 OBJ files with 16-bit multispectral
-  TIFF textures) fail to build: bm3d cannot read those textures. The 3D model view of these two
-  datasets shows a failed build.
 - `/version` and the admin pages show the version numbers of the pinned commit, which can be lower
   than the version of the release that ships these features.
 
