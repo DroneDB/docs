@@ -10,14 +10,14 @@ requires: { access: read, data: "A Gaussian splat (PLY, SPLAT, SPZ, KSPLAT, SOG 
 
 <Requires />
 
-<TryLive org="odx" ds="splats" path="train.ply" view="splat"
+<TryLive org="odx" ds="splats" path="Willa Global Poland.ply" view="splat"
          hint="Press 1 to fly to the first camera view, or P to start the tour." />
 
 ## When to use it
 
-A Gaussian splat is a photo-real 3D scene made from photos or video. Use the splat viewer to walk through it and show it from saved camera views. Hub streams only the detail that the view needs, so a large scene opens quickly.
+A Gaussian splat is a photo-real 3D scene made from photos or video. Use the splat viewer to walk through it and show it from saved camera views. Hub streams only the detail that the view needs, so a large scene opens quickly: the example below has 14.5 million splats in a 3.4 GB file.
 
-<LiveEmbed org="odx" ds="splats" path="train.ply" view="splat" poster="viewing/splats--embed" />
+<LiveEmbed org="odx" ds="splats" path="Willa Global Poland.ply" view="splat" poster="viewing/splats--embed" />
 
 ## Steps
 
@@ -66,7 +66,7 @@ The saved camera views belong to the splat, so everyone who opens it gets them. 
 
 - The splat opens after its build is done. Until then the viewer says that it is not built yet. See [Builds](/hub-guide/processing/builds.mdx).
 - The viewer needs WebGL 2.
-- Only users with write access can save camera views. Hub keeps them in a file next to the splat (`train_cameras.json` for `train.ply`).
+- Only users with write access can save camera views. Hub keeps them in a file next to the splat (`Willa Global Poland_cameras.json` for `Willa Global Poland.ply`).
 
 ## Related
 

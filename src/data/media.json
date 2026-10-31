@@ -167,6 +167,27 @@
     "alt": "The measure toolbar on an orthophoto with its two saved measurements",
     "youtubeId": null
   },
+  "measure/splat--distance": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A distance measured on a Gaussian splat, with the measure toolbar at the top left",
+    "youtubeId": null
+  },
+  "measure/splat--distance-height-pin": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "A distance and a height measured on a splat, then a pin added and saved",
+    "youtubeId": null
+  },
+  "measure/splat--set-scale": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Set the scale dialog with the real length of two picked points",
+    "youtubeId": null
+  },
   "processing/builds--details-panel": {
     "type": "screenshot",
     "width": 684,
@@ -323,8 +344,8 @@
   },
   "viewing/splats--about": {
     "type": "screenshot",
-    "width": 2880,
-    "height": 1800,
+    "width": 2160,
+    "height": 1350,
     "alt": "The About this splat panel with the splat count, size, streaming state and quality",
     "youtubeId": null
   },
@@ -339,27 +360,27 @@
     "type": "screenshot",
     "width": 2880,
     "height": 1800,
-    "alt": "The train splat in the splat viewer",
+    "alt": "The Willa Global Poland splat in the splat viewer, at its first camera view",
     "youtubeId": null
   },
   "viewing/splats--fly-cameras-quality": {
     "type": "clip",
     "width": 1920,
     "height": 1200,
-    "alt": "Flying through the train splat, jumping to its camera views and setting the quality",
+    "alt": "Flying around the Willa Global Poland splat, jumping to its camera views and setting the quality",
     "youtubeId": null
   },
   "viewing/splats--overview": {
     "type": "screenshot",
-    "width": 2880,
-    "height": 1800,
+    "width": 2160,
+    "height": 1350,
     "alt": "A Gaussian splat with the navigation buttons, the camera rail and the movement pad",
     "youtubeId": null
   },
   "viewing/splats--settings": {
     "type": "screenshot",
     "width": 608,
-    "height": 1528,
+    "height": 1608,
     "alt": "The View settings of the splat viewer with the up axis, quality, point size and calibration",
     "youtubeId": null
   }

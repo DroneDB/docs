@@ -266,11 +266,13 @@ report() {
 
 load_local_index
 
-while read -r spec globs; do
+# read without -r: a backslash keeps a space inside a glob (Willa\ Global\ Poland.ply)
+# shellcheck disable=SC2162
+while read -a fields; do
+    spec="${fields[0]:-}"
     [[ -z "$spec" || "$spec" == \#* ]] && continue
     selected "$spec" || continue
-    # shellcheck disable=SC2086
-    set -f; mirror_dataset "${spec%%/*}" "${spec#*/}" $globs; set +f
+    mirror_dataset "${spec%%/*}" "${spec#*/}" "${fields[@]:1}"
 done < "$DATASETS_FILE"
 
 log "== local-only files"

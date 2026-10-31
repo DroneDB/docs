@@ -4,8 +4,9 @@
 # - dataset `sheffield-park`: the two orthophotos of odm/sheffield-park-1 and odm/sheffield-park-2
 #   (odm_orthophoto/odm_orthophoto.tif of each) as `park-1.tif` and `park-2.tif`, built, with no
 #   measurements file. The analyse shots use the same dataset.
-# - dataset `splats`: a copy of odx/splats `train.ply` (built), with no `train_cameras.json`
-#   (no pins, no scale, no measurements).
+# - dataset `splats`: a copy of odx/splats `Willa Global Poland.ply` (built) with its
+#   `Willa Global Poland_cameras.json` (camera views and up axis; no pins, no scale, no
+#   measurements), copied on the server.
 #
 # Map canvases: the coordinates of `mouse` actions are CSS pixels of the default 1440x900
 # viewport, on the orthophoto as the map fits it on open. A later pass checks them on screen.
@@ -231,25 +232,29 @@
   type: clip
   alt: A distance and a height measured on a splat, then a pin added and saved
   page: hub-guide/measure/splat
-  open: { org: acme-surveys, ds: splats, path: train.ply, view: splat }
+  open: { org: acme-surveys, ds: splats, path: "Willa Global Poland.ply", view: splat }
   base: hub
   auth: demo
   waitFor: { selector: "[aria-label='Measure a distance']", networkIdle: true, extraMs: 4000 }
   actions:
-    # the splat quality must be High (README): the pipeline sets the Quality preference before the run
+    # the splat quality must be High (README): the pipeline sets the Quality preference before the run.
+    # Camera view 2 (the side with the outside stairs) stops the tour that starts on open; the
+    # clip is 1920x1200, so its points are those of the 1440x900 shots times 4/3
+    - press: Digit2
+    - wait: 2000
     - click: "[aria-label='Measure a distance']"
-    - mouse: { click: [600, 520] }
-    - mouse: { click: [860, 520] }
+    - mouse: { click: [800, 693] }
+    - mouse: { click: [1147, 693] }
     - press: Enter
     - click: "[aria-label='Measure a height']"
-    - mouse: { click: [700, 600] }
-    - mouse: { click: [700, 380] }
+    - mouse: { click: [980, 560] }    # the downpipe: from the eaves to the ground
+    - mouse: { click: [980, 990] }
     - wait: 800
     - click: "[aria-label='Pins']"
     - click: "text=Add a pin"
-    - mouse: { click: [760, 440] }
-    - fill: { selector: "[aria-label='Name of pin 1']", value: Locomotive }
-    - fill: { selector: "textarea", value: "**Steam engine**, restored in 2012." }
+    - mouse: { click: [1240, 600] }   # the outside stairs
+    - fill: { selector: "[aria-label='Name of pin 1']", value: Outside stairs }
+    - fill: { selector: "textarea", value: "**Fire escape** from the upper floors." }
     - click: "text=Save"
     - wait: 1500
   highlight: null
@@ -262,11 +267,13 @@
   type: screenshot
   alt: A distance measured on a Gaussian splat, with the measure toolbar at the top left
   page: hub-guide/measure/splat
-  open: { org: odx, ds: splats, path: train.ply, view: splat }
+  open: { org: odx, ds: splats, path: "Willa Global Poland.ply", view: splat }
   base: hub
   auth: none
   waitFor: { selector: "[aria-label='Measure a distance']", networkIdle: true, extraMs: 4000 }
   actions:
+    - press: Digit2      # the side with the outside stairs; stops the tour that starts on open
+    - wait: 2000
     - click: "[aria-label='Measure a distance']"
     - mouse: { click: [600, 520] }
     - mouse: { click: [860, 520] }
@@ -280,11 +287,13 @@
   type: screenshot
   alt: The Set the scale dialog with the real length of two picked points
   page: hub-guide/measure/splat
-  open: { org: acme-surveys, ds: splats, path: train.ply, view: splat }
+  open: { org: acme-surveys, ds: splats, path: "Willa Global Poland.ply", view: splat }
   base: hub
   auth: demo
   waitFor: { selector: "[aria-label='Set the scale']", networkIdle: true, extraMs: 4000 }
   actions:
+    - press: Digit2
+    - wait: 2000
     - click: "[aria-label='Set the scale']"
     - mouse: { click: [600, 520] }
     - mouse: { click: [860, 520] }
@@ -298,17 +307,19 @@
   type: screenshot
   alt: The Pins panel with a pin and its Markdown text, link and image
   page: hub-guide/measure/splat
-  open: { org: acme-surveys, ds: splats, path: train.ply, view: splat }
+  open: { org: acme-surveys, ds: splats, path: "Willa Global Poland.ply", view: splat }
   base: hub
   auth: demo
   waitFor: { selector: "[aria-label='Pins']", networkIdle: true, extraMs: 4000 }
   actions:
+    - press: Digit1      # the entrance with the sign; stops the tour that starts on open
+    - wait: 2000
     - click: "[aria-label='Pins']"
     - click: "text=Add a pin"
-    - mouse: { click: [760, 440] }
-    - fill: { selector: "[aria-label='Name of pin 1']", value: Locomotive }
-    - fill: { selector: "textarea", value: "**Steam engine**, restored in 2012." }
-    - fill: { selector: "input[type='url']", value: "https://example.org/locomotive" }
+    - mouse: { click: [840, 470] }   # the canopy over the entrance
+    - fill: { selector: "[aria-label='Name of pin 1']", value: Entrance }
+    - fill: { selector: "textarea", value: "**Main entrance** and reception." }
+    - fill: { selector: "input[type='url']", value: "https://example.org/entrance" }
   highlight: "[aria-label='Pins']"
   crop: null
   blocked: null

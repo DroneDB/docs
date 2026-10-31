@@ -59,6 +59,16 @@ export class Registry {
     return `/orgs/${encodeURIComponent(org)}/ds/${encodeURIComponent(ds)}`;
   }
 
+  /**
+   * Copies a file or folder of a dataset of this Registry into another dataset, on the server (the
+   * Hub's Copy to another dataset): no upload, and the builds of the source come along, so the copy
+   * is not built again. Needs read access to the source and write access to the destination.
+   */
+  copy({org, ds, path: sourcePath}, destOrg, destDs, dest) {
+    const body = new URLSearchParams({sourcePath, destOrgSlug: destOrg, destDsSlug: destDs, destPath: dest, keepSource: 'true'});
+    return this.request('POST', `${this.dsPrefix(org, ds)}/transfer`, {body});
+  }
+
   /** Uploads a local file to `dest` (a path in the dataset). */
   async upload(org, ds, file, dest) {
     const size = fs.statSync(file).size;

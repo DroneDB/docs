@@ -108,8 +108,12 @@ data; the next `start` uses the same data and accounts.
 It only reads production. Run it again at any time: it sends only what is missing or changed. Give
 dataset names to copy only those, e.g. `./mirror-datasets.sh odx/splats`.
 
-odx/splats is copied in part: `train.ply`, its `train_cameras.json`, `LICENSE.md` and the dataset
-thumbnail. The other scenes are several GB each and the documentation does not use them.
+odx/splats is copied in part: `Willa Global Poland.ply` (3.4 GB, 14.5 million splats; the scene of
+the splat pages) and `train.ply` (the small splat of the pipeline test), each with its
+`_cameras.json`, `LICENSE.md` and the dataset thumbnail. The other scenes are large and the
+documentation does not use them. In `datasets.txt` a space in a path is written `\ `. The
+level-of-detail build of `Willa Global Poland.ply` takes about 6 minutes; `npm run reset-demo`
+copies it, with its build, into the demo organization on the server.
 
 ## Local-only data
 

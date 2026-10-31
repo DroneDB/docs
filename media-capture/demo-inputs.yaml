@@ -15,6 +15,10 @@
 #   text: <content>                a small text file written by the script
 #   zip: [ <entries> ]             a ZIP made by the script; each entry is a from/file/text source
 #                                  with `as`, its path in the archive (a folder for a glob)
+#   copy: <org>/<dataset>/<path>   a file of a public dataset of the Hub that is reset, copied on
+#                                  the server (Copy to another dataset, as the demo account): nothing
+#                                  is downloaded or uploaded and its build comes along, so it is not
+#                                  built again. For large files. Globs as with `from`.
 # `bytes: N` with from or file keeps only the first N bytes (a damaged file).
 # Input files are never committed to the docs repository.
 
@@ -98,13 +102,16 @@ datasets:
       - dest: park-2.tif
         from: odm/sheffield-park-2/odm_orthophoto/odm_orthophoto.tif
 
-  # Measure a splat: a copy of train.ply without its cameras (no pins, no scale, no measurements)
+  # Measure a splat: a copy of Willa Global Poland.ply (3.4 GB, built) with its camera views and
+  # orientation (its _cameras.json has no pins, scale or measurements), copied on the server
   - slug: splats
     name: Splats
     visibility: private
     files:
-      - dest: train.ply
-        from: odx/splats/train.ply
+      - dest: Willa Global Poland.ply
+        copy: odx/splats/Willa Global Poland.ply
+      - dest: Willa Global Poland_cameras.json
+        copy: odx/splats/Willa Global Poland_cameras.json
 
   # Processing: builds that complete, wait for a file and fail
   - slug: builds

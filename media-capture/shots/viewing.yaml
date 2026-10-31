@@ -8,7 +8,10 @@
 # Notes for the capture pass:
 # - The file list opens a folder or a file with Enter on a focused tile (EntryThumbnail), so
 #   "click the tile, press Enter" stands for a double click.
-# - The splat viewer is set to Quality High in each shot (README rule).
+# - The splat viewer is set to Quality High in each shot (README rule). It starts a tour of the
+#   camera views on open, so each splat shot presses the number of a camera view: the flight to it
+#   stops the tour, and the shot shows that view (Willa Global Poland.ply: 1 the entrance with the
+#   sign, 2 the side with the outside stairs, 3 the garden side).
 # - blocked: data = the showcase data is missing: 3D Tiles (.3tz), video / geo-video,
 #   geo-panorama, georeferenced splat.
 
@@ -297,9 +300,9 @@
 # ---------------------------------------------------------------- splats
 - id: viewing/splats--fly-cameras-quality
   type: clip
-  alt: Flying through the train splat, jumping to its camera views and setting the quality
+  alt: Flying around the Willa Global Poland splat, jumping to its camera views and setting the quality
   page: hub-guide/viewing/splats
-  open: { org: odx, ds: splats, path: train.ply, view: splat }
+  open: { org: odx, ds: splats, path: "Willa Global Poland.ply", view: splat }
   base: hub
   auth: none
   waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
@@ -323,9 +326,9 @@
 
 - id: viewing/splats--embed
   type: screenshot
-  alt: The train splat in the splat viewer
+  alt: The Willa Global Poland splat in the splat viewer, at its first camera view
   page: hub-guide/viewing/splats
-  open: { org: odx, ds: splats, path: train.ply, view: splat }
+  open: { org: odx, ds: splats, path: "Willa Global Poland.ply", view: splat }
   base: hub
   auth: none
   waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
@@ -334,6 +337,7 @@
     - click: "role=combobox[name='Quality']"
     - click: "role=option[name='High']"
     - click: "[aria-label='View settings']"
+    - press: Digit1      # the tour starts on open: a camera view stops it where the shot wants it
     - wait: 3000
   blocked: null
 
@@ -341,7 +345,25 @@
   type: screenshot
   alt: A Gaussian splat with the navigation buttons, the camera rail and the movement pad
   page: hub-guide/viewing/splats
-  open: { org: odx, ds: splats, path: train.ply, view: splat }
+  open: { org: odx, ds: splats, path: "Willa Global Poland.ply", view: splat }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
+  actions:
+    - click: "[aria-label='View settings']"
+    - click: "role=combobox[name='Quality']"
+    - click: "role=option[name='High']"
+    - click: "[aria-label='View settings']"
+    - press: Digit3
+    - wait: 3000
+  highlight: "[aria-label='Fly navigation']"
+  blocked: null
+
+- id: viewing/splats--camera-views
+  type: screenshot
+  alt: The Camera views window of the splat viewer
+  page: hub-guide/viewing/splats
+  open: { org: odx, ds: splats, path: "Willa Global Poland.ply", view: splat }
   base: hub
   auth: none
   waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
@@ -351,23 +373,7 @@
     - click: "role=option[name='High']"
     - click: "[aria-label='View settings']"
     - press: Digit1
-    - wait: 3000
-  highlight: "[aria-label='Fly navigation']"
-  blocked: null
-
-- id: viewing/splats--camera-views
-  type: screenshot
-  alt: The Camera views window of the splat viewer
-  page: hub-guide/viewing/splats
-  open: { org: odx, ds: splats, path: train.ply, view: splat }
-  base: hub
-  auth: none
-  waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
-  actions:
-    - click: "[aria-label='View settings']"
-    - click: "role=combobox[name='Quality']"
-    - click: "role=option[name='High']"
-    - click: "[aria-label='View settings']"
+    - wait: 2000
     - click: "[aria-label='Manage camera views']"
     - wait: "#splat-cameras"
     - wait: 800
@@ -378,11 +384,13 @@
   type: screenshot
   alt: The View settings of the splat viewer with the up axis, quality, point size and calibration
   page: hub-guide/viewing/splats
-  open: { org: odx, ds: splats, path: train.ply, view: splat }
+  open: { org: odx, ds: splats, path: "Willa Global Poland.ply", view: splat }
   base: hub
   auth: none
   waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
   actions:
+    - press: Digit2
+    - wait: 2000
     - click: "[aria-label='View settings']"
     - click: "role=combobox[name='Quality']"
     - click: "role=option[name='High']"
@@ -395,7 +403,7 @@
   type: screenshot
   alt: The About this splat panel with the splat count, size, streaming state and quality
   page: hub-guide/viewing/splats
-  open: { org: odx, ds: splats, path: train.ply, view: splat }
+  open: { org: odx, ds: splats, path: "Willa Global Poland.ply", view: splat }
   base: hub
   auth: none
   waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
@@ -404,6 +412,8 @@
     - click: "role=combobox[name='Quality']"
     - click: "role=option[name='High']"
     - click: "[aria-label='View settings']"
+    - press: Digit3
+    - wait: 2000
     - click: "button[aria-label='About this splat']"
     - wait: "section[aria-label='About this splat']"
     - wait: 1500
@@ -450,7 +460,7 @@
   type: screenshot
   alt: The downloads at the bottom of the About this splat panel
   page: hub-guide/viewing/splat-downloads
-  open: { org: odx, ds: splats, path: train.ply, view: splat }
+  open: { org: odx, ds: splats, path: "Willa Global Poland.ply", view: splat }
   base: hub
   auth: none
   waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
@@ -459,6 +469,8 @@
     - click: "role=combobox[name='Quality']"
     - click: "role=option[name='High']"
     - click: "[aria-label='View settings']"
+    - press: Digit1
+    - wait: 2000
     - click: "button[aria-label='About this splat']"
     - wait: "[role='group'][aria-label='Downloads']"
   highlight: "[role='group'][aria-label='Downloads']"
@@ -472,9 +484,9 @@
   url: /r/odx/splats
   base: hub
   auth: none
-  waitFor: { selector: 'text="train.ply"', networkIdle: true, extraMs: 1000 }
+  waitFor: { selector: 'text="Willa Global Poland.ply"', networkIdle: true, extraMs: 1000 }
   actions:
-    - rightClick: 'text="train.ply"'
+    - rightClick: 'text="Willa Global Poland.ply"'
     - hover: "text=Tools"
     - wait: "text=Download original"
   highlight: "text=Download level-of-detail (.rad)"

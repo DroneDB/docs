@@ -2,8 +2,8 @@
 // Puts the demo data of the documentation back in its fixed state, through the Registry REST API,
 // as media-capture/demo-inputs.yaml describes it: signed in as the demo account, it deletes every
 // dataset of the demo organization (creating the organization when it is missing), creates the
-// listed datasets again, uploads their files, waits for their builds and resets the account's
-// Preferences to the Hub defaults. Run it before a capture of the shots with `auth: demo`.
+// listed datasets again, uploads their files (or copies them on the server from a public dataset of
+// the same Hub), waits for their builds and resets the account's Preferences to the Hub defaults. Run it before a capture of the shots with `auth: demo`.
 //
 //   node media-capture/reset-demo.mjs [options]       (npm run reset-demo)
 //
@@ -34,7 +34,7 @@ const run = promisify(execFile);
 const VISIBILITY = {private: 0, unlisted: 1, public: 2};
 const BUILDING = new Set(['queued', 'building']);
 const CACHE = path.join(DOCS_HOME, 'demo-inputs-cache');
-/** Listings of the source Hub, by URL (a glob and the files of one folder list it once). */
+/** Listings of the source Hub and of the Hub that is reset, by URL (a glob and the files of one folder list it once). */
 const listings = new Map();
 
 const args = parseArgs(process.argv.slice(2), {booleans: ['dry-run', 'no-wait', 'help'], repeat: ['only']});
@@ -75,7 +75,7 @@ async function main() {
     const files = [];
     for (const f of ds.files) files.push(...await resolveFile(f));
     plan.push({ds, files});
-    console.log(`  ${ds.slug} (${ds.visibility}): ${files.length} file(s), ${mb(files.reduce((n, f) => n + fs.statSync(f.local).size, 0))}`);
+    console.log(`  ${ds.slug} (${ds.visibility}): ${files.length} file(s), ${mb(files.reduce((n, f) => n + f.size, 0))}`);
   }
   if (args['dry-run']) {
     for (const {ds, files} of plan) for (const f of files) console.log(`    ${ds.slug}/${f.dest} <- ${f.origin}`);
@@ -115,9 +115,10 @@ async function main() {
     })});
     for (const f of files) {
       const t = Date.now();
-      await reg.upload(org, ds.slug, f.local, f.dest);
+      if (f.copy) await reg.copy(f.copy, org, ds.slug, f.dest);
+      else await reg.upload(org, ds.slug, f.local, f.dest);
       uploaded.push({ds: ds.slug, path: f.dest});
-      console.log(`  ${ds.slug}/${f.dest} (${mb(fs.statSync(f.local).size)}, ${((Date.now() - t) / 1000).toFixed(1)} s)`);
+      console.log(`  ${ds.slug}/${f.dest} (${mb(f.size)}${f.copy ? ', copied on the server' : ''}, ${((Date.now() - t) / 1000).toFixed(1)} s)`);
     }
     console.log(`Created ${org}/${ds.slug}`);
   }
@@ -152,16 +153,33 @@ function checkSpec(doc) {
     d.files ??= [];
     if (!(d.visibility in VISIBILITY)) errors.push(`${where}: visibility private | unlisted | public`);
     for (const [j, f] of d.files.entries()) {
-      const kinds = ['from', 'file', 'text', 'zip'].filter(k => f?.[k] !== undefined);
-      if (!f?.dest || kinds.length !== 1) errors.push(`${where} files[${j}]: dest and one of from | file | text | zip`);
+      const kinds = ['from', 'file', 'text', 'zip', 'copy'].filter(k => f?.[k] !== undefined);
+      if (!f?.dest || kinds.length !== 1) errors.push(`${where} files[${j}]: dest and one of from | file | text | zip | copy`);
+      else if (f.copy !== undefined && f.bytes) errors.push(`${where} files[${j}]: bytes cannot cut a copy made on the server`);
     }
   }
   if (errors.length) fail(`${inputsFile}:\n  ${errors.join('\n  ')}`);
   return doc;
 }
 
-/** Local files of a `files` entry: [{ dest, local, origin }] (a glob gives several). */
+/**
+ * Files of a `files` entry: [{ dest, local, size, origin }], or [{ dest, copy, size, origin }] for a
+ * copy made on the server (a glob gives several).
+ */
 async function resolveFile(f) {
+  if (f.copy !== undefined) {
+    const {org, ds, entries} = await matchingEntries(base, f.copy);
+    if (entries.length > 1 && !f.dest.endsWith('/')) throw new Error(`${f.dest}: a glob needs a folder dest (ending with /)`);
+    return entries.map(e => ({
+      dest: f.dest.endsWith('/') ? f.dest + path.posix.basename(e.path) : f.dest,
+      copy: {org, ds, path: e.path}, size: e.size, origin: `copy of ${org}/${ds}/${e.path} on ${base}`
+    }));
+  }
+  return (await resolveLocalFile(f)).map(r => ({...r, size: fs.statSync(r.local).size}));
+}
+
+/** Local files of a from / file / text / zip entry: [{ dest, local, origin }]. */
+async function resolveLocalFile(f) {
   if (f.zip) {
     const stage = fs.mkdtempSync(path.join(tmp, 'zip-'));
     for (const entry of f.zip) {
@@ -202,22 +220,27 @@ async function resolveWhole(src) {
     if (!fs.existsSync(local)) throw new Error(`missing input file ${local} (set DDB_DOCS_INPUTS)`);
     return [{name: path.basename(local), local, origin: local}];
   }
-  const m = /^([^/]+)\/([^/]+)\/(.+)$/.exec(src.from || '');
-  if (!m) throw new Error(`from: "<org>/<dataset>/<path>", not "${src.from}"`);
-  const [, org, ds, filePath] = m;
-  const dir = path.posix.dirname(filePath);
-  const name = path.posix.basename(filePath);
-  const entries = await listSource(org, ds, dir === '.' ? '' : dir);
-  const re = globRegExp(name);
-  const matches = entries.filter(e => re.test(path.posix.basename(e.path)) && e.type !== 1);
-  if (!matches.length) throw new Error(`no file ${src.from} on ${source}`);
+  const {org, ds, entries} = await matchingEntries(source, src.from);
   const out = [];
-  for (const e of matches) out.push({name: e.path, local: await download(org, ds, e), origin: `${source} ${org}/${ds}/${e.path}`});
+  for (const e of entries) out.push({name: e.path, local: await download(org, ds, e), origin: `${source} ${org}/${ds}/${e.path}`});
   return out;
 }
 
-async function listSource(org, ds, dir) {
-  const url = listApiUrl({org, ds, path: dir || undefined, base: source});
+/** The files of a public dataset of a Hub that "<org>/<dataset>/<path>" names (a glob in the file name). */
+async function matchingEntries(hub, ref) {
+  const m = /^([^/]+)\/([^/]+)\/(.+)$/.exec(ref || '');
+  if (!m) throw new Error(`"<org>/<dataset>/<path>", not "${ref}"`);
+  const [, org, ds, filePath] = m;
+  const dir = path.posix.dirname(filePath);
+  const re = globRegExp(path.posix.basename(filePath));
+  const entries = (await listEntries(hub, org, ds, dir === '.' ? '' : dir))
+    .filter(e => re.test(path.posix.basename(e.path)) && e.type !== 1);
+  if (!entries.length) throw new Error(`no file ${ref} on ${hub}`);
+  return {org, ds, entries};
+}
+
+async function listEntries(hub, org, ds, dir) {
+  const url = listApiUrl({org, ds, path: dir || undefined, base: hub});
   if (!listings.has(url)) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`GET ${url} -> ${res.status}`);

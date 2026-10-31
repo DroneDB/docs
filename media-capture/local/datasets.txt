@@ -4,7 +4,7 @@
 #   <org>/<dataset> [<glob> ...]
 #
 # Without globs the whole dataset is copied. With globs only the files whose path matches one of
-# them (shell pattern, matched on the whole path) are copied.
+# them (shell pattern, matched on the whole path) are copied. A space in a glob is written "\ ".
 
 odm/brighton-beach
 odm/zoo
@@ -20,5 +20,7 @@ odm/vector
 odx/micasense
 odx/sequoia
 odx/hat-creek
-# The other scenes of odx/splats are several GB each; the documentation uses train.ply only.
-odx/splats train.ply train_cameras.json LICENSE.md README.md thumbnail.webp
+# The other scenes of odx/splats are large and the documentation does not use them: its pages show
+# Willa Global Poland.ply (3.4 GB, 14.5 million splats); train.ply is the small splat of the
+# pipeline test (test/pipeline.yaml).
+odx/splats train.ply train_cameras.json Willa\ Global\ Poland.ply Willa\ Global\ Poland_cameras.json LICENSE.md README.md thumbnail.webp
