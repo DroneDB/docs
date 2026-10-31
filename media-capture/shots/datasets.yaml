@@ -8,8 +8,8 @@
 #   - the personal organization of docsdemo exists too (the Organizations page lists both).
 # The members shots run on the local Registry (base: local, auth: admin): member management is off
 # on hub.dronedb.app. The local Registry needs AppSettings EnableOrganizationMemberManagement=true,
-# an organization acme-surveys and one extra user (for example "surveyor", surveyor@example.com)
-# added as a member with Read/Write.
+# an organization acme-surveys and its second user docsmember (docsmember@example.com) added once
+# as a member with Read/Write (reset-demo keeps the organization, so the member stays).
 #
 # Icon buttons are selected by aria-label (the header Settings button: [aria-label='Settings']);
 # buttons with a visible text by role and name (role=button[name='Create Dataset']), which also
@@ -58,7 +58,26 @@
   crop: null
   blocked: null
 
-- id: datasets/create--flow
+- id: datasets/create--dialog
+  type: screenshot
+  alt: The Create new dataset dialog with the name, visibility, slug and tagline
+  page: hub-guide/datasets/create
+  url: /r/acme-surveys
+  auth: demo
+  waitFor:
+    selector: "role=button[name='Create Dataset']"
+    networkIdle: true
+  actions:
+    - click: "role=button[name='Create Dataset']"
+    - fill: { selector: "#dataset-dialog-dataset-name", value: "Quarry survey 2026" }
+    - fill: { selector: "#dataset-dialog-tagline", value: "North quarry, monthly flight" }
+    - click: "role=checkbox[name='Open dataset after creation']"   # off by default; Create is not clicked
+    - wait: 500
+  highlight: "#dataset-dialog-dataset-name"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: datasets/create--flow          # after create--dialog: it creates the dataset that the dialog names
   type: clip
   alt: Create a dataset, open it and open its Settings
   page: hub-guide/datasets/create
@@ -73,6 +92,11 @@
     - fill: { selector: "#dataset-dialog-tagline", value: "North quarry, monthly flight" }
     - wait: 800
     - click: "[role='dialog'] button:has-text('Create')"
+    # Open dataset after creation is off by default (and Create would save the choice to the
+    # account's Preferences): the new dataset is opened from the list
+    - wait: "tr:has-text('Quarry survey 2026')"
+    - wait: 1000
+    - click: "tr:has-text('Quarry survey 2026')"
     - wait: "[aria-label='Files']"
     - wait: 1200
     - click: "[aria-label='Settings']"
@@ -80,24 +104,6 @@
   maxSeconds: 20
   blocked: null
   youtubeId: null
-
-- id: datasets/create--dialog
-  type: screenshot
-  alt: The Create new dataset dialog with the name, visibility, slug and tagline
-  page: hub-guide/datasets/create
-  url: /r/acme-surveys
-  auth: demo
-  waitFor:
-    selector: "role=button[name='Create Dataset']"
-    networkIdle: true
-  actions:
-    - click: "role=button[name='Create Dataset']"
-    - fill: { selector: "#dataset-dialog-dataset-name", value: "Quarry survey 2026" }
-    - fill: { selector: "#dataset-dialog-tagline", value: "North quarry, monthly flight" }
-    - wait: 500
-  highlight: "#dataset-dialog-dataset-name"
-  crop: "[role='dialog']"
-  blocked: null
 
 - id: datasets/create--settings
   type: screenshot
@@ -163,8 +169,8 @@
     - fill: { selector: "role=textbox[name='User name']", value: jdoe }   # a made-up name; Add is not clicked
     - click: "[aria-labelledby='organization-members-dialog-permissions-label']"
     - wait: "text=Read/Write/Delete"
-  highlight: "[aria-labelledby='organization-members-dialog-permissions-label']"
-  crop: null
+  highlight: "[aria-labelledby='organization-members-dialog-permissions-label'] >> xpath=.."   # the whole list
+  crop: "[role='dialog']"           # the open list stays inside the window
   blocked: null
 
 - id: datasets/members--create-organization

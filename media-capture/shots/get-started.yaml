@@ -206,6 +206,7 @@
     - wait: "#dataset-dialog-dataset-name"
     - fill: { selector: "#dataset-dialog-dataset-name", value: Quarry survey 2026 }
     - fill: { selector: "#dataset-dialog-tagline", value: Monthly volume survey of the north quarry }
+    - click: "role=checkbox[name='Open dataset after creation']"   # off by default; Create is not clicked
   highlight: "#dataset-dialog-dataset-name"
   crop: "[role='dialog']"
   blocked: null                      # the shot does not click Create
@@ -375,7 +376,7 @@
   actions:
     - click: "[aria-label='Settings']"
     - wait: "#settings-visibility"
-  highlight: "#settings-visibility >> xpath=.."   # the whole list (the combobox is its label part)
+  highlight: "#settings-visibility-hint >> xpath=.."   # the list and its hint below (a box around the list alone covers the hint)
   crop: "[role='dialog']"
   blocked: null
 

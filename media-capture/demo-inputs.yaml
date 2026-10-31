@@ -55,8 +55,9 @@ datasets:
     name: Site A
     visibility: private
     files:
+      # Written here: the README of odm/aukerman is a single image that is not in the dataset
       - dest: README.md
-        from: odm/aukerman/README.md
+        text: "# Site A\n\nMonthly drone survey of Site A.\n\n## Contents\n\n- `DJI_0001.JPG` … `DJI_0003.JPG`: the photos of the October flight\n- `ortho.tif`: the orthophoto, with its measurements\n- `products/`: the deliverables for the client\n\nContact the survey team before you delete or move a file.\n"
       - dest: options.json
         from: odm/zoo/options.json
       - dest: ortho.tif

@@ -2,7 +2,7 @@
 #
 # Read-only shots use odm/zoo (736 entries), odm/brighton-beach and odm/aukerman with auth: none.
 # Demo inputs (reset-demo.mjs) for the shots with auth: demo, in the dataset acme-surveys/site-a:
-#   - README.md: a copy of odm/aukerman README.md
+#   - README.md: a short Markdown text written in demo-inputs.yaml (headings and a list)
 #   - options.json: a copy of odm/zoo options.json (opens in the text editor, shows Format)
 #   - ortho.tif: a small georeferenced GeoTIFF (for example a crop of the odm/brighton-beach
 #     orthophoto), and ortho_measurements.geojson next to it (the sidecar of the rename shot)
@@ -68,7 +68,7 @@
   actions:
     - click: "[aria-label='Table View']"
     - wait: 2000
-  highlight: "[aria-label='Grid View']"
+  highlight: "role=row >> nth=0"     # the column headers that sort (Name, Type, Size, Modified)
   crop: null
   blocked: null
 
@@ -83,6 +83,7 @@
     networkIdle: true
   actions:
     - fill: { selector: "[aria-label='Search files']", value: "*.json" }
+    - wait: 1000                     # Enter within 0.5 s of typing empties the box (Hub search debounce)
     - press: Enter
     - wait: 2500
   highlight: "[aria-label='Search files']"
@@ -91,7 +92,7 @@
 
 - id: files/browser--context-menu
   type: screenshot
-  alt: The context menu of a file with the open, edit, download, tools, copy and delete actions
+  alt: The context menu of an orthophoto with the open, share, download, tools and copy actions
   page: hub-guide/files/browser
   url: /r/odm/brighton-beach
   auth: none
@@ -155,7 +156,7 @@
     - click: "[role='option']:has-text('ortho.tif')"
     - click: "[aria-label='Rename']"
     - wait: "text=Also rename sidecar files"
-  highlight: "label[for='renameSidecarsCheckbox']"
+  highlight: "label[for='renameSidecarsCheckbox'] >> xpath=../.."   # the option and the files it renames
   crop: "[role='dialog']"
   blocked: null
 
@@ -226,7 +227,7 @@
   actions:
     - rightClick: "[role='option']:has-text('ortho.tif')"
     - wait: "text=Cut"
-  highlight: "text=Copy"
+  highlight: "role=menuitem[name='Copy']"
   crop: null
   blocked: null
 
@@ -301,7 +302,7 @@
     - hover: "text=Tools"
     - click: "text=Copy to another dataset..."
     - wait: "text=Destination Organization"
-  highlight: "[data-transfer-note]"
+  highlight: "[data-transfer-note] >> xpath=.."   # the source and the note under it
   crop: "[role='dialog']"
   blocked: null
 
@@ -329,6 +330,7 @@
   page: hub-guide/files/import
   url: /r/acme-surveys
   auth: demo
+  viewport: { width: 1440, height: 1300 }   # the whole window, down to Import, without its scroll bar
   waitFor:
     selector: "role=button[name='Import Dataset']"
     networkIdle: true
@@ -377,6 +379,7 @@
     - click: "[role='dialog'] button:has-text('Extract')"
     - wait: "text=Extract Completed"
     - wait: 2000
+  highlight: "[aria-label='Files'] [role='option']:has-text('photos')"   # the folder of the archive
   crop: null
   blocked: null
 
@@ -471,7 +474,7 @@
   actions:
     - click: "[aria-label='Settings']"
     - wait: "text=Rescan Dataset"
-  highlight: "button:has-text('Rescan Dataset')"
+  highlight: "button:has-text('Rescan Dataset') >> xpath=.."   # the button and its hint (a box around the button covers the hint)
   crop: "[role='dialog']"
   blocked: null
 
@@ -489,7 +492,7 @@
     - click: "button:has-text('Rescan Dataset')"
     - wait: "text=Are you sure you want to rescan this dataset?"
   # never click Rescan
-  crop: "[role='dialog']"
+  crop: "[role='dialog']:has-text('Are you sure you want to rescan')"   # not the Settings window under it
   blocked: null
 
 - id: files/coordinate-system--dialog
