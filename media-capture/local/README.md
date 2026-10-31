@@ -146,7 +146,8 @@ and before the next one, which uploads the results.
 ```bash
 ./generate-data.sh                  # all three, or name some:
 ./generate-data.sh caliterra-dem    # ODX run of the 78 Caliterra images on the local NodeODX (DSM + DTM,
-                                    # 5 cm), moved onto the published outputs; about 10 minutes
+                                    # 5 cm), moved and scaled onto the published outputs by
+                                    # `ddb align -m similarity`; about 10 minutes
 ./generate-data.sh mask-borders     # the Brighton Beach orthophoto without its alpha band, and `ddb mask`
 ./generate-data.sh splats-geo       # `ddb gsplat --training-data` of Brighton Beach, trained with Brush
                                     # v0.3.0 (Vulkan, 20 000 steps, 1 000 000 splats); about 5 minutes
@@ -166,10 +167,15 @@ and before the next one, which uploads the results.
   `point_geom` is a bare GeoJSON Point (`isGeoreferencedSplat`, `libs/map/splatFootprints.js`), and
   the Registry sends a GeoJSON Feature with that Point in `geometry`. The splat itself is
   georeferenced (`georeferenced: true`, EPSG:32615 in the viewer, `wgs84Footprint` in its bounds).
-- odm/caliterra has no earth stockpile in the open: Stockpile Volume detects the two tree clumps at
-  the south edge (about 2 700 m³ each), the slope on the west side, and a debris pile near the
-  excavator (30.17072, -98.09070: about 5 m², 9 m³). The sand pile next to the culverts is too low
-  on its slope to be detected. A click that finds nothing answers HTTP 500.
+- odm/caliterra lies on a hillside, and a click of Stockpile Volume finds no small pile on its DSM: the
+  detection compares the heights with the mean of the border of its search square (100 m wide by
+  default), so a click near the excavator or on the sand pile gives the whole slope (40 000 to
+  100 000 m³) or nothing (HTTP 400, "No stockpile detected at this location"). The debris pile near
+  the excavator is in a part of the DSM that ODX filled by interpolation. Detect all finds the two
+  tree clumps at the south edge (about 2 000 and 1 000 m³) and the slope. A polygon drawn around the
+  sand pile next to the culverts (centre 30.170892, -98.090734; about 3.5 m in radius) gives 9 to
+  10.5 m³ with the Best-fit plane base; the default Lowest perimeter base gives 80 to 180 m³, because
+  the pile is on the slope.
 - WMS of odx/micasense: GetCapabilities answers OGC XML, but GetMap of the six-band Float32
   orthophoto gives a transparent image (`Cannot encode the render of …/cog.tif` in the log); its DSM
   and DTM render.

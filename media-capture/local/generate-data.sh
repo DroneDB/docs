@@ -8,7 +8,7 @@
 #
 #   caliterra-dem  dsm.tif + dtm.tif of odm/caliterra, from a new ODX run of its 78 images on the
 #                  local NodeODX (about 8 minutes on 16 cores), moved onto the published
-#                  outputs (see measure_shift). Stockpile Volume pages.
+#                  outputs by `ddb align` (similarity). Stockpile Volume pages.
 #   mask-borders   the Brighton Beach orthophoto with its alpha band removed (a real black border)
 #                  and its `ddb mask` copy. Mask Borders page.
 #   splats-geo     a Gaussian splat trained with Brush from the splat training data of
@@ -62,51 +62,63 @@ licence_of_brighton() { api "$B/orgs/odm/ds/brighton-beach/download?path=LICENSE
 
 # ------------------------------------------------------------------ caliterra-dem
 
-# Prints the shift "east north" (metres) that puts the DSM REF_GRID_SRC (resampled to the grid of
-# REF) on REF: the best normalised cross-correlation of the two, each minus its 10 m local mean
-# (so a pile counts, a slope or a constant height difference does not), over +-20 m
-measure_shift() { # REF SRC_ON_REF_GRID
-    python3 -I - "$1" "$2" <<'EOF'
-import sys
+# Moves DEMs of the new run onto the published outputs by the similarity that `ddb align` found
+# for the DSM (ALIGN_JSON: X_ref = pivot + scale·R(theta)·(X - pivot) + (tx, ty)), and writes them
+# as COGs into OUT_DIR on a 5 cm grid of the same CRS. The run is larger than the published outputs
+# in height as well as on the ground (both come from the GPS tags of the images, scaled
+# differently), so the heights are scaled by the same factor; the vertical offset is the median
+# difference between the scaled DSM and the reference. The first DEM must be the DSM. Prints
+# "z_offset p5 p95", the 5th and 95th percentiles of the DSM minus the reference after the move.
+apply_alignment() { # ALIGN_JSON REFERENCE_DSM OUT_DIR DEM...
+    python3 -I - "$@" <<'EOF'
+import json, math, sys
 import numpy as np
 from osgeo import gdal
 gdal.UseExceptions()
 
-def load(path):
-    dataset = gdal.Open(path)
-    a = dataset.GetRasterBand(1).ReadAsArray().astype(np.float64)
-    return a, np.isfinite(a) & (a > -1000)
+align, ref_path, out_dir, dems = json.load(open(sys.argv[1])), sys.argv[2], sys.argv[3], sys.argv[4:]
+s, th = align['scale'], math.radians(align['thetaDeg'])
+co, si = math.cos(th), math.sin(th)
+px, py = align['pivotX'], align['pivotY']
+tx = px + align['tx'] - s * (co * px - si * py)   # the same transform as s·R·X + (tx, ty)
+ty = py + align['ty'] - s * (si * px + co * py)
 
-def high_pass(a, m, k=20):
-    def box(z):
-        s = np.cumsum(np.cumsum(np.pad(z, ((k + 1, k), (k + 1, k))), 0), 1)
-        return s[2*k+1:, 2*k+1:] - s[:-2*k-1, 2*k+1:] - s[2*k+1:, :-2*k-1] + s[:-2*k-1, :-2*k-1]
-    x = np.where(m, a, 0.0)
-    return np.where(m, x - box(x) / np.maximum(box(m * 1.0), 1), 0.0)
+def moved(path):
+    src = gdal.Open(path)
+    gt, nodata = src.GetGeoTransform(), src.GetRasterBand(1).GetNoDataValue()
+    vrt = gdal.Translate('', src, format='VRT')
+    vrt.SetGeoTransform((s * (co * gt[0] - si * gt[3]) + tx, s * (co * gt[1] - si * gt[4]), s * (co * gt[2] - si * gt[5]),
+                         s * (si * gt[0] + co * gt[3]) + ty, s * (si * gt[1] + co * gt[4]), s * (si * gt[2] + co * gt[5])))
+    out = gdal.Warp('', vrt, format='MEM', dstSRS=src.GetProjection(), xRes=round(abs(gt[1]), 6),
+                    yRes=round(abs(gt[5]), 6), targetAlignedPixels=True, resampleAlg='bilinear',
+                    srcNodata=nodata, dstNodata=nodata)
+    return out, nodata
 
-ref, mr = load(sys.argv[1]); src, ms = load(sys.argv[2])
-gt = gdal.Open(sys.argv[1]).GetGeoTransform()
-R, S = high_pass(ref, mr), high_pass(src, ms)
-H, W = R.shape
-
-def ncc(dy, dx):
-    a = R[max(0, dy):H + min(0, dy), max(0, dx):W + min(0, dx)]
-    b = S[max(0, -dy):H + min(0, -dy), max(0, -dx):W + min(0, -dx)]
-    m = mr[max(0, dy):H + min(0, dy), max(0, dx):W + min(0, dx)] & ms[max(0, -dy):H + min(0, -dy), max(0, -dx):W + min(0, -dx)]
-    if m.sum() < 1000: return -1
-    a, b = a[m], b[m]
-    return np.dot(a, b) / np.sqrt(np.dot(a, a) * np.dot(b, b))
-
-reach = int(20 / gt[1])
-best = max((ncc(dy, dx), dy, dx) for dy in range(-reach, reach + 1, 2) for dx in range(-reach, reach + 1, 2))
-best = max((ncc(dy, dx), dy, dx) for dy in range(best[1] - 2, best[1] + 3) for dx in range(best[2] - 2, best[2] + 3))
-print(f"{best[2] * gt[1]:.2f} {best[1] * gt[5]:.2f}")
-print(f"correlation {best[0]:.2f}", file=sys.stderr)
+ref = gdal.Open(ref_path)
+rgt, rw, rh = ref.GetGeoTransform(), ref.RasterXSize, ref.RasterYSize
+z0 = None
+for path in dems:
+    ds, nodata = moved(path)
+    band = ds.GetRasterBand(1)
+    z = band.ReadAsArray()
+    if z0 is None:
+        on_ref = gdal.Warp('', ds, format='MEM', width=rw, height=rh, resampleAlg='average',
+                           outputBounds=(rgt[0], rgt[3] + rh * rgt[5], rgt[0] + rw * rgt[1], rgt[3]),
+                           srcNodata=nodata, dstNodata=nodata)   # held: its band is freed with it
+        on_ref = on_ref.GetRasterBand(1).ReadAsArray().astype(np.float64)
+        r = ref.GetRasterBand(1).ReadAsArray().astype(np.float64)
+        m = (on_ref != nodata) & (r != ref.GetRasterBand(1).GetNoDataValue())
+        z0 = float(np.median(r[m] - s * on_ref[m]))
+        d = s * on_ref[m] + z0 - r[m]
+        print(f"{z0:.2f} {np.percentile(d, 5):.2f} {np.percentile(d, 95):.2f}")
+    band.WriteArray(np.where(z == nodata, z, s * z + z0).astype(z.dtype))
+    gdal.Translate(f"{out_dir}/{path.rsplit('/', 1)[-1]}", ds, format='COG',
+                   creationOptions=['COMPRESS=DEFLATE', 'PREDICTOR=YES'])
 EOF
 }
 
 caliterra_dem() {
-    local dest="$OUT/caliterra-dem" src="$WORK/caliterra" ip uuid code args=() f east north ext
+    local dest="$OUT/caliterra-dem" src="$WORK/caliterra" ip uuid code args=() f fit larger heights z0 p5 p95
     log "== caliterra-dem"
     mkdir -p "$dest"
     rm -rf "$src"; fetch odm caliterra "$src" '^(images/|odm_georeferencing/odm_georeferenced_model\.laz$)'
@@ -127,28 +139,26 @@ caliterra_dem() {
     done
     curl -fsS -X POST "http://$ip:3000/task/remove" -d "uuid=$uuid" > /dev/null
 
-    # The new run is georeferenced from the GPS tags again, so it lands metres away from the
-    # published outputs (10 m in October 2026). A DSM of the published point cloud (PDAL of the
-    # NodeODX image, 25 cm) gives the shift; dsm.tif and dtm.tif move by it. (ddb align does not
-    # measure it: it answers 0 or a shift of kilometres for this pair of DSMs.)
+    # The new run is georeferenced from the GPS tags again: it lands metres away from the published
+    # outputs, and about 9 % larger (October 2026). `ddb align` finds the similarity (shift,
+    # rotation, scale) that puts its DSM on a DSM of the published point cloud (the mean height of
+    # its points in each 25 cm cell, by PDAL of the NodeODX image: the maximum would put the DSM
+    # 0.3 m above the points); dsm.tif and dtm.tif move by it. The output of ddb align (Web
+    # Mercator, heights shifted but not scaled) is not used.
     docker cp "$src/odm_georeferencing/odm_georeferenced_model.laz" "$NODEODX_CONTAINER:/tmp/caliterra.laz"
     docker exec "$NODEODX_CONTAINER" pdal translate /tmp/caliterra.laz /tmp/caliterra_dsm.tif --writer gdal \
-        --writers.gdal.resolution=0.25 --writers.gdal.output_type=max --writers.gdal.data_type=float32 \
+        --writers.gdal.resolution=0.25 --writers.gdal.output_type=mean --writers.gdal.data_type=float32 \
         --writers.gdal.nodata=-9999
     docker cp "$NODEODX_CONTAINER:/tmp/caliterra_dsm.tif" "$src/published_dsm.tif"
     docker exec "$NODEODX_CONTAINER" rm -f /tmp/caliterra.laz /tmp/caliterra_dsm.tif
-    ext="$(gdalinfo -json "$src/published_dsm.tif" | jq -r '.cornerCoordinates | "\(.upperLeft[0]) \(.lowerRight[1]) \(.lowerRight[0]) \(.upperLeft[1])"')"
-    # shellcheck disable=SC2086
-    gdalwarp -q -overwrite -te $ext -tr 0.25 0.25 -r average "$src/dsm.tif" "$src/new_dsm.tif"
-    read -r east north < <(measure_shift "$src/published_dsm.tif" "$src/new_dsm.tif")
-    log "   shift to the published outputs: east $east m, north $north m"
-    for f in dsm dtm; do
-        # shellcheck disable=SC2046
-        gdal_translate -q -of COG -co COMPRESS=DEFLATE -co PREDICTOR=YES \
-            -a_ullr $(gdalinfo -json "$src/$f.tif" | jq -r --argjson e "$east" --argjson n "$north" \
-                '.cornerCoordinates | "\(.upperLeft[0] + $e) \(.upperLeft[1] + $n) \(.lowerRight[0] + $e) \(.lowerRight[1] + $n)"') \
-            "$src/$f.tif" "$dest/$f.tif"
-    done
+    "$DDB" align -m similarity -i "$src/dsm.tif" -r "$src/published_dsm.tif" -o "$src/aligned.tif" > "$src/align.json" \
+        || die "ddb align found no alignment of the new DSM on the published point cloud"
+    log "   $(jq -r '"similarity: scale \(.scale * 1000 | round / 1000), rotation \(.thetaDeg * 1000 | round / 1000) deg, shift at the centre \(.tx * 100 | round / 100) m E \(.ty * 100 | round / 100) m N, correlation \(.correlation * 100 | round / 100), overlap \(.overlap * 100 | round) %"' "$src/align.json")"
+    heights="$(apply_alignment "$src/align.json" "$src/published_dsm.tif" "$dest" "$src/dsm.tif" "$src/dtm.tif")"
+    read -r z0 p5 p95 <<< "$heights"
+    log "   heights x $(jq -r '.scale * 1000 | round / 1000' "$src/align.json") + $z0 m; DSM minus the published point cloud: $p5..$p95 m (5th..95th percentile)"
+    larger="$(jq -r '(1 / .scale - 1) * 100 | round' "$src/align.json")"
+    fit="$(jq -r '"scale \(.scale * 1000 | round / 1000), rotation \(.thetaDeg * 1000 | round / 1000)°, shift \(.tx * 100 | round / 100) m east and \(.ty * 100 | round / 100) m north at the centre of the area"' "$src/align.json")"
     rm -rf "$src"
     cat > "$dest/README.md" <<EOF
 # DSM and DTM of Caliterra
@@ -163,10 +173,13 @@ They come from a new ODX run (NodeODX 2.4.0, ODX engine 3.8.4) on the 78 images 
     dsm: true, dtm: true, dem-resolution: 5 (cm/px), pc-quality: medium,
     skip-orthophoto: true, skip-3dmodel: true, skip-report: true
 
-The run georeferences the images from their GPS tags, as the published run did, and its result lands
-some metres away. Both models are moved by $east m east and $north m north, the shift that puts the
-DSM on a DSM of the published point cloud, so they lie on the published orthophoto. Their heights are
-not changed: they are about 8 m lower than the heights of the published point cloud.
+The run georeferences the images from their GPS tags, as the published run did, but its result is
+some metres away and about $larger % larger, in height as well as on the ground. \`ddb align -m similarity\`
+(DroneDB 2.0.0) gives the transform that puts the DSM on a DSM of the published point cloud (the mean
+height of its points in each 25 cm cell): $fit. Both models are moved and scaled by it, their
+heights (above sea level) are scaled by the same factor and moved by $z0 m, the median difference to
+that DSM. They lie on the published orthophoto and point cloud: for 90 % of the area, the DSM minus the
+DSM of the published point cloud is between $p5 m and $p95 m.
 
 ## Source and licence
 
