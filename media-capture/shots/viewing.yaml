@@ -13,7 +13,7 @@
 #   stops the tour, and the shot shows that view (Willa Global Poland.ply: 1 the entrance with the
 #   sign, 2 the side with the outside stairs, 3 the garden side).
 # - blocked: data = the showcase data is missing: 3D Tiles (.3tz), video / geo-video,
-#   geo-panorama, georeferenced splat.
+#   geo-panorama.
 
 # ---------------------------------------------------------------- map
 - id: viewing/map--zoom-opacity
@@ -156,8 +156,8 @@
   auth: none
   waitFor: { selector: "[aria-label='Units']", networkIdle: true, extraMs: 5000 }
   actions:
-    - scroll: { selector: "#potree_render_area canvas", y: -300 }   # zoom in on the centre
-    - wait: 1500
+    - mouse: { dblclick: [640, 560] }              # fly to the shops by the road (the wheel does not zoom here)
+    - wait: 2500
     - drag: { from: [720, 600], to: [770, 565] }   # orbit and tilt a little: the cloud in 3D
     - wait: 2500
   highlight: "[aria-label='Units']"
@@ -433,13 +433,13 @@
     - click: "[role='tab']:has-text('Map')"
     - wait: "[aria-label='Map'] canvas"
     - wait: 3000
-  blocked: data
+  blocked: null
 
 - id: viewing/splats-georeferenced--coordinates
   type: screenshot
   alt: A measured point of a georeferenced splat in WGS84, with the coordinate format button
   page: hub-guide/viewing/splats-georeferenced
-  url: /r/odx/splats-geo   # replace with `open:` to the georeferenced splat (view splat)
+  open: { org: odx, ds: splats-geo, path: brighton-beach.ply, view: splat }
   base: hub
   auth: none
   waitFor: { selector: "[aria-label='About this splat']", extraMs: 6000 }
@@ -453,7 +453,10 @@
     - click: "[aria-label^='Coordinates are shown in']"
     - wait: 1000
   highlight: "[aria-label^='Coordinates are shown in']"
-  blocked: data
+  blocked: release   # Hub 1262443: a georeferenced splat without camera views opens at ground level
+                     # among its splats (needles of grass fill the screen) and its orbit stays there;
+                     # rig.frame puts the camera on +Z of the box with camera.up = +Z, which is the
+                     # view direction of a Z-up scene. Capture once the Hub frames it from above.
 
 # ---------------------------------------------------------------- splat downloads
 - id: viewing/splat-downloads--about-panel
@@ -531,12 +534,16 @@
 
 - id: viewing/panoramas--embed
   type: screenshot
-  alt: The odm/langley panorama in the panorama viewer
+  alt: The odm/copr panorama in the panorama viewer
   page: hub-guide/viewing/panoramas
-  open: { org: odm, ds: langley, path: langley.png, view: panorama }
+  open: { org: odm, ds: copr, path: copr.png, view: panorama }   # langley.png (974x423) is too small: blurred
   base: hub
   auth: none
   waitFor: { selector: "[title='Fullscreen']", networkIdle: true, extraMs: 2000 }
+  actions:
+    - click: "[title='Zoom out']"
+    - click: "[title='Zoom out']"
+    - wait: 1500
   blocked: null
 
 - id: viewing/panoramas--viewer
