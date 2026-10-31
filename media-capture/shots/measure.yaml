@@ -81,8 +81,9 @@
     - mouse: { click: [640, 380] }
     - mouse: { click: [820, 360] }
     - mouse: { click: [860, 540] }
-    - mouse: { click: [660, 560] }
-    - mouse: { click: [640, 380] }
+    - mouse: { dblclick: [660, 560] }   # a double click on the last corner finishes the polygon
+    - wait: 500
+    - press: Escape                      # stops the tool: its drawing hint follows the pointer
     - wait: 800
   highlight: "[aria-label='Measure Area']"
   crop: null
@@ -119,6 +120,7 @@
     - fill: { selector: "#mg-name", value: North beach }
     - click: "text=Create"
     - wait: 500
+    - hover: "[aria-label='Move to group']"   # the row actions show on hover
   highlight: "[aria-label='Move to group']"
   crop: "[role='dialog']"
   blocked: null
@@ -171,9 +173,9 @@
   actions:
     - click: "#potree_render_area [aria-label='Menu']"
     - click: "img[title='Distance measurement']"
-    - mouse: { click: [640, 460] }
-    - mouse: { click: [820, 420] }
-    - mouse: { click: [820, 420], button: right }   # Potree ends a measurement on right click
+    - mouse: { click: [1000, 640] }   # two points of the road (1920x1200 clip viewport)
+    - mouse: { click: [1080, 800] }
+    - mouse: { click: [1080, 800], button: right }   # Potree ends a measurement on right click
     - wait: 1500
   highlight: null
   crop: null
@@ -255,11 +257,11 @@
     - mouse: { click: [1240, 600] }   # the outside stairs
     - fill: { selector: "[aria-label='Name of pin 1']", value: Outside stairs }
     - fill: { selector: "textarea", value: "**Fire escape** from the upper floors." }
-    - click: "text=Save"
+    - click: "#splat-pins >> role=button[name=/^Save( \\*)?$/]"   # "Save *" with changes; "text=Save" also matches "saved", and "Save the current view" is a button too
     - wait: 1500
   highlight: null
   crop: null
-  maxSeconds: 30
+  maxSeconds: 40
   blocked: null
   youtubeId: null
 
@@ -316,10 +318,10 @@
     - wait: 2000
     - click: "[aria-label='Pins']"
     - click: "text=Add a pin"
-    - mouse: { click: [840, 470] }   # the canopy over the entrance
-    - fill: { selector: "[aria-label='Name of pin 1']", value: Entrance }
-    - fill: { selector: "textarea", value: "**Main entrance** and reception." }
-    - fill: { selector: "input[type='url']", value: "https://example.org/entrance" }
+    - mouse: { click: [1200, 490] }  # the Villa Global sign (the Pins window covers the entrance)
+    - fill: { selector: "[aria-label='Name of pin 1']", value: Reception }
+    - fill: { selector: "textarea", value: "**Reception** under the Villa Global sign." }
+    - fill: { selector: "input[type='url']", value: "https://example.org/reception" }
   highlight: "[aria-label='Pins']"
   crop: null
   blocked: null
