@@ -6,6 +6,223 @@
     "alt": "The Storage Info window with the total, used and free space",
     "youtubeId": null
   },
+  "analyse/area-statistics--area": {
+    "type": "screenshot",
+    "width": 2160,
+    "height": 1350,
+    "alt": "A rectangle drawn on a DSM with Area, and its minimum, maximum, mean, median, standard deviation and pixel count in the Raster Analysis panel",
+    "youtubeId": null
+  },
+  "analyse/area-statistics--value-range": {
+    "type": "screenshot",
+    "width": 2160,
+    "height": 1350,
+    "alt": "The value range of a DSM and the value of a point read with Inspect, kept in the panel with its latitude and longitude",
+    "youtubeId": null
+  },
+  "analyse/colormaps--bands": {
+    "type": "screenshot",
+    "width": 1728,
+    "height": 1080,
+    "alt": "The Bands (R,G,B) selector of a multispectral orthophoto in the Plant Health panel",
+    "youtubeId": null
+  },
+  "analyse/colormaps--bands-histogram": {
+    "type": "clip",
+    "width": 1440,
+    "height": 900,
+    "alt": "Bands of a multispectral orthophoto changed, then NDVI selected and the range of its histogram dragged",
+    "youtubeId": null
+  },
+  "analyse/colormaps--colormap-dropdown": {
+    "type": "screenshot",
+    "width": 2448,
+    "height": 1530,
+    "alt": "The colormaps of a single-band elevation raster in the Raster Analysis panel",
+    "youtubeId": null
+  },
+  "analyse/colormaps--histogram": {
+    "type": "screenshot",
+    "width": 512,
+    "height": 412,
+    "alt": "The histogram of a raster with its two range handles",
+    "youtubeId": null
+  },
+  "analyse/compare-layers--opacity-panel": {
+    "type": "screenshot",
+    "width": 2448,
+    "height": 1530,
+    "alt": "The layer opacity panel of the Map tab with two thermal mosaics",
+    "youtubeId": null
+  },
+  "analyse/compare-layers--split": {
+    "type": "screenshot",
+    "width": 2448,
+    "height": 1530,
+    "alt": "Two thermal mosaics side by side on the map, with the divider between them",
+    "youtubeId": null
+  },
+  "analyse/compare-layers--swipe": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "Two thermal mosaics split side by side, the divider dragged across the map",
+    "youtubeId": null
+  },
+  "analyse/compare-view--bar": {
+    "type": "screenshot",
+    "width": 1728,
+    "height": 1080,
+    "alt": "The compare view with two thermal mosaics side by side and the compare bar",
+    "youtubeId": null
+  },
+  "analyse/compare-view--compare-to-add-save": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "A second orthophoto added to the compare view, the divider dragged, the comparison saved",
+    "youtubeId": null
+  },
+  "analyse/compare-view--menu": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "Compare in Map in the context menu of two selected georasters",
+    "youtubeId": null
+  },
+  "analyse/compare-view--picker": {
+    "type": "screenshot",
+    "width": 2352,
+    "height": 1216,
+    "alt": "The Add raster to compare dialog of the compare view",
+    "youtubeId": null
+  },
+  "analyse/compare-view--saved-list": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A saved comparison under the folder tree of a dataset, with its context menu",
+    "youtubeId": null
+  },
+  "analyse/contours--dialog": {
+    "type": "screenshot",
+    "width": 968,
+    "height": 1348,
+    "alt": "The Generate Contour Lines dialog",
+    "youtubeId": null
+  },
+  "analyse/contours--generate": {
+    "type": "clip",
+    "width": 1440,
+    "height": 900,
+    "alt": "Contour lines generated from a DSM every metre",
+    "youtubeId": null
+  },
+  "analyse/contours--result": {
+    "type": "screenshot",
+    "width": 1928,
+    "height": 1206,
+    "alt": "Contour lines of a DSM on the map, coloured from low to high",
+    "youtubeId": null
+  },
+  "analyse/elevation-profile--chart": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The value profile of a DSM along a line, with the chart in the panel",
+    "youtubeId": null
+  },
+  "analyse/elevation-profile--draw": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "A profile line drawn across a DSM, then the pointer moved along the chart",
+    "youtubeId": null
+  },
+  "analyse/elevation-profile--panel": {
+    "type": "screenshot",
+    "width": 2160,
+    "height": 1350,
+    "alt": "The Raster Analysis panel of a DSM with the Profile button",
+    "youtubeId": null
+  },
+  "analyse/plant-health--formulas-dialog": {
+    "type": "screenshot",
+    "width": 1328,
+    "height": 1572,
+    "alt": "The Vegetation index formulas dialog",
+    "youtubeId": null
+  },
+  "analyse/plant-health--index-switching": {
+    "type": "clip",
+    "width": 1440,
+    "height": 900,
+    "alt": "NDVI, NDRE and GNDVI of a multispectral orthophoto, one after the other",
+    "youtubeId": null
+  },
+  "analyse/plant-health--ndvi": {
+    "type": "screenshot",
+    "width": 1440,
+    "height": 900,
+    "alt": "NDVI of a multispectral orthophoto with the Plant Health panel",
+    "youtubeId": null
+  },
+  "analyse/plant-health--poster": {
+    "type": "screenshot",
+    "width": 1714,
+    "height": 964,
+    "alt": "NDVI of a multispectral orthophoto on the map (poster of the live viewer)",
+    "youtubeId": null
+  },
+  "analyse/stockpile--base-methods": {
+    "type": "screenshot",
+    "width": 1168,
+    "height": 1480,
+    "alt": "The Base plane methods dialog of the stockpile panel",
+    "youtubeId": null
+  },
+  "analyse/stockpile--draw": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A polygon drawn around a small sand pile on a DSM, with its volume on a best-fit base plane",
+    "youtubeId": null
+  },
+  "analyse/stockpile--panel": {
+    "type": "screenshot",
+    "width": 2160,
+    "height": 1350,
+    "alt": "The Stockpile Volume panel open on a DSM",
+    "youtubeId": null
+  },
+  "analyse/thermal--inspect": {
+    "type": "screenshot",
+    "width": 1928,
+    "height": 1206,
+    "alt": "The value of a point of a thermal mosaic, read with Inspect",
+    "youtubeId": null
+  },
+  "analyse/thermal--panel": {
+    "type": "screenshot",
+    "width": 1928,
+    "height": 1206,
+    "alt": "A thermal mosaic with the Raster Analysis panel and a thermal colormap",
+    "youtubeId": null
+  },
+  "datasets/browse--datasets-list": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The datasets page of the ODM organization with thumbnails, taglines and sortable columns",
+    "youtubeId": null
+  },
+  "datasets/browse--datasets-map": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Map view of the ODM organization with one pin per dataset",
+    "youtubeId": null
+  },
   "datasets/browse--organizations": {
     "type": "screenshot",
     "width": 2880,
@@ -13,11 +230,172 @@
     "alt": "The Organizations page with the organizations of the signed-in user, the search box and the sort control",
     "youtubeId": null
   },
+  "datasets/create--dialog": {
+    "type": "screenshot",
+    "width": 956,
+    "height": 1028,
+    "alt": "The Create new dataset dialog with the name, visibility, slug and tagline",
+    "youtubeId": null
+  },
+  "datasets/create--flow": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "Create a dataset, open it and open its Settings",
+    "youtubeId": null
+  },
+  "datasets/create--set-thumbnail": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The context menu of a photo with Set as Dataset Thumbnail",
+    "youtubeId": null
+  },
+  "datasets/create--settings": {
+    "type": "screenshot",
+    "width": 1248,
+    "height": 1668,
+    "alt": "The Dataset Settings window with tagline, thumbnail, readme, visibility, license and rescan",
+    "youtubeId": null
+  },
+  "datasets/delete--dataset-confirm": {
+    "type": "screenshot",
+    "width": 1016,
+    "height": 624,
+    "alt": "The confirmation before a dataset is deleted, with the irreversible warning",
+    "youtubeId": null
+  },
+  "datasets/delete--organization-confirm": {
+    "type": "screenshot",
+    "width": 1168,
+    "height": 624,
+    "alt": "The confirmation before an organization and all its datasets are deleted",
+    "youtubeId": null
+  },
+  "datasets/members--add": {
+    "type": "screenshot",
+    "width": 1828,
+    "height": 1016,
+    "alt": "A typed user name and the permission levels of a new member in the Manage Members window",
+    "youtubeId": null
+  },
+  "datasets/members--create-organization": {
+    "type": "screenshot",
+    "width": 788,
+    "height": 880,
+    "alt": "The Add New Organization dialog with name, description and Public",
+    "youtubeId": null
+  },
+  "datasets/members--dialog": {
+    "type": "screenshot",
+    "width": 1828,
+    "height": 1016,
+    "alt": "The Manage Members window with the Add Member fields and the list of current members",
+    "youtubeId": null
+  },
+  "files/archives--extract-dialog": {
+    "type": "screenshot",
+    "width": 908,
+    "height": 860,
+    "alt": "The Extract Archive window with the destination folder and the overwrite and delete options",
+    "youtubeId": null
+  },
+  "files/archives--extracted": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The files of an extracted archive in the file browser",
+    "youtubeId": null
+  },
   "files/browser--context-menu": {
     "type": "screenshot",
     "width": 2880,
     "height": 1800,
-    "alt": "The context menu of a file with the open, edit, download, tools, copy and delete actions",
+    "alt": "The context menu of an orthophoto with the open, share, download, tools and copy actions",
+    "youtubeId": null
+  },
+  "files/browser--grid": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The file browser with the folder tree, the grid of photos and the detail panel of the selected photo",
+    "youtubeId": null
+  },
+  "files/browser--search": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The search box above the folder tree with the JSON files of the whole dataset",
+    "youtubeId": null
+  },
+  "files/browser--table": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The table view of the file browser with the Name, Type, Size and Modified columns",
+    "youtubeId": null
+  },
+  "files/browser--views": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "The images folder of a dataset in the grid view, then the table view and the expanded table view",
+    "youtubeId": null
+  },
+  "files/copy-paste--clipboard-panel": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The clipboard panel with the copied item and its source dataset",
+    "youtubeId": null
+  },
+  "files/copy-paste--conflict": {
+    "type": "screenshot",
+    "width": 1048,
+    "height": 632,
+    "alt": "The Paste Conflict window with Skip All, Overwrite All and Cancel",
+    "youtubeId": null
+  },
+  "files/copy-paste--context-menu": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Copy, Cut and Paste items of the context menu",
+    "youtubeId": null
+  },
+  "files/copy-paste--copy-to-dataset": {
+    "type": "screenshot",
+    "width": 1332,
+    "height": 1212,
+    "alt": "The Copy to Another Dataset window of a dataset that the user can only read, with its note that the files stay",
+    "youtubeId": null
+  },
+  "files/copy-paste--flow": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "Copy a file with Ctrl+C, open another folder and paste it with Ctrl+V",
+    "youtubeId": null
+  },
+  "files/copy-paste--transfer": {
+    "type": "screenshot",
+    "width": 1148,
+    "height": 1212,
+    "alt": "The Transfer to Dataset window with the destination organization, dataset and path",
+    "youtubeId": null
+  },
+  "files/download--build-downloads": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Tools menu of an orthophoto with Download COG",
+    "youtubeId": null
+  },
+  "files/download--confirm": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The download button at the top of the page and its confirmation for the selected file",
     "youtubeId": null
   },
   "files/edit-text--editor": {
@@ -25,6 +403,69 @@
     "width": 2352,
     "height": 1488,
     "alt": "The text editor with a JSON file, the Format button and the Save button",
+    "youtubeId": null
+  },
+  "files/edit-text--markdown": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A README in the Markdown viewer in edit mode, with the save button",
+    "youtubeId": null
+  },
+  "files/folders--delete-confirm": {
+    "type": "screenshot",
+    "width": 876,
+    "height": 448,
+    "alt": "The confirmation before a file is deleted",
+    "youtubeId": null
+  },
+  "files/folders--new-folder": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Create folder window with a folder name",
+    "youtubeId": null
+  },
+  "files/folders--rename-sidecars": {
+    "type": "screenshot",
+    "width": 668,
+    "height": 688,
+    "alt": "The Rename window with Also rename sidecar files and the measurements file that is renamed too",
+    "youtubeId": null
+  },
+  "files/import--dataset-dialog": {
+    "type": "screenshot",
+    "width": 1464,
+    "height": 1936,
+    "alt": "The Import dataset window with a DroneDB Hub source verified, its file count and size",
+    "youtubeId": null
+  },
+  "files/import--url-dialog": {
+    "type": "screenshot",
+    "width": 1212,
+    "height": 1300,
+    "alt": "The Import from URL window with a verified URL, the file name and the destination folder",
+    "youtubeId": null
+  },
+  "files/properties--detail-panel": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The detail panel of an orthophoto with its preview and its properties",
+    "youtubeId": null
+  },
+  "files/properties--entry-type": {
+    "type": "screenshot",
+    "width": 1248,
+    "height": 1488,
+    "alt": "The window that explains the GeoRaster entry type",
+    "youtubeId": null
+  },
+  "files/rescan--confirm": {
+    "type": "screenshot",
+    "width": 1968,
+    "height": 816,
+    "alt": "The Rescan Dataset confirmation with its side effects",
     "youtubeId": null
   },
   "files/rescan--settings": {
@@ -74,6 +515,20 @@
     "width": 988,
     "height": 700,
     "alt": "The Share / Embed window with Embed selected and the iframe code of the map",
+    "youtubeId": null
+  },
+  "get-started/share-first-map--link": {
+    "type": "screenshot",
+    "width": 988,
+    "height": 608,
+    "alt": "The share link of the orthophoto after the dataset became unlisted",
+    "youtubeId": null
+  },
+  "get-started/share-first-map--private": {
+    "type": "screenshot",
+    "width": 1924,
+    "height": 672,
+    "alt": "The Share / Embed window of a private dataset with the button that makes it Unlisted",
     "youtubeId": null
   },
   "get-started/share-first-map--settings": {
@@ -153,11 +608,81 @@
     "alt": "The Upload Progress window with the files, the speed and the time left",
     "youtubeId": null
   },
+  "measure/3d--pointcloud-distance": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "A distance measured on a point cloud",
+    "youtubeId": null
+  },
+  "measure/3d--pointcloud-saved": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The saved measurements of a point cloud and the Units selector",
+    "youtubeId": null
+  },
   "measure/3d--pointcloud-tools": {
     "type": "screenshot",
     "width": 2880,
     "height": 1800,
     "alt": "The Tools section of the point cloud viewer menu, with the measurement tools",
+    "youtubeId": null
+  },
+  "measure/3d--unified-area": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "An area measured on a point cloud in the 3D viewer",
+    "youtubeId": null
+  },
+  "measure/annotations--dialog": {
+    "type": "screenshot",
+    "width": 780,
+    "height": 868,
+    "alt": "The Point Annotation dialog with a colour and a description",
+    "youtubeId": null
+  },
+  "measure/annotations--popup": {
+    "type": "screenshot",
+    "width": 1000,
+    "height": 560,
+    "alt": "A point annotation on the map with its coordinates and description",
+    "youtubeId": null
+  },
+  "measure/map--area": {
+    "type": "screenshot",
+    "width": 1928,
+    "height": 1206,
+    "alt": "An area drawn on an orthophoto, with its size in the polygon",
+    "youtubeId": null
+  },
+  "measure/map--export": {
+    "type": "screenshot",
+    "width": 1928,
+    "height": 1206,
+    "alt": "The second row of the measure toolbar with Export Measurements as GeoJSON and Export Measurements as CSV",
+    "youtubeId": null
+  },
+  "measure/map--length-area-save": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "A length and an area measured on an orthophoto, then saved in the dataset",
+    "youtubeId": null
+  },
+  "measure/map--list": {
+    "type": "screenshot",
+    "width": 788,
+    "height": 816,
+    "alt": "The Measurements list with a group and the ungrouped measurements",
+    "youtubeId": null
+  },
+  "measure/map--properties": {
+    "type": "screenshot",
+    "width": 780,
+    "height": 1156,
+    "alt": "The properties of a measurement - name, description, colours, line width and group",
     "youtubeId": null
   },
   "measure/map--toolbar": {
@@ -181,6 +706,13 @@
     "alt": "A distance and a height measured on a splat, then a pin added and saved",
     "youtubeId": null
   },
+  "measure/splat--pins": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Pins panel with a pin and its Markdown text, link and image",
+    "youtubeId": null
+  },
   "measure/splat--set-scale": {
     "type": "screenshot",
     "width": 2880,
@@ -188,11 +720,137 @@
     "alt": "The Set the scale dialog with the real length of two picked points",
     "youtubeId": null
   },
+  "processing/align-raster--dialog": {
+    "type": "screenshot",
+    "width": 1248,
+    "height": 1560,
+    "alt": "The Align GeoTIFF to Reference window with a reference selected",
+    "youtubeId": null
+  },
+  "processing/align-raster--validated": {
+    "type": "screenshot",
+    "width": 1248,
+    "height": 1660,
+    "alt": "The alignment check says Compatible with the overlap and the ground resolution",
+    "youtubeId": null
+  },
+  "processing/builds--badges": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 720,
+    "alt": "File browser with a failed build badge on broken.laz and a Waiting for files badge on house.obj",
+    "youtubeId": null
+  },
   "processing/builds--details-panel": {
     "type": "screenshot",
     "width": 684,
     "height": 1612,
     "alt": "Details panel of an OBJ whose build waits for its .mtl file",
+    "youtubeId": null
+  },
+  "processing/builds--download-menu": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Tools menu of an orthophoto with Download COG",
+    "youtubeId": null
+  },
+  "processing/builds--rebuild": {
+    "type": "screenshot",
+    "width": 1272,
+    "height": 736,
+    "alt": "The Rebuild File window with the Rebuild Anyway button",
+    "youtubeId": null
+  },
+  "processing/export-raster--formula": {
+    "type": "screenshot",
+    "width": 1440,
+    "height": 900,
+    "alt": "NDVI with a colormap in the Plant Health panel, ready to export",
+    "youtubeId": null
+  },
+  "processing/export-raster--panel": {
+    "type": "screenshot",
+    "width": 1728,
+    "height": 1080,
+    "alt": "The Plant Health panel with its Export button",
+    "youtubeId": null
+  },
+  "processing/mask-borders--before-after": {
+    "type": "screenshot",
+    "width": 1928,
+    "height": 1206,
+    "alt": "An orthophoto with a black border next to its masked copy, whose border is transparent, in the compare view",
+    "youtubeId": null
+  },
+  "processing/mask-borders--dialog": {
+    "type": "screenshot",
+    "width": 1248,
+    "height": 928,
+    "alt": "The Mask Borders window with the source file",
+    "youtubeId": null
+  },
+  "processing/merge-multispectral--dialog": {
+    "type": "screenshot",
+    "width": 1848,
+    "height": 1344,
+    "alt": "The Merge Multispectral Bands window with the band order, the check and the preview",
+    "youtubeId": null
+  },
+  "processing/merge-multispectral--menu": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "Five band files selected, with Tools → Merge Multispectral Bands",
+    "youtubeId": null
+  },
+  "processing/photogrammetry--dialog": {
+    "type": "screenshot",
+    "width": 1712,
+    "height": 1668,
+    "alt": "The Run Photogrammetry window with the processing profile list open",
+    "youtubeId": null
+  },
+  "processing/photogrammetry--progress": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A running photogrammetry task with its progress bar in the Tasks tab",
+    "youtubeId": null
+  },
+  "processing/photogrammetry--results": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1200,
+    "alt": "The photogrammetry_output folder with the odm_orthophoto folder and the other results of a Fast Orthophoto run",
+    "youtubeId": null
+  },
+  "processing/photogrammetry--run": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "Start photogrammetry on the 18 images of a folder and follow the task in the Tasks tab",
+    "youtubeId": null
+  },
+  "processing/photogrammetry--tasks-button": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Tasks tab of a dataset with the Run Photogrammetry button",
+    "youtubeId": null
+  },
+  "processing/tasks--log": {
+    "type": "screenshot",
+    "width": 1584,
+    "height": 668,
+    "alt": "The log window of a failed build, with Auto-scroll (Auto-refresh shows only while a task runs)",
+    "youtubeId": null
+  },
+  "processing/tasks--table": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Tasks tab with a failed and two finished builds, their state, progress and actions",
     "youtubeId": null
   },
   "reference/faq--phone-dataset": {
@@ -209,11 +867,179 @@
     "alt": "The orthophoto of a dataset on the map of a phone",
     "youtubeId": null
   },
+  "self-hosting/admin-pages--config": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Configuration page with the Usage and contact card, the E-mail templates card and the setting sections",
+    "youtubeId": null
+  },
+  "self-hosting/admin-pages--hangfire": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Hangfire dashboard of Registry",
+    "youtubeId": null
+  },
+  "self-hosting/admin-pages--menu": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The user menu of an administrator with Manage Users, Tasks, Configuration, Hangfire and API Docs",
+    "youtubeId": null
+  },
+  "self-hosting/admin-pages--tasks": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Tasks page of the administrator with the user, tool and state filters",
+    "youtubeId": null
+  },
+  "self-hosting/email--preview": {
+    "type": "screenshot",
+    "width": 1532,
+    "height": 1290,
+    "alt": "The preview of the build notification with three sample builds",
+    "youtubeId": null
+  },
+  "self-hosting/email--received": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A build notification e-mail as a user receives it, in a mail client",
+    "youtubeId": null
+  },
+  "self-hosting/email--templates": {
+    "type": "screenshot",
+    "width": 1584,
+    "height": 1354,
+    "alt": "The E-mail templates card with the subject, the body and the placeholders",
+    "youtubeId": null
+  },
   "self-hosting/processing-nodes--tool-gating": {
     "type": "screenshot",
     "width": 2880,
     "height": 1800,
     "alt": "The Tool Gating section of the Configuration page",
+    "youtubeId": null
+  },
+  "self-hosting/update-check--usage-card": {
+    "type": "screenshot",
+    "width": 1584,
+    "height": 918,
+    "alt": "The Usage and contact card with the usage question and the optional contact address",
+    "youtubeId": null
+  },
+  "self-hosting/users--add": {
+    "type": "screenshot",
+    "width": 788,
+    "height": 1216,
+    "alt": "The Add User dialog with user name, e-mail, password rules and roles",
+    "youtubeId": null
+  },
+  "self-hosting/users--list": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The User Management page with the users, their roles, organizations and storage",
+    "youtubeId": null
+  },
+  "self-hosting/users--organizations": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "Manage User Organizations with the organizations of a user and their permissions",
+    "youtubeId": null
+  },
+  "sharing/links-embeds--copy-iframe": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "Open Share/Embed on an orthophoto, switch to Embed and copy the iframe code",
+    "youtubeId": null
+  },
+  "sharing/links-embeds--embed-code": {
+    "type": "screenshot",
+    "width": 988,
+    "height": 700,
+    "alt": "The Share / Embed window in Embed mode with the iframe code",
+    "youtubeId": null
+  },
+  "sharing/links-embeds--embed-poster": {
+    "type": "screenshot",
+    "width": 2040,
+    "height": 1360,
+    "alt": "The orthophoto of odm/brighton-beach in the embedded Hub map",
+    "youtubeId": null
+  },
+  "sharing/links-embeds--link": {
+    "type": "screenshot",
+    "width": 988,
+    "height": 608,
+    "alt": "The Share / Embed window in Link mode with the Share link and its copy button",
+    "youtubeId": null
+  },
+  "sharing/links-embeds--menu": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The file menu with Share/Embed",
+    "youtubeId": null
+  },
+  "sharing/ogc--hints": {
+    "type": "screenshot",
+    "width": 1364,
+    "height": 1208,
+    "alt": "How to use this OGC service, for the WMS of an orthophoto",
+    "youtubeId": null
+  },
+  "sharing/ogc--wfs-vector": {
+    "type": "screenshot",
+    "width": 988,
+    "height": 820,
+    "alt": "The Share window of a KMZ in WFS mode with the GetCapabilities and GetFeature URLs",
+    "youtubeId": null
+  },
+  "sharing/qgis--share-dialog": {
+    "type": "screenshot",
+    "width": 1504,
+    "height": 768,
+    "alt": "The Share window in QGIS mode with the QGIS steps and the QGIS URL",
+    "youtubeId": null
+  },
+  "sharing/qgis--tms": {
+    "type": "screenshot",
+    "width": 988,
+    "height": 608,
+    "alt": "The Share window in TMS mode with the tile URL",
+    "youtubeId": null
+  },
+  "sharing/stac--collection": {
+    "type": "screenshot",
+    "width": 1800,
+    "height": 1120,
+    "alt": "The STAC collection of odm/brighton-beach as JSON",
+    "youtubeId": null
+  },
+  "sharing/visibility--make-unlisted": {
+    "type": "screenshot",
+    "width": 1924,
+    "height": 672,
+    "alt": "The Share window of a file in a private dataset, which says the dataset is Private and offers Make the dataset Unlisted...",
+    "youtubeId": null
+  },
+  "sharing/visibility--make-unlisted-confirm": {
+    "type": "screenshot",
+    "width": 2064,
+    "height": 544,
+    "alt": "The question before a private dataset becomes Unlisted, which names the dataset and says that anyone with a link can open every file in it",
+    "youtubeId": null
+  },
+  "sharing/visibility--settings": {
+    "type": "screenshot",
+    "width": 1248,
+    "height": 1668,
+    "alt": "The Dataset Settings window with the Visibility list open",
     "youtubeId": null
   },
   "viewing/3d-model--embed": {
@@ -242,6 +1068,13 @@
     "width": 2880,
     "height": 1800,
     "alt": "A textured 3D model in the 3D model viewer",
+    "youtubeId": null
+  },
+  "viewing/3d-viewer--point-cloud": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A point cloud on its basemap in the 3D viewer",
     "youtubeId": null
   },
   "viewing/map--custom-basemap": {
@@ -293,6 +1126,34 @@
     "alt": "The ODM report PDF of odm/brighton-beach in the PDF window",
     "youtubeId": null
   },
+  "viewing/markdown-pdf--readme": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The README.md of odm/langley in the Markdown viewer",
+    "youtubeId": null
+  },
+  "viewing/panoramas--drag-look": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "Dragging to look around the odm/copr panorama",
+    "youtubeId": null
+  },
+  "viewing/panoramas--embed": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The odm/copr panorama in the panorama viewer",
+    "youtubeId": null
+  },
+  "viewing/panoramas--viewer": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A 360° panorama in the panorama viewer, with its bar at the bottom",
+    "youtubeId": null
+  },
   "viewing/point-cloud--attribute": {
     "type": "screenshot",
     "width": 2880,
@@ -323,14 +1184,14 @@
   },
   "viewing/point-cloud--overview": {
     "type": "screenshot",
-    "width": 2880,
-    "height": 1800,
+    "width": 1440,
+    "height": 900,
     "alt": "A point cloud in the point cloud viewer, with the Units selector at the top left",
     "youtubeId": null
   },
   "viewing/splat-downloads--about-panel": {
     "type": "screenshot",
-    "width": 816,
+    "width": 818,
     "height": 704,
     "alt": "The downloads at the bottom of the About this splat panel",
     "youtubeId": null
@@ -340,6 +1201,13 @@
     "width": 2880,
     "height": 1800,
     "alt": "The splat downloads in the Tools menu of the file list",
+    "youtubeId": null
+  },
+  "viewing/splat-downloads--training-export": {
+    "type": "screenshot",
+    "width": 1288,
+    "height": 1204,
+    "alt": "The Export Splat Training Data dialog with its options",
     "youtubeId": null
   },
   "viewing/splats--about": {
@@ -382,6 +1250,13 @@
     "width": 608,
     "height": 1608,
     "alt": "The View settings of the splat viewer with the up axis, quality, point size and calibration",
+    "youtubeId": null
+  },
+  "viewing/splats-georeferenced--map-footprint": {
+    "type": "screenshot",
+    "width": 2448,
+    "height": 1530,
+    "alt": "The footprint of a georeferenced splat on the Map tab of its dataset",
     "youtubeId": null
   }
 }
