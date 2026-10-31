@@ -302,7 +302,15 @@ async function captureOnce(browser, shot, tmp) {
     // Relative times ("1 hour ago") stay the same on each run: the page clock of a page that is not a
     // viewer starts at a fixed time after the last demo reset of its Hub and runs on from there
     const resetAt = shot.open?.view ? null : demoResetTime(base);
-    if (resetAt) await context.clock.install({time: resetAt + CLOCK_AFTER_RESET_MS});
+    if (resetAt) {
+      // The fake clock replaces window.performance, whose entries are then empty: the page keeps the
+      // real Resource Timing entries (the upload test of the Account page reads the protocol there)
+      await context.addInitScript({content: 'window.__ddbRealPerformance = performance;'});
+      await context.clock.install({time: resetAt + CLOCK_AFTER_RESET_MS});
+      await context.addInitScript({content: `{ const real = window.__ddbRealPerformance;
+        if (real && performance !== real) for (const m of ['getEntries', 'getEntriesByType', 'getEntriesByName']) {
+          try { performance[m] = real[m].bind(real); } catch {} } }`});
+    }
 
     let page = await context.newPage();
     await throttleUploads(page, shot.uploadKBps);
@@ -580,7 +588,9 @@ async function runAction(page, action, isClip) {
       break;
     }
     case 'scroll': {
-      await center(page, v.selector, isClip);
+      // The wheel goes where the mouse is: over the element, also in a screenshot
+      const at = await center(page, v.selector, isClip);
+      await page.mouse.move(at.x, at.y);
       // In small steps: a map zooms and a list scrolls the same way on each run
       const steps = Math.max(1, Math.ceil(Math.max(Math.abs(v.y || 0), Math.abs(v.x || 0)) / 100));
       for (let i = 0; i < steps; i++) {
