@@ -527,7 +527,11 @@ async function runAction(page, action, isClip) {
       await center(page, v.selector, isClip);
       const loc = page.locator(v.selector).first();
       if (await loc.evaluate(e => e.tagName === 'SELECT')) {
-        await loc.selectOption({label: String(v.value)}).catch(() => loc.selectOption(String(v.value)));
+        // By its label when an option has it, else by its value: selectOption waits its whole
+        // timeout for a label that no option has, which made the clips overrun
+        const text = String(v.value);
+        const byLabel = await loc.evaluate((e, t) => [...e.options].some(o => o.label.trim() === t), text);
+        await loc.selectOption(byLabel ? {label: text} : text);
       } else {
         // PrimeVue Select: open it, then pick the option by its text
         await loc.click();
