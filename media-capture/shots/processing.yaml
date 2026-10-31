@@ -3,40 +3,45 @@
 # Demo inputs that reset-demo.mjs must create in the organization acme-surveys (private, owner docsdemo):
 #   builds          (dataset)  orthophoto.tif           a copy of odm/brighton-beach odm_orthophoto/odm_orthophoto.tif (built)
 #                              house.obj                an OBJ uploaded WITHOUT its house.mtl (build "Waiting for files")
-#                              broken.laz               a few bytes that are not a LAZ file (build "Failed")
+#                              broken.laz               a LAZ cut after 300 KB (build "Failed")
 #   photogrammetry  (dataset)  images/*.JPG             the 18 images of odm/brighton-beach images/
 #   multispectral   (dataset)  bands/IMG_0180_1.tif … bands/IMG_0180_5.tif
 #                                                       the five band files of one capture of odx/micasense images/
 #   align           (dataset)  orthos/sheffield-park-1.tif, orthos/sheffield-park-2.tif
 #                                                       odm_orthophoto/odm_orthophoto.tif of odm/sheffield-park-1 and -2
-#   mask-borders    (dataset)  ortho-black-border.tif   an orthophoto with a black (no-data) border — source not chosen yet
+#   mask-borders    (dataset)  ortho-black-border.tif, ortho-black-border_masked.tif
+#                                                       the Brighton Beach orthophoto with a real black border and its
+#                                                       masked copy (local/generate-data.sh mask-borders)
 #
-# The Photogrammetry shots need a processing node. On the local Registry of media-capture/local there is none
-# yet: start.sh must add a NodeODX container (for example opendronemap/nodeodm) and set
-# AppSettings__ProcessingPlatform__NodeOdx__0__* for it; without a node the "Run Photogrammetry" button is hidden.
-# The photogrammetry clip uses processing quota on a real node: capture it only when it changes.
+# The Photogrammetry shots need a processing node: the local Registry of media-capture/local has one (NodeODX
+# `local`); without a node the "Run Photogrammetry" button is hidden. The clip starts a Fast Orthophoto run of the
+# 18 images (about 2.5 minutes locally); capture processing/photogrammetry--progress right after it and
+# processing/photogrammetry--results when the task has ended. It uses processing quota on a real node: capture it
+# only when it changes. A running task shows a duration of 90 minutes or more: the page clock of the capture
+# starts 90 minutes after the last demo reset.
 #
-# Right-click: `click: { selector, button: right }` opens the context menu of the file browser (the capture
-# runner must support the button key). Context menu entries are PrimeVue menu items: select them by role+name.
+# Folders are clicked in the tree ([aria-label='Folders']) and files by their tile ([role='option']:has-text(...)):
+# the accessible names of the tiles and tabs start with their icon glyph. Context menu entries are menu items:
+# select them by role and name.
 
 # ---- Builds -------------------------------------------------------------------------------------------------
 
 - id: processing/builds--badges
   type: screenshot
-  alt: File browser with a queued, a waiting and a failed build badge
+  alt: File browser with a failed build badge on broken.laz and a Waiting for files badge on house.obj
   page: hub-guide/processing/builds
   url: /r/acme-surveys/builds
   base: hub
   auth: demo
   waitFor:
-    selector: "text=house.obj"
+    # the tile of broken.laz shows its icon only after the Hub gives up its thumbnail (about 85 s)
+    selector: "[role='option']:has-text('broken.laz') i.icon-file"   # the file icon; no name to select it by
     networkIdle: true
-    extraMs: 1500
-  actions:
-    - hover: "text=house.obj"           # shows the "Waiting for files: …" tooltip of the badge
-    - wait: 800
-  highlight: "text=house.obj"
-  crop: null
+    extraMs: 1000
+    timeout: 120000
+  actions: []                           # the reason of a badge is a browser tooltip (title): not in a screenshot
+  highlight: null
+  crop: { x: 0, y: 0, width: 1440, height: 360 }
   blocked: null
 
 - id: processing/builds--details-panel
@@ -82,12 +87,12 @@
   base: hub
   auth: none
   waitFor:
-    selector: "text=odm_orthophoto"
+    selector: "[aria-label='Files'] [role='option']"
     networkIdle: true
   actions:
-    - click: "text=odm_orthophoto"      # open the folder
-    - wait: "text=odm_orthophoto.tif"
-    - click: { selector: "text=odm_orthophoto.tif", button: right }
+    - click: "[aria-label='Folders'] >> text=odm_orthophoto"
+    - wait: 1500
+    - rightClick: "[role='option']:has-text('odm_orthophoto.tif')"
     - hover: "role=menuitem[name='Tools']"
     - wait: "role=menuitem[name='Download COG']"
   highlight: "role=menuitem[name='Download COG']"
@@ -98,16 +103,16 @@
 
 - id: processing/photogrammetry--run
   type: clip
-  alt: Start photogrammetry on 18 images, follow the task, open the orthophoto
+  alt: Start photogrammetry on the 18 images of a folder and follow the task in the Tasks tab
   page: hub-guide/processing/photogrammetry
   url: /r/acme-surveys/photogrammetry
   base: hub
   auth: demo
   waitFor:
-    selector: "role=tab[name='Tasks']"
+    selector: "[role='tab']:has-text('Tasks')"
     networkIdle: true
   actions:
-    - click: "role=tab[name='Tasks']"
+    - click: "[role='tab']:has-text('Tasks')"
     - click: "role=button[name='Run Photogrammetry']"
     - fill: { selector: "#task-history-image-folder", value: images }
     - click: "[aria-labelledby='task-history-processing-profile-label']"
@@ -128,10 +133,10 @@
   base: hub
   auth: demo
   waitFor:
-    selector: "role=tab[name='Tasks']"
+    selector: "[role='tab']:has-text('Tasks')"
     networkIdle: true
   actions:
-    - click: "role=tab[name='Tasks']"
+    - click: "[role='tab']:has-text('Tasks')"
     - wait: "role=button[name='Run Photogrammetry']"
   highlight: "role=button[name='Run Photogrammetry']"
   crop: null
@@ -145,16 +150,16 @@
   base: hub
   auth: demo
   waitFor:
-    selector: "role=tab[name='Tasks']"
+    selector: "[role='tab']:has-text('Tasks')"
     networkIdle: true
   actions:
-    - click: "role=tab[name='Tasks']"
+    - click: "[role='tab']:has-text('Tasks')"
     - click: "role=button[name='Run Photogrammetry']"
     - wait: "#photogrammetry"
     - fill: { selector: "#task-history-image-folder", value: images }
     - click: "[aria-labelledby='task-history-processing-profile-label']"
     - wait: "role=option[name='DSM + DTM (terrain)']"
-  highlight: "[aria-labelledby='task-history-processing-profile-label']"
+  highlight: "div:has(> [aria-labelledby='task-history-processing-profile-label'])"   # the whole list, arrow included
   crop: "#photogrammetry"
   blocked: null
 
@@ -166,30 +171,31 @@
   base: hub
   auth: demo
   waitFor:
-    selector: "text=Photogrammetry (NodeODX)"   # needs a task started by processing/photogrammetry--run
+    selector: "[role='tab']:has-text('Tasks')"
     networkIdle: true
+    stable: false                              # the progress bar and the elapsed time move
   actions:
-    - click: "role=tab[name='Tasks']"
-    - wait: "role=progressbar"
+    - click: "[role='tab']:has-text('Tasks')"
+    - wait: "role=progressbar"                 # the task that processing/photogrammetry--run started
   highlight: "role=progressbar"
   crop: null
   blocked: null
 
 - id: processing/photogrammetry--results
   type: screenshot
-  alt: The photogrammetry_output folder with the orthophoto and the other results
+  alt: The photogrammetry_output folder with the odm_orthophoto folder and the other results of a Fast Orthophoto run
   page: hub-guide/processing/photogrammetry
   url: /r/acme-surveys/photogrammetry
   base: hub
   auth: demo
   waitFor:
-    selector: "text=photogrammetry_output"      # after processing/photogrammetry--run has finished
+    selector: "[aria-label='Folders'] >> text=photogrammetry_output"   # after processing/photogrammetry--run has finished
     networkIdle: true
   actions:
-    - click: "text=photogrammetry_output"
-    - wait: "text=odm_orthophoto"
+    - click: "[aria-label='Folders'] >> text=photogrammetry_output"
+    - wait: "[role='option']:has-text('odm_orthophoto')"
   highlight: null
-  crop: null
+  crop: { x: 0, y: 0, width: 1440, height: 600 }
   blocked: null
 
 # ---- Merge multispectral ------------------------------------------------------------------------------------
@@ -202,13 +208,17 @@
   base: hub
   auth: demo
   waitFor:
-    selector: "text=bands"
+    selector: "[aria-label='Folders'] >> text=bands"
     networkIdle: true
   actions:
-    - click: "text=bands"
-    - wait: "text=IMG_0180_1.tif"
-    - press: Control+a                   # Select All/None
-    - click: { selector: "text=IMG_0180_1.tif", button: right }
+    - click: "[aria-label='Folders'] >> text=bands"
+    - wait: "[role='option']:has-text('IMG_0180_1.tif')"
+    - click: "[role='option']:has-text('IMG_0180_1.tif')"
+    - click: { selector: "[role='option']:has-text('IMG_0180_2.tif')", modifiers: [Control] }
+    - click: { selector: "[role='option']:has-text('IMG_0180_3.tif')", modifiers: [Control] }
+    - click: { selector: "[role='option']:has-text('IMG_0180_4.tif')", modifiers: [Control] }
+    - click: { selector: "[role='option']:has-text('IMG_0180_5.tif')", modifiers: [Control] }
+    - rightClick: "[role='option']:has-text('IMG_0180_1.tif')"
     - hover: "role=menuitem[name='Tools']"
     - wait: "role=menuitem[name='Merge Multispectral Bands']"
   highlight: "role=menuitem[name='Merge Multispectral Bands']"
@@ -223,13 +233,17 @@
   base: hub
   auth: demo
   waitFor:
-    selector: "text=bands"
+    selector: "[aria-label='Folders'] >> text=bands"
     networkIdle: true
   actions:
-    - click: "text=bands"
-    - wait: "text=IMG_0180_1.tif"
-    - press: Control+a
-    - click: { selector: "text=IMG_0180_1.tif", button: right }
+    - click: "[aria-label='Folders'] >> text=bands"
+    - wait: "[role='option']:has-text('IMG_0180_1.tif')"
+    - click: "[role='option']:has-text('IMG_0180_1.tif')"
+    - click: { selector: "[role='option']:has-text('IMG_0180_2.tif')", modifiers: [Control] }
+    - click: { selector: "[role='option']:has-text('IMG_0180_3.tif')", modifiers: [Control] }
+    - click: { selector: "[role='option']:has-text('IMG_0180_4.tif')", modifiers: [Control] }
+    - click: { selector: "[role='option']:has-text('IMG_0180_5.tif')", modifiers: [Control] }
+    - rightClick: "[role='option']:has-text('IMG_0180_1.tif')"
     - hover: "role=menuitem[name='Tools']"
     - click: "role=menuitem[name='Merge Multispectral Bands']"
     - wait: "img[alt='Merge preview']"
@@ -247,36 +261,37 @@
   base: hub
   auth: demo
   waitFor:
-    selector: "text=ortho-black-border.tif"
+    selector: "[role='option']:has-text('ortho-black-border.tif')"
     networkIdle: true
   actions:
-    - click: { selector: "text=ortho-black-border.tif", button: right }
+    - rightClick: "[role='option']:has-text('ortho-black-border.tif')"
     - hover: "role=menuitem[name='Tools']"
     - click: "role=menuitem[name='Mask Borders']"
     - wait: "#mask-borders-dialog"
   highlight: "role=button[name='Mask Borders']"
   crop: "#mask-borders-dialog"
-  blocked: data                          # no orthophoto with a black border is chosen yet
+  blocked: null
 
 - id: processing/mask-borders--before-after
   type: screenshot
-  alt: An orthophoto with a black border next to its masked copy on the map
+  alt: An orthophoto with a black border next to its masked copy, whose border is transparent, in the compare view
   page: hub-guide/processing/mask-borders
   open:
     org: acme-surveys
     ds: mask-borders
-    path: ortho-black-border_masked.tif
-    view: map
+    compare: [ortho-black-border.tif, ortho-black-border_masked.tif]
   base: hub
   auth: demo
   waitFor:
-    selector: ".ol-layer canvas"
+    selector: "canvas"
     networkIdle: true
-    extraMs: 2000
-  actions: []
+    extraMs: 2500
+  actions:
+    - click: "[title='Zoom in']"         # the OpenLayers zoom control (the divider handle takes the wheel)
+    - wait: 3000
   highlight: null
   crop: null
-  blocked: data                          # same input as processing/mask-borders--dialog
+  blocked: null
 
 # ---- Align a raster -----------------------------------------------------------------------------------------
 
@@ -288,18 +303,18 @@
   base: hub
   auth: demo
   waitFor:
-    selector: "text=orthos"
+    selector: "[aria-label='Folders'] >> text=orthos"
     networkIdle: true
   actions:
-    - click: "text=orthos"
-    - wait: "text=sheffield-park-2.tif"
-    - click: { selector: "text=sheffield-park-2.tif", button: right }
+    - click: "[aria-label='Folders'] >> text=orthos"
+    - wait: "[role='option']:has-text('sheffield-park-2.tif')"
+    - rightClick: "[role='option']:has-text('sheffield-park-2.tif')"
     - hover: "role=menuitem[name='Tools']"
     - click: "role=menuitem[name='Align to Reference...']"
     - wait: "#align-georaster"
     - click: "[aria-labelledby='align-dialog-reference-geotiff-label']"
     - click: "role=option[name='orthos/sheffield-park-1.tif']"
-  highlight: "[aria-labelledby='align-dialog-reference-geotiff-label']"
+  highlight: "div:has(> [aria-labelledby='align-dialog-reference-geotiff-label'])"   # the whole list, arrow included
   crop: "#align-georaster"
   blocked: null
 
@@ -311,12 +326,12 @@
   base: hub
   auth: demo
   waitFor:
-    selector: "text=orthos"
+    selector: "[aria-label='Folders'] >> text=orthos"
     networkIdle: true
   actions:
-    - click: "text=orthos"
-    - wait: "text=sheffield-park-2.tif"
-    - click: { selector: "text=sheffield-park-2.tif", button: right }
+    - click: "[aria-label='Folders'] >> text=orthos"
+    - wait: "[role='option']:has-text('sheffield-park-2.tif')"
+    - rightClick: "[role='option']:has-text('sheffield-park-2.tif')"
     - hover: "role=menuitem[name='Tools']"
     - click: "role=menuitem[name='Align to Reference...']"
     - click: "[aria-labelledby='align-dialog-reference-geotiff-label']"
@@ -378,33 +393,33 @@
 
 - id: processing/tasks--table
   type: screenshot
-  alt: The Tasks tab with builds, a merge and an export, their state, progress and actions
+  alt: The Tasks tab with a failed and two finished builds, their state, progress and actions
   page: hub-guide/processing/tasks
-  url: /r/acme-surveys/multispectral
+  url: /r/acme-surveys/builds
   base: hub
   auth: demo
   waitFor:
-    selector: "role=tab[name='Tasks']"
+    selector: "[role='tab']:has-text('Tasks')"
     networkIdle: true
   actions:
-    - click: "role=tab[name='Tasks']"
+    - click: "[role='tab']:has-text('Tasks')"
     - wait: "role=button[name='View log']"
-  highlight: "[aria-label='Filter by state']"
+  highlight: "div:has(> [aria-label='Filter by state'])"   # the whole list, arrow included
   crop: null
   blocked: null
 
 - id: processing/tasks--log
   type: screenshot
-  alt: The log window of a task with Auto-refresh and Auto-scroll
+  alt: The log window of a failed build, with Auto-scroll (Auto-refresh shows only while a task runs)
   page: hub-guide/processing/tasks
-  url: /r/acme-surveys/multispectral
+  url: /r/acme-surveys/builds
   base: hub
   auth: demo
   waitFor:
-    selector: "role=tab[name='Tasks']"
+    selector: "[role='tab']:has-text('Tasks')"
     networkIdle: true
   actions:
-    - click: "role=tab[name='Tasks']"
+    - click: "[role='tab']:has-text('Tasks')"
     - click: "role=button[name='View log'] >> nth=0"
     - wait: "#task-log"
   highlight: null
