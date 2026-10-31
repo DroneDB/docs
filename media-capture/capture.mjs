@@ -326,9 +326,11 @@ async function captureOnce(browser, shot, tmp) {
     const tReady = Date.now();
     if (isClip) await page.waitForTimeout(800);
 
+    let newTab = false;
     for (const action of shot.actions) {
       const opened = await runAction(page, action, isClip);
       if (opened) {
+        newTab = true;
         // The shot goes on in the page the click opened (a new tab)
         page = opened;
         await throttleUploads(page, shot.uploadKBps);
@@ -336,7 +338,9 @@ async function captureOnce(browser, shot, tmp) {
         await page.waitForLoadState('domcontentloaded');
       }
     }
-    if (shot.actions.length) await waitReady(page, {...shot, waitFor: {...shot.waitFor, selector: undefined}}, net);
+    // After the actions, the viewer's loaded state only in a tab that an action opened: in the same tab an
+    // action can leave it (Edit in the Markdown viewer replaces the rendered Markdown with its source)
+    if (shot.actions.length) await waitReady(page, {...shot, waitFor: {...shot.waitFor, selector: newTab ? undefined : null}}, net);
 
     if (shot.highlight) {
       const box = await visibleBox(page, shot.highlight);
@@ -415,7 +419,7 @@ function watchNetwork(page, origin) {
 async function waitReady(page, shot, net) {
   const w = shot.waitFor;
   const timeout = w.timeout ?? TIMEOUT;
-  const selector = w.selector || VIEW_READY[shot.open?.view];
+  const selector = w.selector === undefined ? VIEW_READY[shot.open?.view] : w.selector;   // null: none
   try {
     if (selector) await page.locator(selector).first().waitFor({state: 'visible', timeout});
     if (w.networkIdle !== false) await net.idle(timeout);
