@@ -59,6 +59,7 @@
     - wait: "#add-user-dialog-username"
     - fill: { selector: "#add-user-dialog-username", value: surveyor }
     - fill: { selector: "#add-user-dialog-email", value: surveyor@example.com }
+    - fill: { selector: "#add-user-dialog-password", value: survey2026 }   # shows the rules of the password policy
   highlight: null
   crop: "#addUserDialog"
   blocked: null
@@ -89,9 +90,11 @@
   waitFor: { selector: "[aria-label='Search users']", networkIdle: true, extraMs: 300 }
   actions:
     - click: "role=button[name='Manage Roles']"
-    - wait: "#role-management-dialog-role-name"
+    - wait: "text=Existing Roles"
   highlight: null
-  crop: null
+  crop: "#roleManagementDialog"
+  # Hub bug: the dialog compares the role with 'Admin' while the role is 'admin', so the admin role shows
+  # "Custom user role" and a Delete button instead of "System Role"; its image is left out until the fix
   blocked: null
 
 - id: self-hosting/users--delete
@@ -106,8 +109,10 @@
     # second row (docsdemo): the button of admin is disabled. The shot never confirms the dialog.
     - click: "[aria-label='Delete User'] >> nth=1"
     - wait: "#users-transfer-data-to-successor"
-  highlight: "#users-transfer-data-to-successor"
+  highlight: "div:has(> [aria-labelledby='users-transfer-data-to-successor-label'])"   # the whole list, arrow included
   crop: null
+  # Hub bug: the label, the list and the help text of Transfer data to successor share one line and the list
+  # covers the end of the label ("(optiona|l)"); its image is left out until the fix
   blocked: null
 
 - id: self-hosting/admin-pages--config
@@ -119,7 +124,7 @@
   auth: admin
   waitFor: { selector: "section[aria-labelledby='usage-contact-title']", networkIdle: true, extraMs: 500 }
   actions: []
-  highlight: "text=Copy AppSettings JSON"
+  highlight: "role=button[name='Copy AppSettings JSON']"
   crop: null
   blocked: null
 
@@ -159,7 +164,7 @@
   url: /hangfire
   base: local
   auth: admin                          # the dashboard reads the sign-in cookie of the Hub
-  waitFor: { networkIdle: true, extraMs: 1500 }
+  waitFor: { networkIdle: true, extraMs: 1500, stable: false }   # the realtime graph keeps moving
   actions: []
   highlight: null
   crop: null
@@ -193,7 +198,7 @@
     - click: "section[aria-labelledby='email-templates-title'] >> text=Send me a test"
     - wait: 1500
   highlight: null
-  crop: "section[aria-labelledby='email-templates-title']"
+  crop: "section[aria-labelledby='email-template-preview-title']"
   blocked: null
 
 - id: self-hosting/email--received
