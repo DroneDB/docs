@@ -29,7 +29,7 @@
     - wait: "#settings"
     - click: "[aria-labelledby='settings-visibility-label']"
     - wait: "role=option[name='Unlisted']"
-  highlight: "[aria-labelledby='settings-visibility-label']"
+  highlight: "div:has(> [aria-labelledby='settings-visibility-label'])"   # the whole list, arrow included
   crop: "#settings"
   blocked: null
 
@@ -41,10 +41,10 @@
   base: hub
   auth: demo
   waitFor:
-    selector: "text=orthophoto.tif"
+    selector: "[role='option']:has-text('orthophoto.tif')"
     networkIdle: true
   actions:
-    - click: { selector: "text=orthophoto.tif", button: right }
+    - rightClick: "[role='option']:has-text('orthophoto.tif')"
     - click: "role=menuitem[name='Share/Embed']"
     - wait: "role=button[name='Make the dataset Unlisted...']"
   highlight: "role=button[name='Make the dataset Unlisted...']"
@@ -59,10 +59,10 @@
   base: hub
   auth: demo
   waitFor:
-    selector: "text=orthophoto.tif"
+    selector: "[role='option']:has-text('orthophoto.tif')"
     networkIdle: true
   actions:
-    - click: { selector: "text=orthophoto.tif", button: right }
+    - rightClick: "[role='option']:has-text('orthophoto.tif')"
     - click: "role=menuitem[name='Share/Embed']"
     - click: "role=button[name='Make the dataset Unlisted...']"   # opens the question only
     - wait: "role=button[name='Make Unlisted']"                    # do NOT click it
@@ -74,25 +74,23 @@
 
 - id: sharing/links-embeds--copy-iframe
   type: clip
-  alt: Copy the embed code of an orthophoto and paste it into a web page
+  alt: Open Share/Embed on an orthophoto, switch to Embed and copy the iframe code
   page: hub-guide/sharing/links-embeds
   url: /r/odm/brighton-beach
   base: hub
   auth: none
   waitFor:
-    selector: "text=odm_orthophoto"
+    selector: "[aria-label='Folders'] >> text=odm_orthophoto"
     networkIdle: true
   actions:
-    - click: "text=odm_orthophoto"
-    - wait: "text=odm_orthophoto.tif"
-    - click: { selector: "text=odm_orthophoto.tif", button: right }
+    - click: "[aria-label='Folders'] >> text=odm_orthophoto"
+    - wait: "[role='option']:has-text('odm_orthophoto.tif')"
+    - rightClick: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "role=menuitem[name='Share/Embed']"
     - click: "#share-mode"
     - click: "role=option[name='Embed']"
     - click: "[aria-label='Embed code']"
     - wait: 1500
-    # second half: a local test page (media-capture/fixtures/embed.html, to be added) with the copied
-    # iframe pasted in, loading the map
   highlight: "[aria-label='Embed code']"
   maxSeconds: 30
   blocked: null
@@ -123,12 +121,12 @@
   base: hub
   auth: none
   waitFor:
-    selector: "text=odm_orthophoto"
+    selector: "[aria-label='Folders'] >> text=odm_orthophoto"
     networkIdle: true
   actions:
-    - click: "text=odm_orthophoto"
-    - wait: "text=odm_orthophoto.tif"
-    - click: { selector: "text=odm_orthophoto.tif", button: right }
+    - click: "[aria-label='Folders'] >> text=odm_orthophoto"
+    - wait: "[role='option']:has-text('odm_orthophoto.tif')"
+    - rightClick: "[role='option']:has-text('odm_orthophoto.tif')"
     - wait: "role=menuitem[name='Share/Embed']"
   highlight: "role=menuitem[name='Share/Embed']"
   crop: null
@@ -142,12 +140,12 @@
   base: hub
   auth: none
   waitFor:
-    selector: "text=odm_orthophoto"
+    selector: "[aria-label='Folders'] >> text=odm_orthophoto"
     networkIdle: true
   actions:
-    - click: "text=odm_orthophoto"
-    - wait: "text=odm_orthophoto.tif"
-    - click: { selector: "text=odm_orthophoto.tif", button: right }
+    - click: "[aria-label='Folders'] >> text=odm_orthophoto"
+    - wait: "[role='option']:has-text('odm_orthophoto.tif')"
+    - rightClick: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "role=menuitem[name='Share/Embed']"
     - wait: "[aria-label='Share link']"
   highlight: "[aria-label='Copy to clipboard']"
@@ -162,12 +160,12 @@
   base: hub
   auth: none
   waitFor:
-    selector: "text=odm_orthophoto"
+    selector: "[aria-label='Folders'] >> text=odm_orthophoto"
     networkIdle: true
   actions:
-    - click: "text=odm_orthophoto"
-    - wait: "text=odm_orthophoto.tif"
-    - click: { selector: "text=odm_orthophoto.tif", button: right }
+    - click: "[aria-label='Folders'] >> text=odm_orthophoto"
+    - wait: "[role='option']:has-text('odm_orthophoto.tif')"
+    - rightClick: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "role=menuitem[name='Share/Embed']"
     - click: "#share-mode"
     - click: "role=option[name='Embed']"
@@ -186,12 +184,12 @@
   base: hub
   auth: none
   waitFor:
-    selector: "text=odm_orthophoto"
+    selector: "[aria-label='Folders'] >> text=odm_orthophoto"
     networkIdle: true
   actions:
-    - click: "text=odm_orthophoto"
-    - wait: "text=odm_orthophoto.tif"
-    - click: { selector: "text=odm_orthophoto.tif", button: right }
+    - click: "[aria-label='Folders'] >> text=odm_orthophoto"
+    - wait: "[role='option']:has-text('odm_orthophoto.tif')"
+    - rightClick: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "role=menuitem[name='Share/Embed']"
     - click: "#share-mode"
     - click: "role=option[name='QGIS']"
@@ -208,12 +206,12 @@
   base: hub
   auth: none
   waitFor:
-    selector: "text=odm_orthophoto"
+    selector: "[aria-label='Folders'] >> text=odm_orthophoto"
     networkIdle: true
   actions:
-    - click: "text=odm_orthophoto"
-    - wait: "text=odm_orthophoto.tif"
-    - click: { selector: "text=odm_orthophoto.tif", button: right }
+    - click: "[aria-label='Folders'] >> text=odm_orthophoto"
+    - wait: "[role='option']:has-text('odm_orthophoto.tif')"
+    - rightClick: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "role=menuitem[name='Share/Embed']"
     - click: "#share-mode"
     - click: "role=option[name='TMS (Tile Map Service)']"
@@ -254,12 +252,12 @@
   base: hub
   auth: none
   waitFor:
-    selector: "text=civil_war"
+    selector: "[aria-label='Folders'] >> text=civil_war"
     networkIdle: true
   actions:
-    - click: "text=civil_war"
-    - wait: "text=civil_war_by_campaign.kmz"
-    - click: { selector: "text=civil_war_by_campaign.kmz", button: right }
+    - click: "[aria-label='Folders'] >> text=civil_war"
+    - wait: "[role='option']:has-text('civil_war_by_campaign.kmz')"
+    - rightClick: "[role='option']:has-text('civil_war_by_campaign.kmz')"
     - click: "role=menuitem[name='Share/Embed']"
     - click: "#share-mode"
     - click: "role=option[name='WFS (Web Feature Service)']"
@@ -276,12 +274,12 @@
   base: hub
   auth: none
   waitFor:
-    selector: "text=odm_orthophoto"
+    selector: "[aria-label='Folders'] >> text=odm_orthophoto"
     networkIdle: true
   actions:
-    - click: "text=odm_orthophoto"
-    - wait: "text=odm_orthophoto.tif"
-    - click: { selector: "text=odm_orthophoto.tif", button: right }
+    - click: "[aria-label='Folders'] >> text=odm_orthophoto"
+    - wait: "[role='option']:has-text('odm_orthophoto.tif')"
+    - rightClick: "[role='option']:has-text('odm_orthophoto.tif')"
     - click: "role=menuitem[name='Share/Embed']"
     - click: "#share-mode"
     - click: "role=option[name='WMS (Web Map Service)']"
@@ -303,7 +301,9 @@
   waitFor:
     selector: "body"
     networkIdle: true
-  actions: []
+  actions:
+    - mouse: { click: [151, 9] }         # the pretty-print box of the browser's JSON viewer (closed shadow DOM, label in the browser's language)
+    - wait: 500
   highlight: null
-  crop: null
+  crop: { x: 0, y: 26, width: 900, height: 560 }    # the start of the JSON, without the pretty-print box
   blocked: null
