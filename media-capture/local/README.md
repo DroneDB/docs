@@ -163,19 +163,13 @@ and before the next one, which uploads the results.
   `isThermal: false`, as production 2.7.1 does): libddb reads a raster as thermal only when it has
   one band and its metadata names a temperature, and these have a grey band, an alpha band and no
   such metadata. The Thermal panel shows the Raster Analysis panel for them.
-- The Map tab of odx/splats-geo shows no splat: the Hub draws a georeferenced splat only when its
-  `point_geom` is a bare GeoJSON Point (`isGeoreferencedSplat`, `libs/map/splatFootprints.js`), and
-  the Registry sends a GeoJSON Feature with that Point in `geometry`. The splat itself is
-  georeferenced (`georeferenced: true`, EPSG:32615 in the viewer, `wgs84Footprint` in its bounds).
-- odm/caliterra lies on a hillside, and a click of Stockpile Volume finds no small pile on its DSM: the
-  detection compares the heights with the mean of the border of its search square (100 m wide by
-  default), so a click near the excavator or on the sand pile gives the whole slope (40 000 to
-  100 000 m³) or nothing (HTTP 400, "No stockpile detected at this location"). The debris pile near
-  the excavator is in a part of the DSM that ODX filled by interpolation. Detect all finds the two
-  tree clumps at the south edge (about 2 000 and 1 000 m³) and the slope. A polygon drawn around the
-  sand pile next to the culverts (centre 30.170892, -98.090734; about 3.5 m in radius) gives 9 to
-  10.5 m³ with the Best-fit plane base; the default Lowest perimeter base gives 80 to 180 m³, because
-  the pile is on the slope.
+- odm/caliterra lies on a hillside. A click of Stockpile Volume on the sand pile next to the culverts
+  (30.170892, -98.090734) detects it against the ground around it: about 15 m², and 6.8 m³ on the
+  Best-fit plane the Hub opens a clicked pile with (the detector itself reports 8.2 m³ above the
+  plane it fits to the ground around the outline). A polygon of 3.5 m radius drawn around it gives
+  9 to 10.5 m³ with the Best-fit plane base; the default Lowest perimeter base of a drawn polygon
+  gives 80 to 180 m³, because the pile is on the slope. The debris pile near the excavator is in a
+  part of the DSM that ODX filled by interpolation and is not detected.
 - WMS of odx/micasense: GetCapabilities answers OGC XML, but GetMap of the six-band Float32
   orthophoto gives a transparent image (`Cannot encode the render of …/cog.tif` in the log); its DSM
   and DTM render.

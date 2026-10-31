@@ -83,7 +83,6 @@
     networkIdle: true
   actions:
     - fill: { selector: "[aria-label='Search files']", value: "*.json" }
-    - wait: 1000                     # Enter within 0.5 s of typing empties the box (Hub search debounce)
     - press: Enter
     - wait: 2500
   highlight: "[aria-label='Search files']"

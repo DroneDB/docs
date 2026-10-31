@@ -82,7 +82,7 @@
 
 - id: self-hosting/users--roles
   type: screenshot
-  alt: The Role Management dialog with a field for a new role and the existing roles
+  alt: The Role Management dialog with the existing roles, the admin system role and a custom role
   page: self-hosting/users
   url: /admin/users
   base: local
@@ -93,8 +93,6 @@
     - wait: "text=Existing Roles"
   highlight: null
   crop: "#roleManagementDialog"
-  # Hub bug: the dialog compares the role with 'Admin' while the role is 'admin', so the admin role shows
-  # "Custom user role" and a Delete button instead of "System Role"; its image is left out until the fix
   blocked: null
 
 - id: self-hosting/users--delete
@@ -109,10 +107,8 @@
     # second row (docsdemo): the button of admin is disabled. The shot never confirms the dialog.
     - click: "[aria-label='Delete User'] >> nth=1"
     - wait: "#users-transfer-data-to-successor"
-  highlight: "div:has(> [aria-labelledby='users-transfer-data-to-successor-label'])"   # the whole list, arrow included
-  crop: null
-  # Hub bug: the label, the list and the help text of Transfer data to successor share one line and the list
-  # covers the end of the label ("(optiona|l)"); its image is left out until the fix
+  highlight: null                    # the question sits right above the field: a box round the field covers it
+  crop: "[role='dialog']"
   blocked: null
 
 - id: self-hosting/admin-pages--config

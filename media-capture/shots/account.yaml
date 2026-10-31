@@ -31,10 +31,7 @@
   actions: []
   highlight: null
   crop: null
-  # Hub 1262443: the page reads the organizations and the storage of a user from /users/{name}/orgs and
-  # /users/{name}/storage, which answer 403 to a user who is not an administrator, and the e-mail only for
-  # an administrator: docsdemo shows 0 organizations, 0 B used, Unlimited and Email "Not set"
-  blocked: release
+  blocked: null
 
 - id: account/account--upload-diagnostics
   type: screenshot
@@ -184,12 +181,7 @@
     selector: "#preferencesDialog"
     networkIdle: true
   actions:
-    # the tab list scrolled to its end: opened by the link, it stops with the tab under the Next button
-    - scroll: { selector: "role=tab[name='Lists']", x: 800 }
-    # the list scrolled to its end: Add material, and no intro text (Hub 1262443: the sticky column titles
-    # paint over the last line of the intro while the list is at its top)
-    - scroll: { selector: "text=Gravel", y: 1200 }
-    - wait: 500
+    - wait: 500                       # opened by the link, the tab list scrolls the tab clear of its arrows
   highlight: "role=tab[name='Stockpiles']"
   crop: "#preferencesDialog"
   blocked: null
@@ -207,7 +199,7 @@
     selector: "#preferencesDialog"
     networkIdle: true
   actions:
-    # the tab list scrolled to its end: opened by the link, it can stop with the tab under the Next button
+    # the tab list scrolled to its end: opened by the link, the last tab stops cut by the edge of the list
     - scroll: { selector: "role=tab[name='Lists']", x: 800 }
     - click: "[aria-labelledby='pref-build-notifications-label']"
     - wait: "role=option[name='Failed or waiting for files']"

@@ -34,11 +34,10 @@
   base: hub
   auth: demo
   waitFor:
-    # the tile of broken.laz shows its icon only after the Hub gives up its thumbnail (about 85 s)
+    # the tile of a failed build shows its file icon as soon as its thumbnail does not load
     selector: "[role='option']:has-text('broken.laz') i.icon-file"   # the file icon; no name to select it by
     networkIdle: true
     extraMs: 1000
-    timeout: 120000
   actions: []                           # the reason of a badge is a browser tooltip (title): not in a screenshot
   highlight: null
   crop: { x: 0, y: 0, width: 1440, height: 360 }
@@ -393,7 +392,7 @@
 
 - id: processing/tasks--table
   type: screenshot
-  alt: The Tasks tab with a failed and two finished builds, their state, progress and actions
+  alt: The Tasks tab with a failed build, a build waiting for files and a finished build, their state, progress and actions
   page: hub-guide/processing/tasks
   url: /r/acme-surveys/builds
   base: hub

@@ -11,8 +11,8 @@
 # mosaics of 24 and 25 August 2018 at the root of the dataset), odm/caliterra (odm_dem/dsm.tif, a
 # local-only DSM made by media-capture/local/generate-data.sh). The stockpile shots measure the sand
 # pile next to the culverts (the debris pile near the excavator is on interpolated DSM and cannot
-# be detected; Detect all does not find the sand pile). The click shots wait for the libddb and Hub
-# that detect a pile on a slope (blocked: release); the draw shot works now.
+# be detected; Detect all does not find the sand pile). A click on it detects it on its slope and
+# opens it on Best-fit plane; the draw shot draws a polygon around the same pile.
 #
 # The compare URLs use base64url of the paths (no padding):
 #   08242018 mosaic: QWlyYm9ybmVfdGhlcm1hbF9pbmZyYXJlZF9tb3NhaWNfSGF0X0NyZWVrX0NhbGlmb3JuaWFfMDgyNDIwMThfMTZiaXQudGlm
@@ -488,24 +488,27 @@
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
-    # The sand pile next to the culverts (30.170892, -98.090734) is at (581, 590) in the default
-    # view: three double clicks there zoom in 8 times around it, and it is then at (583, 600)
-    - mouse: { dblclick: [581, 590] }
+    # The sand pile next to the culverts (30.170892, -98.090734) is at (821, 741) in the default
+    # view of the clip (1920×1200): three double clicks there zoom in 8 times around it, and it is
+    # then at (823, 751)
+    - mouse: { dblclick: [821, 741] }
     - wait: 1200
-    - mouse: { dblclick: [581, 590] }
+    - mouse: { dblclick: [821, 741] }
     - wait: 1200
-    - mouse: { dblclick: [581, 590] }
+    - mouse: { dblclick: [821, 741] }
     - wait: 2000
     - click: "[aria-label='Stockpile Volume']"
+    - wait: 1500
     - click: "button[title='Click on the map to detect a pile at that point']"
-    - mouse: { click: [583, 600] }              # the sand pile: about 8.7 m³ and 15 m², on a Best-fit plane
+    - wait: 1000                                # a map click right after the button is not taken as a detection
+    - mouse: { click: [823, 751] }              # the sand pile: about 6.8 m³ and 15 m², on a Best-fit plane
     - wait: "text=Net volume"
     - select: { selector: "#stockpile-volume-panel-material", value: gravel }
     - wait: 1500
   highlight: null
   crop: null
-  maxSeconds: 20
-  blocked: release   # needs the libddb that detects piles on a slope (base fitted to the ground around the click) and the Hub that opens a detected pile on Best-fit plane
+  maxSeconds: 25
+  blocked: null
   youtubeId: null
 
 - id: analyse/stockpile--panel
@@ -541,12 +544,14 @@
     - mouse: { dblclick: [581, 590] }
     - wait: 2000
     - click: "[aria-label='Stockpile Volume']"
+    - wait: 1500
     - click: "button[title='Click on the map to detect a pile at that point']"
-    - mouse: { click: [583, 600] }              # the sand pile: about 8.7 m³ and 15 m², on a Best-fit plane
+    - wait: 1000                                # a map click right after the button is not taken as a detection
+    - mouse: { click: [583, 600] }              # the sand pile: about 6.8 m³ and 15 m², on a Best-fit plane
     - wait: "text=Net volume"
   highlight: "button[title='Click on the map to detect a pile at that point']"
   crop: null
-  blocked: release   # needs the libddb that detects piles on a slope (base fitted to the ground around the click) and the Hub that opens a detected pile on Best-fit plane
+  blocked: null
 
 - id: analyse/stockpile--draw
   type: screenshot
@@ -605,14 +610,16 @@
     - mouse: { dblclick: [581, 590] }
     - wait: 2000
     - click: "[aria-label='Stockpile Volume']"
+    - wait: 1500
     - click: "button[title='Click on the map to detect a pile at that point']"
-    - mouse: { click: [583, 600] }              # the sand pile: about 8.7 m³ and 15 m², on a Best-fit plane
+    - wait: 1000                                # a map click right after the button is not taken as a detection
+    - mouse: { click: [583, 600] }              # the sand pile: about 6.8 m³ and 15 m², on a Best-fit plane
     - wait: "text=Net volume"
     - select: { selector: "#stockpile-volume-panel-material", value: gravel }
     - wait: "text=Est. cost"
-  highlight: "#stockpile-volume-panel-material"
+  highlight: "div:has(> #stockpile-volume-panel-material)"   # the label and the list: a box round the list alone covers the label
   crop: null
-  blocked: release   # needs the libddb that detects piles on a slope (base fitted to the ground around the click) and the Hub that opens a detected pile on Best-fit plane
+  blocked: null
 
 - id: analyse/stockpile--base-methods
   type: screenshot

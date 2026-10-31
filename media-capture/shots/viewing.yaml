@@ -453,10 +453,7 @@
     - click: "[aria-label^='Coordinates are shown in']"
     - wait: 1000
   highlight: "[aria-label^='Coordinates are shown in']"
-  blocked: release   # Hub 1262443: a georeferenced splat without camera views opens at ground level
-                     # among its splats (needles of grass fill the screen) and its orbit stays there;
-                     # rig.frame puts the camera on +Z of the box with camera.up = +Z, which is the
-                     # view direction of a Z-up scene. Capture once the Hub frames it from above.
+  blocked: null
 
 # ---------------------------------------------------------------- splat downloads
 - id: viewing/splat-downloads--about-panel

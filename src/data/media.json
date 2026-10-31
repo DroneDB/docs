@@ -6,6 +6,13 @@
     "alt": "The Change Password window with the password rules",
     "youtubeId": null
   },
+  "account/account--page": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The Account page with the user information, the storage and the upload diagnostics",
+    "youtubeId": null
+  },
   "account/account--upload-diagnostics": {
     "type": "screenshot",
     "width": 1648,
@@ -265,11 +272,32 @@
     "alt": "The Base plane methods dialog of the stockpile panel",
     "youtubeId": null
   },
+  "analyse/stockpile--detect": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A pile detected with a click, with its outline on the map and its volumes in the panel",
+    "youtubeId": null
+  },
+  "analyse/stockpile--detect-material": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "A pile detected on a DSM with a click, then a material selected for its weight and cost",
+    "youtubeId": null
+  },
   "analyse/stockpile--draw": {
     "type": "screenshot",
     "width": 2880,
     "height": 1800,
     "alt": "A polygon drawn around a small sand pile on a DSM, with its volume on a best-fit base plane",
+    "youtubeId": null
+  },
+  "analyse/stockpile--material-cost": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The weight and the estimated cost of a pile of gravel",
     "youtubeId": null
   },
   "analyse/stockpile--panel": {
@@ -645,8 +673,8 @@
   },
   "get-started/tour--ortho-map": {
     "type": "screenshot",
-    "width": 1928,
-    "height": 1206,
+    "width": 1728,
+    "height": 1080,
     "alt": "The orthophoto of Brighton Beach on the map, with its saved measurements",
     "youtubeId": null
   },
@@ -934,7 +962,7 @@
     "type": "screenshot",
     "width": 2880,
     "height": 1800,
-    "alt": "The Tasks tab with a failed and two finished builds, their state, progress and actions",
+    "alt": "The Tasks tab with a failed build, a build waiting for files and a finished build, their state, progress and actions",
     "youtubeId": null
   },
   "reference/faq--phone-dataset": {
@@ -1021,6 +1049,13 @@
     "alt": "The Add User dialog with user name, e-mail, password rules and roles",
     "youtubeId": null
   },
+  "self-hosting/users--delete": {
+    "type": "screenshot",
+    "width": 1500,
+    "height": 764,
+    "alt": "The Delete User dialog with the successor and the warning that all data will be deleted",
+    "youtubeId": null
+  },
   "self-hosting/users--list": {
     "type": "screenshot",
     "width": 2880,
@@ -1033,6 +1068,13 @@
     "width": 2880,
     "height": 1800,
     "alt": "Manage User Organizations with the organizations of a user and their permissions",
+    "youtubeId": null
+  },
+  "self-hosting/users--roles": {
+    "type": "screenshot",
+    "width": 1036,
+    "height": 868,
+    "alt": "The Role Management dialog with the existing roles, the admin system role and a custom role",
     "youtubeId": null
   },
   "sharing/links-embeds--copy-iframe": {
@@ -1334,6 +1376,13 @@
     "width": 608,
     "height": 1608,
     "alt": "The View settings of the splat viewer with the up axis, quality, point size and calibration",
+    "youtubeId": null
+  },
+  "viewing/splats-georeferenced--coordinates": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A measured point of a georeferenced splat in WGS84, with the coordinate format button",
     "youtubeId": null
   },
   "viewing/splats-georeferenced--map-footprint": {

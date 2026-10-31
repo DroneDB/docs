@@ -99,7 +99,7 @@
   auth: none
   waitFor: { networkIdle: true, extraMs: 3000 }   # the map's own ready state (capture.mjs)
   actions:
-    - scroll: { selector: "[aria-label='Map'] canvas", y: -100 }   # zoom in one step
+    - mouse: { dblclick: [720, 470] }   # zoom in twice around the orthophoto (a wheel step zooms ~1.4 times)
     - wait: 2500
   highlight: null
   crop: null
@@ -137,7 +137,7 @@
   auth: none
   waitFor: { networkIdle: true, extraMs: 8000 }   # the viewer's ready state, then the textures stream in
   actions:
-    - scroll: { selector: "#model canvas", y: -200 }   # zoom in
+    - scroll: { selector: "#model canvas", y: -600 }   # zoom in until the model fills the view
     - wait: 3000
   highlight: null
   crop: null
