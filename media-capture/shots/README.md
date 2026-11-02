@@ -18,7 +18,7 @@ Every screenshot and clip of the documentation is defined here, one YAML file pe
     ds: micasense
     path: odm_orthophoto/odm_orthophoto.tif
     view: map                        # map | pointcloud | model | unified | splat | panorama | markdown
-    # compare: [a.tif, b.tif]        # instead of path and view: the compare view of 2+ rasters
+    # compare: [a.tif, b.tif]        # instead of path and view: the map of the first with the others added (2+ rasters, split on)
   # url: /r/odm                      # any other Hub path (dataset list, /account, /admin/users …),
                                      # or an absolute URL that is not a Hub (http://localhost:5181/, the
                                      # MailHog of the local Registry): --base and base do not change it

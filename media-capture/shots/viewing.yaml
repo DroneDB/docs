@@ -1,9 +1,10 @@
 # Shots of the Hub guide pages under docs/hub-guide/viewing/.
 #
-# Demo inputs (acme-surveys): none. Every shot here is read-only and uses the public odm/odx
-# datasets with auth none, except the training-data export dialog, which uses auth demo only
-# because the export is a task (it opens the dialog on the public odm/brighton-beach and does not
-# start the export).
+# Demo inputs (acme-surveys): the map views shots use the dataset `sheffield-park` (the orthophotos
+# park-1.tif and park-2.tif, see analyse.yaml) with auth demo, because saving a view needs write
+# access. Every other shot here is read-only and uses the public odm/odx datasets with auth none,
+# except the training-data export dialog, which uses auth demo only because the export is a task
+# (it opens the dialog on the public odm/brighton-beach and does not start the export).
 #
 # Notes for the capture pass:
 # - The file list opens a folder or a file with Enter on a focused tile (EntryThumbnail), so
@@ -28,11 +29,11 @@
     - wait: 1000
     - scroll: { selector: "[aria-label='Map'] canvas", y: -300 }   # zoom in at the centre (mouse wheel)
     - wait: 2500
-    - drag: { selector: "[aria-label='Layer opacity']", from: [0.97, 0.5], to: [0.25, 0.5] }
+    - drag: { selector: "[aria-label^='Opacity of']", from: [0.97, 0.5], to: [0.25, 0.5] }
     - wait: 1500
-    - drag: { selector: "[aria-label='Layer opacity']", from: [0.25, 0.5], to: [0.8, 0.5] }
+    - drag: { selector: "[aria-label^='Opacity of']", from: [0.25, 0.5], to: [0.8, 0.5] }
     - wait: 1500
-  highlight: "[aria-label='Layer opacity']"
+  highlight: "[aria-label^='Opacity of']"
   maxSeconds: 20
   blocked: null
   youtubeId: null
@@ -113,6 +114,149 @@
   base: hub
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 2500 }
+  blocked: null
+
+# ---------------------------------------------------------------- map views
+# The clip viewing/map-views--add-save saves the view "Park 1 and 2" (park-1.tif and park-2.tif) in
+# acme-surveys/sheffield-park, in the dataset meta list `views`. The shots map-views--view-bar and
+# map-views--tree-menu open that view, so capture the three together, the clip first, with no demo
+# reset in between: npm run media:capture -- --only viewing/map-views
+# The shot map-views--save-prompt cancels its prompt and saves nothing.
+
+- id: viewing/map-views--add-save
+  type: clip
+  alt: A second orthophoto added to the map, the divider dragged, the view saved under a name
+  page: hub-guide/viewing/map-views
+  # Compare to... opens the map of the file in a new tab, which a clip cannot follow: the clip starts
+  # where that tab starts, on park-1.tif with the Add layer picker open (pick=1). The first raster
+  # picked there turns the split on.
+  url: /r/acme-surveys/sheffield-park/view/cGFyay0xLnRpZg==/map?pick=1
+  base: hub
+  auth: demo
+  waitFor: { selector: "[aria-label='Selected file']", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[role='dialog'] >> text=park-2.tif"
+    - click: "[role='dialog'] >> role=button[name='Confirm']"
+    - wait: 2500
+    - drag: { from: [960, 700], to: [700, 700] }   # the divider (1920x1200 clip viewport)
+    - wait: 1000
+    - click: "[aria-label='View'] >> role=button[name='Save']"
+    - fill: { selector: "[role='dialog'] input", value: Park 1 and 2 }
+    - click: "[role='dialog'] >> role=button[name='Save']"
+    - wait: 2000
+  highlight: null
+  crop: null
+  maxSeconds: 30
+  blocked: null
+  youtubeId: null
+
+- id: viewing/map-views--compare-menu
+  type: screenshot
+  alt: Compare in Map in the context menu of two selected georasters
+  page: hub-guide/viewing/map-views
+  url: /r/odx/hat-creek
+  base: hub
+  auth: none
+  waitFor: { selector: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08242018_16bit.tif", networkIdle: true, extraMs: 1000 }
+  actions:
+    # the tiles of the file list (a click on the long names of the folder tree scrolls it sideways)
+    - click: "[role='option'][title*='08242018_16bit.tif']"
+    - click: { selector: "[role='option'][title*='08252018_16bit.tif']", modifiers: [Control] }
+    - rightClick: "[role='option'][title*='08252018_16bit.tif']"
+    - wait: "text=Compare in Map"
+  highlight: "text=Compare in Map"
+  crop: null
+  blocked: null
+
+- id: viewing/map-views--picker
+  type: screenshot
+  alt: The Add layer window with the georasters of a dataset
+  page: hub-guide/viewing/map-views
+  # pick=1 is what Compare to... adds to the address: the picker opens once the map shows
+  url: /r/odx/hat-creek/view/QWlyYm9ybmVfdGhlcm1hbF9pbmZyYXJlZF9tb3NhaWNfSGF0X0NyZWVrX0NhbGlmb3JuaWFfMDgyNDIwMThfMTZiaXQudGlm/map?pick=1
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Selected file']", networkIdle: true, extraMs: 1000 }
+  actions: []
+  highlight: null
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: viewing/map-views--layers
+  type: screenshot
+  alt: The map with two thermal mosaics, one over the other, and the layer panel with the eye, opacity and order of each layer
+  page: hub-guide/viewing/map-views
+  # Compare in Map: the first mosaic as the file, the second as an add value; the split starts on
+  open:
+    org: odx
+    ds: hat-creek
+    compare:
+      - Airborne_thermal_infrared_mosaic_Hat_Creek_California_08242018_16bit.tif
+      - Airborne_thermal_infrared_mosaic_Hat_Creek_California_08252018_16bit.tif
+  base: hub
+  auth: none
+  # The layer panel is hidden in split mode: turn the split off to show it
+  waitFor: { selector: "[aria-label='View']", networkIdle: true, extraMs: 2500 }
+  actions:
+    - click: "role=button[name='Compare georasters side by side']"
+    - wait: ".raster-opacity-panel"
+    - wait: 1500
+  highlight: ".raster-opacity-panel"
+  crop: null
+  blocked: null
+
+- id: viewing/map-views--save-prompt
+  type: screenshot
+  alt: The Save view window, which asks for the name of the view
+  page: hub-guide/viewing/map-views
+  # park-1.tif with park-2.tif added (the address Compare in Map opens); the prompt is not confirmed
+  url: /r/acme-surveys/sheffield-park/view/cGFyay0xLnRpZg==/map?add=cGFyay0yLnRpZg
+  base: hub
+  auth: demo
+  waitFor: { selector: "[aria-label='View'] >> role=button[name='Save']", networkIdle: true, extraMs: 2500 }
+  actions:
+    - click: "[aria-label='View'] >> role=button[name='Save']"
+    - wait: "[role='dialog'] input"
+  highlight: null
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: viewing/map-views--view-bar
+  type: screenshot
+  alt: The bar above the map of a saved view with its name, Unsaved changes after a change of opacity, Save and Save as new
+  page: hub-guide/viewing/map-views
+  # Opens the view saved by the clip viewing/map-views--add-save from the tree, in the tab that opens
+  url: /r/acme-surveys/sheffield-park
+  base: hub
+  auth: demo
+  waitFor: { selector: "[aria-label='Saved views']", networkIdle: true, extraMs: 1000 }
+  actions:
+    - rightClick: "[aria-label='Saved views'] >> text=Park 1 and 2"
+    - click: { selector: "role=menuitem[name='Open']", popup: true }
+    - wait: "[aria-label='Map'] canvas"
+    - wait: 2000
+    # The saved view has the split on, which hides the layer panel: turn it off, then change an opacity
+    - click: "role=button[name='Compare georasters side by side']"
+    - wait: ".raster-opacity-panel"
+    - drag: { selector: "[aria-label^='Opacity of'] >> nth=0", from: [0.95, 0.5], to: [0.4, 0.5] }
+    - wait: "text=Unsaved changes"
+  highlight: "[aria-label='View']"
+  crop: null
+  blocked: null
+
+- id: viewing/map-views--tree-menu
+  type: screenshot
+  alt: A saved view under Views in the folder tree of a dataset, with its context menu
+  page: hub-guide/viewing/map-views
+  url: /r/acme-surveys/sheffield-park
+  base: hub
+  auth: demo
+  waitFor: { selector: "[aria-label='Saved views']", networkIdle: true, extraMs: 1000 }
+  actions:
+    - rightClick: "[aria-label='Saved views'] >> text=Park 1 and 2"
+    - wait: "text=Copy Link"
+  highlight: null   # the context menu opens over the list: a box would cut through it
+  crop: null
   blocked: null
 
 # ---------------------------------------------------------------- point cloud

@@ -1,0 +1,117 @@
+---
+title: "Map views & saved views"
+description: "Show up to six georasters of a dataset on one map, split them, and save the view under a name that opens from a short link."
+hub_feature: ["route:SavedView", "menu:compare-to", "menu:compare-in-map", "dataset:saved-views"]
+datasets: [odx/hat-creek]
+requires: { access: read, data: "One or more georasters in the dataset" }
+---
+
+<Clip id="viewing/map-views--add-save" />
+
+<Requires />
+
+<TryLive org="odx" ds="hat-creek"
+         compare="Airborne_thermal_infrared_mosaic_Hat_Creek_California_08242018_16bit.tif, Airborne_thermal_infrared_mosaic_Hat_Creek_California_08252018_16bit.tif"
+         hint="The map opens with the two thermal mosaics side by side. Drag the divider." />
+
+## When to use it
+
+Use a map view to show several georasters of a dataset on one map, from any folder: the flights
+of a site over a season, an orthophoto over its elevation model. Users with write access save the
+view in the dataset. Everyone who can open the dataset opens it again from a short link.
+
+A saved view keeps the layers and their order, the opacity, the eye and the Plant Health
+settings of each layer, the split, the map position, the basemap and the elevation model.
+
+## Steps
+
+<Steps>
+
+1. Open a georaster on the [map](/hub-guide/viewing/map.mdx). To start from several, select two to
+   six georasters, right-click and select **Compare in Map**: the map opens in a new tab with the
+   rasters side by side. With one georaster, **Compare to...** opens the map and the file picker.
+
+   <Screenshot id="viewing/map-views--compare-menu" />
+
+2. Click **Add layer** in the layer panel at the bottom of the map. Select a georaster in any
+   folder of the dataset. It goes on top of the others.
+
+   <Screenshot id="viewing/map-views--picker" />
+
+3. Set the opacity of each layer, hide it with its eye, or change the order with **Move layer up**
+   and **Move layer down**. From two rasters, the split button puts them side by side. Drag a
+   divider to swipe.
+
+   <Screenshot id="viewing/map-views--layers" />
+
+4. Users with write access click **Save** in the bar above the map and type a **Name**. The
+   address of the page becomes the link of the saved view.
+
+   <Screenshot id="viewing/map-views--save-prompt" />
+
+5. After a later change, the bar shows **Unsaved changes**. **Save** replaces the saved view.
+   **Save as new** keeps it and saves your version under a new name.
+
+   <Screenshot id="viewing/map-views--view-bar" />
+
+6. Click **Copy link** to share the view. See [Share links & embeds](/hub-guide/sharing/links-embeds.mdx).
+
+</Steps>
+
+## Options
+
+### The layer panel
+
+| Control | What it does |
+|---|---|
+| Eye | Hides a layer or shows it again. |
+| Opacity slider | The opacity of one layer. |
+| **Plant Health** | Opens [Plant health](/hub-guide/analyse/plant-health.mdx) for a raster with two or more bands. |
+| **Move layer up** / **Move layer down** | Changes the order of the layers. |
+| **Remove layer** | Takes a layer off the map. This works while two or more layers remain. If you remove the file the view was opened on, the next layer takes its place. |
+| **Pick another raster** | Shows on a layer whose file is missing. Select a new file. |
+| **Add layer** | Adds a georaster of the dataset on top. The split stays as it is. |
+| **Layers (n)** | On a phone, the panel folds to this line. |
+
+The tools of the map work on every view: **Stockpile Volume** and **Raster Analysis**, with an
+**Elevation model** selector when the view has two or more elevation models. They are off while
+the map is split. See [Stockpile volume](/hub-guide/analyse/stockpile.mdx).
+
+### Saved views in the dataset
+
+The folder tree of the dataset lists the saved views under **Views**. Double-click one to open it
+in a new tab, or right-click it:
+
+| Action | Who | What it does |
+|---|---|---|
+| **Open** | Everyone who can open the dataset | Opens the view in a new tab. |
+| **Copy Link** | Everyone who can open the dataset | Copies the link of the saved view. |
+| **Rename** | Users with write access | Changes the name. |
+| **Delete** | Users with write access | Deletes the view. Its links stop working. The files are not deleted. |
+
+<Screenshot id="viewing/map-views--tree-menu" />
+
+The details panel of a georaster lists the saved views that use it under **Used in views**.
+
+## Limits & requirements
+
+- A view has at most 6 rasters, all from the same dataset. A dataset holds at most 100 saved
+  views. A view that is too large to save needs fewer layers or no Plant Health settings.
+- Only users with write access save, rename and delete. Others can change a view in the browser,
+  but not save it.
+- A reload keeps the changes you have not saved, in the same tab. A link never holds them. **Copy
+  link** gives the saved view, or the file, and says **Save the view to share your changes.**
+- If a file of a saved view is deleted or moved, its row says what happened. Use **Pick another
+  raster** or **Remove layer**. A file that changed after the save shows **Changed since this view
+  was saved**.
+- If someone saved the view after you opened it, **Save** asks whether to overwrite their changes
+  or to save yours as a new view.
+- A link with **Viewer only** hides the bar and every control that saves, adds or removes.
+- [Measurements](/hub-guide/measure/map.mdx) and stockpiles keep their own files and their own
+  **Save**, not the saved view.
+
+## Related
+
+- [Compare layers (split / swipe)](/hub-guide/analyse/compare-layers.mdx)
+- [Plant health](/hub-guide/analyse/plant-health.mdx)
+- [Share links & embeds](/hub-guide/sharing/links-embeds.mdx)

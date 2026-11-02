@@ -3,9 +3,8 @@
 # Demo inputs (reset-demo.mjs) for the shots with `auth: demo`, in the org acme-surveys:
 # - dataset `sheffield-park` (shared with measure.yaml): the orthophotos of odm/sheffield-park-1
 #   and odm/sheffield-park-2 as `park-1.tif` and `park-2.tif`, built.
-# - the clip analyse/compare-view--compare-to-add-save saves the comparison "Park 1 and 2" of
-#   park-1.tif and park-2.tif (the dataset meta list `comparisons`); the saved-list shot shows it,
-#   so capture the two together, the clip first (--only analyse/compare-view).
+# - the shots of the map views (viewing/map-views--*, viewing.yaml) save the view "Park 1 and 2" of
+#   park-1.tif and park-2.tif in this dataset.
 #
 # Public data: odx/micasense (6-band orthophoto and odm_dem/dsm.tif), odx/hat-creek (two thermal
 # mosaics of 24 and 25 August 2018 at the root of the dataset), odm/caliterra (odm_dem/dsm.tif, a
@@ -13,10 +12,6 @@
 # pile next to the culverts (the debris pile near the excavator is on interpolated DSM and cannot
 # be detected; Detect all does not find the sand pile). A click on it detects it on its slope and
 # opens it on Best-fit plane; the draw shot draws a polygon around the same pile.
-#
-# The compare URLs use base64url of the paths (no padding):
-#   08242018 mosaic: QWlyYm9ybmVfdGhlcm1hbF9pbmZyYXJlZF9tb3NhaWNfSGF0X0NyZWVrX0NhbGlmb3JuaWFfMDgyNDIwMThfMTZiaXQudGlm
-#   08252018 mosaic: QWlyYm9ybmVfdGhlcm1hbF9pbmZyYXJlZF9tb3NhaWNfSGF0X0NyZWVrX0NhbGlmb3JuaWFfMDgyNTIwMThfMTZiaXQudGlm
 
 # ---- Colormaps, bands & histogram ------------------------------------------------------------
 
@@ -157,93 +152,6 @@
     - click: "[aria-label='Compare georasters side by side']"
     - wait: 2500
   highlight: "[aria-label='Compare georasters side by side']"
-  crop: null
-  blocked: null
-
-# ---- Compare view ---------------------------------------------------------------------------
-
-- id: analyse/compare-view--compare-to-add-save
-  type: clip
-  alt: A second orthophoto added to the compare view, the divider dragged, the comparison saved
-  page: hub-guide/analyse/compare-view
-  # Compare to... opens the compare view in a new tab, which a clip cannot follow: the clip starts
-  # where that tab starts, on park-1.tif with the Add raster to compare dialog open (pick=1)
-  url: /r/acme-surveys/sheffield-park/compare?p=cGFyay0xLnRpZg&pick=1
-  base: hub
-  auth: demo
-  waitFor: { selector: "text=Add raster to compare", networkIdle: true, extraMs: 1500 }
-  actions:
-    - click: "[role='dialog'] >> text=park-2.tif"
-    - click: "[role='dialog'] >> text=Confirm"
-    - wait: 2500
-    - drag: { from: [960, 700], to: [700, 700] }   # the divider (1920x1200 clip viewport)
-    - wait: 1000
-    - click: "role=button[name='Save']"
-    - fill: { selector: "[role='dialog'] input", value: Park 1 and 2 }
-    - press: Enter
-    - wait: 1500
-  highlight: null
-  crop: null
-  maxSeconds: 30
-  blocked: null
-  youtubeId: null
-
-- id: analyse/compare-view--menu
-  type: screenshot
-  alt: Compare in Map in the context menu of two selected georasters
-  page: hub-guide/analyse/compare-view
-  url: /r/odx/hat-creek
-  base: hub
-  auth: none
-  waitFor: { selector: "text=Airborne_thermal_infrared_mosaic_Hat_Creek_California_08242018_16bit.tif", networkIdle: true, extraMs: 1000 }
-  actions:
-    # the tiles of the file list (a click on the long names of the folder tree scrolls it sideways)
-    - click: "[role='option'][title*='08242018_16bit.tif']"
-    - click: { selector: "[role='option'][title*='08252018_16bit.tif']", modifiers: [Control] }
-    - rightClick: "[role='option'][title*='08252018_16bit.tif']"
-    - wait: "text=Compare in Map"
-  highlight: "text=Compare in Map"
-  crop: null
-  blocked: null
-
-- id: analyse/compare-view--picker
-  type: screenshot
-  alt: The Add raster to compare dialog of the compare view
-  page: hub-guide/analyse/compare-view
-  url: /r/odx/hat-creek/compare?p=QWlyYm9ybmVfdGhlcm1hbF9pbmZyYXJlZF9tb3NhaWNfSGF0X0NyZWVrX0NhbGlmb3JuaWFfMDgyNDIwMThfMTZiaXQudGlm&pick=1
-  base: hub
-  auth: none
-  waitFor: { selector: "text=Add raster to compare", networkIdle: true, extraMs: 1000 }
-  actions: []
-  highlight: null
-  crop: "[role='dialog']"
-  blocked: null
-
-- id: analyse/compare-view--bar
-  type: screenshot
-  alt: The compare view with two thermal mosaics side by side and the compare bar
-  page: hub-guide/analyse/compare-view
-  url: /r/odx/hat-creek/compare?p=QWlyYm9ybmVfdGhlcm1hbF9pbmZyYXJlZF9tb3NhaWNfSGF0X0NyZWVrX0NhbGlmb3JuaWFfMDgyNDIwMThfMTZiaXQudGlm&p=QWlyYm9ybmVfdGhlcm1hbF9pbmZyYXJlZF9tb3NhaWNfSGF0X0NyZWVrX0NhbGlmb3JuaWFfMDgyNTIwMThfMTZiaXQudGlm
-  base: hub
-  auth: none
-  waitFor: { selector: "[aria-label='Comparison']", networkIdle: true, extraMs: 2500 }
-  actions: []
-  highlight: "[aria-label='Comparison']"
-  crop: null
-  blocked: null
-
-- id: analyse/compare-view--saved-list
-  type: screenshot
-  alt: A saved comparison under the folder tree of a dataset, with its context menu
-  page: hub-guide/analyse/compare-view
-  url: /r/acme-surveys/sheffield-park
-  base: hub
-  auth: demo
-  waitFor: { selector: "[aria-label='Saved comparisons']", networkIdle: true, extraMs: 1000 }
-  actions:
-    - rightClick: "[aria-label='Saved comparisons'] >> text=Park 1 and 2"
-    - wait: "text=Copy Link"
-  highlight: null   # the context menu opens over the list: a box would cut through it
   crop: null
   blocked: null
 
@@ -488,20 +396,20 @@
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
-    # The sand pile next to the culverts (30.170892, -98.090734) is at (821, 741) in the default
+    # The sand pile next to the culverts (30.170892, -98.090734) is at (821, 765) in the default
     # view of the clip (1920×1200): three double clicks there zoom in 8 times around it, and it is
-    # then at (823, 751)
-    - mouse: { dblclick: [821, 741] }
+    # then at (823, 775)
+    - mouse: { dblclick: [821, 765] }
     - wait: 1200
-    - mouse: { dblclick: [821, 741] }
+    - mouse: { dblclick: [821, 765] }
     - wait: 1200
-    - mouse: { dblclick: [821, 741] }
+    - mouse: { dblclick: [821, 765] }
     - wait: 2000
     - click: "[aria-label='Stockpile Volume']"
     - wait: 1500
     - click: "button[title='Click on the map to detect a pile at that point']"
     - wait: 1000                                # a map click right after the button is not taken as a detection
-    - mouse: { click: [823, 751] }              # the sand pile: about 6.8 m³ and 15 m², on a Best-fit plane
+    - mouse: { click: [823, 775] }              # the sand pile: about 6.8 m³ and 15 m², on a Best-fit plane
     - wait: "text=Net volume"
     - select: { selector: "#stockpile-volume-panel-material", value: gravel }
     - wait: 1500
@@ -535,19 +443,19 @@
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
-    # The sand pile next to the culverts (30.170892, -98.090734) is at (581, 590) in the default
-    # view: three double clicks there zoom in 8 times around it, and it is then at (583, 600)
-    - mouse: { dblclick: [581, 590] }
+    # The sand pile next to the culverts (30.170892, -98.090734) is at (581, 614) in the default
+    # view: three double clicks there zoom in 8 times around it, and it is then at (583, 624)
+    - mouse: { dblclick: [581, 614] }
     - wait: 1200
-    - mouse: { dblclick: [581, 590] }
+    - mouse: { dblclick: [581, 614] }
     - wait: 1200
-    - mouse: { dblclick: [581, 590] }
+    - mouse: { dblclick: [581, 614] }
     - wait: 2000
     - click: "[aria-label='Stockpile Volume']"
     - wait: 1500
     - click: "button[title='Click on the map to detect a pile at that point']"
     - wait: 1000                                # a map click right after the button is not taken as a detection
-    - mouse: { click: [583, 600] }              # the sand pile: about 6.8 m³ and 15 m², on a Best-fit plane
+    - mouse: { click: [583, 624] }              # the sand pile: about 6.8 m³ and 15 m², on a Best-fit plane
     - wait: "text=Net volume"
   highlight: "button[title='Click on the map to detect a pile at that point']"
   crop: null
@@ -563,29 +471,29 @@
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
     # The sand pile next to the culverts (centre 30.170892, -98.090734, about 7 m across) is at
-    # (581, 590) in the default view: three double clicks there zoom in 8 times around it
-    - mouse: { dblclick: [581, 590] }
+    # (581, 614) in the default view: three double clicks there zoom in 8 times around it
+    - mouse: { dblclick: [581, 614] }
     - wait: 1200
-    - mouse: { dblclick: [581, 590] }
+    - mouse: { dblclick: [581, 614] }
     - wait: 1200
-    - mouse: { dblclick: [581, 590] }
+    - mouse: { dblclick: [581, 614] }
     - wait: 2000
     - click: "[aria-label='Stockpile Volume']"
     - select: { selector: "#stockpile-volume-panel-base-plane-method", value: best_fit }   # the pile is on a slope
     - click: "[data-testid='stockpile-draw-btn']"
     # the 12 points of /mnt/data/docs-capture/inputs/caliterra-sand-pile-polygon.json (radius 3.5 m)
-    - mouse: { click: [657, 600] }
-    - mouse: { click: [647, 563] }
-    - mouse: { click: [620, 536] }
-    - mouse: { click: [584, 526] }
-    - mouse: { click: [547, 535] }
-    - mouse: { click: [519, 562] }
-    - mouse: { click: [509, 599] }
-    - mouse: { click: [519, 636] }
-    - mouse: { click: [546, 664] }
-    - mouse: { click: [582, 674] }
-    - mouse: { click: [619, 664] }
-    - mouse: { dblclick: [647, 637] }   # a double click finishes the polygon
+    - mouse: { click: [657, 624] }
+    - mouse: { click: [647, 587] }
+    - mouse: { click: [620, 560] }
+    - mouse: { click: [584, 550] }
+    - mouse: { click: [547, 559] }
+    - mouse: { click: [519, 586] }
+    - mouse: { click: [509, 623] }
+    - mouse: { click: [519, 660] }
+    - mouse: { click: [546, 688] }
+    - mouse: { click: [582, 698] }
+    - mouse: { click: [619, 688] }
+    - mouse: { dblclick: [647, 661] }   # a double click finishes the polygon
     - wait: "text=Net volume"
     - wait: 1500
   highlight: "[data-testid='stockpile-draw-btn']"
@@ -601,19 +509,19 @@
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
-    # The sand pile next to the culverts (30.170892, -98.090734) is at (581, 590) in the default
-    # view: three double clicks there zoom in 8 times around it, and it is then at (583, 600)
-    - mouse: { dblclick: [581, 590] }
+    # The sand pile next to the culverts (30.170892, -98.090734) is at (581, 614) in the default
+    # view: three double clicks there zoom in 8 times around it, and it is then at (583, 624)
+    - mouse: { dblclick: [581, 614] }
     - wait: 1200
-    - mouse: { dblclick: [581, 590] }
+    - mouse: { dblclick: [581, 614] }
     - wait: 1200
-    - mouse: { dblclick: [581, 590] }
+    - mouse: { dblclick: [581, 614] }
     - wait: 2000
     - click: "[aria-label='Stockpile Volume']"
     - wait: 1500
     - click: "button[title='Click on the map to detect a pile at that point']"
     - wait: 1000                                # a map click right after the button is not taken as a detection
-    - mouse: { click: [583, 600] }              # the sand pile: about 6.8 m³ and 15 m², on a Best-fit plane
+    - mouse: { click: [583, 624] }              # the sand pile: about 6.8 m³ and 15 m², on a Best-fit plane
     - wait: "text=Net volume"
     - select: { selector: "#stockpile-volume-panel-material", value: gravel }
     - wait: "text=Est. cost"
@@ -625,25 +533,30 @@
   type: screenshot
   alt: The orthophoto of a site added as a layer over its DSM, with a pile detected on the DSM and its outline on the map
   page: hub-guide/analyse/stockpile
-  # The orthophoto is the layer added over the DSM: the Hub keeps it in the `layer` value of the URL
-  # (base64url of its path), and its opacity is 100%. The map still opens on the extent of the DSM,
-  # so the sand pile is at the same place as in analyse/stockpile--detect.
-  url: /r/odm/caliterra/view/b2RtX2RlbS9kc20udGlm/map?layer=b2RtX29ydGhvcGhvdG8vb2RtX29ydGhvcGhvdG8udGlm
+  # The orthophoto is the layer added over the DSM with Add layer, as a user does: the picker takes
+  # the path typed in Selected file. The layer goes on top at 100% opacity and the split stays off.
+  # The map still fits the DSM, so the sand pile is at the same place as in analyse/stockpile--detect
+  # (the bar above the map of a view moves the map area down: check the clicks).
+  url: /r/odm/caliterra/view/b2RtX2RlbS9kc20udGlm/map
   base: hub
   auth: none
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 2500 }
   actions:
-    - mouse: { dblclick: [581, 590] }
+    - click: "role=button[name='Add layer']"
+    - fill: { selector: "[aria-label='Selected file']", value: odm_orthophoto/odm_orthophoto.tif }
+    - click: "[role='dialog'] >> role=button[name='Confirm']"
+    - wait: 2500
+    - mouse: { dblclick: [581, 614] }
     - wait: 1200
-    - mouse: { dblclick: [581, 590] }
+    - mouse: { dblclick: [581, 614] }
     - wait: 1200
-    - mouse: { dblclick: [581, 590] }
+    - mouse: { dblclick: [581, 614] }
     - wait: 2000
     - click: "[aria-label='Stockpile Volume']"
     - wait: 1500
     - click: "button[title='Click on the map to detect a pile at that point']"
     - wait: 1000                                # a map click right after the button is not taken as a detection
-    - mouse: { click: [583, 600] }              # the sand pile: about 6.8 m³ and 15 m², on a Best-fit plane
+    - mouse: { click: [583, 624] }              # the sand pile: about 6.8 m³ and 15 m², on a Best-fit plane
     - wait: "text=Net volume"
     - wait: 1500
   highlight: null

@@ -273,7 +273,7 @@
 
 - id: processing/mask-borders--before-after
   type: screenshot
-  alt: An orthophoto with a black border next to its masked copy, whose border is transparent, in the compare view
+  alt: An orthophoto with a black border next to its masked copy, whose border is transparent, side by side on the map
   page: hub-guide/processing/mask-borders
   open:
     org: acme-surveys

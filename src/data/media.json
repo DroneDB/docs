@@ -99,15 +99,15 @@
   },
   "analyse/area-statistics--area": {
     "type": "screenshot",
-    "width": 2160,
-    "height": 1350,
+    "width": 2448,
+    "height": 1530,
     "alt": "A rectangle drawn on a DSM with Area, and its minimum, maximum, mean, median, standard deviation and pixel count in the Raster Analysis panel",
     "youtubeId": null
   },
   "analyse/area-statistics--value-range": {
     "type": "screenshot",
-    "width": 2160,
-    "height": 1350,
+    "width": 2448,
+    "height": 1530,
     "alt": "The value range of a DSM and the value of a point read with Inspect, kept in the panel with its latitude and longitude",
     "youtubeId": null
   },
@@ -127,8 +127,8 @@
   },
   "analyse/colormaps--colormap-dropdown": {
     "type": "screenshot",
-    "width": 2448,
-    "height": 1530,
+    "width": 2880,
+    "height": 1800,
     "alt": "The colormaps of a single-band elevation raster in the Raster Analysis panel",
     "youtubeId": null
   },
@@ -160,41 +160,6 @@
     "alt": "Two thermal mosaics split side by side, the divider dragged across the map",
     "youtubeId": null
   },
-  "analyse/compare-view--bar": {
-    "type": "screenshot",
-    "width": 1728,
-    "height": 1080,
-    "alt": "The compare view with two thermal mosaics side by side and the compare bar",
-    "youtubeId": null
-  },
-  "analyse/compare-view--compare-to-add-save": {
-    "type": "clip",
-    "width": 1920,
-    "height": 1200,
-    "alt": "A second orthophoto added to the compare view, the divider dragged, the comparison saved",
-    "youtubeId": null
-  },
-  "analyse/compare-view--menu": {
-    "type": "screenshot",
-    "width": 2880,
-    "height": 1800,
-    "alt": "Compare in Map in the context menu of two selected georasters",
-    "youtubeId": null
-  },
-  "analyse/compare-view--picker": {
-    "type": "screenshot",
-    "width": 2352,
-    "height": 1216,
-    "alt": "The Add raster to compare dialog of the compare view",
-    "youtubeId": null
-  },
-  "analyse/compare-view--saved-list": {
-    "type": "screenshot",
-    "width": 2880,
-    "height": 1800,
-    "alt": "A saved comparison under the folder tree of a dataset, with its context menu",
-    "youtubeId": null
-  },
   "analyse/contours--dialog": {
     "type": "screenshot",
     "width": 968,
@@ -204,8 +169,8 @@
   },
   "analyse/contours--generate": {
     "type": "clip",
-    "width": 1440,
-    "height": 900,
+    "width": 1632,
+    "height": 1020,
     "alt": "Contour lines generated from a DSM every metre",
     "youtubeId": null
   },
@@ -232,8 +197,8 @@
   },
   "analyse/elevation-profile--panel": {
     "type": "screenshot",
-    "width": 2160,
-    "height": 1350,
+    "width": 2448,
+    "height": 1530,
     "alt": "The Raster Analysis panel of a DSM with the Profile button",
     "youtubeId": null
   },
@@ -253,8 +218,8 @@
   },
   "analyse/plant-health--ndvi": {
     "type": "screenshot",
-    "width": 1440,
-    "height": 900,
+    "width": 1728,
+    "height": 1080,
     "alt": "NDVI of a multispectral orthophoto with the Plant Health panel",
     "youtubeId": null
   },
@@ -309,8 +274,8 @@
   },
   "analyse/stockpile--panel": {
     "type": "screenshot",
-    "width": 2160,
-    "height": 1350,
+    "width": 2448,
+    "height": 1530,
     "alt": "The Stockpile Volume panel open on a DSM",
     "youtubeId": null
   },
@@ -771,15 +736,15 @@
   },
   "measure/map--area": {
     "type": "screenshot",
-    "width": 1928,
-    "height": 1206,
+    "width": 2160,
+    "height": 1350,
     "alt": "An area drawn on an orthophoto, with its size in the polygon",
     "youtubeId": null
   },
   "measure/map--export": {
     "type": "screenshot",
-    "width": 1928,
-    "height": 1206,
+    "width": 2160,
+    "height": 1350,
     "alt": "The second row of the measure toolbar with Export Measurements as GeoJSON and Export Measurements as CSV",
     "youtubeId": null
   },
@@ -806,8 +771,8 @@
   },
   "measure/map--toolbar": {
     "type": "screenshot",
-    "width": 1928,
-    "height": 1206,
+    "width": 2160,
+    "height": 1350,
     "alt": "The measure toolbar on an orthophoto with its two saved measurements",
     "youtubeId": null
   },
@@ -883,8 +848,8 @@
   },
   "processing/export-raster--formula": {
     "type": "screenshot",
-    "width": 1440,
-    "height": 900,
+    "width": 1728,
+    "height": 1080,
     "alt": "NDVI with a colormap in the Plant Health panel, ready to export",
     "youtubeId": null
   },
@@ -899,7 +864,7 @@
     "type": "screenshot",
     "width": 1928,
     "height": 1206,
-    "alt": "An orthophoto with a black border next to its masked copy, whose border is transparent, in the compare view",
+    "alt": "An orthophoto with a black border next to its masked copy, whose border is transparent, side by side on the map",
     "youtubeId": null
   },
   "processing/mask-borders--dialog": {
@@ -1095,7 +1060,7 @@
     "type": "screenshot",
     "width": 1928,
     "height": 1206,
-    "alt": "The Copy link panel of the map, with the link that includes the added orthophoto and the Viewer only box checked",
+    "alt": "The Copy link panel of the map, with the link of a saved view and the Viewer only box checked",
     "youtubeId": null
   },
   "sharing/links-embeds--embed-code": {
@@ -1257,6 +1222,55 @@
     "width": 1286,
     "height": 804,
     "alt": "Zooming into the odm/zoo orthophoto and dragging the opacity slider",
+    "youtubeId": null
+  },
+  "viewing/map-views--add-save": {
+    "type": "clip",
+    "width": 1920,
+    "height": 1200,
+    "alt": "A second orthophoto added to the map, the divider dragged, the view saved under a name",
+    "youtubeId": null
+  },
+  "viewing/map-views--compare-menu": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "Compare in Map in the context menu of two selected georasters",
+    "youtubeId": null
+  },
+  "viewing/map-views--layers": {
+    "type": "screenshot",
+    "width": 1728,
+    "height": 1080,
+    "alt": "The map with two thermal mosaics, one over the other, and the layer panel with the eye, opacity and order of each layer",
+    "youtubeId": null
+  },
+  "viewing/map-views--picker": {
+    "type": "screenshot",
+    "width": 2352,
+    "height": 1108,
+    "alt": "The Add layer window with the georasters of a dataset",
+    "youtubeId": null
+  },
+  "viewing/map-views--save-prompt": {
+    "type": "screenshot",
+    "width": 668,
+    "height": 592,
+    "alt": "The Save view window, which asks for the name of the view",
+    "youtubeId": null
+  },
+  "viewing/map-views--tree-menu": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "A saved view under Views in the folder tree of a dataset, with its context menu",
+    "youtubeId": null
+  },
+  "viewing/map-views--view-bar": {
+    "type": "screenshot",
+    "width": 2160,
+    "height": 1350,
+    "alt": "The bar above the map of a saved view with its name, Unsaved changes after a change of opacity, Save and Save as new",
     "youtubeId": null
   },
   "viewing/markdown-pdf--pdf": {

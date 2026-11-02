@@ -38,6 +38,7 @@ const sidebars = {
     ]),
     category('Viewing data', [
       'hub-guide/viewing/map',
+      'hub-guide/viewing/map-views',
       'hub-guide/viewing/point-cloud',
       'hub-guide/viewing/3d-model',
       'hub-guide/viewing/3d-viewer',
@@ -57,7 +58,6 @@ const sidebars = {
     category('Analyse rasters', [
       'hub-guide/analyse/colormaps',
       'hub-guide/analyse/compare-layers',
-      'hub-guide/analyse/compare-view',
       'hub-guide/analyse/plant-health',
       'hub-guide/analyse/thermal',
       'hub-guide/analyse/elevation-profile',

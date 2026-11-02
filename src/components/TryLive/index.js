@@ -3,8 +3,8 @@ import {translate} from '@docusaurus/Translate';
 import {hubUrl} from '@site/src/lib/hub.mjs';
 import styles from './styles.module.css';
 
-// "Try it live" button: opens a public showcase dataset on DroneDB Hub. `compare` opens the
-// compare view of several rasters: an array, or the paths separated by commas.
+// "Try it live" button: opens a public showcase dataset on DroneDB Hub. `compare` opens the map
+// of several rasters, split between them: an array, or the paths separated by commas.
 export default function TryLive({org, ds, path, view, compare, hint, label = translate({id: 'component.tryLive.label', message: 'Try it live on Hub'})}) {
   const paths = typeof compare === 'string' ? compare.split(',').map(p => p.trim()) : compare;
   const href = hubUrl({org, ds, path, view, compare: paths});

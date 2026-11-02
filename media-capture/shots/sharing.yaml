@@ -176,14 +176,20 @@
 
 - id: sharing/links-embeds--copy-link
   type: screenshot
-  alt: The Copy link panel of the map, with the link that includes the added orthophoto and the Viewer only box checked
+  alt: The Copy link panel of the map, with the link of a saved view and the Viewer only box checked
   page: hub-guide/sharing/links-embeds
-  # The orthophoto is the layer added over the DSM (the `layer` value of the URL, base64url of its path).
-  url: /r/odm/caliterra/view/b2RtX2RlbS9kc20udGlm/map?layer=b2RtX29ydGhvcGhvdG8vb2RtX29ydGhvcGhvdG8udGlm
+  # Saves a view of orthophoto.tif in share-demo (the dataset meta list `views`; the demo reset removes
+  # it), then opens Copy link on it. The address becomes the link of the saved view, which the panel shows.
+  url: /r/acme-surveys/share-demo/view/b3J0aG9waG90by50aWY=/map
   base: hub
-  auth: none
+  auth: demo
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 2000 }
   actions:
+    - click: "[aria-label='View'] >> role=button[name='Save']"
+    - fill: { selector: "[role='dialog'] input", value: Shared orthophoto }
+    - click: "[role='dialog'] >> role=button[name='Save']"
+    - wait: "[aria-label='View'] >> text=Shared orthophoto"
+    - wait: 1500
     - click: "role=button[name='Copy link']"
     - wait: "text=Viewer only"
     - click: "text=Viewer only"

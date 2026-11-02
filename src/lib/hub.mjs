@@ -14,24 +14,26 @@ export function encodePath(path) {
   return btoa(binary);
 }
 
-/** URL-safe base64 without padding, as the Hub encodes compare paths (b64urlEncode). */
+/** URL-safe base64 without padding, as the Hub encodes the paths of the `add` values (b64urlEncode). */
 export function encodePathUrlSafe(path) {
   return encodePath(path).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
 /**
- * URL of a dataset, of one file in one of its views, or of the compare view of 2 or more
- * rasters (`compare`: dataset-relative paths, leftmost first; the Hub's compareUrl).
+ * URL of a dataset, of one file in one of its views, or of the map of 2 or more rasters
+ * (`compare`: dataset-relative paths; the map of the first one, with the others as `add` values,
+ * which opens the map viewer with the split on).
  */
 export function hubUrl({org, ds, path, view, compare, embed = false, base = HUB_URL}) {
   if (!org) return base;
   let url = `${base}/r/${encodeURIComponent(org)}`;
   if (ds) url += `/${encodeURIComponent(ds)}`;
   if (ds && compare) {
+    const [first, ...others] = compare;
     const query = new URLSearchParams();
-    compare.forEach(p => query.append('p', encodePathUrlSafe(p)));
-    url += `/compare?${query}`;
-    return embed ? `${url}&embed=1` : url;
+    others.forEach(p => query.append('add', encodePathUrlSafe(p)));
+    if (embed) query.append('embed', '1');
+    return `${url}/view/${encodePath(first)}/map?${query}`;
   }
   if (ds && path && view) {
     if (!HUB_VIEWS.includes(view)) throw new Error(`Unknown Hub view "${view}"`);
