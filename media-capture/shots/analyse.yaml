@@ -621,6 +621,35 @@
   crop: null
   blocked: null
 
+- id: analyse/stockpile--ortho-under-dsm
+  type: screenshot
+  alt: The orthophoto of a site added as a layer over its DSM, with a pile detected on the DSM and its outline on the map
+  page: hub-guide/analyse/stockpile
+  # The orthophoto is the layer added over the DSM: the Hub keeps it in the `layer` value of the URL
+  # (base64url of its path), and its opacity is 100%. The map still opens on the extent of the DSM,
+  # so the sand pile is at the same place as in analyse/stockpile--detect.
+  url: /r/odm/caliterra/view/b2RtX2RlbS9kc20udGlm/map?layer=b2RtX29ydGhvcGhvdG8vb2RtX29ydGhvcGhvdG8udGlm
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 2500 }
+  actions:
+    - mouse: { dblclick: [581, 590] }
+    - wait: 1200
+    - mouse: { dblclick: [581, 590] }
+    - wait: 1200
+    - mouse: { dblclick: [581, 590] }
+    - wait: 2000
+    - click: "[aria-label='Stockpile Volume']"
+    - wait: 1500
+    - click: "button[title='Click on the map to detect a pile at that point']"
+    - wait: 1000                                # a map click right after the button is not taken as a detection
+    - mouse: { click: [583, 600] }              # the sand pile: about 6.8 m³ and 15 m², on a Best-fit plane
+    - wait: "text=Net volume"
+    - wait: 1500
+  highlight: null
+  crop: null
+  blocked: null
+
 - id: analyse/stockpile--base-methods
   type: screenshot
   alt: The Base plane methods dialog of the stockpile panel

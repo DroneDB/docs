@@ -59,8 +59,9 @@ the mean height of one part of a site.
 
 ## Limits & requirements
 
-- **Raster Analysis** shows when the map has exactly one raster with one band, or one thermal
-  raster.
+- **Raster Analysis** shows when the map has a raster with one band, or a thermal raster. With
+  two or more, an **Elevation model** selector sets the one it works on. It is not available
+  while the map is split.
 - One map tool works at a time: **Area**, **Inspect** or **Profile**. A new one stops the other.
   The measure toolbar waits while you draw the rectangle.
 - Pixels with the nodata value of the band do not count in **Area Statistics**. A rectangle with only

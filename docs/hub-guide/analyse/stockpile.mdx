@@ -50,6 +50,28 @@ also gives the weight and the cost of the pile.
 
 </Steps>
 
+## See the pile on an orthophoto
+
+Add the orthophoto as a layer to see the pile as in a photo.
+
+<Steps>
+
+1. Open the DSM on the map. Click **Add layer** in the opacity control at the bottom.
+
+2. Select the orthophoto in any folder. It goes on top of the DSM. You can add up to 3 layers. **Remove layer** takes one off.
+
+   <Screenshot id="analyse/stockpile--ortho-under-dsm" />
+
+</Steps>
+
+With two or more elevation models on the map, **Stockpile Volume** shows an **Elevation model**
+selector. At first it uses the model of the measurements, or else the top one. Hub saves a pile with
+the model you select. If you select another model with unsaved measurements, Hub asks **Discard the
+unsaved measurements of …?**.
+
+An opaque orthophoto on top hides the **Raster Analysis** colours of the DSM below it. Hide it with its
+eye in the layer panel, or lower its opacity. The volume does not depend on the other layers.
+
 ## Options
 
 | Option | What it does | Default |
@@ -94,7 +116,9 @@ material it was weighed with.
 
 ## Limits & requirements
 
-- **Stockpile Volume** shows when the map has exactly one raster with one band.
+- **Stockpile Volume** shows when the map has a raster with one band. It is off while the map is split,
+  and the [compare view](/hub-guide/analyse/compare-view.mdx) does not have it.
+- The address of the page keeps the added layers, not their opacity, order or eye.
 - **Edit materials…** needs a signed-in account.
 - Saving the pile needs write access to the dataset.
 - Hub detects one pile for each click.

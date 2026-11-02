@@ -28,8 +28,8 @@ of each other and change their opacity.
    all the files of the folder that have a location.
 
 2. With two or more rasters, the layer opacity panel shows at the bottom. Drag the slider of a
-   layer to change its opacity. Use **Move layer up** and **Move layer down** to change which
-   raster is on top.
+   layer to change its opacity. Use the eye of a layer to hide it and show it again, and **Move
+   layer up** and **Move layer down** to change which raster is on top.
 
    <Screenshot id="analyse/compare-layers--opacity-panel" />
 
@@ -50,7 +50,9 @@ of each other and change their opacity.
 | Control | What it does |
 |---|---|
 | Opacity slider | The opacity of one raster, from 0% to 100%. With one raster on the map, there is one slider. |
+| Eye | Hides a layer or shows it again. Its opacity stays the same. |
 | **Move layer up** / **Move layer down** | Changes the order of the rasters. |
+| **Add layer** | On the map of a single georaster: adds another georaster of the dataset as a layer, up to 3. **Remove layer** takes it off. See [Stockpile volume](/hub-guide/analyse/stockpile.mdx). |
 | **Plant Health** | Opens [Plant health](/hub-guide/analyse/plant-health.mdx) for a raster with two or more bands. |
 | **Compare georasters side by side** | Splits the map into one band for each raster, with equal widths. |
 | Divider | Drag it to change the width of the bands next to it. |
@@ -62,7 +64,10 @@ of each other and change their opacity.
 - The compare button shows on the **Map** tab of a dataset, when the map shows a raster.
 - The map compares the rasters of the folder on show. To compare rasters from different folders,
   to save a comparison or to share it as a link, use the [compare view](/hub-guide/analyse/compare-view.mdx).
-- **Raster Analysis** and **Stockpile Volume** need exactly one raster on the map.
+- **Raster Analysis** and **Stockpile Volume** work with several rasters on the map. With two or
+  more elevation models, an **Elevation model** selector sets the one they work on. They are not
+  available while the map is split, and the compare view does not have them. An opaque raster on
+  top hides the colours of **Raster Analysis** on the raster below it: hide it with its eye.
 
 ## Related
 

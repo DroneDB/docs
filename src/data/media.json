@@ -300,6 +300,13 @@
     "alt": "The weight and the estimated cost of a pile of gravel",
     "youtubeId": null
   },
+  "analyse/stockpile--ortho-under-dsm": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The orthophoto of a site added as a layer over its DSM, with a pile detected on the DSM and its outline on the map",
+    "youtubeId": null
+  },
   "analyse/stockpile--panel": {
     "type": "screenshot",
     "width": 2160,
@@ -1084,6 +1091,13 @@
     "alt": "Open Share/Embed on an orthophoto, switch to Embed and copy the iframe code",
     "youtubeId": null
   },
+  "sharing/links-embeds--copy-link": {
+    "type": "screenshot",
+    "width": 1928,
+    "height": 1206,
+    "alt": "The Copy link panel of the map, with the link that includes the added orthophoto and the Viewer only box checked",
+    "youtubeId": null
+  },
   "sharing/links-embeds--embed-code": {
     "type": "screenshot",
     "width": 988,
@@ -1100,8 +1114,8 @@
   },
   "sharing/links-embeds--link": {
     "type": "screenshot",
-    "width": 988,
-    "height": 608,
+    "width": 1732,
+    "height": 716,
     "alt": "The Share / Embed window in Link mode with the Share link and its copy button",
     "youtubeId": null
   },
