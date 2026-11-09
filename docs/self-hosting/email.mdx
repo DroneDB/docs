@@ -111,7 +111,7 @@ curl -X POST https://registry.example.com/sys/email/test \
 | `502` | The server refused the e-mail or could not be reached. The `detail` gives the reply of the server, for example `The mail server smtp.example.com:587 replied 535: authentication failed`. |
 
 In the Hub, **Send me a test** on the [E-mail templates](#edit-the-build-notification-template)
-card sends a sample build notification to your own address.
+card sends a sample build or task notification to your own address.
 
 ## Health check and clients
 
@@ -204,17 +204,38 @@ Builds that Registry starts by itself (a rescan, a check of the built files) sen
 - **Where.** A build ends on the process that runs it: every processing node needs the `Smtp`
   settings.
 
+## Task notifications
+
+A user can also get one e-mail when a task they started ends: the preference `notifications.tasks`
+(**Send task notifications** in the Hub: **None**, the default, **Failed only** or **All**). What each
+choice sends is on [Build notification e-mails](/docs/hub-guide/account/build-notifications). It is a
+preference of the user, not a configuration key. The [requirements](#requirements) are the same.
+
+- Registry e-mails the user who submitted the task, when it ends **Failed** or **Succeeded**. It sends
+  one e-mail for each run, not a digest. A retry of a failed task starts a new run and a new e-mail.
+- It sends nothing for a cancelled task, for the build tool (see [Build notifications](#build-notifications)),
+  for a child task, for a task that Registry starts by itself, for a deleted dataset, for a user without an
+  address, or for a user who cannot read the dataset.
+- The e-mail shows the reason of a failure without URL query strings, credentials or the values of
+  `token`, `password`, `secret` and `key`.
+- The link opens the **Tasks** tab of the dataset (`?tab=tasks`). When the failed run had created its
+  dataset and Registry removes it, the link opens the organization.
+- The e-mail is sent by the process that ends the task: every processing node needs the `Smtp` settings.
+
 ## Edit the build notification template
 
 In the Hub, open the user menu, then **Configuration**. The **E-mail templates** card is there when
-e-mail is on. It shows the **Subject** and the **Body**, with a **Default** or **Custom** tag.
+e-mail is on. Choose the **Template**: **Build notifications** or **Task notifications**. It shows the **Subject**
+and the **Body**, with a **Default** or **Custom** tag. Below, `build-notification` is the template of the builds;
+[the template of the tasks](#the-task-notification-template) is `task-notification`.
 
 <Screenshot id="self-hosting/email--templates" />
 
 - Click a placeholder to insert it at the cursor of the field you were in. Placeholders that only
   the body can use are disabled while the cursor is in the subject.
-- **Preview** shows the text that is not saved yet with three sample builds (completed, failed,
-  waiting for files), with the real layout and branding: the subject, the HTML and the plain text.
+- **Preview** shows the text that is not saved yet with sample data (three builds for the build template,
+  a failed photogrammetry run for the task template), with the real layout and branding: the subject, the HTML and
+  the plain text.
 - **Send me a test** sends the same sample to the address of your account at once. Your account
   needs an address.
 - **Reset to default** removes the saved text, after you confirm.
@@ -293,10 +314,54 @@ A saved text that a newer Registry no longer accepts (for example with a placeho
 removed) is not used: Registry sends the built-in text, logs a warning, and the card shows the
 built-in text. Edit the text and save it again.
 
+### The task notification template
+
+The built-in text:
+
+```text title="Subject"
+{{appName}}: {{task}} {{result}}
+```
+
+```text title="Body"
+Hello {{user}},
+
+Your task "{{task}}" on {{dataset}} {{result}}.
+
+Files: {{label}}
+
+Reason: {{error}}
+
+{{datasetNote}}
+
+Duration: {{duration}}
+
+{{link}}
+
+To change which task e-mails you get, open your notification settings: {{preferencesLink}}
+```
+
+| Placeholder | Value | In the subject |
+|-------------|-------|----------------|
+| `{{appName}}` | The application name | Yes |
+| `{{user}}` | The name of the user | Yes |
+| `{{task}}` | What the task is, for example `Photogrammetry (NodeODX)` | Yes |
+| `{{label}}` | The files of the task, as the task list names them | Yes |
+| `{{dataset}}` | The dataset, as `organization/dataset` | Yes |
+| `{{result}}` | How it ended: `completed` or `failed` | Yes |
+| `{{error}}` | Why the task failed | No |
+| `{{duration}}` | How long it ran, for example `17 min 4 s` | Yes |
+| `{{datasetNote}}` | A sentence that the dataset the run created is removed, because the task failed | No |
+| `{{link}}` | A link to the **Tasks** tab of the dataset, or to the organization when the dataset is removed. Alone in its paragraph it is a button | No |
+| `{{preferencesLink}}` | A link to the notification settings of the user | No |
+
+A paragraph that uses a placeholder that has no value is left out with all its words: `{{error}}` for a task
+that completed, `{{label}}` for a task without files, `{{datasetNote}}` unless a failed run created its dataset.
+The rules of [how the text is rendered](#how-the-text-is-rendered) are the same.
+
 ### Template API
 
 The card uses these endpoints, for administrators only (`403` for other users). The template name
-is `build-notification`.
+is `build-notification` or `task-notification`.
 
 | Method | Endpoint | Body | Answer |
 |--------|----------|------|--------|
@@ -304,5 +369,5 @@ is `build-notification`.
 | GET | `/sys/email/templates/{name}` | — | `subject`, `body`, `isDefault`, `defaultSubject`, `defaultBody` and the `placeholders` (`name`, `description`, `inSubject`). `404` for an unknown name |
 | PUT | `/sys/email/templates/{name}` | `{"subject", "body"}` | Checks and saves the text; answers like GET. `400` names the problem |
 | DELETE | `/sys/email/templates/{name}` | — | Removes the saved text; answers like GET, with `isDefault: true` |
-| POST | `/sys/email/templates/{name}/preview` | `{"subject", "body"}` | The text (not saved) with the sample builds: `{"subject", "text", "html"}`. `400` names the problem |
+| POST | `/sys/email/templates/{name}/preview` | `{"subject", "body"}` | The text (not saved) with the sample builds or the sample task: `{"subject", "text", "html"}`. `400` names the problem |
 | POST | `/sys/email/templates/{name}/test` | `{"subject", "body"}` | Sends the sample to the calling administrator. Answers like [the test e-mail](#test-the-settings); `400` also when the account has no valid address |

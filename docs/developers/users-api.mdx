@@ -135,7 +135,7 @@ These act on the signed-in user.
 | Request | What it does |
 |---|---|
 | `GET /users/preferences` | The Hub preferences, one property per section (`{}` when none) |
-| `PATCH /users/preferences` | Set the sections in the JSON body and keep the others. A section set to `null` goes back to the defaults. The `notifications` section has one field, `builds`: `none`, `all` or `failed`. |
+| `PATCH /users/preferences` | Set the sections in the JSON body and keep the others. A section set to `null` goes back to the defaults. The `notifications` section has two fields, merged one by one: `builds` (`none`, `all` or `failed`) and `tasks` (`none`, `all` or `failed`). A field that is missing or `null` keeps the stored value, so a client that sets one does not change the other. |
 | `GET /users/notifications/status` | `{ canReceiveEmail, reason }`: `reason` is `emailDisabled` (the server sends no e-mail), `noAddress` (the account has no valid address) or `null` |
 
 ## Organizations

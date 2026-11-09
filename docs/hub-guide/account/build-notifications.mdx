@@ -1,6 +1,6 @@
 ---
 title: Build notification e-mails
-description: Get an e-mail when the builds of your files end, fail or wait for a missing file.
+description: Get an e-mail when the builds of your files end, fail or wait for a missing file, and when a task of yours such as a photogrammetry run ends or fails.
 hub_feature: [prefs:notifications]
 datasets: []
 requires: { access: none }
@@ -61,12 +61,30 @@ itself, such as a rescan, send nothing.
 
 The administrator of the server can change the text of the e-mail, so it can look different on your server.
 
+## E-mail when a task ends
+
+A task such as a photogrammetry run, an import or an extract can run for a long time. Select **Send task
+notifications** in the same tab:
+
+| Value | You get an e-mail for |
+|---|---|
+| **None** (default) | Nothing |
+| **All** | Tasks of yours that completed and tasks that failed |
+| **Failed only** | Tasks of yours that failed, with the reason |
+
+You get one e-mail for each task, when it ends, not a digest. It names the task, its files and its dataset, how
+long it ran, the reason when it failed, and a link that opens the **Tasks** tab of the dataset. If the failed
+run had created a new dataset, Hub removes that dataset, and the link opens the organization instead, with a
+note. You get no e-mail for a task that you cancel, for a build (the setting above) or for a task that the
+server starts by itself. Click **Retry** on a failed task and you get an e-mail again when the new run ends.
+
 ## Limits & requirements
 
 - The **Notifications** tab is there only when the server sends e-mail.
 - Your account needs an e-mail address. Without one, the setting is disabled and the window says
   **Your account has no e-mail address. Ask an administrator to add one.**
 - The e-mail goes to the address of your account. You cannot change it in the Hub.
+- A task e-mail needs read access to the dataset of the task.
 
 ## Related
 
