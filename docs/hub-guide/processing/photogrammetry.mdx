@@ -44,8 +44,10 @@ back into a dataset.
 
 7. Select where the results go:
    - **Output folder**: a folder of this dataset (default `photogrammetry_output`).
-   - **Create new dataset for results**: type a **New dataset name** (lowercase letters, digits and
-     hyphens) and select its **Visibility** (default **Private**).
+   - **Create new dataset for results**: type a **New dataset name** and select its **Visibility**
+     (default **Private**). The name is a slug: 2 to 128 lowercase letters, digits, `_` and `-`, starting
+     with a letter or a digit, with no `--`. The line under the field shows the rule of your server. The
+     dataset is made in the same organization, when the results are imported at the end of the run.
 
 8. Click **Start**. If the node does not answer, Hub asks before it starts the task.
 
@@ -85,7 +87,10 @@ The options editor lists every option of the node, in groups.
 | **… changed** | The number of options you changed |
 | **Customized options** | One button per changed option. Click it to go to that option |
 
-An option you change replaces the value of the profile. The other options of the profile stay.
+An option you change replaces the value of the profile. The other options of the profile stay. When you
+switch the profile, an option you changed that equals the value of the new profile goes back to the profile:
+**Default - Orthophoto + DSM**, then **Fast Orthophoto**, then **Default - Orthophoto + DSM** again sends no
+options of its own.
 
 ## Limits & requirements
 
@@ -94,6 +99,11 @@ An option you change replaces the value of the profile. The other options of the
   your account or organization cannot use processing, the button is grey and its tooltip says why.
 - On DroneDB Hub, every [plan](/hub-guide/account/plans.mdx) includes processing. The plan sets the priority.
 - The results count toward your storage.
+- When you click **Start**, the name and your write access in the organization are checked: a name that is
+  already taken there is refused with a message that names it, and nothing is created. The server checks
+  again when the results are imported. If someone took the name during the run, or you lost write access,
+  the task fails with a message that says so, and the results are not imported. **Retry** on a failed task
+  does not fail on a dataset that the first run made.
 - If you cancel the task, or it fails, Hub deletes the result files that it added to the dataset. The
   images and the other files stay. A dataset that the task created is deleted a few minutes later if it is
   still empty. See [Tasks panel & logs](/hub-guide/processing/tasks.mdx).
