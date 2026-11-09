@@ -243,6 +243,18 @@ To fill one dataset from another Registry or from an archive URL, use the `impor
 | `POST …/push/init`, `…/push/upload`, `…/push/meta`, `…/push/commit` | `ddb push` |
 | `GET …/stamp`, `GET …/download`, `POST …/meta/dump` | `ddb pull`, `ddb clone` |
 
+`POST /share/init` takes `tag` (`org/dataset`), or `orgSlug` and `datasetName` to make a new dataset: the
+slug comes from `datasetName`, and a slug that is taken gets `-2`, `-3`... (cut to fit 128 characters).
+The new dataset has the `visibility` of the request (`0` Private, `1` Unlisted, `2` Public). A request
+without `visibility`, such as `ddb share`, makes a **Public** dataset, as before; the Hub always sends one,
+Private by default. A wrong field answers `400` with the field in `errors`.
+
+`POST /share/rollback/{token}` removes what the batch added: the files that it created, and the dataset
+when the batch created it and the dataset holds nothing else. A file that the batch replaced stays. A batch
+with no upload for 24 hours is rolled back by the job `rollback-abandoned-share-batches`, which runs every hour (the
+24 hours and the schedule are not settings). A batch left by an older version on a dataset that it did not
+create is only closed: no file is deleted.
+
 `push/init` compares the stamp of the client with the dataset once and returns the files to
 upload. When the dataset changed since the last sync it answers `pullRequired: true`.
 `push/commit` applies the change only if the dataset did not change meanwhile, and only if each

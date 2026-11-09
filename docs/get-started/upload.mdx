@@ -49,9 +49,23 @@ clouds, 3D models, splats, vector files and reports. You need a dataset first: s
 
 You can also paste files with **Ctrl+V** (**Cmd+V** on a Mac) on the dataset page, or add a file
 from a web address with **Import from URL**. **Upload Files** in the user menu (the user icon at
-the top right) opens an upload page: drop files there, and Hub puts them in a new dataset of
-your personal organization and opens it. That dataset is **Public** and gets a generated slug:
-change its visibility in **Settings** if the data is not for everyone.
+the top right) opens an upload page that makes a new dataset:
+
+<Steps>
+
+1. Select the **Organization**. It starts as your personal organization. The list has only the
+   organizations where you can add datasets.
+2. Type the **Dataset name**. Hub fills it from the first file or folder you add. If the name is taken
+   in that organization, the dataset gets the same name with `-2`, `-3`... at the end.
+3. Select the **Visibility**: **Private** (the default), **Unlisted** or **Public**.
+4. Drop files or a folder on **Drop files or a folder here** (the folders are kept), or click **Choose
+   files**. **Clear** empties the list. Click **Upload**. When all the files are sent, Hub opens the dataset.
+
+</Steps>
+
+Click **Cancel** while the files are sent, or leave the page, to remove the upload: the files that it
+added and the dataset that it made are deleted. An upload that nobody finishes is removed by the server
+after 24 hours. **Upload Files** makes a dataset only when you click **Upload**.
 
 ## Big uploads
 
@@ -59,8 +73,9 @@ change its visibility in **Settings** if the data is not for everyone.
   stops.
 - Hub sends a large file in parts. After a network error, it sends again only the part that
   failed, not the whole file. It tries again by itself after short network problems.
-- **Cancel Upload** stops the files that are not sent. The files that the server already has
-  are still added to the dataset.
+- **Cancel Upload** in the upload window of a dataset stops the files that are not sent. The files that the
+  server already has are still added to the dataset. **Cancel** on the **Upload Files** page is different:
+  it removes everything that the upload added.
 - If uploads are slower than you expect, click **Uploads slower than expected? Test the
   connection** at the end of an upload. It opens a connection test on your account page.
 
