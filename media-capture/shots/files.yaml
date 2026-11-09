@@ -12,12 +12,14 @@
 #   - civil_example-imperial.dwg: the CAD drawing without a coordinate system (dataset gap: licence
 #     to confirm, source /mnt/data/datasets/vectors/dwg/); its shots are blocked until it is added
 #
-# The header icon buttons are selected by aria-label ([aria-label='Download'], [aria-label='Settings']);
+# The header icon buttons are selected by aria-label ([aria-label='Download'], [aria-label='Settings']),
+# the explorer toolbar buttons by aria-label inside .hub-toolbar (Upload, New folder, Open, Share/Embed,
+# Rename, Delete, Select all, Clear selection, Refresh, Grid, List, Thumbnails, More);
 # the context menu of a file opens with rightClick on its tile.
 
 - id: files/browser--views
   type: clip
-  alt: The images folder of a dataset in the grid view, then the table view and the expanded table view
+  alt: The images folder of a dataset in the grid view, then the list view with and without thumbnails
   page: hub-guide/files/browser
   url: /r/odm/zoo
   auth: none
@@ -29,11 +31,11 @@
     - wait: 2500
     - click: "[aria-label='Files'] [role='option'] >> nth=0"
     - wait: 1500
-    - click: "[aria-label='Table View']"
+    - click: ".hub-toolbar [aria-label='List']"
     - wait: 1500
-    - click: "[aria-label='Expanded Table View']"
+    - click: ".hub-toolbar [aria-label='Thumbnails']"
     - wait: 1500
-    - click: "[aria-label='Grid View']"
+    - click: ".hub-toolbar [aria-label='Grid']"
     - wait: 1500
   maxSeconds: 20
   blocked: null
@@ -58,7 +60,7 @@
 
 - id: files/browser--table
   type: screenshot
-  alt: The table view of the file browser with the Name, Type, Size and Modified columns
+  alt: The list view of the file browser with the Name, Type, Size and Modified columns
   page: hub-guide/files/browser
   url: /r/odm/zoo
   auth: none
@@ -66,7 +68,7 @@
     selector: "[aria-label='Files'] [role='option']"
     networkIdle: true
   actions:
-    - click: "[aria-label='Table View']"
+    - click: ".hub-toolbar [aria-label='List']"
     - wait: 2000
   highlight: "role=row >> nth=0"     # the column headers that sort (Name, Type, Size, Modified)
   crop: null
@@ -166,12 +168,12 @@
   url: /r/acme-surveys/site-a
   auth: demo
   waitFor:
-    selector: "[aria-label='Create folder']"
+    selector: ".hub-toolbar [aria-label='New folder']"
     networkIdle: true
   actions:
-    - click: "[aria-label='Create folder']"
+    - click: ".hub-toolbar [aria-label='New folder']"
     - fill: { selector: "[aria-label='Folder name']", value: "flight-2" }
-  highlight: "[aria-label='Create folder']"
+  highlight: "[aria-label='Folder name']"
   crop: null
   blocked: null
 
@@ -186,9 +188,9 @@
     networkIdle: true
   actions:
     - click: "[role='option']:has-text('notes-old.txt')"
-    - click: "[aria-label='Remove']"
+    - click: ".hub-toolbar [aria-label='Delete']"
     - wait: "text=Confirm delete"
-  # never click Remove in the dialog
+  # never click Delete in the dialog
   crop: "[role='dialog']"
   blocked: null
 

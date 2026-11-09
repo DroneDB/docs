@@ -1,7 +1,7 @@
 ---
 title: "Folders, rename & delete"
 description: "Create folders, move files by drag and drop, rename files with their sidecar files, and delete files."
-hub_feature: ["menu:create-folder", menu:rename, menu:delete]
+hub_feature: ["menu:new-folder", menu:rename, menu:delete]
 requires: { access: write }
 ---
 
@@ -20,8 +20,8 @@ files that you do not need.
 
 <Steps>
 
-1. To create a folder, open the parent folder and click **Create folder** in the toolbar. You can
-   also right-click and click **Create Folder**. Type the **Folder name** and click **Create folder**.
+1. To create a folder, open the parent folder and click **New folder** in the toolbar. You can
+   also right-click and click **New folder**. Type the **Folder name** and click **Create folder**.
 
    <Screenshot id="files/folders--new-folder" />
 
@@ -31,8 +31,8 @@ files that you do not need.
    click **Rename**. Type the new name and click **Rename**.
 4. If the file has sidecar files, such as `ortho_measurements.geojson` next to `ortho.tif`, keep
    **Also rename sidecar files** selected. Hub then renames them with the file.
-5. To delete, select the files and folders, then click **Remove** in the toolbar, press Delete, or
-   right-click and click **Delete**. Click **Remove** to confirm.
+5. To delete, select the files and folders, then click **Delete** in the toolbar, press Delete
+   (the delete key on a Mac), or right-click and click **Delete**. Click **Delete** to confirm.
 
    <Screenshot id="files/folders--delete-confirm" />
 
@@ -59,6 +59,9 @@ files that you do not need.
 - You cannot move a folder into itself or into one of its subfolders.
 - To move files to another dataset, use [Copy, cut, paste & transfer](/hub-guide/files/copy-paste.mdx).
 - You cannot undo a delete.
+- **Rename** and **Delete** stay in the toolbar when they do not apply. They are dimmed, and their
+  tooltip says why, for example "Select one file to rename". The dataset itself cannot be deleted
+  from the file list.
 
 ## Related
 

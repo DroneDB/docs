@@ -1,7 +1,7 @@
 ---
 title: "File browser"
-description: "The dataset page: folder tree, grid, table and expanded table views, detail panel, search, selection and keyboard keys."
-hub_feature: [route:ViewDataset, menu:open, "menu:select-all-none"]
+description: "The dataset page: folder tree, grid and list views, the toolbar, detail panel, search, selection and keyboard keys."
+hub_feature: [route:ViewDataset, menu:open, menu:select-all, menu:upload, menu:refresh, menu:open-3d-tiles]
 datasets: [odm/zoo]
 requires: { access: read }
 ---
@@ -10,23 +10,21 @@ requires: { access: read }
 
 <Requires />
 
-<TryLive org="odm" ds="zoo" hint="Open the images folder in the tree, then switch to the table view." />
+<TryLive org="odm" ds="zoo" hint="Open the images folder in the tree, then click List in the toolbar." />
 
 ## When to use it
 
-The file browser is the page of a dataset. It shows the folders and files, and starts every viewer
-and every file action.
+The page of a dataset: its folders and files, every viewer and every file action.
 
 ## The page
 
 <Screenshot id="files/browser--grid" />
 
-- **Folder tree** (left): the folders and files of the dataset. Drag the border to change its width.
-  Hub keeps the width on this device.
-- **Files** tab: the content of the folder that you selected in the tree. The **Folder path** above
-  the list goes back to a parent folder.
-- **Detail panel** (right): opens when you select a file. It shows a preview, the
-  [properties](/hub-guide/files/properties.mdx) and the buttons **Open**, **Share/Embed** and **Build**.
+- **Folder tree** (left): drag its border to change its width.
+- **Files** tab: the folder selected in the tree, under the toolbar. The **Folder path** above the
+  list goes back to a parent folder.
+- **Detail panel** (right): a preview of the selected file, its
+  [properties](/hub-guide/files/properties.mdx), **Open**, **Share/Embed** and **Build**.
 - **Map** tab: the files that have coordinates on a map. See [Map viewer](/hub-guide/viewing/map.mdx).
 - **Tasks** tab: the tasks of the dataset. See [Tasks panel & logs](/hub-guide/processing/tasks.mdx).
 
@@ -38,20 +36,20 @@ On a phone, the tree, the files and the properties are the tabs **Browser**, **F
 <Steps>
 
 1. Click a folder in the tree. The **Files** tab shows its content as a grid of thumbnails.
-2. Click **Table View** in the toolbar to see the files as rows. Click **Name**, **Type**, **Size**
-   or **Modified** to sort.
+2. Click **List** in the toolbar to see the files as rows. Click **Name**, **Type**, **Size**
+   or **Modified** to sort. **Thumbnails** switches the list between thumbnails and small icons.
 
    <Screenshot id="files/browser--table" />
 
-3. In the table view, click **Expanded Table View** to switch between thumbnails with relative times
-   and small icons with dates.
-4. To find a file in any folder, type in **Search files** above the tree and press Enter. Use `*` as
-   a wildcard, for example `*.json`. Click **Clear search** to go back to the tree.
+3. To find a file in any folder, type in **Search files** above the tree and press Enter (`*` is a
+   wildcard, as in `*.json`). **Clear search** goes back to the tree.
 
    <Screenshot id="files/browser--search" />
 
-5. Double-click a file, or select it and press Enter, to open it.
-6. Right-click a file or a folder to see all the actions for it.
+4. Double-click a file, or select it and press Enter, to open it.
+5. Right-click a file or a folder for its actions, in groups, with **Delete** last in red.
+   Right-click an empty area for the folder's actions: **New folder**, **Upload**, **Paste**,
+   **Select all** and **Refresh**.
 
    <Screenshot id="files/browser--context-menu" />
 
@@ -63,47 +61,52 @@ On a phone, the tree, the files and the properties are the tabs **Browser**, **F
 |---|---|
 | Folder | The folder |
 | Orthophoto, elevation model, vector | The [map viewer](/hub-guide/viewing/map.mdx), in a new tab |
-| Point cloud, 3D model, splat, panorama | Its viewer, in a new tab. A file that is not built yet shows why |
+| Point cloud, 3D model, 3D Tiles, splat, panorama | Its viewer, in a new tab |
 | Markdown | The [Markdown viewer](/hub-guide/viewing/markdown-pdf.mdx) |
 | Text, JSON, CSV | The [text editor](/hub-guide/files/edit-text.mdx) |
 | PDF | The PDF viewer |
 | Photo, video | A lightbox |
 | ZIP or other archive | **Extract Archive**, if you can write. See [Extract archives](/hub-guide/files/archives.mdx) |
 
-The **Open** item of the context menu opens the selected files in the same way.
+**Open** in the toolbar and the context menu does the same, and names the viewer, for example **Open Map**.
+
+## The toolbar
+
+The toolbar keeps the same buttons: **Upload**, **New folder**, **Open**, **Share/Embed**,
+**Rename**, **Delete**, **Select all**, **Clear selection**, **Refresh**, **Grid**, **List** and
+**Thumbnails**. A button that does not apply to the selection is dimmed, and its tooltip says why.
+On a narrow screen, the buttons that do not fit go into **More** (⋮).
 
 ## Selection and keys
 
 | Action | What it does |
 |---|---|
 | Click | Selects one file |
-| Ctrl+click (Cmd+click on a Mac) | Adds a file to the selection, or removes it |
+| Ctrl+click (Cmd+click on a Mac) | Adds or removes a file |
 | Shift+click | Selects a range |
-| **Select All** / **Deselect All** (toolbar), **Select All/None** (menu) | Selects all the files of the folder, or none |
+| **Select all** / **Clear selection** | Selects all the files of the folder, or none |
 | Esc | Clears the selection |
 | Space / Enter | Selects / opens the file that has the focus |
-| Up / Down arrows (tree) | Moves in the tree |
-| Right / Left arrows (tree) | Expands or collapses a folder |
+| Arrow keys (tree) | Move in the tree, expand or collapse a folder |
 | Ctrl+C, Ctrl+X, Ctrl+V | Copy, cut, paste. See [Copy, cut, paste & transfer](/hub-guide/files/copy-paste.mdx) |
-| Delete | Deletes the selection, after a question |
+| Delete (the delete key on a Mac) | Deletes the selection, after a question |
 
-The context menu shows these keys next to **Copy**, **Cut**, **Paste** and **Delete**. The other
-items of the menu have no key.
+The context menu shows these keys next to **Copy**, **Cut**, **Paste** and **Delete**.
 
 ## Options
 
 | Option | What it does | Default |
 |---|---|---|
-| **Grid View** / **Table View** | The layout of the **Files** tab | Grid |
-| **Expanded Table View** | Thumbnails and relative times in the table | On |
+| **Grid** / **List** | The layout of the **Files** tab | Grid |
+| **Thumbnails** | Thumbnails and relative times in the list | On |
 | Sort button next to **Search files** | Sorts the tree A→Z or Z→A, folders first | A→Z |
 
-Hub saves the view to your account. Set the default in [Preferences](/hub-guide/account/preferences.mdx).
+Hub saves the view to your account ([Preferences](/hub-guide/account/preferences.mdx)).
 
 ## Limits & requirements
 
-- Read access shows the files. Upload, rename, delete and the other changes need write access.
-- In a folder of 200 files or more, Hub draws only the rows on the screen, so large folders stay fast.
+- Read access shows the files; every change (upload, new folder, rename, delete...) needs write access.
+- In a folder of 200 files or more, Hub draws only the rows on the screen.
 - Saved map views show under the tree, in **Views**. See [Map views & saved views](/hub-guide/viewing/map-views.mdx).
 
 ## Related
