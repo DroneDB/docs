@@ -20,7 +20,7 @@ The page of a dataset: its folders and files, every viewer and every file action
 
 <Screenshot id="files/browser--grid" />
 
-- **Folder tree** (left): drag its border to change its width.
+- **Folder tree** (left): drag its border to change its width. On a large screen it keeps its width, so the file list and the detail panel get the extra room.
 - **Files** tab: the folder selected in the tree, under the toolbar. The **Folder path** above the
   list goes back to a parent folder.
 - **Detail panel** (right): a preview of the selected file, its
@@ -77,8 +77,8 @@ the **Details** button brings it back. Long values, such as a path, wrap instead
 ## The toolbar
 
 The toolbar keeps the same buttons: **Upload**, **New folder**, **Open**, **Share/Embed**,
-**Rename**, **Delete**, **Select all**, **Clear selection**, **Refresh**, **Grid**, **List** and
-**Thumbnails**. A button that does not apply to the selection is dimmed, and its tooltip says why.
+**Rename**, **Delete**, **Select all**, **Clear selection**, **Refresh**, **Grid**, **List**,
+**Thumbnails** and **S**, **M**, **L**. A button that does not apply to the selection is dimmed, and its tooltip says why.
 On a narrow screen, the buttons that do not fit go into **More** (⋮).
 
 ## Selection and keys
@@ -114,6 +114,7 @@ counts the files you selected; it does not count what is inside a selected folde
 |---|---|---|
 | **Grid** / **List** | The layout of the **Files** tab | Grid |
 | **Thumbnails** | Thumbnails and relative times in the list | On |
+| **S** / **M** / **L** (**Small**, **Medium**, **Large thumbnails**) | The size of the thumbnails of the grid: 128, 192 or 256 px. The list has fixed thumbnails. Hub keeps the choice for this browser | **S**; **M** on a screen 2560 px wide or more |
 | Sort button next to **Search files** | Sorts the tree A→Z or Z→A, folders first | A→Z |
 
 Hub saves the view to your account ([Preferences](/hub-guide/account/preferences.mdx)).
@@ -122,6 +123,7 @@ Hub saves the view to your account ([Preferences](/hub-guide/account/preferences
 
 - Read access shows the files; every change (upload, new folder, rename, delete...) needs write access.
 - In a folder of 200 files or more, Hub draws only the rows on the screen.
+- Hub asks for each thumbnail and preview at the size it draws times the pixel ratio of the screen, so they are sharp on a high-DPI screen. The detail panel can be wider than 400 px, and the preview follows its width. When you change the size of the thumbnails, only the tiles in view load again, and each keeps its old image until the new one is there.
 - Saved map views show under the tree, in **Views**. See [Map views & saved views](/hub-guide/viewing/map-views.mdx).
 
 ## Related
