@@ -170,14 +170,18 @@ curl -H "$AUTH" $DS/tasks/tools
 curl -X POST -H "$AUTH" -H "Content-Type: application/json" $DS/tasks -d '{
   "toolId": "raster-export",
   "path": "odm_orthophoto/odm_orthophoto.tif",
-  "params": { "formula": "NDVI", "colormap": "rdylgn" }
+  "params": { "formula": "VARI", "colormap": "rdylgn" }
 }'
 
 # Follow it
-curl -H "$AUTH" $DS/tasks/$TASK              # state, progress, log tail, artifact
+curl -H "$AUTH" $DS/tasks/$TASK              # state, progress, log tail, artifact, error
 curl -H "$AUTH" "$DS/tasks/$TASK/log?since=0"
 curl -H "$AUTH" -OJ $DS/tasks/$TASK/result   # the file, when the state is Succeeded
 ```
+
+`VARI` works on an RGB orthophoto. `NDVI` needs a near-infrared band: on an RGB orthophoto the
+request is refused with `400` and the reason. When a task fails, `state` is `Failed` and `error`
+says why, without server paths.
 
 Poll the status, or open `GET …/tasks/events`, a server-sent event stream that sends a `tasks`
 event when the task list of the dataset changes. Every tool and its parameters are on the

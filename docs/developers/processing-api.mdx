@@ -65,7 +65,7 @@ Content-Type: application/json
 {
   "toolId": "raster-export",
   "path": "odm_orthophoto/odm_orthophoto.tif",
-  "params": { "formula": "NDVI", "colormap": "rdylgn" },
+  "params": { "formula": "VARI", "colormap": "rdylgn" },
   "force": false
 }
 ```
@@ -76,7 +76,7 @@ Content-Type: application/json
 |---|---|
 | `202 Accepted` | A new task. `Location` is its status URL. |
 | `200 OK` | `deduplicated: true`: an earlier task with the same request. |
-| `400` | Unknown tool, invalid parameters or an invalid path |
+| `400` | Unknown tool, invalid parameters or an invalid path. The answer gives the reason. |
 | `403` | The tool is disabled or hidden for you (see [Feature gating](#feature-gating)), or you do not have the access it needs |
 | `413`, `429` | A limit: the output would be too large, or you have too many tasks running or queued |
 
@@ -114,6 +114,11 @@ Content-Type: application/json
 When the task succeeds, `artifact` holds `sizeBytes`, `sha256`, `resultUrl` and `expiresAt`.
 `GET …/result` returns the file with `Content-Disposition: attachment` and the SHA-256 as its
 `ETag`. It works only when the state is `Succeeded` and the tool makes an artifact.
+
+When the task fails, `state` is `Failed` and `error` says why, for example
+`"The file is damaged or not a valid GeoTIFF"`. The last line of the log is the same reason,
+after `Failed: `. Server paths are hidden: the dataset folder reads `[dataset]` and other paths
+`[server path]`. In `GET …/tasks` each task has `error` and `errorType`, the type of the error.
 
 To read the log as it grows, pass the `cursor` of each answer as `since` of the next request:
 
@@ -179,7 +184,7 @@ spectral index, a colormap, a rescale. Memory stays bounded at any size.
   "path": "odm_orthophoto/odm_orthophoto.tif",
   "preset": null,
   "bands": null,
-  "formula": "NDVI",
+  "formula": "VARI",
   "bandFilter": null,
   "colormap": "rdylgn",
   "rescale": "-1,1",
@@ -187,7 +192,10 @@ spectral index, a colormap, a rescale. Memory stays bounded at any size.
 }
 ```
 
-`path` is required. The others are optional.
+`path` is required. The others are optional. A `formula` that the raster cannot compute is
+refused with `400` before the task is queued, for example `NDVI is not available for this raster:
+Requires bands: RN` on an RGB orthophoto. Use `VARI` on RGB, and `NDVI` on a raster with a
+near-infrared band. An unknown formula answers `Unknown formula: <name>`.
 
 ### bulk-download
 

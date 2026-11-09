@@ -29,9 +29,11 @@ see what runs, why a file is not ready, or to get the result of a task.
 
 3. Read the row:
    - **State**: an icon. Point at it to read the state, for example **Enqueued**, **Processing**,
-     **Succeeded** or **Failed**.
+     **Succeeded**, **Failed**, or **Deleted** for a task that you cancelled.
    - **Tool**: the task type, its version and the file or folder it works on.
-   - **Progress**: a bar and the current step. A failed task shows the error type here.
+   - **Progress**: a bar and the current step. A failed task shows no bar: it shows a red **Failed**
+     tag and why the task failed, for example "The file is damaged or not a valid GeoTIFF". Point at
+     the reason to see the error type. The last line of the log gives the same reason.
      A build that waits for a missing companion file (for example the `.mtl` of an `.obj`) shows a
      yellow **Waiting for files** tag with the missing names. Its task ended, but the build starts again
      when you upload those files. See [Builds](/hub-guide/processing/builds.mdx).

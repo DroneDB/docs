@@ -41,7 +41,7 @@ A file without a badge is ready. The file browser, the table view and the detail
 | Clock | **Queued**: the build waits for its turn | Wait |
 | Triangle | **Waiting for files**: a file that the build needs is not in the dataset | Upload the missing file (see below) |
 | Triangle | **On Hold**: a temporary error | Nothing. Hub tries again by itself |
-| Red cross | **Failed** | Read the log in the [Tasks tab](/hub-guide/processing/tasks.mdx), then build the file again |
+| Red cross | **Failed** | Read why on the build task in the [Tasks tab](/hub-guide/processing/tasks.mdx), or in your [build notification e-mail](/hub-guide/account/build-notifications.mdx). Fix the file, then build it again |
 
 Point at a badge to see the reason. When you open a file that is not ready, a window tells you why. It
 offers **Start Processing**, **Wait and Open** or **Retry Processing**, as the case needs.
@@ -70,7 +70,8 @@ offers **Start Processing**, **Wait and Open** or **Retry Processing**, as the c
 Some files need companion files with the same name:
 
 - An `.obj` model needs its `.mtl` file and the textures that the `.mtl` names.
-- A Shapefile (`.shp`) needs its `.shx` and `.dbf` files.
+- A Shapefile (`.shp`) needs its `.shx` file. Upload its `.dbf` and `.prj` files too: they hold the
+  attributes and the coordinate system.
 
 When a companion file is missing, the build does not fail. It waits, and the badge shows **Waiting for
 files** with the missing names. The **Tasks** tab shows the same yellow tag on the build task. Upload the missing files to the folder that the message names. The build
