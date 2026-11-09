@@ -44,13 +44,13 @@ curl -X POST -H "$AUTH" $DS/obj \
      -F path=images/DJI_0001.JPG -F file=@DJI_0001.JPG \
      -F path=images/DJI_0002.JPG -F file=@DJI_0002.JPG
 
-# A folder: no file part
+# A folder: no file part, 201 with the entry of the folder and its mtime
 curl -X POST -H "$AUTH" $DS/obj -F path=images
 ```
 
 - Access, the storage quota (from `Content-Length`) and a `path` sent before its file are
   checked before the first byte is stored. A refused upload fails at once (`401`, `403`,
-  `404`, `507`).
+  `404`, `507`). A `507` is a `ProblemDetails` with `title` "Insufficient Storage".
 - In a bundle a file that fails does not fail the others. Each result is
   `{ "path", "entry", "error", "status" }`.
 - After the upload, Registry builds the files that can be built, in the background.

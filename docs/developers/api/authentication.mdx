@@ -83,7 +83,19 @@ curl -u survey-bot:'…' \
 | `401 Unauthorized` | You are not signed in, or the token is no longer valid. Sign in again. |
 | `403 Forbidden` | You are signed in, but you do not have the permission. Before Registry 3.0 this was also a `401`. |
 
-Errors are `ProblemDetails`: see [Errors](/developers/api/reference.mdx#errors).
+Both answers are `ProblemDetails` (`application/problem+json`), also on `/users`, `/users/me`,
+`/sys/*`, `/health`, `/quickhealth` and `/hangfire`: see
+[Errors](/developers/api/reference.mdx#errors). A `401` has `detail` "Not signed in" and the
+header `WWW-Authenticate: Bearer`; the OGC services, the vector tiles and the build files answer
+with the `Basic` challenge shown above. `GET /orgs` without a token answers its own `401`
+("Invalid user").
+
+```bash
+curl -i https://hub.dronedb.app/users/me
+# HTTP/1.1 401 Unauthorized
+# Content-Type: application/problem+json
+# WWW-Authenticate: Bearer
+```
 
 ## Health checks
 

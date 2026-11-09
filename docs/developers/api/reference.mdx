@@ -13,7 +13,10 @@ Every Registry serves its own interactive API reference, generated from its code
 | OpenAPI document | `/swagger/v1/swagger.json` |
 
 The reference of a Registry always matches its version. Use it for the list of endpoints, the
-parameters and the response fields. This page holds the rules that apply to all endpoints.
+parameters and the response fields. It lists the `bearer` and `basic` security schemes (the
+Authentication section of Test Request), the `401` and `403` answers of the protected endpoints
+and the `multipart/form-data` fields of the upload endpoints. This page holds the rules that apply
+to all endpoints.
 
 ## Requests
 
@@ -53,7 +56,9 @@ Errors are RFC 9457 `ProblemDetails` with the media type `application/problem+js
 }
 ```
 
-- Show `detail` to the user.
+- Every error has this shape, also a `401` from a protected endpoint, a `403` from an
+  administrator-only endpoint (`/sys`, `/health`, `/hangfire`) and a `507`. Show `detail` to the
+  user.
 - `noRetry: true` means that the same request will fail again. Do not retry it.
 - Validation errors of a body are `ValidationProblemDetails`: an `errors` object per field and
   the joined messages in `detail`.
@@ -63,7 +68,7 @@ Errors are RFC 9457 `ProblemDetails` with the media type `application/problem+js
 | Status | Meaning |
 |---|---|
 | `400` | Invalid parameters, or an uploaded file that cannot be read as its file type (for example a `.laz` that is not LAZ; `noRetry: true`, the detail names the file) |
-| `401` | Not signed in, or the token is no longer valid |
+| `401` | Not signed in, or the token is no longer valid. The body is `ProblemDetails` with `detail` "Not signed in", and the answer has `WWW-Authenticate: Bearer`. `GET /orgs` without a token answers its own `401` ("Invalid user"). |
 | `403` | Signed in without permission (a `401` before Registry 3.0). Admin-only endpoints say "Only administrators can perform this operation". |
 | `404` | Not found, also for a request other than `GET` or `HEAD` to a path that no endpoint answers |
 | `409` | Conflict |
@@ -71,7 +76,7 @@ Errors are RFC 9457 `ProblemDetails` with the media type `application/problem+js
 | `429` | Too many requests: the concurrent download limit or a rate limit. Read `Retry-After`. |
 | `500` | Server error |
 | `503` | Temporary: a busy index, a build that holds it, a server that stops. Read `Retry-After` and try again. |
-| `507` | The storage quota is full |
+| `507` | The storage quota is full: an upload, a chunk or a commit over the quota answers `type` `https://www.rfc-editor.org/rfc/rfc4918#section-11.5` and `title` "Insufficient Storage" |
 
 The OGC services answer with the exception format of their standard instead: see
 [OGC errors](/developers/ogc.mdx#errors).
@@ -88,7 +93,8 @@ The OGC services answer with the exception format of their standard instead: see
 | OGC API `…/items` | `limit` (at most 1000), `offset`, `bbox` | |
 
 `GET /orgs/{orgSlug}/ds` without parameters returns every dataset. With any of them it returns
-one page. `GET …/tasks` sends an `ETag`: a request with `If-None-Match` gets `304` while the
+one page. `X-Total-Count` is the number of datasets that match the whole query (`q`, `slugs`, or
+both), not the size of the page. `GET …/tasks` sends an `ETag`: a request with `If-None-Match` gets `304` while the
 list is the same.
 
 ## Build file URLs
@@ -129,7 +135,7 @@ The roles are in the [library build manifest](/developers/library.mdx#build-mani
 |---|---|
 | `registryVersion`, `hubVersion`, `ddbVersion` | The versions of the backend, the web app and the DroneDB library |
 | `taskTools` | The processing tools: id, version, title, required access, artifact flag, and `hidden`, `disabled`, `disabledMessage` |
-| `taskStates` | The task states, each with `isTerminal` |
+| `taskStates` | The task states, each `{value, terminal}` |
 | `entryTypes` | The entry types of the library: `{id, name, buildable, thumbnail, sidecarExtensions, roles}`. `thumbnail` is `none`, `file` or `build`. |
 | `archiveExtensions` | The archive suffixes the server extracts, lowercase, compound ones first (`tar.gz` before `gz`) |
 | `emailEnabled` | Whether the server sends e-mail. When `false`, hide what needs e-mail. |
