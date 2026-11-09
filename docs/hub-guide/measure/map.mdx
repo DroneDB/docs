@@ -76,6 +76,16 @@ measurements.
 | **Export Measurements as CSV** | Downloads one row per measurement as a CSV table. See [CSV columns](#csv-columns). |
 | **Delete Saved Measurements** | Deletes the saved measurements from the dataset. |
 
+### How lengths and areas are measured
+
+Hub measures lengths and areas on the WGS84 ellipsoid, not on a sphere and not on a flat map. A
+length is the sum of the geodesic distances between the points. An area is the area of the
+polygon on the ellipsoid. The numbers are the same as the ones that `ddb` gives, and the area of
+a polygon is the same as its 2D area in the [stockpile](/hub-guide/analyse/stockpile.mdx) panel.
+The stockpile panel counts pixels, so its area can differ from the map's by the pixels along the
+edge of the polygon. The result does not depend on the latitude: a 100 m line east to west
+measures 100 m at 0° and at 70°.
+
 ### Units
 
 | Value | Metric | Imperial |
