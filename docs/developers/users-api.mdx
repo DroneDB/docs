@@ -181,7 +181,7 @@ everyone, system administrators included.
 
 | Request | What it does |
 |---|---|
-| `GET /orgs/{orgSlug}/members` | The members and their permissions |
+| `GET /orgs/{orgSlug}/members` | The members and their permissions, sorted by user name (letter case does not matter) |
 | `POST /orgs/{orgSlug}/members` | Add a member: JSON `{ "userName": "jdoe", "permissions": 1 }` |
 | `PUT /orgs/{orgSlug}/members/{userName}` | Change the permission: JSON `{ "permissions": 2 }` |
 | `DELETE /orgs/{orgSlug}/members/{userName}` | Remove a member |
