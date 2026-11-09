@@ -29,7 +29,7 @@ The embed above is a live Hub viewer.
    <Screenshot id="sharing/links-embeds--menu" />
 
 2. The share window opens, titled with the name of the file (**Share <name>**, or **Share Folder <name>**
-   for a folder), with **Share: Link**. It keeps the same width for every mode. Click the copy button next to **Share link**.
+   for a folder), with **Share: Link**. It keeps the same width for every mode. Click the copy button next to the link.
    The link opens the file in its default viewer. To hide the Hub around it, check **Viewer only**.
 
    <Screenshot id="sharing/links-embeds--link" />
@@ -66,6 +66,10 @@ The code looks like this. Change `width` and `height` to fit your page:
 - In an embed, the Hub hides its header, the back arrow and the buttons that add or remove layers, as
   with [Viewer only](#viewer-only): only the viewer shows.
 - Copy the code from the window, do not write the address by hand: the path of the file is encoded in it.
+- The map decides its layout from its own size, not from the window. In the default 600 × 400 embed, and in
+  any map less than 576 px wide or 560 px high, the measure tools fold behind one **Measure** button and
+  the layer panel starts folded, so the toolbar is not cut. Make the frame bigger to see them all. In
+  a map with a saved view, **Save** and **Save as new** are in the **View actions** menu (the three dots).
 
 ## Viewer only
 
@@ -101,7 +105,7 @@ click **Save** in the panel.
 
 ## Limits & requirements
 
-- A link or an embed works for others only when the dataset is **Public** or **Unlisted**. For a private
+- A link or an embed works for others, signed in or not, only when the dataset is **Public** or **Unlisted**. This holds when the organization is private too. For a private
   dataset, the window says that only its members can open the links, and shows **Make the dataset
   Unlisted...**. Hub asks first: the whole dataset becomes **Unlisted** (see
   [Visibility](/hub-guide/sharing/visibility.mdx)). On the map, the **Copy link** panel says that only
