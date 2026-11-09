@@ -31,10 +31,13 @@ Plant Health, the panel tells you to do this.
    <Screenshot id="processing/merge-multispectral--menu" />
 
 3. Put the bands in order under **Band Order**. Drag a band, or use its up and down arrows. The first band
-   of the list is band 1 of the new file.
+   of the list is band 1 of the new file. A long file name is cut in the middle, so that the end that tells
+   the bands apart (`_1`, `_NIR`) stays. Point at it to read the whole path.
 
-4. Wait for the check. Hub shows the coordinate system, the size, the number of bands and their data type,
-   and an estimate of the file size. Errors and warnings show in the same place.
+4. Wait for the check. Hub shows the size, the number of bands and their data type, and an estimate of
+   the file size, and the coordinate system when the bands have one. Errors and warnings show in the same
+   place. A warning that the check gives for several files is said once, with its count, for example
+   **(×5)**. If you change the order while the check runs, Hub ignores the old answer and checks again.
 
 5. Look at the preview. It shows bands 1, 2 and 3 as red, green and blue.
 
@@ -65,8 +68,9 @@ browser and is [built](/hub-guide/processing/builds.mdx) like any other raster. 
 - Hub checks that the files fit together: coordinate system, data type and alignment. It reprojects and
   resamples them to one grid.
 - When a camera has several lenses, the bands can be shifted. If the shift is more than 2 pixels, Hub shows
-  **Band misalignment detected** and applies an approximate correction. For an exact result, process the
-  images with photogrammetry, for example with the **Multispectral** profile of
+  **Band misalignment detected** and, when it can, applies an approximate correction (it says so when none
+  applies to the images). The window says to use **Run Photogrammetry** in the Tasks tab for an accurate
+  result: select the **Multispectral** profile of
   [Photogrammetry](/hub-guide/processing/photogrammetry.mdx).
 - **Delete source files after merge** cannot be undone. Once Hub has started to delete the band files,
   **Cancel** is not offered for the task. If the server restarts at that point, the task ends **Failed**
