@@ -41,6 +41,9 @@ rebuilds it in the background.
 
 <FormatTable category="splat" />
 
+DroneDB does not read a SOG level-of-detail folder (a `lod-meta.json` with `.webp` files) as a
+splat. Bundle it into one `.sog` file first, then upload that file.
+
 ## Vector data and CAD drawings
 
 <FormatTable category="vector" />
@@ -77,8 +80,8 @@ misses a required companion file waits. It starts when the missing file arrives.
 | Main file | Companion files | Required |
 |---|---|---|
 | `.obj` | `.mtl` and the textures it names | Yes |
-| `.shp` | `.shx`, `.dbf` | Yes |
-| `.shp` | `.prj`, `.cpg` | No |
+| `.shp` | `.shx` | Yes |
+| `.shp` | `.dbf` (the attributes), `.prj` (the coordinate system), `.cpg` | No |
 | `.dxf`, `.dwg` | `.prj` with the same name: the coordinate system of the drawing | No |
 | 3D model, Gaussian splat | `<name>.geo.json`, `georef.json`, `reference_lla.json` or ODM's `coords.txt`: the georeference | No |
 | Gaussian splat | `<name>_cameras.json`: saved camera views, pins and measurements | No |

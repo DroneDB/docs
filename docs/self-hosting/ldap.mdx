@@ -24,9 +24,8 @@ sequenceDiagram
     User->>Registry: Sign in (user name + password)
     Registry->>LDAP: Bind as the service account
     Registry->>LDAP: Search the user with SearchFilter
-    LDAP-->>Registry: User DN and attributes
+    LDAP-->>Registry: User DN, attributes and groups (memberOf)
     Registry->>LDAP: Bind as the user (checks the password)
-    Registry->>LDAP: Read the groups (memberOf)
     Registry->>Registry: Map AdminGroupDns to the admin role
     Registry-->>User: Sign-in token
 ```
@@ -169,7 +168,7 @@ an `LDAP health check` entry:
 |-------|---------|
 | **Healthy** | The server answers and the bind (service account or anonymous) works. |
 | **Degraded** | The server answers but refuses the anonymous bind. Set `BindDn` and `BindPassword` for a full check. |
-| **Unhealthy** | The server cannot be reached (network error, timeout, connection refused). |
+| **Unhealthy** | The server cannot be reached (network error, timeout, connection refused), or the service-account bind failed (for example a wrong `BindPassword`). |
 
 ## Security
 

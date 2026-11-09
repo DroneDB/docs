@@ -98,13 +98,13 @@ After a failure, read `DDBGetLastError()` (the whole message, UTF-8) and `DDBGet
 An entry path is a path inside a dataset, relative to its root (`photos/a.jpg`), as the index stores it. Every export that takes one applies the rule of `DDBNormalizePath`:
 
 - `\` and `/` both separate segments; `.` segments and repeated or trailing separators are dropped, so `a\b`, `./a//b/` and `a/b` name the same entry;
-- a path that is absolute (a leading `/` or `\`, or a drive such as `C:`), has a `..` segment, names the reserved `.ddb` folder at any depth, or is not valid UTF-8 is refused: the call returns `DDBERR_INVALIDARGS`, changes nothing, and the last error reads `Invalid <argument> '<path>': <code>` (`absolute`, `traversal`, `reserved`, `encoding`, `empty`).
+- a path that is absolute (a leading `/` or `\`, or a drive such as `C:`), has a `..` segment, names the reserved `.ddb` folder or its NTFS short name (`ddb~` and digits, such as `DDB~1` or `ddb~2`, in any case, on every platform) at any depth, or is not valid UTF-8 is refused: the call returns `DDBERR_INVALIDARGS`, changes nothing, and the last error reads `Invalid <argument> '<path>': <code>` (`absolute`, `traversal`, `reserved`, `encoding`, `empty`).
 
 This applies to `DDBGet`, `DDBListEntries` and `DDBListEntriesEx` (folder; `""` and `"."` are the root), `DDBSearch`, `DDBMoveEntry`, `DDBBuild` (source), `DDBIsBuildable`, `DDBIsBuildActive`, `DDBIsBuildComplete`, `DDBGetBuildStatus`, `DDBGetBuildArtifacts`, the `DDBMeta*` exports (and the rows of `DDBMetaRestore`), `DDBStac` and `DDBStacData`, `DDBResolveBuildFile`, and every path inside a delta (`DDBApplyDelta`, `DDBApplyDeltaEx`, `DDBComputeDeltaLocals`). It also applies to the exports that existed in 1.x, whose other invalid arguments still return `DDBERR_EXCEPTION`.
 
 Filesystem paths are not entry paths and keep their meaning: the files `DDBAdd`, `DDBAddWithOptions` and `DDBAddWithHints` add, the paths of `DDBRemove`, `DDBList` and `DDBInfo`, dataset folders, output files and `DDBBuild`'s destination.
 
-Call `DDBNormalizePath(path, reservedJson, &out)` to check or normalize a path before using it (it answers `{"path": "<normalized>"}` or `{"rejected": "<code>"}`); `reservedJson` adds names reserved as the first segment (Registry reserves its own upload folder this way). DroneDB keeps the expected results of 54 inputs in `tests/contract/vectors/entry-paths.json`, so a host can test that it rejects the same paths.
+Call `DDBNormalizePath(path, reservedJson, &out)` to check or normalize a path before using it (it answers `{"path": "<normalized>"}` or `{"rejected": "<code>"}`); `reservedJson` adds names reserved as the first segment (Registry reserves its own upload folder this way). DroneDB keeps the expected results of more than 70 inputs in `tests/contract/vectors/entry-paths.json`, so a host can test that it rejects the same paths.
 
 ## Cancellation
 
