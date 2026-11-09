@@ -48,7 +48,7 @@ All task endpoints are below `/orgs/{orgSlug}/ds/{dsSlug}/tasks`.
 | `GET …/tasks/{id}/log?since={cursor}` | The log lines after a cursor |
 | `GET …/tasks/{id}/result` | Download the artifact (range requests work) |
 | `DELETE …/tasks/{id}` | Cancel a task. Only its owner or an administrator can. |
-| `POST …/tasks/{id}/retry` | Queue a failed task again. `409` when its state does not allow it. |
+| `POST …/tasks/{id}/retry` | Run a failed task again from the beginning. `409` for a succeeded, cancelled or committed task, and for one that already runs. The request is checked as a new submit (`400`, `409`, `507`) |
 | `POST …/tasks/{id}/delete` | Remove one terminal task and its artifact from the history. `400` for a task that is still active. |
 | `POST …/tasks/clear?toolId=` | Remove every terminal task (of one tool, with `toolId`) and its artifacts |
 
@@ -122,6 +122,16 @@ When the task fails, `state` is `Failed` and `error` says why, for example
 `"The file is damaged or not a valid GeoTIFF"`. The last line of the log is the same reason,
 after `Failed: `. Server paths are hidden: the dataset folder reads `[dataset]` and other paths
 `[server path]`. In `GET …/tasks` each task has `error` and `errorType`, the type of the error.
+
+Each task of `GET …/tasks`, of `/sys/tasks` and of `GET …/tasks/{id}` has four fields that say what a
+row can offer:
+
+| Field | Meaning |
+|-------|---------|
+| `actions` | What the caller may do with the task: `cancel`, `retry`, `delete` and `viewLog`. A caller who may not touch the task gets an empty list. A reader with no write access gets only `viewLog`. A task that has saved its result has no `cancel` and no `retry` |
+| `targetLabel` | The files of the task in words, as the tool says them, or `null` |
+| `waitingForNode` | `true` while a processing node holds the task in its queue. The `state` filter `Enqueued` includes such a task |
+| `cancelledBy` | The name of the user who cancelled a `Deleted` task, or `null` |
 
 To read the log as it grows, pass the `cursor` of each answer as `since` of the next request:
 

@@ -24,25 +24,29 @@ see what runs, why a file is not ready, or to get the result of a task.
 
 1. Open the dataset and click the **Tasks** tab.
 
-2. Find the task. The newest task is at the top. To filter the list, select a state in **All States** or a
+2. Find the task. The newest task is at the top. To filter the list, select a state in **All States** (**Cancelled or deleted** also lists the tasks that a user cancelled; **Enqueued** includes the tasks that wait on a node) or a
    tool in **All Tools**; the x in the list clears one filter, and **Clear filters** clears them all (it is also in
    the empty list that the filters leave). Click the header **State**, **Tool** or **Created** to sort. Click
    **Refresh** to read the list again. On a phone, each task is a card.
 
 3. Read the row:
    - **State**: an icon. Point at it to read the state, for example **Enqueued**, **Processing**,
-     **Succeeded**, **Failed**, or **Deleted** for a task that you cancelled.
-   - **Tool**: the task type, its version and the file or folder it works on.
+     **Succeeded**, **Failed**, or **Cancelled** for a task that a user stopped: point at it to see who.
+     A task that waits in the queue of a processing node says **Queued on node**.
+   - **Tool**: the task type, its version and the files it works on. A tool names its files, for example
+     the folder of a photogrammetry run, so two runs can be told apart.
    - **Progress**: a bar and the current step. A failed task shows no bar: it shows a red **Failed**
      tag and why the task failed, for example "The file is damaged or not a valid GeoTIFF". Point at
      the reason to see the error type. The last line of the log gives the same reason.
      A build that waits for a missing companion file (for example the `.mtl` of an `.obj`) shows a
      yellow **Waiting for files** tag with the missing names. Its task ended, but the build starts again
-     when you upload those files. See [Builds](/hub-guide/processing/builds.mdx).
+     when you upload those files. See [Builds](/hub-guide/processing/builds.mdx). A cancelled task shows
+     **Cancelled at 42 %**, the progress it had reached.
    - **Created** and **Duration**: when the task started and how long it ran. A running task shows a
      stopwatch.
 
-4. Click **View log** (the terminal button) to open the log.
+4. Click **View log** (the terminal button) to open the log. The title of the window names the tool, the
+   files, the dataset and the time of the task.
 
    <Screenshot id="processing/tasks--log" />
 
@@ -59,8 +63,8 @@ see what runs, why a file is not ready, or to get the result of a task.
 |---|---|---|
 | **View log** | Opens the last lines of the log | Every task |
 | **Result** | Downloads the result file. Point at it to see until when it is available | A finished task that makes a file, for example a raster export or a ZIP download |
-| **Cancel** | Stops the task, after you confirm. For a task that adds files, the confirmation says what is deleted | A running or waiting task, except one that can no longer be cancelled (see below) |
-| **Retry** | Runs the task again | A failed task. Not a cancelled task |
+| **Cancel** | Stops the task, after you confirm. For a task that adds files, the confirmation says what is deleted. A toast says **Task cancelled** | A running or waiting task, except one that can no longer be cancelled (see below) |
+| **Retry** (tooltip **Run again from the beginning**) | Runs the task again from the beginning. The row turns **Enqueued** at once and a toast says **Task queued again**. Hub checks it like a new task, so it can be refused with a message | A failed task. Not a succeeded or a cancelled task, and not a task that already saved its result |
 | **Delete from history** | Removes the task and its result file, after you confirm | A finished task |
 | **Clear Concluded** | Removes every finished task of the list, and their result files | The toolbar |
 | **Run Photogrammetry** | Starts [photogrammetry](/hub-guide/processing/photogrammetry.mdx) | The toolbar, when the server has a processing node |
@@ -84,7 +88,9 @@ see what runs, why a file is not ready, or to get the result of a task.
 - Anyone who can read the dataset sees its tasks.
 - The log and the result of a task are for the user who started it, the owner of the organization and the
   administrators. Tasks that the server starts by itself are open to every reader.
-- **Cancel**, **Retry**, **Delete from history** and **Clear Concluded** need write access.
+- **Cancel**, **Retry**, **Delete from history** and **Clear Concluded** need write access. A row shows only
+  the buttons that you can use: a member who can only read sees no **Cancel**, and **View log** shows only for
+  the tasks whose log you may read.
 - A result file is kept for a limited time. After that, **Result** is not shown.
 - The server limits how many tasks run at the same time, for you and for your organization. When you are at
   the limit, a new task is refused with a message. Wait for a task to end and try again.
