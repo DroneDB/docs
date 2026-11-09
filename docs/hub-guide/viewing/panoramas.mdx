@@ -35,7 +35,7 @@ Use the panorama viewer to look around a 360° photo as if you stand where it wa
    - **Move** turns the view up, down, left or right.
    - **Fullscreen** fills the screen.
 
-4. If the panorama has a GPS position, open the **Map** tab of the dataset. The panorama is a marker of its own. Click the marker to open the panorama.
+4. If the panorama has a GPS position, open the folder that holds it, then the **Map** tab. The panorama is a marker of its own. Click the marker to open the panorama.
 
    <Screenshot id="viewing/panoramas--map-marker" />
 
@@ -44,8 +44,9 @@ Use the panorama viewer to look around a 360° photo as if you stand where it wa
 ## Limits & requirements
 
 - The viewer shows equirectangular panoramas: the usual format of 360° cameras and of stitching software.
-- A panorama with GPS tags in its file (a geo-panorama) is also on the map. A panorama without them is only in the file list.
+- A panorama with GPS tags in its file (a geo-panorama) is also on the map of its folder. The **Map** tab shows the panoramas of the folder that is open, so open the folder of the panorama. A panorama without GPS tags is only in the file list.
 - The viewer uses the orientation that the camera wrote in the file (heading, pitch and roll), when there is one.
+- A cropped panorama (a part of the sphere) is shown at its place in the full sphere, and the rest of the sphere is black. The viewer takes the full size of the sphere from the entry of the file, or from the GPano XMP tags of the file. A file with neither is shown as a complete panorama.
 - To download the original image, use **Download** in the file list. See [Download files](/hub-guide/files/download.mdx).
 
 ## Related
@@ -56,6 +57,6 @@ Use the panorama viewer to look around a 360° photo as if you stand where it wa
 
 <ForDevelopers api="/docs/developers/api/workflows">
 
-The viewer is Photo Sphere Viewer. DroneDB indexes the image as a `Panorama` entry, or `GeoPanorama` when it has GPS tags, and reads the crop and the pose from its XMP tags.
+The viewer is Photo Sphere Viewer. DroneDB indexes the image as a `Panorama` entry, or `GeoPanorama` when it has GPS tags, and reads the crop, the full size and the pose from its GPano XMP tags.
 
 </ForDevelopers>
