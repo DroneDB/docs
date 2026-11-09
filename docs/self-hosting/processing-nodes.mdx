@@ -59,6 +59,11 @@ its progress and log, downloads the result (`all.zip`) and extracts it into the 
 new dataset. Registry then indexes the files and builds them. Canceling the task cancels the task on
 the node.
 
+A task that failed or was cancelled is removed from the node, after Registry has copied its output to the log
+of the task, as a task that succeeded is. To keep these tasks on the node, for example to debug a failure
+there, set `ProcessingPlatform:KeepFailedNodeTasks` to `true` (default `false`). A node that does not answer
+in time fails the run, and Registry does not remove its task then.
+
 List the nodes in `AppSettings:ProcessingPlatform:NodeOdx`:
 
 ```json

@@ -26,13 +26,13 @@ To configure the platform on your own server (limits, processing nodes, which to
 ## Task states
 
 ```text
-Created → Enqueued → Scheduled → Processing → Succeeded
-                                            → Failed
-                                            → Deleted
+Created → Indexing → Enqueued → Scheduled → Processing → Succeeded
+                                                       → Failed
+                                                       → Deleted
 ```
 
-`Created`, `Enqueued`, `Scheduled` and `Processing` are active. `Succeeded`, `Failed` and
-`Deleted` are terminal. `GET /sys/features` lists the states with `isTerminal` in `taskStates`.
+`Created`, `Indexing`, `Enqueued`, `Scheduled` and `Processing` are active. `Succeeded`, `Failed` and
+`Deleted` are terminal. `GET /sys/features` lists the states with `terminal` in `taskStates`.
 
 ## Endpoints
 
@@ -367,11 +367,19 @@ separate artifact. The nodes and their options:
 | Request | What it does |
 |---|---|
 | `GET /sys/processingNodes` | The nodes you can use: id and title (never the URL or the token) |
-| `GET /sys/processingNodes/{nodeId}/options` | The options of a node, read live from it: name, type, domain, help, default |
-| `GET /sys/processingNodes/{nodeId}/status` | Whether the node can be reached, and its queue |
+| `GET /sys/processingNodes/{nodeId}/options` | The options of a node, read live from it. Each has `name`, `type`, `domain`, `help` and `value`, the default of the node |
+| `GET /sys/processingNodes/{nodeId}/status` | Whether the node can be reached, its engine, `taskQueueCount`, the tasks it runs plus the tasks that wait, and `maxParallelTasks` |
 
-Common NodeODX options: `dsm`, `dtm`, `orthophoto`, `pc`, `3d-tiles`, `feature-quality`
-(`low`, `medium`, `high`), `gsd`.
+The `help` of an option comes with its placeholders filled in (the choices, the default and `%%`).
+Common NodeODX options: `dsm`, `dtm`, `3d-tiles`, `fast-orthophoto`, `feature-quality` (`ultra`, `high`,
+`medium`, `low`, `lowest`), `pc-quality` and `orthophoto-resolution`. Read the list of your node, as the
+options depend on its version.
+
+The progress of a run follows the stages of the node: its `phase` is one of `opensfm`, `openmvs`,
+`filtering points`, `meshing`, `texturing`, `georeferencing`, `DEM`, `orthophoto`, `report` and
+`postprocess`, and the percent does not go back. A failed or cancelled run is removed from the node after its
+output is copied to the log of the task (see
+[Processing nodes & features](/self-hosting/processing-nodes.mdx#nodeodx-nodes-for-photogrammetry)).
 
 ### splat-spz-export
 

@@ -705,6 +705,7 @@ Builds that wait and their retries never block a download or an import.
 | `RemoteNodePollIntervalSeconds` | `2` | Interval between two status requests to a remote node |
 | `RemoteNodePollMaxBackoffSeconds` | `30` | Longest interval after repeated failures |
 | `RemoteNodeRequestTimeoutSeconds` | `30` | Timeout of a request to a remote node |
+| `KeepFailedNodeTasks` | `false` | Keep a failed or cancelled NodeODX task on its node, for debugging. Off: Registry removes it from the node after it copied the output to the log of the task. |
 | `NodeOdx` | `[]` | NodeODX nodes for photogrammetry: `Id` (default `default`), `Url`, `Token` (optional), `Title` (optional). See [Processing nodes & features](/self-hosting/processing-nodes.mdx#nodeodx-nodes-for-photogrammetry). |
 | `Tools` | `{}` | Tool gating by tool id. See [Processing nodes & features](/self-hosting/processing-nodes.mdx#tool-gating). |
 

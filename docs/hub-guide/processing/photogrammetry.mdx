@@ -33,14 +33,16 @@ back into a dataset.
    every image of the dataset. All images under the folder are processed.
 
 4. If the server has more than one node, select the **Processing node**. Click **Check Node** to see if
-   the node answers and how many tasks wait on it.
+   the node answers, how many tasks it has and how many it runs at once, for example **Node reachable - 1
+   running, 0 waiting, max 1 parallel**, with its engine and version.
 
 5. Select a **Processing profile** (see the table below). The line under the list says what the profile
    makes.
 
    <Screenshot id="processing/photogrammetry--dialog" />
 
-6. Optional: change single options in the options editor under the profile (see **Options**). The window is 90 % of the screen high and the options list fills it. On a screen 1600 px wide or more, the list stands beside the fields; a phone keeps one column.
+6. Optional: type a **Task name**. It shows in the **Tool** column of the task list, so that two runs can be told apart.
+   Change single options in the options editor under the profile (see **Options**). The window is 90 % of the screen high and the options list fills it. On a screen 1600 px wide or more, the list stands beside the fields; a phone keeps one column.
 
 7. Select where the results go:
    - **Output folder**: a folder of this dataset (default `photogrammetry_output`).
@@ -49,14 +51,19 @@ back into a dataset.
      with a letter or a digit, with no `--`. The line under the field shows the rule of your server. The
      dataset is made in the same organization, when the results are imported at the end of the run.
 
-8. Click **Start**. If the node does not answer, Hub asks before it starts the task.
+8. Click **Start**. Hub checks the node first and shows one toast. If the node does not answer, Hub asks
+   before it starts the task.
 
-9. Follow the task in the **Tasks** tab. Click **View log** (the terminal button) to read what the node does.
+9. Follow the task in the **Tasks** tab. The row shows the current stage of the run next to the bar, for example
+   **opensfm**, **openmvs**, **meshing**, **texturing**, **DEM** or **orthophoto**, and the stage never goes back.
+   A task that waits for the node says so. Click **View log** (the terminal button) to read what the node does.
 
    <Screenshot id="processing/photogrammetry--progress" />
 
 10. When the task ends, the results are in the output folder. Hub then [builds](/hub-guide/processing/builds.mdx) them, so
-    they open on the map and in the viewers.
+    they open on the map and in the viewers. The builds of a run give one toast when the last of them ends, for
+    example **Photogrammetry finished - 9 files built** (with the names in the detail), and the **Tasks** tab folds
+    the builds that succeeded under the run, with their count. A build that failed stays in the list.
 
     <Screenshot id="processing/photogrammetry--results" />
 
@@ -86,6 +93,9 @@ The options editor lists every option of the node, in groups.
 | **Expand All** / **Collapse All** | Opens or closes every group |
 | **… changed** | The number of options you changed |
 | **Customized options** | One button per changed option. Click it to go to that option |
+| **Reset … to default** (the arrow on a changed option) | Puts the option back to the value of the profile and removes it from **Customized options** |
+
+Each option shows its help, with the allowed values and the default filled in.
 
 An option you change replaces the value of the profile. The other options of the profile stay. When you
 switch the profile, an option you changed that equals the value of the new profile goes back to the profile:
