@@ -68,7 +68,11 @@ browser and is [built](/hub-guide/processing/builds.mdx) like any other raster. 
   **Band misalignment detected** and applies an approximate correction. For an exact result, process the
   images with photogrammetry, for example with the **Multispectral** profile of
   [Photogrammetry](/hub-guide/processing/photogrammetry.mdx).
-- **Delete source files after merge** cannot be undone.
+- **Delete source files after merge** cannot be undone. Once Hub has started to delete the band files,
+  **Cancel** is not offered for the task. If the server restarts at that point, the task ends **Failed**
+  and names the band files that remain, and **Retry** answers that the task cannot run again.
+- If you cancel the merge, or it fails, Hub deletes the new file. The band files stay. See
+  [Tasks panel & logs](/hub-guide/processing/tasks.mdx).
 
 ## Related
 

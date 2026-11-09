@@ -55,11 +55,25 @@ see what runs, why a file is not ready, or to get the result of a task.
 |---|---|---|
 | **View log** | Opens the last lines of the log | Every task |
 | **Result** | Downloads the result file. Point at it to see until when it is available | A finished task that makes a file, for example a raster export or a ZIP download |
-| **Cancel** | Stops the task, after you confirm | A running or waiting task |
-| **Retry** | Runs the task again | A failed task |
+| **Cancel** | Stops the task, after you confirm. For a task that adds files, the confirmation says what is deleted | A running or waiting task, except one that can no longer be cancelled (see below) |
+| **Retry** | Runs the task again | A failed task. Not a cancelled task |
 | **Delete from history** | Removes the task and its result file, after you confirm | A finished task |
 | **Clear Concluded** | Removes every finished task of the list, and their result files | The toolbar |
 | **Run Photogrammetry** | Starts [photogrammetry](/hub-guide/processing/photogrammetry.mdx) | The toolbar, when the server has a processing node |
+
+## Cancel and failure of a task that adds files
+
+- Some tasks add files to a dataset: an import of a dataset or a file from a URL, an archive extraction,
+  a merge of multispectral bands, an alignment of a raster and photogrammetry. If such a task is
+  cancelled or fails, Hub deletes the files that the task added. The files that were in the dataset before,
+  and the files that other users add meanwhile, stay. The same happens if the server restarts during the
+  task.
+- A dataset that the task created is deleted a few minutes later if it is still empty.
+- **Cancel** is not offered for a task that can no longer be cancelled: a merge with **Delete source
+  files after merge**, or an extraction that deletes its archive, once it has started to delete its
+  sources. If such a task is lost because the server restarts, it ends **Failed** and names the sources
+  that remain. **Retry** then answers that the task cannot run again.
+- A failed import shows its reason as the error of the task.
 
 ## Limits & requirements
 

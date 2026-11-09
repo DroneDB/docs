@@ -25,8 +25,8 @@ file becomes a normal file of the dataset, with its properties, thumbnail and bu
 3. In **Extract to**, keep the folder of the archive, type another folder, or click **Browse folders**.
    Leave it empty for the root of the dataset. Hub says if the folder exists or will be created.
 4. Select **Overwrite existing files** and **Delete archive after extraction** if necessary.
-5. Click **Extract**. The window shows the progress. When the extraction is complete, Hub opens the
-   destination folder.
+5. Click **Extract**. The window shows the progress. When the extraction is complete, the new files
+   show in the file browser. Open the destination folder to see them.
 
    <Screenshot id="files/archives--extracted" />
 
@@ -47,8 +47,13 @@ ZIP (`.zip`), 7-Zip (`.7z`), RAR (`.rar`), TAR (`.tar`), compressed TAR (`.tar.g
 
 ## What happens
 
-- The extraction is all or nothing. If it fails, Hub removes every file it wrote and puts back every
-  file it replaced.
+- The extraction is all or nothing. If it fails, or if you cancel it, Hub removes every file it wrote and
+  puts back every file it replaced. The files that were in the dataset before, and the files that other
+  users add meanwhile, stay. The confirmation of **Cancel** says what is deleted. The same happens if
+  the server restarts during the extraction.
+- With **Delete archive after extraction**, **Cancel** is not offered once Hub has started to delete the
+  archive. If the server restarts at that point, the task ends **Failed** and names the files that
+  remain, and **Retry** answers that the task cannot run again.
 - Hub skips entries with a file type that the server does not allow, and reserved names such as
   `.ddb`. An entry with an unsafe path, for example one that contains `..`, stops the extraction.
 - Hub starts a build for each extracted file that it builds (orthophotos, point clouds, models …).
