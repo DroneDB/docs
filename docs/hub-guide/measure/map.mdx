@@ -28,11 +28,12 @@ save the measurements in the dataset, so the next visitor sees them too.
 
    <Screenshot id="measure/map--toolbar" />
 
-2. Click **Measure Length**. Click the points of the line on the map. Double-click to finish.
-   Press `Esc` to cancel.
+2. Click **Measure Length**. Click the points of the line on the map. Double-click, right-click or press
+   `Enter` to finish. Press `Esc` to cancel: the half-drawn line is removed. A hint on the map says the same
+   for each tool.
 
-3. Click **Measure Area**. Click the corners of the area. Double-click to finish. The area shows
-   in the middle of the polygon.
+3. Click **Measure Area**. Click the corners of the area (three or more) and finish the same way. The area
+   shows in the middle of the polygon.
 
    <Screenshot id="measure/map--area" />
 
@@ -56,6 +57,19 @@ save the measurements in the dataset, so the next visitor sees them too.
 
 </Steps>
 
+## Keys and gestures
+
+Every measuring and drawing tool of the map (measure, annotation, **Profile**, **Area**, **Inspect**,
+the stockpile tools) uses the same gestures. A tool that takes one point or two corners ends by itself:
+
+| Gesture | What it does |
+|---|---|
+| Left click | Adds a point |
+| Right click, double-click or `Enter` | Finishes the shape |
+| `Esc` | Cancels it: nothing is kept |
+| Right-drag | Pans the map without finishing the shape (a right button released within a few pixels is a click) |
+| `Space` | Adds a point at the crosshair that shows in the centre of the map, when the map has the focus, so you can draw without a pointer |
+
 ## Options
 
 The first row of the toolbar has the drawing tools. The second row shows when there are
@@ -68,7 +82,7 @@ measurements.
 | **Measure Area** | Draws a polygon and shows its area. |
 | **Erase Measurement** | Deletes the measurement you click. |
 | **Edit/Move Measurements** | Drag a point to move it. `Shift`+drag moves the whole measurement. Double-click opens the properties. `Ctrl+Z` undoes. `Esc` exits. |
-| **Stop Measuring** | Cancels the current tool (`Esc`). |
+| **Stop Measuring** | Cancels the current tool (`Esc`), and the shape you were drawing. |
 | **Measurement List** | Opens the list of measurements and groups. |
 | **Save Measurements** | Makes the saved file the same as the map. With nothing left on the map, it removes the saved measurements. |
 | **Clear All Measurements** | Removes all measurements from the map. The saved file does not change until you save again. |
