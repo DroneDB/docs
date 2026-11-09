@@ -32,10 +32,12 @@ also gives the weight and the cost of the pile.
    uses **Lowest perimeter**. After you choose one, every next pile uses it, and the pile on screen
    is measured again with it.
 
-3. Click **Click map**, then click on the pile. Hub finds the edge of the pile and computes its
-   volume against the ground around it, so detection works on a slope too. If Hub does not find
-   the right edge, click **Draw** and draw a polygon around the pile. Double-click to finish. On a
-   slope, choose **Best-fit plane** for a drawn polygon.
+3. Click **Click map**, then click on the pile. Hub outlines the pile down to its foot and
+   computes its volume against the ground around it, so detection works on a slope too. Check the
+   outline: when it does not reach the foot of the pile, the **Confidence** is below 50 %. Then
+   change the **Detection Sensitivity** or the **Search Radius**, or click **Draw** and draw a
+   polygon around the pile. Double-click to finish. On a slope, choose **Best-fit plane** for a
+   drawn polygon.
 
    <Screenshot id="analyse/stockpile--detect" />
 
@@ -78,7 +80,7 @@ eye in the layer panel, or lower its opacity. The volume does not depend on the 
 |---|---|---|
 | **Base Plane Method** | The surface under the pile. See the table below. | Lowest perimeter for a drawn polygon; Best-fit plane for a detected pile |
 | **Detection Sensitivity** | How easily the detection separates the pile from the ground, from 0 to 1. Higher values find lower piles, but can take in nearby ground. | 0.50 |
-| **Search Radius (m)** | How far from your click Hub looks for the edge of the pile. Make it larger for a large pile. | 50 |
+| **Search Radius (m)** | How far from your click Hub looks for the edge of the pile. A pile that is longer than this area is not found whole: use a radius that contains the whole pile. | 50 |
 | **Material (optional)** | The material that gives the weight and the cost. **+ Custom…** lets you type a density and a cost for this pile only. | none |
 
 <Screenshot id="analyse/stockpile--base-methods" />
@@ -99,9 +101,12 @@ eye in the layer panel, or lower its opacity. The volume does not depend on the 
 | **Net volume** | Cut minus fill. |
 | **2D area** / **3D surface** | The area of the outline on the map, and of the surface of the pile. |
 | **Base elevation** | The elevation of the base plane. |
-| **Confidence** | For a detected pile: how sure Hub is of the outline. |
+| **Confidence** | For a detected pile: how sure Hub is of the outline. It is below 50 % when the outline does not reach the foot of the pile. |
 | **Weight** | The larger of the cut and the net volume, times the density of the material. |
 | **Est. cost** | The weight times the price of the material. |
+
+**Clear** resets the panel and the detection overlay. A pile that you already saved on the map
+stays there. A detected pile that you did not save is removed.
 
 ## Materials, units and currency
 
@@ -110,9 +115,12 @@ the [preferences](/docs/hub-guide/account/preferences). There you change the den
 of each material, hide the ones you do not use and add your own. The prices are in the currency
 of the **Units** tab. The currency is a label: Hub does not convert prices.
 
-With imperial units, volumes are in yd³, weights in short tons and prices per short ton. Areas
-follow the same scale as the [measurements](/hub-guide/measure/map.mdx#units). A saved pile keeps the
-material it was weighed with.
+With imperial units, volumes are in yd³, weights in short tons and prices per short ton. The
+label of the pile on the map and in the **Measurement List** follow the units too, after
+**Map Settings > Measurement Units > Convert** and after you reload the page: they show yd³ and
+ST/yd³. The saved values stay metric. Areas follow the same scale as the
+[measurements](/hub-guide/measure/map.mdx#units). A saved pile keeps the material it was weighed
+with.
 
 ## Limits & requirements
 

@@ -96,7 +96,14 @@ change at once.
   **Delete Saved** shows only for users who can delete in the dataset.
 - The point cloud viewer saves next to the point cloud, with `_measurements.geojson` in place of
   the extension. The [map](/hub-guide/measure/map.mdx) uses the same file when it shows the point cloud. Each
-  view saves and deletes only its own measurements; the other view's stay in the file.
+  view saves and deletes only its own measurements; the other view's measurements and groups stay
+  in the file.
+- The file is in format 2.0. A file in an older format opens as it is and is upgraded the next
+  time you save. Opening a file never changes it.
+- The saved coordinates are in the coordinate system of the point cloud, converted to WGS84:
+  longitude and latitude, with the height in the units of the point cloud. A GIS program and the
+  map read the right place. A point cloud without a coordinate system saves its local coordinates,
+  with no `crs`.
 - The 3D viewer does not save its measurements.
 - The 3D viewer is experimental.
 

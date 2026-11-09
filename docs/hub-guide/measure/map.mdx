@@ -89,6 +89,9 @@ first. Click **Convert** to show all measurements in the new units. If you can w
 Hub then saves them in the new units; if you can only read it, nothing is saved. The units
 are the same setting as the **Units** tab of the [preferences](/docs/hub-guide/account/preferences),
 so they follow your account. Saved lengths and areas show in your current units when they load.
+The label of a [stockpile](/hub-guide/analyse/stockpile.mdx) on the map and its row in the
+**Measurement List** follow the units too, after **Convert** and after you reload the page: with
+**Imperial** they show yd³ and ST/yd³. The saved values stay metric.
 
 ### CSV columns
 
@@ -118,7 +121,10 @@ coordinates as `latitude, longitude`.
   the **Map** tab, they belong to the first orthophoto, raster or point cloud on show; with none,
   to a `measurements.geojson` file in the folder.
 - The map and the [point cloud viewer](/hub-guide/measure/3d.mdx) use the same file for the same point cloud.
-  Each view saves and deletes only its own measurements.
+  Each view saves and deletes only its own measurements, and keeps the measurements and groups
+  of the other view in the file.
+- Hub writes the file in format 2.0. A file in an older format opens as it is and is upgraded the
+  next time you save. Opening a file never changes it.
 - When the map changes to another file, unsaved changes are lost. Hub shows a warning.
 
 ## Related
