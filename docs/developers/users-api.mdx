@@ -29,6 +29,12 @@ AUTH="Authorization: Bearer $ADMIN_TOKEN"
 | `POST /users/changepwd` | Signed in | Change your own password (form `oldPassword`, `newPassword`). Returns a new token. |
 | `PUT /users/{userName}/changepwd` | Signed in | Change a password (JSON `currentPassword`, `newPassword`). Only an administrator may omit `currentPassword`, to reset the password of a user. |
 
+A refused password change is a `400` `ValidationProblemDetails` that names the field in `errors`, also when
+the form call sends `oldPassword`: `errors.currentPassword` is `["The current password is incorrect."]`, and
+`errors.newPassword` has the password rules that the new password breaks, as one sentence without the
+Identity codes. `detail` keeps the whole message. Read the field, not the text: the Hub shows each message
+under its field. A refusal that concerns no field (for example a locked user) has no `errors` member.
+
 ### Create a user
 
 ```bash

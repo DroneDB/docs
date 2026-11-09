@@ -43,9 +43,10 @@ button is always disabled for the user `admin`.
 
    <Screenshot id="self-hosting/users--add" />
 
-2. Enter the **Username**, the **Email** and the **Password**. A user name is 1 to 127 lowercase
-   letters (`a-z`) and digits. The dialog shows the rules of the
-   [password policy](/self-hosting/configuration.mdx#passwordpolicy) under the password field.
+2. Enter the **Username**, the **Email** and the **Password**, and type the password again in **Confirm
+   Password**. A user name is 1 to 127 lowercase letters (`a-z`) and digits. The dialog lists the rules of
+   the [password policy](/self-hosting/configuration.mdx#passwordpolicy) under the password field from the
+   start and ticks each one as you type. A message under a field says what is wrong with it.
 3. Optional: choose one or more **Roles**.
 4. Click **Add User**.
 
@@ -62,7 +63,9 @@ In the **Actions** column:
   user name cannot change. Users cannot change their own e-mail address in the Hub: an
   administrator sets it here. Build notification e-mails need a valid address.
 - **Change Password** (key): enter the **New Password** twice and click **Change Password**. Leave
-  **Current Password** empty to set a password without knowing the old one.
+  **Current Password** empty to set a password without knowing the old one. The dialog lists the password
+  rules and says under the field which one the new password breaks. The dialog asks the browser not to
+  fill in a saved password.
 - **Disable User** / **Enable User**: Disable asks first, then blocks sign-in at once; the open
   sessions of the user lose access too. The data of the user is kept. A disabled user has a
   **Disabled** tag next to the user name. Enable gives the access back. You cannot disable your
