@@ -76,7 +76,7 @@ Errors are RFC 9457 `ProblemDetails` with the media type `application/problem+js
 | `429` | Too many requests: the concurrent download limit or a rate limit. Read `Retry-After`. |
 | `500` | Server error |
 | `503` | Temporary: a busy index, a build that holds it, a server that stops. Read `Retry-After` and try again. |
-| `507` | The storage quota is full: an upload, a chunk or a commit over the quota answers `type` `https://www.rfc-editor.org/rfc/rfc4918#section-11.5` and `title` "Insufficient Storage" |
+| `507` | The storage quota of the organization owner is full. An upload, a chunk, a commit, a push, a paste or copy, an import and the start or the retry of a task that adds files answer `type` `https://www.rfc-editor.org/rfc/rfc4918#section-11.5` and `title` "Insufficient Storage". The `detail` says how much the owner has left |
 
 The OGC services answer with the exception format of their standard instead: see
 [OGC errors](/developers/ogc.mdx#errors).

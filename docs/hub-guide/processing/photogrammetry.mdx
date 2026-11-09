@@ -108,7 +108,13 @@ options of its own.
 - The server needs a processing node. Without one, the **Run Photogrammetry** button is not shown. When
   your account or organization cannot use processing, the button is grey and its tooltip says why.
 - On DroneDB Hub, every [plan](/hub-guide/account/plans.mdx) includes processing. The plan sets the priority.
-- The results count toward your storage.
+- The results count toward the storage of the owner of the organization, also when you are a member. **Start** is
+  refused when the owner has no space left or the estimate does not fit, and a run that runs out of space fails and
+  Hub removes what it added.
+- Hub imports the results without the internal folders of the run (`entwine_pointcloud/`, `opensfm/` and
+  `odm_meshing/`): they hold hundreds of chunk files that would show as separate point clouds. The point cloud
+  that Hub builds comes from the georeferenced model. The task log counts the files that it left out. An
+  administrator can change the folders ([Configuration](/self-hosting/configuration.mdx#processingplatform)).
 - When you click **Start**, the name and your write access in the organization are checked: a name that is
   already taken there is refused with a message that names it, and nothing is created. The server checks
   again when the results are imported. If someone took the name during the run, or you lost write access,

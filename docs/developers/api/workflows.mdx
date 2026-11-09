@@ -48,7 +48,7 @@ curl -X POST -H "$AUTH" $DS/obj \
 curl -X POST -H "$AUTH" $DS/obj -F path=images
 ```
 
-- Access, the storage quota (from `Content-Length`) and a `path` sent before its file are
+- Access, the storage quota of the organization owner (from `Content-Length`) and a `path` sent before its file are
   checked before the first byte is stored. A refused upload fails at once (`401`, `403`,
   `404`, `507`). A `507` is a `ProblemDetails` with `title` "Insufficient Storage".
 - In a bundle a file that fails does not fail the others. Each result is
@@ -96,8 +96,8 @@ session stored.
   and `complete`.
 - `DELETE …/obj/chunk/{fileId}` removes the stored chunks (`204`, or `404`). A chunk that is being
   written finishes first and then answers `404`.
-- The first chunk of a new upload reserves its size, with the open uploads of the caller in the organization.
-  When they do not fit in the storage quota, it answers `507`.
+- The first chunk of a new upload reserves its size, with the open uploads of the owner of the organization
+  (in all its organizations). When they do not fit in the storage quota of the owner, it answers `507`.
 
 An upload that is not committed is removed after 7 days without a chunk. The server removes after 24 hours
 a session that was made before the update that keeps the file id, and the chunks of a share batch.

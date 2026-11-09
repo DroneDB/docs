@@ -54,8 +54,14 @@ ZIP (`.zip`), 7-Zip (`.7z`), RAR (`.rar`), TAR (`.tar`), compressed TAR (`.tar.g
 - With **Delete archive after extraction**, **Cancel** is not offered once Hub has started to delete the
   archive. If the server restarts at that point, the task ends **Failed** and names the files that
   remain, and **Retry** answers that the task cannot run again.
-- Hub skips entries with a file type that the server does not allow, and reserved names such as
-  `.ddb`. An entry with an unsafe path, for example one that contains `..`, stops the extraction.
+- Hub skips entries with a file type that the server does not allow, entries that already exist when **Overwrite
+  existing files** is off, and reserved names such as `.ddb`. An entry with an unsafe path, for example one that
+  contains `..`, stops the extraction.
+- The skipped entries are not hidden. A toast names them with the reason, for example **Skipped 1 entry:
+  vectors/tool.exe (file type not allowed)** (the first three, then a count), and the log lists each one
+  (**Skipped: path (reason)**, the first 50) before the line **Extraction complete: 8 extracted, 1 skipped**.
+- The space of the owner of the organization counts: an extraction that does not fit is refused, and one that
+  runs out of space fails and is rolled back.
 - Hub starts a build for each extracted file that it builds (orthophotos, point clouds, models …).
 
 ## Limits & requirements

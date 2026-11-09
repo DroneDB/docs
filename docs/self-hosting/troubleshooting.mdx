@@ -236,7 +236,7 @@ file done when Registry reports it. Raise `proxy_read_timeout` if this happens o
 |---------|---------------|
 | `413 Payload Too Large` | [`MaxRequestBodySize`](/self-hosting/configuration.mdx#maxrequestbodysize) and the body limit of the proxy |
 | A file is refused with a message about its extension | The file type is blocked: [`BlockedFileExtensions`](/self-hosting/configuration.mdx#import) or `AllowedFileExtensions` |
-| Uploads are refused for one user | The [storage quota](/self-hosting/users.mdx#storage-quotas) of the user is full |
+| Uploads, imports or tasks are refused for one user | The [storage quota](/self-hosting/users.mdx#storage-quotas) of the user is full. In an organization it is the quota of the owner that counts, also for the members |
 | Uploads fail for everyone | Free disk space and the permissions of `DatasetsPath` (the `registry` user must own it) |
 
 ## Builds

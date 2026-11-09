@@ -152,7 +152,18 @@ datasets stay hidden.
    [Users & organizations API](/docs/developers/users-api)).
 
 The **Storage** column then shows the use, the quota and a bar. A user without `maxStorageMB` has
-no limit. When a user is at the quota, new uploads are refused. The parts of the open chunked uploads of a user count in the use: **Cancel** or **Discard** in the upload window of the Hub, or the cleanup after 7 days, frees them.
+no limit. When a user is at the quota, new uploads are refused.
+
+The quota is the one of the **owner of the organization**, and it counts on every way that adds files to its datasets:
+uploads (also chunked and bundled), push, paste and copy, file and dataset import, archive extract,
+Merge Multispectral, Align, Mask Borders and photogrammetry. A member who writes into the organization of an
+owner who is over the quota gets `507` (**Storage quota exceeded**), and the message says how much the owner has left.
+An administrator owner has no limit, and an organization without an owner is unlimited.
+
+A task that adds files is refused when it starts, and when it is retried, if nothing is left or its estimate does not fit.
+While it runs it also reads what is left when it writes. If the quota stops the task, the task fails with the `507` text, and
+Registry removes the files that it added and puts back the files it replaced. The parts of the open chunked uploads of the
+owner count in the use: **Cancel** or **Discard** in the upload window of the Hub, or the cleanup after 7 days, frees them.
 
 ## Common problems
 

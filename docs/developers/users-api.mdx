@@ -121,7 +121,10 @@ the disable and enable endpoints change it. A role can also limit who may use a 
 | `POST /users/{userName}/meta` | Admin | Set the metadata of a user (a JSON object) |
 
 The storage limit of a user is the metadata key `maxStorageMB`. It applies when the storage
-limiter is on (`storageLimiter` in `GET /sys/features`). An upload over the limit answers `507`.
+limiter is on (`storageLimiter` in `GET /sys/features`). It is the quota of the **owner of the
+organization** that counts, whoever writes: when the owner is over the quota, a member of the organization
+who uploads, pastes, copies, imports or starts a task that adds files gets `507` too. An administrator
+owner has no limit, and an organization without an owner is unlimited.
 
 ```bash
 curl -X POST -H "$AUTH" -H "Content-Type: application/json" $REG/users/jdoe/meta \

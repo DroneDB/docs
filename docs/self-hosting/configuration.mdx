@@ -351,7 +351,7 @@ Tuning of the upload pipeline (`POST …/obj`, bundles and chunked uploads). Eve
 | `MaxPartsPerRequest` | `64` | Most file parts in one bundled upload request. |
 | `MaxChunkBytes` | `134217728` (128 MB) | Largest chunk of a chunked (resumable) upload. |
 
-The chunks of a chunked upload that nobody finishes stay for 7 days after the last chunk, so a user can resume after a reload; the cleanup then removes them. This is not a setting. A session without a file id (made before the update) and the chunks of a share batch go after 24 hours. The chunks of the open uploads of a user count in the storage quota of the organization.
+The chunks of a chunked upload that nobody finishes stay for 7 days after the last chunk, so a user can resume after a reload; the cleanup then removes them. This is not a setting. A session without a file id (made before the update) and the chunks of a share batch go after 24 hours. The chunks of the open uploads of the owner of an organization count in the storage quota of that owner.
 
 ### IndexQueue
 
@@ -705,6 +705,7 @@ Builds that wait and their retries never block a download or an import.
 | `RemoteNodePollIntervalSeconds` | `2` | Interval between two status requests to a remote node |
 | `RemoteNodePollMaxBackoffSeconds` | `30` | Longest interval after repeated failures |
 | `RemoteNodeRequestTimeoutSeconds` | `30` | Timeout of a request to a remote node |
+| `PhotogrammetryExcludedFolders` | not set | The folders of a photogrammetry result (relative to the bundle, any letter case) that Registry does not import. Not set: `entwine_pointcloud/`, `opensfm/` and `odm_meshing/`. `[]`: import every file. A list excludes only its folders. The skipped files are counted in the task log. |
 | `KeepFailedNodeTasks` | `false` | Keep a failed or cancelled NodeODX task on its node, for debugging. Off: Registry removes it from the node after it copied the output to the log of the task. |
 | `NodeOdx` | `[]` | NodeODX nodes for photogrammetry: `Id` (default `default`), `Url`, `Token` (optional), `Title` (optional). See [Processing nodes & features](/self-hosting/processing-nodes.mdx#nodeodx-nodes-for-photogrammetry). |
 | `Tools` | `{}` | Tool gating by tool id. See [Processing nodes & features](/self-hosting/processing-nodes.mdx#tool-gating). |
