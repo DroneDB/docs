@@ -84,7 +84,23 @@ For files too large for one request, send chunks of at most 128 MB:
 3. `POST …/obj/chunk/{fileId}/commit` adds the file: `201` with the entry, or `409` with the
    missing chunks. A second commit returns the same entry.
 
-An upload that is not committed is removed after 24 hours.
+An upload belongs to the user who sends it and to its `fileId`: another user gets `404` for it. To
+let a client find the upload again after a restart, make `fileId` from the file, so that the same file
+gets the same id. Hub uses the SHA-256 (hex) of the dataset, the path, the size and the
+last-modified time. Add the form fields `fileName` (the name on the client's disk) and `lastModified`
+(milliseconds since 1970) to the first chunk, and the server keeps them. A resume goes to the path that the
+session stored.
+
+- `GET …/obj/chunk` lists the open uploads of the caller in the dataset. Each has `fileId`, `path`,
+  `totalFileSize`, `totalChunks`, `chunkSize`, `sourceFileName`, `lastModified`, `received`, `missing`
+  and `complete`.
+- `DELETE …/obj/chunk/{fileId}` removes the stored chunks (`204`, or `404`). A chunk that is being
+  written finishes first and then answers `404`.
+- The first chunk of a new upload reserves its size, with the open uploads of the caller in the organization.
+  When they do not fit in the storage quota, it answers `507`.
+
+An upload that is not committed is removed after 7 days without a chunk. The server removes after 24 hours
+a session that was made before the update that keeps the file id, and the chunks of a share batch.
 
 ### Check the connection
 

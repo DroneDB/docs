@@ -69,13 +69,23 @@ after 24 hours. **Upload Files** makes a dataset only when you click **Upload**.
 
 ## Big uploads
 
-- Keep the browser tab open until the upload is complete. If you close the tab, the upload
-  stops.
 - Hub sends a large file in parts. After a network error, it sends again only the part that
   failed, not the whole file. It tries again by itself after short network problems.
-- **Cancel Upload** in the upload window of a dataset stops the files that are not sent. The files that the
-  server already has are still added to the dataset. **Cancel** on the **Upload Files** page is different:
-  it removes everything that the upload added.
+- Click **Pause** in the upload window to stop sending, and **Resume** to go on. The upload also goes on
+  while you use other pages of the Hub: click **Continue in background**. The cloud button in the header
+  shows the files left and the progress. Click it for the list of uploads, with **Pause**, **Resume** and
+  **Cancel**.
+- If you reload the page, close the tab or lose the connection, the parts that the server has are kept for 7
+  days. Open the dataset, click **Upload**, and the window lists **Interrupted uploads**. Select the same file
+  again (the same name, size and date) and **Resume**, and Hub sends only the missing parts. **Discard**
+  deletes the stored parts.
+- Uploads stop when you sign out or your session ends. Sign in and resume them the same way.
+- **Cancel Upload** in the upload window of a dataset stops the files that are not sent, and the server
+  deletes the parts of those files. The files that the server already has are still added to the dataset.
+  **Cancel** on the **Upload Files** page is different: it removes everything that the upload added. Only
+  uploads in a dataset resume; an upload on the **Upload Files** page does not.
+- The parts of an open upload count in your storage, so a new upload is refused when the open ones and
+  the new file do not fit. **Cancel** or **Discard** frees the space at once.
 - If uploads are slower than you expect, click **Uploads slower than expected? Test the
   connection** at the end of an upload. It opens a connection test on your account page.
 

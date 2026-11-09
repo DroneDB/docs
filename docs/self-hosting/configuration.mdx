@@ -351,6 +351,8 @@ Tuning of the upload pipeline (`POST …/obj`, bundles and chunked uploads). Eve
 | `MaxPartsPerRequest` | `64` | Most file parts in one bundled upload request. |
 | `MaxChunkBytes` | `134217728` (128 MB) | Largest chunk of a chunked (resumable) upload. |
 
+The chunks of a chunked upload that nobody finishes stay for 7 days after the last chunk, so a user can resume after a reload; the cleanup then removes them. This is not a setting. A session without a file id (made before the update) and the chunks of a share batch go after 24 hours. The chunks of the open uploads of a user count in the storage quota of the organization.
+
 ### IndexQueue
 
 Tuning of the queue that writes new files into the index of each dataset. Every field is optional.
