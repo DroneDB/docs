@@ -29,11 +29,22 @@ messages (warnings, `--debug` records) to **stderr**. You can pipe the output of
 | Exit code | When |
 |---|---|
 | `0` | The command succeeded. Also `ddb --help` and `ddb <command> --help`. |
-| `1` | The command failed: no arguments, an unknown command, an invalid argument or format, a failed push or pull, or a Registry that cannot be reached. The message is on stderr. |
+| `1` | The command failed: no arguments, an unknown command, an invalid argument or format, a failed push or pull, a pull that stops on unresolved conflicts, or a Registry that cannot be reached. The message is on stderr. |
 
 `ddb push`, `ddb pull`, `ddb clone` and `ddb share` accept only `http` and `https` Registry
-URLs. A Registry that cannot be reached fails at once with
-`could not connect to <url>: <reason>`, without a password prompt.
+URLs. When the Registry cannot be reached, `ddb push`, `ddb pull`, `ddb share` and `ddb clone`
+fail at once with `could not connect to <url>: <reason>` (for `ddb clone`, after
+`Registry request failed: `), without a password prompt.
+
+A pull that stops on conflicts exits with `1`:
+`Pull stopped: N conflicts. Use --keep-theirs or --keep-ours.`
+
+Without a terminal (a script, a CI job), a command that needs a password does not wait for one.
+It fails with:
+
+```text
+no terminal to read the password: run `ddb login -u <user> -p <password>` first (ddb share also reads DDB_USERNAME and DDB_PASSWORD)
+```
 
 Before DroneDB 2.0 the log also went to stdout, and some failures exited with `0`.
 
@@ -49,10 +60,10 @@ process-wide settings with `DDBConfigure` instead (see [DroneDB library](/develo
 |---|---|---|
 | `DDB_LOG` | not set | Any value: write a log file (`ddb-log.csv`) in the current folder. |
 | `DDB_DEBUG` | not set | Any value: verbose debug output on stderr, as `--debug`. |
-| `DDB_HOME` | `~/.ddb` | The DroneDB home folder: saved credentials and the user profile. |
+| `DDB_HOME` | your home folder | DroneDB keeps its profile (saved credentials, templates, cache) in `$DDB_HOME/.ddb`. |
 | `DDB_DATA` | the bundled folder | The folder of the bundled data files (time zones, PROJ, GDAL). A `GDAL_DATA`, `PROJ_DATA` or `PROJ_LIB` that you set wins. |
 | `DDB_OPENTOPOGRAPHY_KEY` | not set | OpenTopography API key, used to estimate the relative altitude of images from the world DSM. Without it the altitude comes from GPS (one warning). There is no built-in key. |
-| `DDB_USERNAME`, `DDB_PASSWORD` | not set | Credentials that `ddb share --non-interactive` uses when there are no saved ones. |
+| `DDB_USERNAME`, `DDB_PASSWORD` | not set | Credentials that `ddb share` signs in with first, when both are set (also with `--non-interactive`). Credentials that work are saved, as with `ddb login`. When they are refused, `ddb share` uses the saved ones. |
 
 ### Threads and disk
 

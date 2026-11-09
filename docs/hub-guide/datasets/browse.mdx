@@ -21,12 +21,13 @@ the organizations you work in. Use the datasets page of an organization to find 
 <Steps>
 
 1. Sign in, click the user button at the top right and click **My Organizations**.
-   Hub lists the organizations that you own. **My Datasets** opens the datasets of your personal
-   organization.
+   Hub lists the organizations that you own, that you are a member of, or that are public.
+   **My Datasets** opens the datasets of your personal organization.
 
    <Screenshot id="datasets/browse--organizations" />
 
-2. To also see the organizations that you are a member of, turn on **Show all**.
+2. To see every organization that you can open, turn on **Show all**. For a server
+   administrator, this lists every organization of the server.
 3. Type in **Search organizations** to filter the list by name, slug, description or owner.
 4. Use the sort control to sort by **Name**, **Creation date**, **Last modified** or
    **Number of datasets**. The arrow button next to it changes the direction.
@@ -43,14 +44,16 @@ the organizations you work in. Use the datasets page of an organization to find 
 </Steps>
 
 You do not need an account to open a public organization. Open its address directly, for example
-`hub.dronedb.app/r/odm`. Hub then shows its public datasets.
+`hub.dronedb.app/r/odm`. Hub then shows its public datasets. A signed-in user who is not a member
+sees a public organization in the list and opens it read-only: there is no **Create Dataset** or
+**Import**.
 
 ## Options
 
 | Option | What it does | Default |
 |---|---|---|
 | **List** / **Map** | Shows the organizations or datasets as a list, or as pins on a map | List |
-| **Show all** | Adds the organizations that you are a member of to the list | Off |
+| **Show all** | Lists every organization that you can open (every organization, for a server administrator) | Off |
 | Sort control | Sorts the organizations | Name, ascending |
 | **No location** | On the map: opens the list of the datasets that have no pin | — |
 | Rows per page | 5, 10, 25, 50 or 100 rows | 10 |

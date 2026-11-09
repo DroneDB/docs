@@ -21,7 +21,8 @@ in the container). The first start creates the file from the built-in defaults
   `1`) and the message lists every failure with the name of its key. To check without starting,
   run `Registry.Web <storage folder> --check`: it reads the file and the environment like a start,
   writes nothing and exits `0` when the settings are valid. With Docker, run the new image with
-  `--check` and the file mounted at `/data/appsettings.json`.
+  `--check` and the file mounted at `/data/appsettings.json`. `--check` does not check the
+  [`IndexQueue`](#indexqueue) fields: Registry checks them when the index queue starts.
 - **Restart.** A change takes effect when the Registry services restart.
 - **Defaults.** "Default" below is the value a new `appsettings.json` has. Where the built-in value
   for an empty or missing key is different, the table says so.
@@ -971,9 +972,10 @@ transfer with a refused file fails with a message that names the file and the re
 ## Logging
 
 The top-level `Serilog` section. A new file logs at `Warning` to the console and to
-`logs/registry.txt` in the storage folder. Each instance type adds its own suffix to the file name
-(`registry-web`, `registry-node-<host name>`, `registry-thumbs`). Files roll daily; 14 are kept, at
-most 100 MB each.
+`logs/registry.txt` in the storage folder. The default instance (type `0`) keeps that name. The
+other instance types add a suffix to it (`registry-web`, `registry-node-<host name>`,
+`registry-thumbs`). Files roll daily, with the date in the name (`registry20261108.txt`); 14 are
+kept, at most 100 MB each.
 
 To change the level, change the value of the level switch and restart:
 

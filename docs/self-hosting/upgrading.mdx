@@ -47,9 +47,10 @@ links to the release pages on GitHub. Embedded views (`?embed=1`) skip the check
 Branding files in `data/branding/` are never touched by the upgrade (see
 [Hub UI customization](/self-hosting/configuration.mdx#hub-ui-customization)).
 
-## Upgrade to Registry 3.0 (DroneDB 2.0)
+## Upgrade to Registry 3.0 (DroneDB 2.x)
 
-Registry 3.0 runs on DroneDB 2.0 and changes the deployment in a few places.
+Registry 3.0 runs on DroneDB 2.x (the image and the Windows release ship DroneDB 2.0.1) and
+changes the deployment in a few places.
 
 ### Before the upgrade
 
@@ -103,8 +104,9 @@ Registry 3.0 runs on DroneDB 2.0 and changes the deployment in a few places.
 - **Administrator password.** `DefaultAdmin.Password` only creates a new administrator. To recover
   a password, use `--reset-admin-password` (see
   [Troubleshooting](/self-hosting/troubleshooting.mdx#reset-the-administrator-password)).
-- **Logs.** Log files are named per instance type (`registry-web*.txt`,
-  `registry-node-<host name>*.txt`, `registry-thumbs*.txt`) and roll daily (14 kept). Give each
+- **Logs.** The default instance (type `0`, the one-container setup) still writes
+  `registry*.txt`. The other instance types write their own files (`registry-web*.txt`,
+  `registry-node-<host name>*.txt`, `registry-thumbs*.txt`). Files roll daily (14 kept). Give each
   processing node container a fixed `hostname`.
 - **Altitude key.** DroneDB 2.0 has no built-in OpenTopography key. Set `DDB_OPENTOPOGRAPHY_KEY` in
   the environment of every Registry process if relative altitudes should come from the world
@@ -146,8 +148,9 @@ Hangfire.
 ## Point clouds: EPT to COPC
 
 Since Registry 2.3.0, point clouds stream in the **COPC** format (`build/<hash>/copc/cloud.copc.laz`)
-instead of the **EPT** layout (`build/<hash>/ept/ept.json`). Registry does not read EPT builds:
-point clouds built before 2.3.0 are not viewable until they are migrated. If you upgrade from a
+instead of the **EPT** layout (`build/<hash>/ept/ept.json`). Registry does not read EPT builds.
+libddb still lists `pointcloud.ept` as a legacy role, but the Hub cannot show it: point clouds
+built before 2.3.0 are not viewable until they are migrated. If you upgrade from a
 version before 2.3.0, choose one way:
 
 1. **Run the migration script** (recommended). `scripts/migrate-to-copc.py` of the Registry

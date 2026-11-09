@@ -16,10 +16,10 @@ Usage:
                         --lat/--lon) (default: 0)
       --local           Force a non-georeferenced (local) tileset, skipping 
                         sidecar auto-detection
-      --overwrite       Overwrite the output directory if it exists
       --force-defaults  Skip face-count heuristic and use default Obj2Tiles 
                         parameters (divisions=3, lods=3, octree=true) for 
                         testing
+      --overwrite       Replace the output if it already exists
   -h, --help            Print help
       --debug           Show debug output
 
@@ -55,6 +55,7 @@ Usage:
                        similarity)
       --validate       Only validate inputs; do not align
       --no-seed        Disable phase-correlation seed (slower NCC search)
+      --overwrite      Replace the output if it already exists
   -h, --help           Print help
       --debug          Show debug output
 
@@ -69,7 +70,7 @@ Usage:
 
   -i, --input arg   File to process
   -o, --output arg  bm3d output file
-      --overwrite   Overwrite output file if it exists
+      --overwrite   Replace the output if it already exists
   -h, --help        Print help
       --debug       Show debug output
 
@@ -133,6 +134,7 @@ Usage:
   -o, --output arg  Output Cloud Optimized GeoTIFF
   -i, --input arg   Input georeferenced raster (GeoTIFF, JPEG 2000, ...) to 
                     process
+      --overwrite   Replace the output if it already exists
   -h, --help        Print help
       --debug       Show debug output
 
@@ -172,6 +174,7 @@ Usage:
   -o, --output arg  Output directory where to store the COPC file 
                     (cloud.copc.laz)
   -i, --input arg   File(s) to process
+      --overwrite   Replace the output if it already exists
   -h, --help        Print help
       --debug       Show debug output
 
@@ -199,11 +202,14 @@ Usage:
 ```
 Project images to georeferenced rasters
 Usage:
-  ddb geoproj output/ *.JPG [args]
+  ddb geoproj output/ *.JPG
+       geoproj -o output/ *.JPG [args]
 
-  -o, --output arg  Output path (file or directory)
+  -o, --output arg  Output path (file, or directory: one that exists or 
+                    ends with /)
   -i, --images arg  Images to project
   -s, --size arg    Output image size (size[%]|0) (default: 100%)
+      --overwrite   Replace the output if it already exists
   -h, --help        Print help
       --debug       Show debug output
 
@@ -236,6 +242,7 @@ Usage:
                             the exported images (default: the originals)
       --max-points arg      With --training-data: most points of the sparse 
                             model (at most 10000000) (default: 100000)
+      --overwrite           Replace the output if it already exists
   -h, --help                Print help
       --debug               Show debug output
 
@@ -334,6 +341,7 @@ Usage:
   -n, --near arg    Tolerance in grey levels (default: 15)
   -w, --white       Search for white borders instead of black
   -c, --color arg   Custom color r,g,b (e.g. 0,0,0) (default: "")
+      --overwrite   Replace the output if it already exists
   -h, --help        Print help
       --debug       Show debug output
 
@@ -349,6 +357,7 @@ Usage:
   -o, --output arg  Output Cloud Optimized GeoTIFF path
       --validate    Only validate inputs, don't merge
   -i, --input arg   Input single-band raster files
+      --overwrite   Replace the output if it already exists
   -h, --help        Print help
       --debug       Show debug output
 
@@ -435,7 +444,9 @@ Usage:
 ### rescan
 
 ```
-Re-process all indexed files to update metadata.Useful when upgrading DroneDB to a version that extracts more metadata or supports new file types.
+Re-process all indexed files to update metadata.
+
+Useful when upgrading DroneDB to a version that extracts more metadata or supports new file types.
 
 Valid type filters: generic, geoimage, georaster, pointcloud, image, dronedb, markdown, video, geovideo, model, panorama, geopanorama, vector, gaussiansplat, tiles3d
 Usage:
@@ -445,8 +456,8 @@ Usage:
   -t, --type arg           Entry types to rescan (comma-separated). Valid 
                            types: generic, geoimage, georaster, pointcloud, 
                            image, dronedb, markdown, video, geovideo, 
-                           model, panorama, geopanorama, vector (default: 
-                           "")
+                           model, panorama, geopanorama, vector, 
+                           gaussiansplat, tiles3d (default: "")
   -e, --ext arg            File extensions to rescan (comma-separated, e.g. 
                            dwg,dxf). Combined with --type, an entry must 
                            match both (default: "")
@@ -615,6 +626,7 @@ Usage:
   -o, --output arg  Output file or directory where to store thumbnail(s)
   -s, --size arg    Size of the largest side of the images (default: 512)
       --use-crc     Use CRC for output filenames
+      --overwrite   Replace the output if it already exists
   -h, --help        Print help
       --debug       Show debug output
 
@@ -642,6 +654,7 @@ Usage:
                     (default: auto)
   -s, --size arg    Tile size (default: 256)
       --tms         Generate TMS tiles instead of XYZ
+      --overwrite   Replace the output if it already exists
   -h, --help        Print help
       --debug       Show debug output
 

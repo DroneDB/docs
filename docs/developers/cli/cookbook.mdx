@@ -43,8 +43,13 @@ random name in your personal organization. It prints the URL of the dataset on s
 
 ### Share from a script
 
-`--non-interactive` never prompts. It uses the saved credentials (from `ddb login`), else
-`DDB_USERNAME` and `DDB_PASSWORD`, and fails when they are refused.
+`--non-interactive` never prompts. It signs in with `DDB_USERNAME` and `DDB_PASSWORD` when
+both are set, else with the saved credentials (from `ddb login`), and fails when they are
+refused.
+
+A share saves the credentials that worked in `auth.json` of your profile, as `ddb login` does.
+When a later `DDB_PASSWORD` is refused, `ddb share` still signs in with the saved credentials.
+Run `ddb logout` to remove them.
 
 ```bash
 export DDB_USERNAME=survey-bot
@@ -76,7 +81,7 @@ ddb logout                                 # every server
 ddb logout --server http://localhost:5000  # one server
 ```
 
-Credentials are saved in the DroneDB home folder (`~/.ddb`, or `DDB_HOME`).
+Credentials are saved in `~/.ddb` (or `$DDB_HOME/.ddb`).
 
 ## Metadata
 
@@ -106,7 +111,8 @@ ddb meta set visibility 2   # public
 ddb push
 ```
 
-In Hub, see [Visibility](/docs/hub-guide/sharing/visibility).
+The Registry applies the pushed visibility at once: the next request sees it, in both
+directions. In Hub, see [Visibility](/docs/hub-guide/sharing/visibility).
 
 ## Inspect and export metadata
 
@@ -129,7 +135,7 @@ ddb info odm_orthophoto.tif -f json --with-hash
 | `ddb sync` | Updates the index for deleted and modified files. |
 | `ddb rescan` | Reads the metadata of every indexed file again. Use it after an upgrade that reads more metadata or new formats. |
 | `ddb cleanup` | Removes entries whose files are gone and their orphaned build files, then shrinks the database. |
-| `ddb delta a.ddb b.ddb` | Lists the add and remove actions between two indexes, with paths and hashes. Push and pull use the same comparison. |
+| `ddb delta ./dataset-a ./dataset-b` | Lists the add and remove actions that turn the second dataset into the first, with paths and hashes. It takes two dataset folders (each with its `.ddb`). Push and pull use the same comparison. |
 | `ddb system clean` | Removes the user cache (thumbnails, downloaded tiles). |
 
 Rescan only some entries with a type (`-t`), an extension (`-e`) or both. An entry must match
@@ -164,13 +170,31 @@ for a temporary reason (low disk space, a tool that stopped printing) is retried
 One-file conversions that do not need an index:
 
 ```bash
-ddb cog input.tif output.tif               # Cloud Optimized GeoTIFF
-ddb copc output/ point_cloud.laz           # Cloud Optimized Point Cloud (LAS, LAZ, E57, PTS, XYZ, PLY)
+ddb cog -i input.tif -o output.tif         # Cloud Optimized GeoTIFF
+ddb copc output/ point_cloud.laz           # Cloud Optimized Point Cloud (LAS, LAZ, E57, PTS, XYZ, PLY): output/cloud.copc.laz
 ddb thumbs *.JPG -o thumbs/                # thumbnails
 ddb thumbs orthophoto.tif -o thumb.webp -s 1024
 ddb tile orthophoto.tif output_tiles/      # static XYZ/TMS tiles (GeoTIFF, GeoImage, COPC)
-ddb geoproj images/DJI_0018.JPG -o projected/   # project a photo to a georeferenced raster
+ddb geoproj -o projected/ images/DJI_0018.JPG   # project a photo to a georeferenced raster
 ```
+
+Give `ddb cog` the input with `-i` and the output with `-o`. `ddb geoproj` takes `-o` before or
+after the images. An output that ends with `/` is a folder, which `ddb geoproj` creates.
+
+### Existing outputs
+
+The commands that write files (`cog`, `copc`, `thumbs`, `tile`, `geoproj`, `align`,
+`merge-multispectral`, `mask`, `bm3d`, `3dtiles` and `gsplat`) never replace a file that exists
+unless you add `--overwrite`. Without it they write nothing, print one line and exit with `1`:
+
+```text
+The output output.tif already exists: add --overwrite to replace it
+```
+
+- They never write over one of their inputs, even with `--overwrite`.
+- A command with several outputs (`thumbs`, `geoproj`, `tile`) checks every output before it
+  writes the first. Two inputs that would write the same file are refused.
+- To tile a raster again into the same folder, add `--overwrite`: the existing tiles are replaced.
 
 ## Generate a STAC catalog
 
@@ -294,10 +318,10 @@ ddb contour dem.tif -o contours.geojson -i 5 --min 0 --max 200
 Make black (or white) border pixels transparent. The output is `<input>_masked.tif`.
 
 ```bash
-ddb mask orthophoto.tif
-ddb mask orthophoto.tif -o output.tif -n 20
-ddb mask orthophoto.tif -w            # white borders
-ddb mask orthophoto.tif -c 0,0,128    # a custom border colour
+ddb mask orthophoto.tif                              # writes orthophoto_masked.tif
+ddb mask orthophoto.tif -o masked.tif -n 20
+ddb mask orthophoto.tif -o white.tif -w              # white borders
+ddb mask orthophoto.tif -o custom.tif -c 0,0,128     # a custom border colour
 ```
 
 | Option | Description |
@@ -314,7 +338,7 @@ is a COG in EPSG:3857.
 
 ```bash
 ddb align -i source.tif -r reference.tif -o aligned.tif                   # similarity (default)
-ddb align -i source.tif -r reference.tif -o aligned.tif -m translation    # translation only
+ddb align -i source.tif -r reference.tif -o shifted.tif -m translation    # translation only
 ddb align -i source.tif -r reference.tif --validate                       # check only
 ```
 
@@ -365,11 +389,10 @@ and removes `nxs/` only after `bm3d/` is published; a failed rebuild keeps `nxs/
 `ddb 3dtiles` needs the optional Obj2Tiles program.
 
 ```bash
-ddb 3dtiles model.obj                                        # next to the input
-ddb 3dtiles model.obj ./3dtiles
-ddb 3dtiles model.obj ./3dtiles --local                      # not georeferenced
-ddb 3dtiles model.obj ./3dtiles --lat 43.7 --lon 10.4 --alt 50
-ddb 3dtiles model.obj ./3dtiles --force-defaults             # skip the size heuristic
+ddb 3dtiles model.obj                                        # 3dtiles/ next to the input
+ddb 3dtiles model.obj ./local-tiles --local                  # not georeferenced
+ddb 3dtiles model.obj ./placed-tiles --lat 43.7 --lon 10.4 --alt 50
+ddb 3dtiles model.obj ./3dtiles --overwrite --force-defaults # replace 3dtiles/, skip the size heuristic
 ```
 
 By default the georeference comes from sidecar files next to the model (the ODM and Obj2Tiles
@@ -389,11 +412,17 @@ finest level):
 
 `--force-defaults` uses the Obj2Tiles defaults (divisions 3, LODs 3, octree) for tests.
 
-The command and the model build write the new tileset in a new folder and then replace the old
-one, so a failed run keeps the tileset that was there. An interrupted replacement can leave
-`3dtiles-old/` next to `3dtiles/`; the next build of the model restores it. A model whose bm3d
-file is complete is complete without 3D Tiles: a failure of Obj2Tiles is logged and does not
-retry the build.
+`ddb 3dtiles` refuses an output folder that is not empty, and one that holds the model:
+
+```text
+The output folder ./3dtiles is not empty: add --overwrite to replace it
+```
+
+The command (with `--overwrite`) and the model build write the new tileset in a new folder and
+then replace the old one, so a failed run keeps the tileset that was there. An interrupted
+replacement can leave `3dtiles-old/` next to `3dtiles/`; the next build of the model restores
+it. A model whose bm3d file is complete is complete without 3D Tiles: a failure of Obj2Tiles is
+logged and does not retry the build.
 
 ### Add a 3D Tiles archive
 
@@ -528,15 +557,19 @@ near side cut away.
 
 ```bash
 ddb gsplat scene.ply scene.spz
-DDB_GSPLAT_SH_BITS=5 ddb gsplat scene.ply scene.spz      # fewer bits for the SH bands (1–8)
-DDB_GSPLAT_SH_BITS=5,4 ddb gsplat scene.ply scene.spz    # first band, other bands
+DDB_GSPLAT_SH_BITS=4 ddb gsplat scene.ply scene-sh4.spz      # fewer bits for the first SH band (1–8)
+DDB_GSPLAT_SH_BITS=3,2 ddb gsplat scene.ply scene-sh32.spz   # first band, other bands
 ```
+
+The defaults are `5` bits for the first spherical-harmonics band and `4` for the others. Fewer
+bits make a smaller file with less accurate colours.
 
 `ddb gsplat input.{ply|splat|spz} [output.spz]` converts one file. It does not touch the index,
 does not build and does not need `build-lod`.
 
 - Without an output path it uses the input name with `.spz`. For an `.spz` input, give another
   path: the command does not overwrite its input.
+- An output that exists is refused unless you add `--overwrite`.
 - The output is written whole or not at all.
 - A gzip-based SPZ (versions 1 to 3) is copied unchanged. An SPZ version 4 is written as
   version 3, which every SPZ reader opens.

@@ -43,7 +43,8 @@ button is always disabled for the user `admin`.
 
    <Screenshot id="self-hosting/users--add" />
 
-2. Enter the **Username**, the **Email** and the **Password**. The dialog shows the rules of the
+2. Enter the **Username**, the **Email** and the **Password**. A user name is 1 to 127 lowercase
+   letters (`a-z`) and digits. The dialog shows the rules of the
    [password policy](/self-hosting/configuration.mdx#passwordpolicy) under the password field.
 3. Optional: choose one or more **Roles**.
 4. Click **Add User**.
@@ -62,6 +63,12 @@ In the **Actions** column:
   administrator sets it here. Build notification e-mails need a valid address.
 - **Change Password** (key): enter the **New Password** twice and click **Change Password**. Leave
   **Current Password** empty to set a password without knowing the old one.
+- **Disable User** / **Enable User**: Disable asks first, then blocks sign-in at once; the open
+  sessions of the user lose access too. The data of the user is kept. A disabled user has a
+  **Disabled** tag next to the user name. Enable gives the access back. You cannot disable your
+  own account or the last active administrator.
+
+Edit User changes only the roles that you add or remove. It never disables or enables a user.
 
 ## Delete a user
 
@@ -81,14 +88,15 @@ transferred or deleted, and the share batches that were deleted.
 ## Roles
 
 Click **Manage Roles** to open **Role Management**. The **View Roles** tab lists the roles: click
-**Delete** next to a role to delete it. On the **Add Role** tab, enter a **Role Name** and click
-**Add Role**.
+**Delete** next to a role to delete it. The system roles have a **System Role** tag instead. On
+the **Add Role** tab, enter a **Role Name** and click **Add Role**.
 
 <Screenshot id="self-hosting/users--roles" />
 
 | Role | Meaning |
 |------|---------|
-| `admin` | Instance administrator: every organization and dataset, the admin pages, Hangfire. It cannot be deleted. |
+| `admin` | Instance administrator: every organization and dataset, the admin pages, Hangfire. A system role: it cannot be deleted. |
+| `deactivated` | Blocks sign-in. A system role: it cannot be deleted, and only **Disable User** and **Enable User** change it. The role pickers do not offer it. |
 | Other roles | Labels you create. They give no rights by themselves. Use them in [tool gating](/self-hosting/processing-nodes.mdx#tool-gating) (`AllowedRoles`) to allow a tool for some users only. |
 
 Assign roles to a user with **Edit User**. Remove a role from every user before you delete it.
@@ -124,9 +132,13 @@ the Registry.
 
 Owners and members manage their own organizations on the Organizations page of the Hub: see
 [Dataset members & organizations](/docs/hub-guide/datasets/members). By default only
-administrators add and remove members; with
+administrators add and remove members. With
 [`EnableOrganizationMemberManagement`](/self-hosting/configuration.mdx#enableorganizationmembermanagement),
-owners can do it too (**Manage Members**).
+owners and members with the **Admin** permission manage members (**Members** button).
+
+A **Public** organization can be read by anyone, signed in or not, and every signed-in user sees
+it in the Organizations list. Those who are not members can only read it, and its private
+datasets stay hidden.
 
 ## Storage quotas
 
@@ -145,4 +157,7 @@ no limit. When a user is at the quota, new uploads are refused.
 |---------|---------------|
 | No **Manage Users** in the user menu | You are not an administrator, or LDAP or external authentication is on. |
 | A quota has no effect | `EnableStorageLimiter` is `true`, the user has `maxStorageMB`, and the value is a number. |
-| A role cannot be deleted | `admin` is protected. |
+| A role cannot be deleted | `admin` and `deactivated` are system roles. |
+| A user cannot sign in | The user has the **Disabled** tag: click **Enable User**. |
+| **Disable User** is refused | You cannot disable your own account or the last active administrator. Make another user an administrator first. |
+| A new user or an e-mail change is refused | The user name must be lowercase letters and digits only; the e-mail must be one valid address. |

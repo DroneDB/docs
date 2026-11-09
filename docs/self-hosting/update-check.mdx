@@ -29,7 +29,7 @@ Registry logs this text at each start (Info level), and the **Update check** sec
 shows it:
 
 ```text
-Update check: enabled (daily). This deployment sends its instance ID ({instanceId}), Registry/DroneDB versions, platform, public URL, host name, network domain and declared use to dronedb.app, and a contact email only if an admin opted in; dronedb.app also records the source IP address and checks the public URL. Purposes: update notices, release notes and license-compliance verification. Docs: docs.dronedb.app/docs/registry/admin/update-check  ·  Opt out: UpdateCheckCron="disabled"
+Update check: enabled (daily). This deployment sends its instance ID ({instanceId}), Registry/DroneDB versions, platform, public URL, host name, network domain and declared use to dronedb.app, and a contact email only if an admin opted in; dronedb.app also records the source IP address and checks the public URL. Purposes: update notices, release notes and license-compliance verification. Docs: docs.dronedb.app/docs/self-hosting/update-check  ·  Opt out: UpdateCheckCron="disabled"
 ```
 
 `{instanceId}` is replaced by the ID of your deployment. When the check is off, the log says
@@ -214,6 +214,15 @@ and explains your rights.
 
 Three keys of the `AppSettings` section control the check: `UpdateCheckCron`, `UpdateCheckEndpoint`
 and `UpdateCheckEmail`. See [Configuration → Update check](/self-hosting/configuration.mdx#update-check).
+
+## API
+
+Both endpoints need an administrator.
+
+| Request | What it does |
+|---|---|
+| `GET /sys/update-info` | What the check knows: the installed and the latest version, whether an update is available and has security fixes, the merged release notes (Markdown), the licence request link and the declaration. The version fields are `null` until a check succeeds. |
+| `PUT /sys/update-check/settings` | Saves the declaration and the contact address (JSON `useDeclaration`, `contactEmail`, `contactConsent`) and answers like `GET /sys/update-info`. An unknown declaration, an address that is not valid, or an address without consent answers `400`. |
 
 ## Turn the check off
 

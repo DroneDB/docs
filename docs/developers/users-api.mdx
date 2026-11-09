@@ -22,6 +22,8 @@ AUTH="Authorization: Bearer $ADMIN_TOKEN"
 | `GET /users/detailed` | Admin | All users with storage, organization and dataset counts |
 | `POST /users` | Admin | Create a user (JSON) |
 | `PUT /users/{userName}` | Admin | Change the e-mail and the roles (JSON) |
+| `POST /users/{userName}/disable` | Admin | Disable a user: they cannot sign in, and their sessions lose access at once |
+| `POST /users/{userName}/enable` | Admin | Enable a disabled user |
 | `DELETE /users/{userName}` | Admin | Delete a user (query `successor`, `conflictResolution`) |
 | `DELETE /users` | Admin | The same, with a form body (`UserName`, `Successor`, `ConflictResolution`) |
 | `POST /users/changepwd` | Signed in | Change your own password (form `oldPassword`, `newPassword`). Returns a new token. |
@@ -33,14 +35,16 @@ AUTH="Authorization: Bearer $ADMIN_TOKEN"
 curl -X POST -H "$AUTH" -H "Content-Type: application/json" $REG/users -d '{
   "userName": "jdoe",
   "email": "jdoe@example.com",
-  "password": "a-long-password",
-  "roles": ["user"]
+  "password": "a-long-password-1"
 }'
 ```
 
-`userName` and `password` are required. User names may hold letters, digits and `-._@+`. The
-password must follow the password policy of the server (`passwordPolicy` in
-`GET /sys/features`). The answer is the new user.
+`userName` and `password` are required. User names are 1 to 127 lowercase letters (`a-z`) and
+digits. Users that LDAP or an external authentication service signs in keep the wider character
+set of their directory. The password must follow the password policy of the server
+(`passwordPolicy` in `GET /sys/features`). The e-mail address is optional; an address that is
+not valid answers `400`. `roles` is optional: every role in it must exist, and it cannot hold
+`deactivated`. The answer is the new user.
 
 When Registry creates a user, it also creates a personal organization with the user name as its
 slug, unless `EnableDefaultUserOrganization` is off in the configuration.
@@ -48,13 +52,30 @@ slug, unless `EnableDefaultUserOrganization` is off in the configuration.
 ### Change e-mail and roles
 
 ```bash
+curl -X POST -H "$AUTH" -H "Content-Type: application/json" $REG/users/roles -d '{ "roleName": "editor" }'
 curl -X PUT -H "$AUTH" -H "Content-Type: application/json" $REG/users/jdoe -d '{
   "email": "jdoe@example.com",
-  "roles": ["user", "editor"]
+  "roles": ["editor"]
 }'
 ```
 
-Both fields are required. `roles` replaces the roles of the user.
+Both fields are required. The user gets the roles of the list: Registry adds the missing ones and
+removes the others. It checks every role first, and a role that does not exist answers `400`
+before anything changes. The list never adds or removes `deactivated`: a list that would add it
+answers `400`, and a disabled user stays disabled. Use the disable and enable endpoints instead.
+The e-mail address is checked only when it changes.
+
+### Disable and enable a user
+
+```bash
+curl -X POST -H "$AUTH" $REG/users/jdoe/disable
+curl -X POST -H "$AUTH" $REG/users/jdoe/enable
+```
+
+Both answer `204`, also when the user is already in that state, and `404` for an unknown user.
+`disable` answers `400` for your own account and for the last active administrator. A disabled
+user cannot sign in, and their tokens lose access at once. Their data is kept. Both endpoints
+also work for LDAP and external authentication users.
 
 ### Delete a user
 
@@ -76,10 +97,12 @@ batches were deleted.
 |---|---|---|
 | `GET /users/roles` | Signed in | The role names |
 | `POST /users/roles` | Admin | Create a role: JSON `{ "roleName": "editor" }` |
-| `DELETE /users/roles/{roleName}` | Admin | Delete a role (`204`). The `admin` role cannot be deleted. |
+| `DELETE /users/roles/{roleName}` | Admin | Delete a role (`204`). The system roles `admin` and `deactivated` cannot be deleted (`400`). |
 
-`admin` is the system administrator. A role can also limit who may use a processing tool (see
-[Feature gating](/developers/processing-api.mdx#feature-gating)).
+The system roles are listed in `systemRoles` of `GET /sys/features`. `admin` is the system
+administrator: `PUT /users/{userName}` grants and removes it. `deactivated` blocks sign-in: only
+the disable and enable endpoints change it. A role can also limit who may use a processing tool
+(see [Feature gating](/developers/processing-api.mdx#feature-gating)).
 
 ## Storage and user metadata
 
@@ -113,7 +136,7 @@ These act on the signed-in user.
 
 | Request | Access | What it does |
 |---|---|---|
-| `GET /orgs` | Signed in | The organizations you can see, by name then slug |
+| `GET /orgs` | Signed in | The organizations you can read, by name then slug (all of them for an administrator). With `ownedOnly=true`: the organizations you own, belong to, or that are Public. |
 | `GET /orgs/public` | Anyone | The public organizations |
 | `GET /orgs/{orgSlug}` | Read access | One organization |
 | `POST /orgs` | Signed in | Create an organization (form fields) |
@@ -131,13 +154,17 @@ curl -X POST -H "$AUTH" $REG/orgs \
 | `slug` | Required. 2 to 128 lowercase letters, digits, `_` and `-`; starts with a letter or digit; no `--`. |
 | `name` | Required |
 | `description` | Optional |
-| `isPublic` | Whether the organization is listed publicly |
+| `isPublic` | Public: anyone, signed in or not, can read the organization and its public datasets, and `GET /orgs` lists it to every signed-in user |
 | `owner` | A user id. Only an administrator may set an owner other than the caller. |
 
 An organization has `slug`, `name`, `description`, `creationDate`, `owner`, `isPublic`,
 `datasetCount` and `lastModified`. `datasetCount` and `lastModified` are `null` for callers who
 are not the owner, a member or an administrator, and in `GET /orgs/public`. `/locations` hides
 unlisted datasets from those callers.
+
+A signed-in user who is not a member reads a Public organization like a visitor: read-only, and
+without its private datasets. Writing needs membership. While the owner of a Public organization is
+disabled, those who are not members can neither read it nor see it in the list.
 
 ## Organization members
 
