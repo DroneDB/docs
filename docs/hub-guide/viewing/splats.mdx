@@ -41,7 +41,7 @@ A Gaussian splat is a photo-real 3D scene made from photos or video. Use the spl
 
    <Screenshot id="viewing/splats--settings" />
 
-6. Click **About this splat** (the (i) button) to see the number of splats, the size, the georeference, the estimated up and the quality, and the [downloads](/hub-guide/viewing/splat-downloads.mdx). When Hub has no reliable estimate of the up, the estimated up says **No reliable estimate**.
+6. Click **About this splat** (the (i) button) to see the number of splats, the size, the georeference, the estimated up, the quality and the memory (**Splat memory budget**, **Splat memory in use**, and **Browser memory (JS heap)** in Chrome and Edge), and the [downloads](/hub-guide/viewing/splat-downloads.mdx). When Hub has no reliable estimate of the up, the estimated up says **No reliable estimate**.
 
    <Screenshot id="viewing/splats--about" />
 
@@ -66,6 +66,7 @@ The saved camera views belong to the splat, so everyone who opens it gets them. 
 
 - The splat opens after its build is done. Until then the viewer says that it is not built yet. See [Builds](/hub-guide/processing/builds.mdx).
 - The viewer needs WebGL 2.
+- A large scene is streamed in pages, and the viewer sizes the memory for the pages to your device: about 20 % of its memory on a computer and 10 % on a phone (4 GB when the browser does not say), less with **Low** and **Medium** quality. A 4 GB computer uses about 800 MB for the splats. **Splat memory budget** in **About this splat** shows it.
 - Only users with write access can save camera views. Hub keeps them in a file next to the splat (`Willa Global Poland_cameras.json` for `Willa Global Poland.ply`).
 
 ## Related
