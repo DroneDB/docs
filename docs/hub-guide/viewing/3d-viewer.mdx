@@ -79,7 +79,7 @@ To put a drawing on the map, [set its coordinate system](/hub-guide/files/coordi
 ## Limits & requirements
 
 - The file opens after its build is done. A model needs its 3D Tiles, which the build makes next to the model. See [Builds](/hub-guide/processing/builds.mdx).
-- The viewer needs a browser with WebGL.
+- The viewer needs a browser with WebGL. On a high-DPI screen it draws at the pixel ratio of the screen, up to 2x, and the lines and labels of the measurements grow with the window.
 - The zoom has limits: you cannot zoom out to where the scene is lost, and the model does not
   disappear when you zoom in close to it.
 - Measurements in this viewer are not saved: they go when you close the page. To save 3D measurements of a point cloud, use the [point cloud viewer](/hub-guide/viewing/point-cloud.mdx).

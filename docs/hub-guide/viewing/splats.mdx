@@ -65,7 +65,7 @@ The saved camera views belong to the splat, so everyone who opens it gets them. 
 ## Limits & requirements
 
 - The splat opens after its build is done. Until then the viewer says that it is not built yet. See [Builds](/hub-guide/processing/builds.mdx).
-- The viewer needs WebGL 2.
+- The viewer needs WebGL 2. On a high-DPI screen it draws at the pixel ratio of the screen, up to 2x, 1.5x with **Medium** quality and 1x with **Low** quality.
 - A large scene is streamed in pages, and the viewer sizes the memory for the pages to your device: about 20 % of its memory on a computer and 10 % on a phone (4 GB when the browser does not say), less with **Low** and **Medium** quality. A 4 GB computer uses about 800 MB for the splats. **Splat memory budget** in **About this splat** shows it.
 - Only users with write access can save camera views. Hub keeps them in a file next to the splat (`Willa Global Poland_cameras.json` for `Willa Global Poland.ply`).
 

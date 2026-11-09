@@ -76,6 +76,7 @@ Other items on the map:
 
 - A file shows on the map only when it has a position. A drawing without a coordinate system opens in the [3D viewer](/hub-guide/viewing/3d-viewer.mdx) instead.
 - Rasters and vector files show after their build is done. See [Builds](/hub-guide/processing/builds.mdx).
+- On a high-DPI screen the map draws at the pixel ratio of the screen, up to 2x, and follows it when you move the window to another screen. **Satellite** and **Hybrid** then load 2x tiles, so their labels are as sharp as the orthophoto. **OpenStreetMap** has no 2x tiles. A custom XYZ source gets 2x tiles when its URL has the `{r}` placeholder (Hub writes `@2x` in its place).
 
 ## Related
 
