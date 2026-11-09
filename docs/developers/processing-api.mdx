@@ -53,7 +53,10 @@ All task endpoints are below `/orgs/{orgSlug}/ds/{dsSlug}/tasks`.
 | `POST …/tasks/clear?toolId=` | Remove every terminal task (of one tool, with `toolId`) and its artifacts |
 
 Administrators list the tasks of every user and dataset with
-`GET /sys/tasks?toolId=&state=&userId=&skip=0&take=50`. The per-dataset endpoints above work for
+`GET /sys/tasks?toolId=&state=&userId=&skip=0&take=50`. Add `sortField` (`createdAt`, `state` or `toolId`;
+default `createdAt`) and `sortOrder` (`asc` or `desc`; default `desc`): the server sorts the whole list, with
+the newest task first and then the id as the tie-break, before it pages, so the total and the pages do
+not change. Another value answers `400` with `errors.sortField` or `errors.sortOrder`. The per-dataset endpoints above work for
 them on any dataset.
 
 ### Start a task

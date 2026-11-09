@@ -86,7 +86,7 @@ The OGC services answer with the exception format of their standard instead: see
 | Endpoint | Parameters | Total |
 |---|---|---|
 | `GET /orgs/{orgSlug}/ds` | `skip`, `take` (at most 500), `q` (search in name, slug and tagline), `sort` (`name`, `creationDate`, `lastModified`, `entries`, `size`, `visibility`), `desc=true`, `slugs` (a comma-separated list) | `X-Total-Count` header |
-| `GET …/tasks`, `GET /sys/tasks` | `skip`, `take` (at most 200), `toolId`, `state` | |
+| `GET …/tasks`, `GET /sys/tasks` | `skip`, `take` (at most 200), `toolId`, `state`; `/sys/tasks` also `userId`, `sortField` (`createdAt`, `state`, `toolId`) and `sortOrder` (`asc`, `desc`) | |
 | `GET /stac/collections/{org}/{ds}/items` | `limit` (default 10, at most 10000), `offset`, `bbox`, `datetime` | `numberMatched` |
 | `GET /stac/collections` | `limit` (default 10, at most 100), `offset` | |
 | WFS `GetFeature` | `count` (at most 10000), `startIndex` | `numberMatched` |
