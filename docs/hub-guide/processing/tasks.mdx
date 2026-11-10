@@ -35,7 +35,12 @@ see what runs, why a file is not ready, or to get the result of a task.
      A task that waits in the queue of a processing node says **Queued on node**.
    - **Tool**: the task type, its version and the files it works on. A tool names its files, for example
      the folder of a photogrammetry run, so two runs can be told apart.
-   - **Progress**: a bar and the current step. A failed task shows no bar: it shows a red **Failed**
+   - **Progress**: a bar and the current step. A build of a georaster shows its percent and its phase under
+     the bar: **warping** (the raster is reprojected to the web map grid), **overviews**, **compressing** and **publishing**,
+     so a build of a large orthophoto, which can take minutes, shows that it moves. A raster that is on the grid already has no
+     **warping**. A build of another kind of file (a point cloud, a model, a splat) keeps a bar without a percent until it ends.
+     A build that waits for another build of the dataset to end is **Enqueued** and says **Waiting behind** and the
+     path of the build that runs. A failed task shows no bar: it shows a red **Failed**
      tag and why the task failed, for example "The file is damaged or not a valid GeoTIFF". Point at
      the reason to see the error type. The last line of the log gives the same reason.
      A build that waits for a missing companion file (for example the `.mtl` of an `.obj`) shows a

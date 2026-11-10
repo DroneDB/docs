@@ -37,8 +37,8 @@ A file without a badge is ready. The file browser, the table view and the detail
 
 | Badge | Status | What to do |
 |---|---|---|
-| Spinning circle | The build runs | Wait. The **Tasks** tab shows the progress |
-| Clock | **Queued**: the build waits for its turn | Wait |
+| Spinning circle | The build runs | Wait. The **Tasks** tab shows its percent and its phase |
+| Clock | **Queued**: the build waits for its turn. In the **Tasks** tab it says **Waiting behind** and the path of the build that runs | Wait |
 | Triangle | **Waiting for files**: a file that the build needs is not in the dataset | Upload the missing file (see below) |
 | Triangle | **On Hold**: a temporary error | Nothing. Hub tries again by itself |
 | Red cross | **Failed** | Read why on the build task in the [Tasks tab](/hub-guide/processing/tasks.mdx), or in your [build notification e-mail](/hub-guide/account/build-notifications.mdx). Fix the file, then build it again |
