@@ -40,7 +40,7 @@ In the Hub, administrators can read the effective configuration in **Admin → C
 | [Database](#database) | `RegistryProvider`, `HangfireProvider`, `MySqlServerVersion`, `ConnectionStrings` |
 | [Storage](#storage) | `StoragePath`, `DatasetsPath`, `TempPath`, `CachePath`, `DataProtectionKeysPath` |
 | [Cache](#cache) | `CacheProvider`, `ClearCacheInterval`, `ThumbnailsCacheExpiration`, `TilesCacheExpiration`, `DatasetVisibilityCacheExpiration`, `AuthorizationCacheExpiration`, `DatasetLookupCacheExpiration` |
-| [Uploads & sharing](#uploads--sharing) | `MaxRequestBodySize`, `BatchTokenLength`, `RandomDatasetNameLength`, `UploadBatchTimeout`, `MaxExportSizeBytes`, `Uploads`, `IndexQueue`, `Reconciliation` (`MaxZipMemoryThreshold` is removed) |
+| [Uploads & sharing](#uploads--sharing) | `MaxRequestBodySize`, `BatchTokenLength`, `RandomDatasetNameLength`, `UploadBatchTimeout`, `MaxExportSizeBytes`, `MaxWcsCoverageSizePixels`, `Uploads`, `IndexQueue`, `Reconciliation` (`MaxZipMemoryThreshold` is removed) |
 | [Downloads](#downloads) | `MaxConcurrentDownloadsPerUser`, `DisableAnonymousBulkDownloads` |
 | [Users & organizations](#users--organizations) | `DefaultAdmin`, `EnableStorageLimiter`, `EnableDefaultUserOrganization`, `EnableOrganizationMemberManagement`, `PasswordPolicy` |
 | [Networking](#networking) | `AllowedOrigins`, `ExternalUrlOverride`, `KnownProxies`, `KnownNetworks` |
@@ -334,8 +334,20 @@ ignores the key if it is still in the file.
 
 ### MaxExportSizeBytes
 
-The largest estimated size of a GeoTIFF raster export (width × height × bytes per pixel × bands of
-the source), in bytes. A larger export is refused. `null`: no limit. Default: `1073741824` (1 GiB).
+The largest estimated size of a GeoTIFF raster export, in bytes. The estimate is the number of
+pixels that have a value × 4 bytes, with no compression factor (for a window of the map, the pixels
+in it × the share of the file that has values). The server gives the estimate and this limit to Hub
+(`estimatedExportBytes` and `exportLimitBytes` of the raster value info), and a larger export is
+refused. `null`: no limit. Default: `1073741824` (1 GiB).
+
+### MaxWcsCoverageSizePixels
+
+The largest output of a WCS `GetCoverage` (WCS 1.0, 1.1 and 2.0), in pixels on its longest side.
+`GetCoverage` returns the native size of the raster or of the requested area, so a request above
+the limit is an OGC exception that states it (never a smaller image); the client asks for a subset
+or a smaller size. At least 1. Default: `8192`. The WMS keeps its own limit of 4096 pixels. The
+value is in `GET /sys/features` as `maxWcsCoverageSizePixels`, and Hub uses it for the sample
+`GetCoverage` of the Share window. The Admin page shows it as **Max WCS Coverage Size**, in the **Export & Zip** section.
 
 ### Uploads
 

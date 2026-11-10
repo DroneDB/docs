@@ -10,16 +10,24 @@ vectors of a dataset directly. For the steps in QGIS, see
 
 The services are per dataset, below `/orgs/{orgSlug}/ds/{dsSlug}`. They publish the
 **GeoRaster** and **Vector** entries of the dataset. A CAD drawing without a coordinate system
-is not published.
+is not published. A service publishes the entry types that it can serve:
+
+| Service | GeoRaster | Vector |
+|---|---|---|
+| WMS | Yes | No: a vector is not a layer of the WMS (`LayerNotDefined`) |
+| WMTS | Yes: listed in `GetCapabilities` | Only through the RESTful template, as vector tiles (`.pbf`); not listed in `GetCapabilities` |
+| WCS | Yes | No |
+| WFS, OGC API – Features | No | Yes |
+| OGC API – Tiles | Yes | Yes |
 
 ## Supported standards
 
 | Standard | Versions | Endpoint | Notes |
 |---|---|---|---|
-| WMS | 1.1.1, 1.3.0 | `/wms` | Several layers in one image, transparent background, spectral index styles |
+| WMS | 1.1.1, 1.3.0 | `/wms` | Raster layers only: several layers in one image, transparent background, spectral index styles |
 | WFS | 2.0.0 (1.1.0 alias) | `/wfs` | GeoJSON and GML, BBOX and FES 2.0 filters, paging with `count` and `startIndex` |
-| WMTS | 1.0.0 | `/wmts` | KVP and RESTful tiles: MVT for vectors, PNG or JPEG for rasters |
-| WCS | 1.0.0, 1.1.x, 2.0.1 | `/wcs` | `GetCoverage` as GeoTIFF, PNG or JPEG |
+| WMTS | 1.0.0 | `/wmts` | KVP and RESTful tiles: PNG or JPEG for rasters, MVT for vectors (RESTful only), tile matrix set `GoogleMapsCompatible` |
+| WCS | 1.0.0, 1.1.x, 2.0.1 | `/wcs` | `GetCoverage` as GeoTIFF, PNG or JPEG, at the native size up to a limit |
 | OGC API – Features | 1.0 | `/ogcapi` | Landing page, conformance, collections, items |
 | OGC API – Tiles | 1.0 | `/ogcapi/collections/{collectionId}/tiles` | MVT tiles for vectors, PNG tiles for rasters |
 | Vector tiles | — | `/mvt/{hash}/{z}/{x}/{y}.pbf` | The tile pyramid that the Hub map uses |
@@ -54,7 +62,9 @@ curl -G "$RASTER/wms" -o ortho.png \
      --data-urlencode width=512 --data-urlencode height=512 --data-urlencode format=image/png
 ```
 
-`/wms/p/{folder}` publishes only the files of one folder.
+`/wms/p/{folder}` publishes only the files of one folder. The WMS publishes raster layers only: `GetCapabilities`
+lists the rasters, and a `GetMap` for a vector answers `LayerNotDefined`. Read vectors with WFS, OGC API – Features or
+the vector tiles.
 
 ### Styles
 
@@ -112,20 +122,25 @@ folder.
 ### Feature ids
 
 Each feature has a stable id, `<typeName>.<fid>`: the type name as an XML name, and the feature
-id of the layer's GeoPackage. It is the same on every page. Read features by id with
-`RESOURCEID` or the `GetFeatureById` stored query; both read by id instead of scanning the
-layer. In the examples, `$DATASET` is one of your datasets and `contours.gpkg` a contour layer
-in it, with an `elevation` field.
+id of the layer's GeoPackage. It is the same on every page. The type name is the layer name, the
+path of the file and the layer inside it (`<path>:<layer>`), with every character that an XML name
+cannot hold replaced by `_`, and the `ddb:` prefix that `GetCapabilities` gives it. For the layer
+`contours` of `contours.gpkg` the type name is `ddb:contours.gpkg_contours` and the id of its
+feature 12 is `contours.gpkg_contours.12`. `typeNames` accepts the path (`contours.gpkg`) or the name of
+`GetCapabilities`; `RESOURCEID` and `GetFeatureById` need the id as it appears in the features. Read
+features by id with `RESOURCEID` or the `GetFeatureById` stored query; both read by id instead of
+scanning the layer. In the examples, `$DATASET` is one of your datasets and `contours.gpkg` a
+contour layer in it, with an `elevation` field.
 
 ```bash
 curl -G "$DATASET/wfs" --data-urlencode service=WFS --data-urlencode request=GetFeature \
-     --data-urlencode version=2.0.0 --data-urlencode typeNames=contours.gpkg \
-     --data-urlencode resourceId=contours.gpkg.12,contours.gpkg.40
+     --data-urlencode version=2.0.0 --data-urlencode typeNames=ddb:contours.gpkg_contours \
+     --data-urlencode resourceId=contours.gpkg_contours.12,contours.gpkg_contours.40
 
 curl -G "$DATASET/wfs" --data-urlencode service=WFS --data-urlencode request=GetFeature \
      --data-urlencode version=2.0.0 \
      --data-urlencode storedQuery_Id=urn:ogc:def:query:OGC-WFS::GetFeatureById \
-     --data-urlencode id=contours.gpkg.12
+     --data-urlencode id=contours.gpkg_contours.12
 ```
 
 The ids change when the layer is built again. `numberMatched` is the number of features that
@@ -158,11 +173,19 @@ curl "$RASTER/wmts?service=WMTS&request=GetCapabilities&version=1.0.0"
 
 `SECTIONS` asks for a part of the document, for example `&SECTIONS=Contents`.
 
-RESTful tiles:
+`GetCapabilities` lists the raster layers. Each layer has a `ResourceURL` template for each of its
+formats (PNG and JPEG), on the tile matrix set `GoogleMapsCompatible` (Web Mercator, zoom 0 to 18,
+256-pixel tiles) and the style `default`. The layer in a template is the real path of the file as one
+URL segment, percent-encoded (`odm_orthophoto%2Fodm_orthophoto.tif`), so a layer in a folder never
+resolves to a root file of the same sanitised name. Use the template as written:
 
 ```text
 {dataset}/wmts/1.0.0/{layer}/{style}/{tileMatrixSet}/{z}/{y}/{x}.{ext}
 ```
+
+For example, `$RASTER/wmts/1.0.0/odm_orthophoto%2Fodm_orthophoto.tif/default/GoogleMapsCompatible/{z}/{y}/{x}.png`.
+`{tileMatrixSet}` is `GoogleMapsCompatible`. `WebMercatorQuad` is accepted as an alias for it (the
+same tiles), and links with the old sanitised layer names keep working.
 
 | `{ext}` | Media type | Layers |
 |---|---|---|
@@ -170,9 +193,10 @@ RESTful tiles:
 | `png` | `image/png` | Raster |
 | `jpg`, `jpeg` | `image/jpeg` | Raster |
 
-Another extension (for example `.webp`) answers `404`. Percent-encode a `{layer}` with a path
-separator (`folder%2Ffile.shp`). KVP `GetTile` takes `layer`, `style`, `format`,
-`tileMatrixSet` (`WebMercatorQuad`), `tileMatrix`, `tileRow` and `tileCol`.
+The route matches only these extensions: another one (for example `.webp`) is not a WMTS tile.
+Percent-encode a `{layer}` with a path separator (`folder%2Ffile.shp`). Vector layers have no entry in
+`GetCapabilities`: ask for their tiles with the `.pbf` template. KVP `GetTile` takes `layer`, `style`,
+`format`, `tileMatrixSet` (`GoogleMapsCompatible`), `tileMatrix`, `tileRow` and `tileCol`.
 
 ## WCS
 
@@ -197,6 +221,31 @@ curl -G "$RASTER/wcs" -o ortho-part.tif \
 `format` is `image/tiff` (GeoTIFF), `image/png` or `image/jpeg`. Read the coverage id from
 `GetCapabilities` (the path with `_` for `/`) and the axis names from `DescribeCoverage`
 (`Long` and `Lat`, in CRS84).
+
+### Size of a coverage
+
+`GetCoverage` returns the **native grid** of the raster: with no `SUBSET` the whole raster at its own
+resolution, with a `SUBSET` the native pixels of that area. `DescribeCoverage` gives the same grid, so GDAL's
+WCS driver and QGIS read it. Ask for another size with the parameters of the version:
+
+| Version | Size |
+|---|---|
+| WCS 1.0.0 | `WIDTH` and `HEIGHT`; one that is missing is the native size of the area |
+| WCS 1.1 | `GridOffsets`, or no size for the native one |
+| WCS 2.0.1 | The Scaling extension (OGC 12-039): `SCALESIZE=Long(2000),Lat(1500)`, `SCALEFACTOR=0.5` or `SCALEAXES=Long(0.5),Lat(0.5)`. Send only one of the three. An axis that is not named keeps its size. `SCALEEXTENT` is not implemented |
+
+```bash
+curl -G "$RASTER/wcs" -o ortho-small.tif \
+     --data-urlencode service=WCS --data-urlencode request=GetCoverage --data-urlencode version=2.0.1 \
+     --data-urlencode coverageId=odm_orthophoto_odm_orthophoto.tif --data-urlencode format=image/tiff \
+     --data-urlencode 'scalesize=Long(2000),Lat(1500)'
+```
+
+The longest side of the output is limited by `AppSettings:MaxWcsCoverageSizePixels` (**8192** pixels by default;
+`maxWcsCoverageSizePixels` in `GET /sys/features`). A request for more is refused with an OGC exception that states the
+limit (`InvalidParameterValue`, HTTP 400), never answered with a smaller image: ask for a `SUBSET`
+or a smaller size. The WMS keeps its own limit of 4096 pixels. A wrong scale factor answers `InvalidScaleFactor`
+and an axis that the coverage does not have `ScaleAxisUndefined`.
 
 ## OGC API – Features and Tiles
 
@@ -305,7 +354,7 @@ client that disconnects stops its render and gets no answer (`499` in the server
 
 ## Caching
 
-- WMS and WCS answers: `Cache-Control: public, max-age=300`.
+- WMS and WCS answers: `Cache-Control: public, max-age=300`. A WCS coverage can be large and takes the heavy lane of the server.
 - MVT and WMTS tiles: `Cache-Control: public, max-age=86400, immutable`. They are build
   products keyed by the entry hash.
 - The layer list is kept for 5 minutes per organization, dataset and folder.

@@ -116,7 +116,11 @@ The build products of an entry (COG, COPC, bm3d, vector tiles, 3D Tiles, RAD) ar
 - **Media types** come from the library: COG
   `image/tiff; application=geotiff; profile=cloud-optimized`, COPC
   `application/vnd.laszip+copc`, GeoPackage `application/geopackage+sqlite3`, bm3d
-  `application/vnd.dronedb.bm3d`.
+  `application/vnd.dronedb.bm3d`. The file is served with that type, also a COPC file that ends in
+  `.copc.laz` or lies in a `copc/` folder; any other `.laz` of a build (the tiles of an older EPT build)
+  is `application/vnd.laszip`. A build file is always served sandboxed (a restrictive
+  `Content-Security-Policy`); a type that is not in the list of build files is
+  `application/octet-stream`.
 - **Legacy outputs.** A model built before DroneDB 2.0 lists `model.nexus` instead of
   `model.bm3d` until the background rebuild; a point cloud built before COPC lists
   `pointcloud.ept`. A client that reads the roles in its order of preference shows the old

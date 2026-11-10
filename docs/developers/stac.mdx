@@ -20,7 +20,8 @@ For a Hub user's view of the catalog, see [STAC catalog](/docs/hub-guide/sharing
 | `GET /stac/collections/{orgSlug}/{dsSlug}/items` | The items of a dataset. `bbox`, `datetime`, `limit` (default 10, at most 10000) and `offset` |
 | `GET /stac/collections/{orgSlug}/{dsSlug}/items/{featureId}` | One item |
 | `GET /stac/search`, `POST /stac/search` | A search across collections: `bbox`, `intersects`, `datetime`, `collections`, `ids`, `limit` |
-| `GET /orgs/{orgSlug}/ds/{dsSlug}/stac` | The collection of a dataset (the same object) |
+| `GET /orgs/{orgSlug}/ds/{dsSlug}/stac` | The collection of a dataset in static-catalog style: a different object from `/stac/collections/{orgSlug}/{dsSlug}`. Its `self` link is this URL and it has a `rel=item` link to each item, but no `items` link |
+| `GET /orgs/{orgSlug}/ds/{dsSlug}/stac/{pathBase64}` | One item of that catalog: `pathBase64` is the Base64 path of the file |
 
 The id of a collection is `organization/dataset`, for example `odm/brighton-beach`. Private
 datasets are in the answers only for users who can read them: send a token
@@ -47,6 +48,13 @@ An item collection has `numberMatched` and `numberReturned`. A search page has a
 
 An item has the footprint of the file as its geometry, and assets with the download URL of the
 file (`roles: ["data"]`) and of its thumbnail (`roles: ["thumbnail"]`).
+
+The footprints, and the spatial extent of a collection that is made of them, are in WGS 84 longitude
+and latitude. A vector file whose coordinate system cannot be read has no footprint. DroneDB 2.2 kept the raw
+envelope of such a vector, in the metres of a UTM file, so a collection mixed degrees with metres. From
+DroneDB 2.3 the footprint is always WGS 84, and the first start of Registry with it reads the
+vector entries again once to correct the footprints of an old index (the same background job that
+rebuilds the models after an upgrade).
 
 ## Client tools
 

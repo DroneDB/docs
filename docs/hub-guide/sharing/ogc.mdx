@@ -44,8 +44,8 @@ any other OGC client.
 
 | Service | Gives | For |
 |---|---|---|
-| **WMS (Web Map Service)** | Map images, rendered by the server | Georasters and vectors |
-| **WMTS (Web Map Tile Service)** | Ready-made map tiles | Georasters and vectors |
+| **WMS (Web Map Service)** | Map images, rendered by the server | Georasters only (**WMS is only available for GeoRaster entries.** for a vector) |
+| **WMTS (Web Map Tile Service)** | Ready-made map tiles | Georasters, and vectors as vector tiles through the tile template (use WFS or OGC API Features for their features) |
 | **WFS (Web Feature Service)** | The vector features themselves | Vectors only |
 | **WCS (Web Coverage Service)** | The raster values, for example as GeoTIFF | Georasters only |
 | **OGC API Features** | Vector features as JSON (GeoJSON) | Vectors, from a file (not from a folder) |
@@ -54,7 +54,12 @@ any other OGC client.
 The window shows the URLs that the service has, for example **GetCapabilities URL**, **Landing page**,
 **Collections**, **RESTful tile template**, **GetMap (sample)**, **GetFeature (sample)** or **GetCoverage
 (sample)**. A *sample* URL is an example request. Replace its placeholders, such as the bounding box of
-GetMap, before you use it.
+GetMap, before you use it. The **RESTful tile template** uses the tile matrix set `GoogleMapsCompatible`
+and the real path of the file, as `GetCapabilities` of the service does. The **GetCoverage (sample)**
+asks for the whole raster at its full resolution (`SCALESIZE`, keeping the aspect ratio), as long as the
+longest side is within the WCS limit of the server (8192 pixels by default; for a larger raster the
+sample asks for a size within it). The WCS gives the native size of the raster, so a client such as QGIS
+or GDAL reads the whole coverage.
 
 For a multispectral raster, WMS also offers index styles such as NDVI, when the bands allow them.
 
