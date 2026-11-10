@@ -36,7 +36,7 @@ see what runs, why a file is not ready, or to get the result of a task.
    - **Tool**: the task type, its version and the files it works on. A tool names its files, for example
      the folder of a photogrammetry run, so two runs can be told apart.
    - **Progress**: a bar and the current step. A build of a georaster shows its percent and its phase under
-     the bar: **warping** (the raster is reprojected to the web map grid), **overviews**, **compressing** and **publishing**,
+     the bar: **warping** (the raster is reprojected to the web map grid), **overviews**, **compressing**, **statistics** (the build computes the statistics of the raster, the last half of the bar) and **publishing**,
      so a build of a large orthophoto, which can take minutes, shows that it moves. A raster that is on the grid already has no
      **warping**. A build of another kind of file (a point cloud, a model, a splat) keeps a bar without a percent until it ends.
      A build that waits for another build of the dataset to end is **Enqueued** and says **Waiting behind** and the

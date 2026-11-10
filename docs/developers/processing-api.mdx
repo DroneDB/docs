@@ -130,7 +130,7 @@ answered `400` for a destination that is a file; they answer `409` now.
 }
 ```
 
-A `build` task has a `progress` too, from libddb 2.4 (`DDBBuildEx2`, see the [library](/developers/library.mdx#builds)): `percent` stays 0 until libddb has measured something, and `phase` is what libddb names: the type of the entry (`georaster`, `pointcloud`, `model`, `vector`, `gaussiansplat` or `tiles3d`), then `warping`, `overviews` and `compressing` for a raster (no `warping` when it is on the tile grid already), then `publishing`, and `done` at the end. The phase never goes back and the percent never goes down. An `Enqueued` build of a dataset whose build runs has the `phase` `Waiting behind <path>`.
+A `build` task has a `progress` too, from libddb 2.4 (`DDBBuildEx2`, see the [library](/developers/library.mdx#builds)): `percent` stays 0 until libddb has measured something, and `phase` is what libddb names: the type of the entry (`georaster`, `pointcloud`, `model`, `vector`, `gaussiansplat` or `tiles3d`), then `warping`, `overviews`, `compressing` and `statistics` for a raster (no `warping` when it is on the tile grid already; `statistics` is the exact statistics of every band, the last half of the percent), then `publishing`, and `done` at the end. The phase never goes back and the percent never goes down. An `Enqueued` build of a dataset whose build runs has the `phase` `Waiting behind <path>`.
 
 When the task succeeds, `artifact` holds `sizeBytes`, `sha256`, `resultUrl` and `expiresAt`.
 `GET …/result` returns the file with `Content-Disposition: attachment` and the SHA-256 as its
