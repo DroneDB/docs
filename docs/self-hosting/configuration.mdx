@@ -25,7 +25,9 @@ in the container). The first start creates the file from the built-in defaults
   [`IndexQueue`](#indexqueue) fields: Registry checks them when the index queue starts.
 - **Restart.** A change takes effect when the Registry services restart.
 - **Defaults.** "Default" below is the value a new `appsettings.json` has. Where the built-in value
-  for an empty or missing key is different, the table says so.
+  for an empty or missing key is different, the table says so. These keys have no built-in value: a
+  file without them does not start (`TokenExpirationInDays`, `AuthCookieName`, `BatchTokenLength`,
+  `RandomDatasetNameLength`, `UploadBatchTimeout`, `DatasetsPath`, `CachePath` and `DefaultAdmin`).
 - **Time spans** are written `d.hh:mm:ss` or `hh:mm:ss`: `00:30:00` is 30 minutes, `1.00:00:00` is
   one day.
 
@@ -74,8 +76,8 @@ Change `ConnectionStrings:IdentityConnection` with it. Default: `Sqlite`.
 
 ### Secret
 
-The key that signs the sign-in tokens (JWT). Registry generates a random value on the first start
-when it is empty. Do not use the same secret for more than one deployment. A new value signs out
+The key that signs the sign-in tokens (JWT). Registry generates a random value at any start where it is
+empty (so the first start of a new storage folder, and a later one after you cleared it). Do not use the same secret for more than one deployment. A new value signs out
 every user.
 
 ### TokenExpirationInDays
@@ -220,7 +222,10 @@ in `ddb-cache` under it. Default: `./temp`.
 
 ### CachePath
 
-The folder of the file cache (generated tiles and thumbnails). Required. Default: `./cache`.
+A folder that Registry requires and watches: it must not be empty, and its free disk space is part of
+the health check (**Ddb cache path space health check**). Registry does not write its tiles and thumbnails
+there: they go to the [`CacheProvider`](#cacheprovider) and to the `ddb-cache` folder of the DroneDB library
+(`<TempPath>/ddb-cache`, see [`Ddb`](#ddb)). Default: `./cache`.
 
 ### DataProtectionKeysPath
 
@@ -267,7 +272,8 @@ Default: `null`.
 
 ### ClearCacheInterval
 
-How often the file cache is cleared. At least 1 minute. Default: `01:00:00` (1 hour).
+Not used at present: no part of Registry reads it. When it is set it must be at least 1 minute
+(the check refuses a smaller value). Default: `01:00:00`.
 
 ### ThumbnailsCacheExpiration
 
@@ -279,7 +285,8 @@ How long a tile stays in the cache. At least 1 minute. Default: `00:30:00`.
 
 ### DatasetVisibilityCacheExpiration
 
-How long the visibility of a dataset stays in the cache. At least 1 minute. Each Registry process
+How long the visibility of a dataset stays in the cache. At least 1 minute; when the key is missing the
+cache uses its own default of 30 minutes (a new file has one day). Each Registry process
 also keeps a visibility it has read in memory for
 [`DatasetLookupCacheExpiration`](#datasetlookupcacheexpiration), so the access check of a request
 (for example each point cloud range request) needs no cache round trip. A change made through this
@@ -390,8 +397,8 @@ Tuning of the hourly index reconciliation ([`IndexReconciliationCron`](#indexrec
 
 ### MaxConcurrentDownloadsPerUser
 
-The most downloads at the same time per user (per IP address for anonymous users). At least 1.
-`null`: no limit. Default: `null`.
+The most downloads at the same time per user (per IP address for anonymous users). `null`, `0` or
+a negative number: no limit (no check refuses it). Default: `null`.
 
 ### DisableAnonymousBulkDownloads
 
@@ -443,7 +450,7 @@ The rules for new passwords. `null` turns them off.
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `MinLength` | `int` | `8` | Minimum length |
-| `RequireDigit` | `bool` | `true` | At least one digit |
+| `RequireDigit` | `bool` | `true` in a new file; `false` when the key is missing | At least one digit |
 | `RequireUppercase` | `bool` | `false` | At least one uppercase letter |
 | `RequireLowercase` | `bool` | `false` | At least one lowercase letter |
 | `RequireNonAlphanumeric` | `bool` | `false` | At least one character that is not a letter or a digit |
@@ -608,8 +615,8 @@ The concurrency and native resources of background jobs. Native builds run on th
 | `HeavyWorkers` | derived | Jobs that run native builds at the same time (COG, COPC, bm3d, LOD, raster tools) |
 | `LightWorkers` | derived | Other jobs at the same time (imports, exports, clean-up, thumbnails, scheduling) |
 | `BuildThreads` | derived | Threads of one native build (`DDB_BUILD_THREADS`): GDAL threads in a raster build, `bm3d` threads in a 3D model build |
-| `BuildCacheMb` | derived | GDAL block cache of a raster build, in MB (`DDB_COG_CACHE_MB`) |
-| `BuildWarpMemoryMb` | derived | GDAL warp memory of a raster build, in MB (`DDB_WARP_MEMORY_MB`) |
+| `BuildCacheMb` | `1024` | GDAL block cache of a raster build, in MB (`DDB_COG_CACHE_MB`). `0` or missing: `1024` |
+| `BuildWarpMemoryMb` | `512` | GDAL warp memory of a raster build, in MB (`DDB_WARP_MEMORY_MB`). `0` or missing: `512` |
 | `BackgroundRebuildThreads` | `2` | Threads of each [background rebuild](#artifactcompletenesscheckercron) (`0` or missing: the default). It caps `BuildThreads` and never raises it. It does not follow the size of the host. |
 
 ### Ddb
@@ -625,8 +632,8 @@ environment variable or its default. `CacheDir` is the exception: Registry alway
 
 | Field | Range | When left out | Description |
 |-------|-------|---------------|-------------|
-| `CpuPoolSize` | 0 to 4096 | From the host budget when declared, else `DDB_CPU_POOL_SIZE` or cores − 1 | Worker threads the library may run beside the calling threads |
-| `IoThreads` | 1 to 256 | From the host budget when declared, else `DDB_IO_THREADS` or 4 | Threads of one disk-bound step (hashing, deleting build folders) |
+| `CpuPoolSize` | 0 to 4096 | `DDB_CPU_POOL_SIZE` when it is set; else, when a host budget is declared, the cores of the process − 1; else cores − 1 | Worker threads the library may run beside the calling threads |
+| `IoThreads` | 1 to 256 | `DDB_IO_THREADS` when it is set; else, when `HostBudget:IoThreads` is above 0, the share of the process; else 4 | Threads of one disk-bound step (hashing, deleting build folders) |
 | `MinFreeDiskMb` | 0 or more | `DDB_MIN_FREE_DISK_MB` or 512 | Free MiB a build needs on the volume it writes to; `0` turns the check off |
 | `GdalCacheMb` | 16 to 1048576 | `DDB_GDAL_CACHE_MB` or 1024, as an upper bound | Size of the GDAL block cache in MiB, shared by the whole process. When set, it is the size of the cache (it wins over `GDAL_CACHEMAX`). Each process on a host has its own cache: size it for the role. |
 | `CacheDir` | absolute path | `<TempPath>/ddb-cache` | Where the library caches thumbnails, tiles, index templates and DSM tiles |
@@ -919,12 +926,12 @@ Days a finished record of the job index is kept. Default: `60`.
 
 ### HangfireJobRetentionDays
 
-Days a finished Hangfire job record (not failed) is kept. At least 1. Low values keep the MySQL
-tablespace small. Default: `2`.
+Days a finished Hangfire job record (not failed) is kept. A value below 1 is read as 1. Low values
+keep the MySQL tablespace small. Default: `2`.
 
 ### HangfireInvisibilityTimeoutHours
 
-MySQL job store only. The hours a running job counts as active. After that, the store treats it as
+MySQL job store only. The hours a running job counts as active (a value below 1 is read as 1). After that, the store treats it as
 abandoned and another worker can start it again, which collides with the build lock of DroneDB.
 Raise it if a build can take longer (a large point cloud, mesh or orthophoto). No effect with
 `HangfireProvider` `InMemory`. Default: `4`.

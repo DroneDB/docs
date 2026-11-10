@@ -29,7 +29,9 @@ when it starts. Use the page to read the effective values and to prepare a chang
 At the top are two cards:
 
 - **Usage and contact**: how this deployment is used and an optional contact address for the
-  [update check](/self-hosting/update-check.mdx#declare-how-you-use-registry). **Save** stores them.
+  [update check](/self-hosting/update-check.mdx#declare-how-you-use-registry). **Save** stores them. It is
+  off, with its reason as a tooltip, when nothing changed, and it checks the e-mail address and the consent
+  before it sends.
 - **E-mail templates**: the build notification e-mail. Shown only when e-mail is on. See
   [Edit the build notification template](/self-hosting/email.mdx#edit-the-build-notification-template).
   **Save** stores the text.
@@ -41,7 +43,7 @@ information such as the instance ID or the effective host budget. Secrets are ne
 **Change** to type a new value.
 
 The sections, in order: Auth & Security, Default Admin, Database & Cache Providers, Storage Paths,
-Upload Settings, Download Settings, Cache Expiration, Redis Configuration (with Redis only), Cron
+Upload Settings, Download Settings, Cache Expiration, Redis Configuration (applies only with the Redis cache provider), Cron
 Jobs, Password Policy, Hub Options, Organization Management, Thumbnails, Export & Zip, LDAP /
 Active Directory, E-mail (SMTP), Build notifications, Update check, Processing Platform, Tool
 Gating, Processing Budget, Host Budget, Import Dataset, Connection Strings, Serilog Logging,
@@ -49,8 +51,13 @@ Miscellaneous. Each setting is described in the [Configuration reference](/self-
 
 To change a setting:
 
-1. Edit the values on the page.
-2. Click **Copy AppSettings JSON**. The clipboard gets the JSON in the shape of
+1. Edit the values on the page. The page checks what you type, with the rules that the server checks: a
+   time span (`d`, `hh:mm:ss` with hours up to 23, such as `00:30:00`), a cron expression (5 or 6 fields,
+   a macro such as `@daily`, or a word that turns the job off such as `disabled`) and a JSON value show their
+   error under the field while you type, and the header of the section counts them (**2 invalid**). A cron
+   field shows the default of the job as its hint (the value that a blank field takes).
+2. Click **Copy AppSettings JSON**. While a value is invalid nothing is copied: the page says how many
+   fields it refuses and which, and moves the focus to the first one. The clipboard gets the JSON in the shape of
    `appsettings.json`, with the current values and your changes. A secret that is set and that you
    did not change is written as `<CHANGE-ME>`.
 3. Put the keys you changed in `appsettings.json` (or set them as environment variables). The copied
@@ -76,10 +83,12 @@ or a copied link shows the same list. The page shows as many tasks as fit the he
 
 Each row has the owner and the dataset of the task, and the same actions as the Tasks panel of a
 dataset (see [Tasks](/docs/hub-guide/processing/tasks)): open the log, download the result, retry,
-**Cancel Task** for a task that runs, and **Delete Task** for a finished task. Deleting a task also
-deletes its downloadable result.
+**Cancel** (the stop button) for a task that runs, and **Delete from history** (the trash button) for a
+finished task. Their confirmation windows are titled **Cancel Task** and **Delete Task**. Deleting a task
+also deletes its downloadable result.
 
-Dataset builds are not tasks: they are in Hangfire.
+Dataset builds also appear here, as **Build** tasks with their file path, owner and log. The background
+jobs that run them are in Hangfire.
 
 ## Hangfire
 

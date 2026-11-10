@@ -65,7 +65,10 @@ curl -X PUT -H "$AUTH" -H "Content-Type: application/json" $REG/users/jdoe -d '{
 }'
 ```
 
-Both fields are required. The user gets the roles of the list: Registry adds the missing ones and
+`roles` is required; `email` is optional: omitted (or `null`) it keeps the current address, an empty
+string removes it, and anything else must be one valid address (`errors.email` of the `400`). Under
+external authentication (`userManagement` false) an update that does not change the e-mail is
+accepted. The user gets the roles of the list: Registry adds the missing ones and
 removes the others. It checks every role first, and a role that does not exist answers `400`
 before anything changes. The list never adds or removes `deactivated`: a list that would add it
 answers `400`, and a disabled user stays disabled. Use the disable and enable endpoints instead.
@@ -102,8 +105,8 @@ batches were deleted.
 | Request | Access | What it does |
 |---|---|---|
 | `GET /users/roles` | Signed in | The role names |
-| `POST /users/roles` | Admin | Create a role: JSON `{ "roleName": "editor" }` |
-| `DELETE /users/roles/{roleName}` | Admin | Delete a role (`204`). The system roles `admin` and `deactivated` cannot be deleted (`400`). |
+| `POST /users/roles` | Admin | Create a role: JSON `{ "roleName": "editor" }`. A role name is 1 to 127 lowercase letters (`a-z`) and digits, as a user name; another name is `400` with `errors.roleName` |
+| `DELETE /users/roles/{roleName}` | Admin | Delete a role (`204`). The system roles `admin` and `deactivated` cannot be deleted (`400`). A role created before the name rule, with a `/` or a sign in its name, is found as written and then unescaped, so it can be deleted. |
 
 The system roles are listed in `systemRoles` of `GET /sys/features`. `admin` is the system
 administrator: `PUT /users/{userName}` grants and removes it. `deactivated` blocks sign-in: only

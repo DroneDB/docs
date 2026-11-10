@@ -59,8 +59,10 @@ When [`EnableDefaultUserOrganization`](/self-hosting/configuration.mdx#enabledef
 
 In the **Actions** column:
 
-- **Edit User** (pencil): change the **Email** and the **Roles**, then click **Update User**. The
-  user name cannot change. Users cannot change their own e-mail address in the Hub: an
+- **Edit User** (pencil): change the **Email** and the **Roles**, then click **Update User**. The e-mail is
+  checked at the field as you type, and a refusal shows once, at the field or in the window. Clear it to
+  remove the address (it is optional, though build notification e-mails need one). The user name cannot
+  change. Users cannot change their own e-mail address in the Hub: an
   administrator sets it here. Build notification e-mails need a valid address.
 - **Change Password** (key): enter the **New Password** twice and click **Change Password**. Leave
   **Current Password** empty to set a password without knowing the old one. The dialog lists the password
@@ -92,7 +94,9 @@ transferred or deleted, and the share batches that were deleted.
 
 Click **Manage Roles** to open **Role Management**. The **View Roles** tab lists the roles: click
 **Delete** next to a role to delete it. The system roles have a **System Role** tag instead. On
-the **Add Role** tab, enter a **Role Name** and click **Add Role**.
+the **Add Role** tab, enter a **Role Name** and click **Add Role**. A role name follows the rule of the user
+names: 1 to 127 lowercase letters (`a-z`) and digits, which the tab shows under the field. A role created
+earlier with another name, for example one with a `/` in it, keeps working and can be deleted.
 
 <Screenshot id="self-hosting/users--roles" />
 
