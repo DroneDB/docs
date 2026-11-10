@@ -20,9 +20,11 @@ the organizations you work in. Use the datasets page of an organization to find 
 
 <Steps>
 
-1. Sign in, click the user button at the top right and click **My Organizations**.
+1. Sign in and click **Organizations** in the header (on a server with one organization the link is **Datasets**).
    Hub lists the organizations that you own, that you are a member of, or that are public.
-   **My Datasets** opens the datasets of your personal organization.
+   **My Datasets** in the user menu (your user name, top right) opens the datasets of your personal organization.
+   The header also shows where you are, as a breadcrumb: **Organizations** / the organization / the dataset. Click a name to go back to
+   it. A visitor who may not open the organization sees its slug, not a link.
 
    <Screenshot id="datasets/browse--organizations" />
 
@@ -35,7 +37,8 @@ the organizations you work in. Use the datasets page of an organization to find 
    **Number of datasets**. The arrow button next to it changes the direction.
 5. Click an organization to open its datasets page.
 6. On the datasets page, click a column header to sort by **Dataset**, **Creation Date**, **Modified**,
-   **Files**, **Size** or **Visibility**. Type in **Search datasets** to filter by name, slug or tagline. An
+   **Files**, **Size** or **Visibility**. Type in **Search datasets** to filter by name, slug or tagline: the list and the **Map** both show what matches, and the
+   number of datasets of the organization in the header does not change with the search (under the list, a search says for example **Showing 1 to 2 of 2 datasets, 5 in the organization**). An
    organization with no datasets says so and, if you can write, offers **Create dataset**, **Import** and
    **Upload**.
 7. Click **Map** to see one pin per dataset. Click a cluster to zoom in, and click a pin to open the
@@ -76,6 +79,9 @@ defaults in [Preferences](/hub-guide/account/preferences.mdx) on the **Lists** t
   short time late.
 - The **Modified** time of an organization is the newest of its datasets. Hub shows it, and the number
   of datasets, only for organizations that you own or are a member of.
+- A dataset whose files spread over more than 1 degree, for example a survey of several places, has its pin at its
+  main cluster, the place with most of its files, and not at the middle of the box, which can be in the sea. The map keeps every pin clear of
+  its toolbar and of the controls at the bottom.
 - A dataset gets a pin when at least one of its files has coordinates: an orthophoto, an elevation
   model, a point cloud, a vector file or a geotagged image. You cannot place a dataset by hand.
 - On the datasets page, a tag shows your role in the organization: **Viewer**, **Editor**, **Editor+**

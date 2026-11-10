@@ -439,9 +439,10 @@ AppSettings__EnableDefaultUserOrganization=false
 
 ### EnableOrganizationMemberManagement
 
-When `true`, the owners of an organization can add and remove its members in the Hub
-(**Manage Members** on the Organizations page). When `false`, only administrators can manage
-members. Default: `false`.
+When `true`, the owner of an organization, its members with the **Admin** permission and the
+server administrators can add and remove its members in the Hub (**Members** on the datasets page of
+the organization, **Manage members** on the Organizations page). When `false`, nobody can, server
+administrators included: the buttons do not show and the member endpoints answer `403`. Default: `false`.
 
 ### PasswordPolicy
 
