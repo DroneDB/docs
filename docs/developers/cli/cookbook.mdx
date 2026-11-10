@@ -159,7 +159,7 @@ ddb build -p odm_orthophoto.tif --threads 2
 ddb build -f                               # build again, also complete builds
 ```
 
-The products go to `.ddb/build/<hash>/`. `--threads N` (1 to 4096) caps the threads of the
+The products go to `.ddb/build/<key>/`: the content hash of the file, or the hash and 16 characters of its georeference for a model or a Gaussian splat that has one, so a georeferenced copy of a model gets its own build ([Build key](/developers/library.mdx#build-key)). `--threads N` (1 to 4096) caps the threads of the
 build. It lowers the `DDB_BUILD_THREADS` budget and never raises it. Untwine and `build-lod`
 run as separate programs and are not bounded by it.
 
@@ -432,7 +432,7 @@ ddb build
 ```
 
 A `.3tz` is a ZIP with `tileset.json` at its root. The build extracts it into
-`.ddb/build/<hash>/3dtiles/` and fails when `tileset.json` is not at the root.
+`.ddb/build/<key>/3dtiles/` and fails when `tileset.json` is not at the root.
 
 ## Vectors and CAD drawings
 

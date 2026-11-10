@@ -142,7 +142,7 @@ curl -H "$AUTH" $DS/builds/pending                                            # 
 
 In a listing, each built entry has `artifacts: [{role, url, mediaType, downloadName?}]`. Read
 the URL of a build file from this list. Do not compose `/build/` paths yourself: the URL holds
-the version of the file (`…/build/{hash}@{version}/{path}`), and a rebuild changes it. See
+the version of the file (`…/build/{key}@{version}/{path}`), and a rebuild changes it. See
 [Build file URLs](/developers/api/reference.mdx#build-file-urls).
 
 To download a build product with a file name:

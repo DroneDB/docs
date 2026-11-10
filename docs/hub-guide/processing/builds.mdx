@@ -78,6 +78,10 @@ files** with the missing names. The **Tasks** tab shows the same yellow tag on t
 starts at once, with no timer. If you turned on [build notification e-mails](/hub-guide/account/build-notifications.mdx),
 you get one e-mail that names the missing files.
 
+Each file waits for its own companions. A file of the same name in another folder does not release
+the build, and two identical models in different folders each wait for their own `.mtl`: the second
+one never shows **Succeeded** without it.
+
 ## Download a built file
 
 <Steps>
@@ -105,6 +109,7 @@ The files take the name of your file. An uploaded `.3tz` archive has no 3D Tiles
 - Anyone who can download a file can download its built files.
 - **Build** needs write access to the dataset.
 - A large file can take a long time to build. Other files of the dataset stay usable meanwhile.
+- A model or a Gaussian splat is built once for each georeference: a copy that you georeference gets its own build, and the georeference of one copy never changes the build of a copy that has none or another one. Identical files without a georeference share one build.
 
 ## Related
 
