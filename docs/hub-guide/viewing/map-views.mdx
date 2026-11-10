@@ -45,12 +45,15 @@ settings of each layer, the split, the map position, the basemap and the elevati
    <Screenshot id="viewing/map-views--layers" />
 
 4. Users with write access click **Save** in the bar above the map (on a phone, in **View actions**, the three dots) and type a **Name**. The
+   prompt starts with the name of the file the map was opened on (without its extension, at most 100
+   characters) selected, so you can accept it or type over it. The
    address of the page becomes the link of the saved view.
 
    <Screenshot id="viewing/map-views--save-prompt" />
 
 5. After a later change, the bar shows **Unsaved changes**. **Save** replaces the saved view.
-   **Save as new** keeps it and saves your version under a new name.
+   **Save as new** keeps it and saves your version under a new name; its prompt starts with the name of the view
+   and **(copy)**.
 
    <Screenshot id="viewing/map-views--view-bar" />
 
@@ -106,7 +109,8 @@ The details panel of a georaster lists the saved views that use it under **Used 
   was saved**.
 - If someone saved the view after you opened it, **Save** asks whether to overwrite their changes
   or to save yours as a new view.
-- A link with **Viewer only** hides the bar and every control that saves, adds or removes.
+- A link with **Viewer only** hides the Hub header, the view bar and the buttons that add or remove layers.
+  The measurement tools stay: a user with write access can still save the measurements.
 - [Measurements](/hub-guide/measure/map.mdx) and stockpiles keep their own files and their own
   **Save**, not the saved view.
 

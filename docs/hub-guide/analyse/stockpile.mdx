@@ -46,6 +46,13 @@ also gives the weight and the cost of the pile.
    On a phone or in a small map, the panel folds its settings behind **Settings** while a result shows, so
    the result stays in view. Click **Settings** to open them.
 
+   To find every pile of the raster at once, click **Find all piles** (it reads **Finding piles…** while it
+   works). It scans the whole raster with the **Detection Sensitivity** above and lists the piles with their
+   area, their estimated volume and their confidence. The list is **Piles found (n)**, or **Largest 50 piles**
+   when more were found and it is cut. Click a pile to make it the one pile of the panel: it is outlined and
+   measured like a pile that you clicked, with the base plane, the material and the other results. With no pile
+   the panel says **No piles found. Raise the detection sensitivity to find finer ones.**
+
 4. Select a **Material**. The panel shows the **Weight** and the **Est. cost** of the pile.
 
    <Screenshot id="analyse/stockpile--material-cost" />
@@ -132,7 +139,8 @@ with.
   [saved view](/hub-guide/viewing/map-views.mdx).
 - **Edit materials…** needs a signed-in account.
 - Saving the pile needs write access to the dataset.
-- Hub detects one pile for each click.
+- **Click map** and **Draw** work on one pile each time. **Find all piles** lists up to 50 piles and you
+  choose one of them: the panel measures one pile at a time.
 
 {/* TODO data: the DSM of odm/caliterra used by the shots is local only; publish it on hub.dronedb.app before the re-capture from production. */}
 

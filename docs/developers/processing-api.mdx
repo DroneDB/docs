@@ -491,9 +491,21 @@ Some quick operations are plain endpoints of a dataset, not tasks:
 | `POST …/mask-borders/check` | Whether the masked file exists already, and its path |
 | `POST …/contours` | Contour lines of a raster, as GeoJSON |
 | `GET …/raster-value-info`, `GET …/raster-point-value`, `GET …/raster-area-stats`, `POST …/raster-profile` | The range of a raster, and its values at a point, in an area and along a line: see [Raster values](#raster-values) |
-| `POST …/stockpile/detect`, `…/stockpile/detect-all`, `…/stockpile/calculate` | Stockpile footprint and volume on an elevation model |
+| `POST …/stockpile/detect`, `…/stockpile/detect-all`, `…/stockpile/calculate` | Stockpile footprint and volume on an elevation model: see [Stockpiles](#stockpiles) |
 
 Their parameters are in the [API reference](/developers/api/reference.mdx) of the server.
+
+### Stockpiles
+
+All three take a JSON body with `path` (the elevation model) and need read access.
+
+| Request | Body and answer |
+|---|---|
+| `POST …/stockpile/detect` | `lat`, `lon` (WGS 84, required), `radius` (metres, default `50`) and `sensitivity` (0 to 1, default `0.5`): the footprint of the pile around the click, down to its foot, with `confidence` and the estimated volume |
+| `POST …/stockpile/detect-all` | `sensitivity` (0 to 1, default `0.5`), `minAreaM2` (the smallest pile in square metres, default `5`) and `maxResults` (default `50`, at most `500`): `{ "stockpiles": [...], "totalFound", "sensitivityUsed", "minAreaUsed" }`: the piles of the raster, the biggest volume first and at most `maxResults`, each with `id`, `polygon`, `estimatedVolume`, `confidence`, `baseElevation`, `centroid`, `areaM2` and `pixelCount`. `totalFound` is the length of the returned list (counted after the cut), so a list as long as `maxResults` may be cut. No pile is an empty list |
+| `POST …/stockpile/calculate` | The volume of a polygon (GeoJSON, WGS 84), with a base plane method |
+
+The volumes are in m³, the areas in m² and the elevations in metres whatever the unit of the raster.
 
 ### Raster values
 
