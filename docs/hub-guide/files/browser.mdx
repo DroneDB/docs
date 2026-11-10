@@ -20,11 +20,16 @@ The page of a dataset: its folders and files, every viewer and every file action
 
 <Screenshot id="files/browser--grid" />
 
+- **Header** (top): the name of the dataset, its visibility and its tagline.
 - **Folder tree** (left): drag its border to change its width. On a large screen it keeps its width, so the file list and the detail panel get the extra room.
 - **Files** tab: the folder selected in the tree, under the toolbar. The **Folder path** above the
   list goes back to a parent folder.
+- **README** (under the files of the root folder): the `README.md` of the dataset, drawn as a page, with a
+  button on its title to fold it and **Open** to read it in the viewer. A README over 1 MB says so and waits for **Open**. A long one
+  shows its first part.
 - **Detail panel** (right): a preview of the selected file, its
-  [properties](/hub-guide/files/properties.mdx), **Open**, **Share/Embed** and **Build**. On a large
+  [properties](/hub-guide/files/properties.mdx), **Open**, **Share/Embed** and **Build**. It starts at the top
+  for each file, and when its file is deleted, moved or extracted away it shows the next selected item, or closes. On a large
   screen it grows with the window, to 45 rem, and you can drag it narrower than before.
 - **Map** tab: the files that have coordinates on a map. See [Map viewer](/hub-guide/viewing/map.mdx).
 - **Tasks** tab: the tasks of the dataset. See [Tasks panel & logs](/hub-guide/processing/tasks.mdx).
@@ -102,8 +107,7 @@ On a narrow screen, the buttons that do not fit go into **More** (⋮).
 | Ctrl+C, Ctrl+X, Ctrl+V | Copy, cut, paste. See [Copy, cut, paste & transfer](/hub-guide/files/copy-paste.mdx) |
 | Delete (the delete key on a Mac) | Deletes the selection, after a question |
 
-A selected tile has a tint, an outline and a check mark; a selected row has a bar on its left. The context
-menu shows these keys next to **Copy**, **Cut**, **Paste** and **Delete**.
+A selected tile has a tint, an outline and a check mark; a selected row has a bar on its left.
 
 When you select several items, the detail panel shows a summary instead of one file: **4 items selected —
 9.3 MB**, the types, the first five names and "and N more", with **Download** and **Delete**. The size
@@ -114,7 +118,7 @@ counts the files you selected; it does not count what is inside a selected folde
 | Option | What it does | Default |
 |---|---|---|
 | **Grid** / **List** | The layout of the **Files** tab | Grid |
-| **Thumbnails** | Thumbnails and relative times in the list | On |
+| **Thumbnails** | Thumbnails and relative times in the list. A tile shows the whole picture in its square, with a grey margin above and below a landscape photo | On |
 | **S** / **M** / **L** (**Small**, **Medium**, **Large thumbnails**) | The size of the thumbnails of the grid: 128, 192 or 256 px. The list has fixed thumbnails. Hub keeps the choice for this browser | **S**; **M** on a screen 2560 px wide or more |
 | Sort button next to **Search files** | Sorts the tree A→Z or Z→A, folders first | A→Z |
 

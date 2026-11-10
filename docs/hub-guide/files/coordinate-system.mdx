@@ -61,9 +61,11 @@ it used.
 ## Limits & requirements
 
 - DWG files from AutoCAD R13 to R2018 (AutoCAD 2018 and later save as R2018). A DWG needs the LibreDWG
-  converter (`dwg2dxf`) on the server. Without it the build fails with **DWG support needs dwg2dxf
-  (LibreDWG)**: ask the administrator, or export the drawing as DXF from your CAD software and upload the
-  DXF. If a DWG does not convert for another reason, do the same.
+  converter (`dwg2dxf`) on the server. Without it, from DroneDB 2.3 Hub says **DWG Not Supported**: **DWG drawings
+  cannot be read on this server; export the drawing as DXF and upload that.** **Show Details** adds a note for the administrator
+  (install `dwg2dxf` next to `ddb`, or set `DDB_DWG2DXF_PATH`, then **Rescan Dataset** in **Settings**), and Hub does not offer a build, because
+  a build cannot work. Drawings that were already in the dataset keep the warning until the rescan indexes them again.
+  If a DWG does not convert for another reason, export it as DXF from your CAD software and upload the DXF.
 - 3D solids are not converted. A drawing that has only 3D solids shows nothing.
 - A drawing without a coordinate system is not on the map and not in the OGC services (WMS, WFS,
   WMTS, OGC API).

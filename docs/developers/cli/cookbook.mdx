@@ -475,6 +475,9 @@ DroneDB converts a DWG to a temporary DXF with LibreDWG `dwg2dxf`, then builds t
 - A conversion may run for 120 seconds (`DDB_DWG2DXF_MAX_SECONDS`).
 - A file that does not convert fails the build with a message that names the DWG version.
   Export the drawing as DXF from your CAD software instead.
+- Without `dwg2dxf` (and without `DDB_DWG2DXF_PATH`), from DroneDB 2.3 the entry of the drawing is indexed with the
+  warning text and `"warningCode": "dwg-converter-missing"` in its `properties`, a stable value that a client words for
+  its users and that says a retry cannot help. Install the converter and run `ddb rescan -e dwg` to index the drawings again.
 
 ### Coordinate system of a drawing
 

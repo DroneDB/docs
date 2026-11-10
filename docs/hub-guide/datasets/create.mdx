@@ -33,12 +33,14 @@ thumbnail, a visibility and a license. You can change all of them later.
 4. Select **Open dataset after creation** to go to the new dataset; Hub remembers this choice.
    Click **Create**. Without it, the new dataset shows in the list: click it to open it.
 5. To configure the dataset, open it and click **Settings** (the wrench button at the top right).
-   The changes are saved as you make them.
+   The changes are saved as you make them. The dataset page shows the result: its **name**, its visibility
+   and its **tagline** in a header above the tabs, and the README under the files of the root.
 
    <Screenshot id="datasets/create--settings" />
 
 6. To use the image of a file as the thumbnail, right-click the file and click
-   **Set as Dataset Thumbnail**.
+   **Set as Dataset Thumbnail**. A toast says **Saved as thumbnail.webp in the dataset root**, and the
+   file shows in the list, because the thumbnail is a file of the dataset.
 
    <Screenshot id="datasets/create--set-thumbnail" />
 
@@ -55,8 +57,10 @@ To change the name, tagline or visibility from the datasets page, click the penc
 | **Dataset Slug** | Create | The name in the address, from the name until you edit it: 2 to 128 lower case letters, numbers, `-` and `_` (see below). An edit shows it read-only: tick **Change URL (slug)** to give it a **New slug** | From the name |
 | **Visibility** | Create, Edit, Settings | **Private**, **Unlisted** or **Public**. See [Visibility](/hub-guide/sharing/visibility.mdx) | Private |
 | **Tagline** | Create, Edit, Settings | A short description under the name, up to 256 characters. The dataset search finds it | Empty |
+| **Name** | Settings | The name of the dataset, in the header, the tree and the lists. It saves when you leave the field, and the address does not change | The name you gave it |
+| **URL slug** | Settings | The name in the address (`/r/<organization>/<slug>`). Type a new slug and click **Change URL**. The window says that links to the old address will stop working, and asks first when files of the dataset are still uploading, because the change stops the upload | The slug |
 | **Thumbnail** | Settings | **Upload** a WebP, JPEG or PNG image, or **Remove** it | None |
-| **Readme** | Settings | **Add Readme** creates `README.md` at the root of the dataset, a file to describe it | None |
+| **Readme** | Settings | **Add Readme** creates `README.md` at the root of the dataset and opens it in the text editor. With a README, **Open** shows it in the viewer and **Edit** opens the editor | None |
 | **License** | Settings | The license of the data, from a list of common licenses | Proprietary |
 | **Rescan Dataset** | Settings | See [Rescan a dataset](/hub-guide/files/rescan.mdx) | — |
 
@@ -70,13 +74,17 @@ To change the name, tagline or visibility from the datasets page, click the penc
 - You need write access to the organization. The server administrator can turn off dataset
   creation.
 - Two datasets of an organization cannot have the same slug.
-- Editing the name does not change the slug: the address stays. Only **Change URL (slug)** gives the
+- Editing the name does not change the slug: the address stays, in **Edit dataset** and in **Settings** alike.
+  Only **Change URL (slug)** there, or **Change URL** in **Settings**, gives the
   dataset a new address, and then links to the old one (the dialog names it) stop working. You can always
   edit a dataset: a name that it keeps is not checked again.
 - The thumbnail is a file in the root of the dataset: `thumbnail.webp`, `.jpg` or `.png`, or
   `cover.webp`, `.jpg` or `.png`. Hub uses the first one it finds in this order. Without one, the
   list shows a placeholder.
-- **Set as Dataset Thumbnail** replaces the current thumbnail. Hub asks first.
+- **Set as Dataset Thumbnail** replaces the current thumbnail. Hub asks first, and it adds a file
+  `thumbnail.webp` to the root of the dataset (the toast says so).
+- The header of the dataset page and the README panel follow the settings: a new name shows in the header and
+  on the root of the tree at once, and the README is read again when you save it.
 
 ## Related
 
