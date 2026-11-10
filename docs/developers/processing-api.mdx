@@ -79,9 +79,11 @@ Content-Type: application/json
 |---|---|
 | `202 Accepted` | A new task. `Location` is its status URL. |
 | `200 OK` | `deduplicated: true`: an earlier task with the same request. |
-| `400` | Unknown tool, invalid parameters or an invalid path. The answer gives the reason. |
+| `400` | Unknown tool, invalid parameters or an invalid path. The answer gives the reason. An output path that is also one of the inputs is a `400` too (`The output '<path>' is also one of the input files: choose another output path.`). |
 | `403` | The tool is disabled or hidden for you (see [Feature gating](#feature-gating)), or you do not have the access it needs |
+| `409` | The output cannot be written: a file or folder of that name exists and the tool did not get `overwrite: true` (see [Existing outputs](#existing-outputs)), or a task of the dataset that has not finished writes the same output path |
 | `413`, `429` | A limit: the output would be too large, or you have too many tasks running or queued |
+| `503` | Another start of a task in this dataset is being checked: try again after the seconds of `Retry-After` (2) |
 
 ```json
 {
@@ -94,6 +96,20 @@ Content-Type: application/json
   "estimatedOutputBytes": 52428800
 }
 ```
+
+#### Existing outputs
+
+`align-raster`, `merge-multispectral` and `mask-borders` (and `import-file` and `archive-extract`,
+for a destination that is a file) refuse to replace a file that exists. Without `overwrite: true`
+the start answers `409` ProblemDetails: the message is `A file or folder named '<name>' already
+exists in this folder`, and `conflictPath` is the path of the existing entry, in its own letter
+case (names are compared without regard to case). A folder is never replaced.
+
+With `overwrite: true` the tool replaces the file only if it exists when the replace is decided,
+and the library puts the new file in its place in one step: a task that fails or is cancelled
+leaves the file that was there unchanged. A file that another user creates after the request is
+refused and kept (the `409` or a failed task). Before this rule, `import-file` and `archive-extract`
+answered `400` for a destination that is a file; they answer `409` now.
 
 ### Follow a task
 
@@ -225,30 +241,33 @@ downloaded directly with `GET …/download` instead. Selections larger than
 ### align-raster
 
 Aligns a GeoTIFF to a reference GeoTIFF (phase correlation and NCC) and adds the result to the
-dataset as a new COG. Build the output afterwards to get its map tiles.
+dataset as a new file: a lossless GeoTIFF in the coordinate system, pixel size and bands of the
+source (only its georeference changes). It is indexed and built afterwards to get its map tiles.
 
 ```json
 {
   "sourcePath": "survey-2026.tif",
   "referencePath": "reference-2024.tif",
   "outputPath": "survey-2026-aligned.tif",
-  "mode": "similarity"
+  "mode": "similarity",
+  "overwrite": false
 }
 ```
 
 `sourcePath`, `referencePath` and `outputPath` are required. `mode` is `similarity` (4 degrees of
-freedom, default) or `translation` (2, faster). `POST …/align/validate` checks the inputs
-first.
+freedom, default) or `translation` (2, faster). `overwrite` (default `false`) replaces an output
+that exists. `POST …/align/validate` checks the inputs first.
 
 ### merge-multispectral
 
 Merges single-band GeoTIFFs into one multi-band COG in the dataset.
 
 ```json
-{ "paths": ["red.tif", "green.tif", "blue.tif", "nir.tif"], "outputPath": "merged.tif" }
+{ "paths": ["red.tif", "green.tif", "blue.tif", "nir.tif"], "outputPath": "merged.tif", "overwrite": false }
 ```
 
-`paths` (at least two, in band order) and `outputPath` are required.
+`paths` (at least two, in band order) and `outputPath` are required. `overwrite` (default
+`false`) replaces an output that exists.
 `POST …/merge-multispectral/validate` and `…/preview` check the inputs first.
 
 ### archive-extract

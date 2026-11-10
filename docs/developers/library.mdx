@@ -1,6 +1,6 @@
 ---
 title: "DroneDB library (C API)"
-description: "Integrate libddb through its C API: versions, start-up, configuration, errors, entry paths, cancellation, builds and the build manifest."
+description: "Integrate libddb through its C API: versions, start-up, configuration, errors, entry paths, cancellation, output files, builds and the build manifest."
 ---
 
 The DroneDB library, `libddb` (`libddb.so` on Linux, `ddb.dll` on Windows), does the indexing, builds, tiles, thumbnails and raster analysis behind the `ddb` command line and Registry. Programs use it through its C API, declared in `ddb.h`. Registry calls it from .NET with P/Invoke; any language with a C foreign-function interface can do the same.
@@ -9,14 +9,20 @@ This page is for integrators who load the library themselves. The `ddb` command 
 
 ## Versions and ABI
 
-The library, its C ABI and the release have **one version**, the `version` of DroneDB's `package.json` (2.0.0 for this release). It is written into the generated header `ddb_version.h`:
+The library, its C ABI and the release have **one version**, the `version` of DroneDB's `package.json` (2.2.0 for this release). It is written into the generated header `ddb_version.h`:
 
-| Macro | Value in 2.0.0 |
+| Macro | Value in 2.2.0 |
 |-------|----------------|
-| `DDB_VERSION_MAJOR`, `DDB_VERSION_MINOR`, `DDB_VERSION_PATCH`, `DDB_VERSION_STRING` | `2`, `0`, `0`, `"2.0.0"` |
-| `DDB_ABI_MAJOR`, `DDB_ABI_MINOR` | `2`, `0` (the major and minor of the version) |
+| `DDB_VERSION_MAJOR`, `DDB_VERSION_MINOR`, `DDB_VERSION_PATCH`, `DDB_VERSION_STRING` | `2`, `2`, `0`, `"2.2.0"` |
+| `DDB_ABI_MAJOR`, `DDB_ABI_MINOR` | `2`, `2` (the major and minor of the version) |
 
-The ABI follows semantic versioning: a removed or changed export needs a new major version, a new export at least a new minor. Within a major version the C ABI only grows, and the JSON outputs only gain fields.
+The ABI follows semantic versioning: a removed or changed export needs a new major version, a new export at least a new minor. Within a major version the C ABI only grows, and the JSON outputs only gain fields. A host that needs an export or a field of a later minor version checks `DDBGetAbiVersion()` first (`DDBGetAbiVersion() >> 16` is the major, the low 16 bits are the minor, so 2.2 is `0x00020002`). What each minor version added:
+
+| ABI | Release | Added |
+|-----|---------|-------|
+| 2.0 | 2.0.0 | The first 2.x C API |
+| 2.1 | 2.1.0 | `DDBAlignRasterEx`, `DDBMergeMultispectralEx` and `DDBMaskBordersEx`, which take an options struct with `overwrite` ([Output files](#output-files)) |
+| 2.2 | 2.2.0 | `DDBRasterOptions` and ten raster value exports that take it, and the build key of every build |
 
 Every release publishes, next to the `.deb` and the Windows zip:
 
@@ -28,7 +34,7 @@ Every release publishes, next to the `.deb` and the Windows zip:
 | `ddb.symbols` | The list of exported functions |
 | `SHA256SUMS` | The SHA-256 of every asset |
 
-The library exports exactly the functions listed in `ddb.symbols` (109 in 2.0.0) and nothing else; its C++ classes and functions are internal. Pin a release by version and SHA-256, and build against that release's headers.
+The library exports exactly the functions listed in `ddb.symbols` (109 in 2.0.0, 112 in 2.1.0 and 122 in 2.2.0) and nothing else; its C++ classes and functions are internal. Pin a release by version and SHA-256, and build against that release's headers.
 
 ## Start-up and shutdown
 
@@ -40,6 +46,7 @@ A host checks the library before it uses it, configures it, then registers the p
 int start_ddb(void) {
     uint32_t abi = DDBGetAbiVersion();               /* callable before DDBRegisterProcess */
     if ((abi >> 16) != DDB_ABI_MAJOR) return -1;     /* another major version: refuse */
+    if ((abi & 0xFFFF) < 2) return -1;               /* this host calls 2.2 exports: refuse 2.0 and 2.1 */
 
     const char *caps = DDBGetCapabilities();         /* JSON: abi, version, errorCodes, errorReasons,
                                                         cancellable, symbols; owned by the library */
@@ -58,7 +65,7 @@ int start_ddb(void) {
 
 When the host stops, after it has stopped sending work, it calls `DDBShutdown(timeoutMs)`: new calls are refused with `DDBERR_SHUTDOWN`, the calls in flight are asked to stop and are waited for, the pooled index connections are checkpointed and closed, and the log is flushed.
 
-Registry runs this sequence at start-up and refuses to start when the library is not 2.x or lacks an export it calls.
+Registry runs this sequence at start-up and refuses to start when the library is not ABI 2.2 or later (DroneDB 2.2.0), or lacks an export it calls. The message names the ABI that it needs.
 
 ## Process configuration
 
@@ -91,7 +98,7 @@ Every export returns a `DDBErr`:
 | `DDBERR_RETRYABLE` | 8 | A temporary condition; `DDBGetLastErrorReason()` says which (`lowDiskSpace`, `noSpaceOnDevice`, `idleTimeout`) |
 | `DDBERR_SHUTDOWN` | 9 | The library is shutting down |
 
-After a failure, read `DDBGetLastError()` (the whole message, UTF-8) and `DDBGetLastErrorReason()` on the same thread, before any other call: the last error belongs to the calling thread and is cleared when a call starts. A failed call leaves its output pointers untouched or NULL; outputs are written only on success. `DDBERR_INVALIDARGS` and `DDBERR_RETRYABLE` are returned by the exports added in 2.0; the older exports keep the codes they returned in 1.x (`DDBERR_EXCEPTION` with the same reason), except for a refused entry path (below), a canceled token and a shutdown.
+After a failure, read `DDBGetLastError()` (the whole message, UTF-8) and `DDBGetLastErrorReason()` on the same thread, before any other call: the last error belongs to the calling thread and is cleared when a call starts. A failed call leaves its output pointers untouched or NULL; outputs are written only on success. `DDBERR_INVALIDARGS` and `DDBERR_RETRYABLE` are returned by the exports added in 2.0; the older exports keep the codes they returned in 1.x (`DDBERR_EXCEPTION` with the same reason), except for a refused entry path (below), a canceled token and a shutdown, and the raster queries of 2.1 and 2.2: a formula that does not exist, or a place without data, is `DDBERR_INVALIDARGS`.
 
 ## Entry paths
 
@@ -115,15 +122,29 @@ A cancel token stops the work of a call from another thread:
 3. `DDBCancel(token)` from any thread: the call stops at its next checkpoint and returns `DDBERR_CANCELED`;
 4. `DDBFreeCancelToken(token)` when the host no longer needs it.
 
-The `cancellable` list of `DDBGetCapabilities()` names the exports that honour a token. In 2.0.0 there are 29:
+The `cancellable` list of `DDBGetCapabilities()` names the exports that honour a token. In 2.0.0 there were 29, in 2.1.0 30 and in 2.2.0 there are 40:
 
-- tiles, renders and thumbnails: `DDBTile`, `DDBMemoryTile`, `DDBMemoryTileEx`, `DDBMemoryTileFmt`, `DDBRenderRasterRegion`, `DDBRenderRasterRegionEx`, `DDBRenderRasterIndex`, `DDBGenerateThumbnail`, `DDBGenerateMemoryThumbnail`, `DDBGenerateMemoryThumbnailEx`;
-- exports and builds: `DDBExportRaster`, `DDBExportRaster2`, `DDBBuild`, `DDBBuildEx`;
-- raster analysis: `DDBGetRasterMetadata`, `DDBGetRasterValueInfo`, `DDBGetRasterPointValue`, `DDBGetRasterAreaStats`, `DDBGetRasterProfile`, `DDBCalculateVolume`, `DDBDetectStockpile`, `DDBDetectAllStockpiles`, `DDBGenerateContours`, `DDBMaskBorders`;
+- tiles, renders and thumbnails: `DDBTile`, `DDBMemoryTile`, `DDBMemoryTileEx`, `DDBMemoryTileEx2`, `DDBMemoryTileFmt`, `DDBRenderRasterRegion`, `DDBRenderRasterRegionEx`, `DDBRenderRasterIndex`, `DDBGenerateThumbnail`, `DDBGenerateMemoryThumbnail`, `DDBGenerateMemoryThumbnailEx`, `DDBGenerateMemoryThumbnailEx2`;
+- exports and builds: `DDBExportRaster`, `DDBExportRaster2`, `DDBExportRaster3`, `DDBBuild`, `DDBBuildEx`;
+- raster analysis: `DDBGetRasterMetadata`, `DDBGetRasterValueInfo`, `DDBGetRasterValueInfoEx`, `DDBGetRasterPointValue`, `DDBGetRasterPointValueEx`, `DDBGetRasterPointValuePixelEx`, `DDBGetRasterAreaStats`, `DDBGetRasterAreaStatsEx`, `DDBGetRasterAreaStatsPixelEx`, `DDBGetRasterProfile`, `DDBGetRasterProfileEx`, `DDBCalculateVolume`, `DDBDetectStockpile`, `DDBDetectAllStockpiles`, `DDBGenerateContours`, `DDBGenerateContoursEx`, `DDBMaskBorders`, `DDBMaskBordersEx`;
 - Gaussian splats: `DDBExportSplatSpz`, `DDBExportSplatTrainingData`;
 - deltas: `DDBComputeDeltaLocals`, `DDBApplyDelta`, `DDBApplyDeltaEx`.
 
-A canceled call leaves no partial output (a canceled `DDBMaskBorders` writes no file). `DDBApplyDelta` and `DDBApplyDeltaEx` are atomic to a cancel: they stop while they read and hash the added files, with the dataset and the source files as they were, and once they start to change the dataset they apply the delta whole and return `DDBERR_NONE`.
+A canceled call leaves no partial output (a canceled `DDBMaskBorders` or `DDBMaskBordersEx` writes no file, and keeps the file it would have replaced). `DDBApplyDelta` and `DDBApplyDeltaEx` are atomic to a cancel: they stop while they read and hash the added files, with the dataset and the source files as they were, and once they start to change the dataset they apply the delta whole and return `DDBERR_NONE`.
+
+## Output files
+
+An export that writes a data file refuses to replace one that exists, and refuses an output that is one of its inputs. Since 2.1 this holds for `DDBAlignRaster`, `DDBMergeMultispectral` and `DDBMaskBorders`, as it does for the [`ddb` commands](/developers/cli/cookbook.mdx#existing-outputs): a call whose output exists returns `DDBERR_EXCEPTION` and leaves the file as it is. A host that replaces an output on purpose calls the variant that takes options:
+
+| Export | Options struct |
+|--------|----------------|
+| `DDBAlignRasterEx(source, reference, output, mode, options, &result)` | `DDBAlignRasterOptions` |
+| `DDBMergeMultispectralEx(paths, numPaths, output, options)` | `DDBMergeMultispectralOptions` |
+| `DDBMaskBordersEx(input, output, near, white, options)` | `DDBMaskBordersOptions` |
+
+The three structs have the same 8 bytes: `uint32_t structSize` (set it to `sizeof` of the struct), `bool overwrite` (true replaces an output that exists, false refuses it) and `uint8_t reserved[3]`, which must be 0. A later version may append fields; a library that does not know a field refuses a struct whose unknown bytes are not zero. The variants return `DDBERR_INVALIDARGS` for a `NULL` options pointer, a `structSize` below 8, a non-zero reserved byte, or an output that is one of the inputs (with or without `overwrite`).
+
+The output is written beside the final path, in a private folder, and put in place with one rename when it is complete. A failed or canceled call therefore leaves the file that it would have replaced as it was, and `DDBMaskBordersEx` with `overwrite` removes the stale `.msk` of the replaced file. The old exports keep their signatures, so move a host to 2.1 together with its switch to the variants: Registry calls only the variants and asks for the replace only when the output exists at the moment it decides (a file that another writer creates in the meantime is refused and kept).
 
 ## Builds
 
