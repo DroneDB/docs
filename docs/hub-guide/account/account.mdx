@@ -32,7 +32,7 @@ The page has these cards:
 | Card | What it shows |
 |---|---|
 | **User Information** | Your **Username**, your **Email** (or **Not set**), the number of **Organizations**, and **Administrator** when you are one |
-| **Storage** | The space you use, of the space your plan gives (or **Unlimited**), and an **Upload Files** button |
+| **Storage** | The space you use, of the space your plan gives (or **Unlimited**, with no bar), the bar named **Storage used** with its percentage, and an **Upload Files** button |
 | **Upload diagnostics** | A test of your connection to the server (see below) |
 | **Security** | **Change Password** |
 | **Session** | **Logout**. If you sign out in another tab, this tab shows the notice **You signed out in another tab.** with a **Sign in** button |
@@ -42,10 +42,16 @@ You cannot change your user name or your e-mail address yourself. Ask an adminis
 ## Storage
 
 Your storage is the size of all the datasets of the organizations that you own. Datasets of organizations
-that you are only a member of count for their owner. The user menu shows the same use as a percentage. Click
-it to open **Storage Info** with the total, the used and the free space.
+that you are only a member of count for their owner. The **Storage** row of the user menu says what the numbers are:
+**Storage: 5 MB of 40 MB · 12.5%** with a quota, **Storage: 0 B of 40 MB** before you use any, and **Storage: 190.86 MB used · Unlimited**
+without one. The row always does the same thing: it opens **Storage Info** with the total, the used and the free space (with no quota, the used space and **Unlimited**,
+and no bar). Nothing shows when the administrator turned the storage information off.
 
-When no space is left, **Storage Info** shows **No storage left!** and the server refuses what adds files, with
+The bar of **Storage Info** and of this page is green, amber from 90 % (**Storage is almost full: 92% of 40 MB used.**) and red from 100 %
+(**Storage quota reached: 41 MB used of 40 MB. Uploads to your organizations are refused until you free space or an administrator
+raises the quota.**). It shows the real percentage, for example **130%**, and not 100 %. Hub does not warn you before an upload; the server refuses it when you are over.
+
+When no space is left, the server refuses what adds files, with
 **Storage quota exceeded**: uploads, imports, paste and copy, and tasks such as photogrammetry, Merge Multispectral,
 Align and archive extraction. In the organization of an owner who has no space left, the members cannot add files
 either, and the message says how much the owner has left. Delete files you no longer need, or change your

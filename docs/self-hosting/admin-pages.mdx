@@ -1,6 +1,6 @@
 ---
 title: "Admin pages"
-description: "The Configuration, Tasks and Hangfire pages that Registry administrators open from the Hub user menu."
+description: "The Configuration, Tasks, Hangfire and System health pages that Registry administrators open from the Hub user menu."
 hub_feature: [route:AdminTasks, route:AdminConfig]
 ---
 
@@ -14,6 +14,12 @@ sees an **Admin** badge next to it). The menu has two groups, **Administration**
 | **Configuration** | The [Configuration](#configuration) page (`/admin/config`) |
 | **Hangfire** | The [Hangfire dashboard](#hangfire) (`/hangfire`), in a new tab |
 | **API Docs** | The interactive API reference (`/scalar/v1`), in a new tab |
+| **System health** | The health check of the server (`/health`), in a new tab |
+
+The entries that open in a new tab say so to a screen reader (**Hangfire (opens in a new tab)**). The last line of the group
+gives the versions that run, for example **Registry 2.7.1 · Hub 2.7.0 · ddb 2.2.0**: quote it in a bug report.
+The button of the menu is named **Account menu for** your user name, says whether the menu is open, and gives the focus back to
+itself when the menu closes with Tab or Esc.
 
 <Screenshot id="self-hosting/admin-pages--menu" />
 
@@ -57,10 +63,12 @@ To change a setting:
    a macro such as `@daily`, or a word that turns the job off such as `disabled`) and a JSON value show their
    error under the field while you type, and the header of the section counts them (**2 invalid**). A cron
    field shows the default of the job as its hint (the value that a blank field takes).
-2. Click **Copy AppSettings JSON**. While a value is invalid nothing is copied: the page says how many
-   fields it refuses and which, and moves the focus to the first one. The clipboard gets the JSON in the shape of
-   `appsettings.json`, with the current values and your changes. A secret that is set and that you
-   did not change is written as `<CHANGE-ME>`.
+2. Click **Copy changes** to copy only the keys that you edited (a toast says **Copied 2 keys. Merge them into
+   appsettings.json.**), or **Copy full file** to copy every setting, as a file to start from. While a value is
+   invalid nothing is copied: the page says how many fields it refuses and which, and moves the focus to the first one (also
+   when its section is closed). In the full file a secret that is set is written as `<CHANGE-ME>`, and the toast lists them
+   (**Copied the full file. Fill in: AppSettings:Smtp:Password.**). **Copy changes** never writes a secret that you did not type, and with
+   nothing edited it says **No setting is edited, so there is nothing to copy.**
 3. Put the keys you changed in `appsettings.json` (or set them as environment variables). The copied
    JSON has the shape that Registry reads: keys that the page only groups (**Update check**, **Cron
    Jobs**, **Cache Expiration** …) are direct keys of `AppSettings`, the nested sections (`Smtp`, `HubOptions`,
@@ -68,8 +76,12 @@ To change a setting:
    `AppSettings`, not inside it.
 4. Run `Registry.Web <storage folder> --check`, then restart Registry.
 
-**Reset Section** and **Reset to Defaults** undo your edits on the page; they do not change the
+**Discard section edits** and **Discard edits** undo your edits on the page; they do not change the
 server.
+
+A setting that `appsettings.json` does not name shows the default that the server uses. This is also true of the Processing
+Platform, Hub Options and Import Dataset sections, which used to show `0` for such a setting. For example
+`MaxArchiveExtractSizeBytes` shows its real default, and `0` means no limit.
 
 ## Tasks
 

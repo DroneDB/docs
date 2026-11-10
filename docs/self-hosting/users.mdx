@@ -17,7 +17,8 @@ the same through the REST API, see [Users & organizations API](/docs/developers/
 <Screenshot id="self-hosting/admin-pages--menu" />
 
 The page shows every user with the **Username**, **Email**, **Roles**, **Organizations**,
-**Datasets**, **Storage** (used and quota) and **Created** columns. On a phone, each user is a card
+**Datasets**, **Storage** (used and quota) and **Created** columns. The **Storage** bar is amber from 90 % of the quota and red from 100 %, and it shows the real
+percentage above 100 (for example **130%**). A user with no quota, or an administrator, or any user while the storage limiter is off, has no bar. On a phone, each user is a card
 with every value and the actions on one line. The page shows as many users as fit the height of the window (**N (fit)** in the paginator); you can choose another number. Type in **Search users** to filter the list; click **Refresh** to load it again.
 
 :::note When the page is missing
@@ -59,7 +60,7 @@ When [`EnableDefaultUserOrganization`](/self-hosting/configuration.mdx#enabledef
 
 In the **Actions** column:
 
-- **Edit User** (pencil): change the **Email** and the **Roles**, then click **Update User**. The e-mail is
+- **Edit User** (pencil): change the **Email**, the **Roles** and the **Storage quota (MB, empty = unlimited)**, then click **Update User**. The e-mail is
   checked at the field as you type, and a refusal shows once, at the field or in the window. Clear it to
   remove the address (it is optional, though build notification e-mails need one). The user name cannot
   change. Users cannot change their own e-mail address in the Hub: an
@@ -73,7 +74,26 @@ In the **Actions** column:
   **Disabled** tag next to the user name. Enable gives the access back. You cannot disable your
   own account or the last active administrator.
 
+The quota field takes a whole number of MB, zero or more. It shows how much the user uses now. It is off, with **Storage limiter is off on
+this server**, when [`EnableStorageLimiter`](/self-hosting/configuration.mdx#enablestoragelimiter) is `false`; a quota that is stored
+anyway shows **A quota of 500 MB is stored but not applied** with **Remove stored quota**. An administrator has no limit whatever the field says.
+
 Edit User changes only the roles that you add or remove. It never disables or enables a user.
+
+## Act on several users
+
+Tick the check box in the row of each user (the one in the header selects every user that the search shows; the built-in `admin` has none). A bar
+says **3 users selected** and offers:
+
+- **Add role**: choose the **Role to add**, then **Add Role**.
+- **Add to organization**: choose the **Organization** and the **Permissions**, then **Add to Organization**.
+- **Disable** (asks first) and **Enable**: each acts on the users that it applies to.
+- **Delete**: one question for all of them, with the same **Transfer data to successor** and conflict choices as for one user (the successor is not one of the selected
+  users, and not a disabled one). Without a successor you type the number of users to confirm.
+- **Clear selection**.
+
+The actions run one user after the other. When all went through, a toast says so and the list refreshes. When some failed, the window lists
+which users it did not work for, and why. A search that hides a selected user takes it out of the selection.
 
 ## Delete a user
 
@@ -151,12 +171,16 @@ datasets stay hidden.
 
 1. Turn on [`EnableStorageLimiter`](/self-hosting/configuration.mdx#enablestoragelimiter) and restart
    Registry.
-2. Give each user a quota in MB with the `maxStorageMB` key of the user's metadata. The Hub has no
-   field for it: use the API (`POST /users/{userName}/meta`, see
+2. Give each user a quota in MB in **Edit User**, in **Storage quota (MB, empty = unlimited)**. It is the
+   `maxStorageMB` key of the user's metadata, which the API sets too (`POST /users/{userName}/meta`, see
    [Users & organizations API](/docs/developers/users-api)).
 
-The **Storage** column then shows the use, the quota and a bar. A user without `maxStorageMB` has
+The **Storage** column then shows the use, the quota and a bar. A user without a quota has
 no limit. When a user is at the quota, new uploads are refused.
+
+Every place shows the quota in the same way: the header menu (**Storage: 5 MB of 40 MB · 12.5%**), **Storage Info**, the **Account** page and this list. The bar is
+green below 90 %, amber from 90 % (**Storage is almost full**) and red from 100 % (**Storage quota reached**), and
+it shows the real percentage above 100. A user with no quota sees **Storage: 190.86 MB used · Unlimited**, with no bar.
 
 The quota is the one of the **owner of the organization**, and it counts on every way that adds files to its datasets:
 uploads (also chunked and bundled), push, paste and copy, file and dataset import, archive extract,
@@ -174,7 +198,7 @@ owner count in the use: **Cancel** or **Discard** in the upload window of the Hu
 | Problem | What to check |
 |---------|---------------|
 | No **Manage Users** in the user menu | You are not an administrator, or LDAP or external authentication is on. |
-| A quota has no effect | `EnableStorageLimiter` is `true`, the user has `maxStorageMB`, and the value is a number. |
+| A quota has no effect | `EnableStorageLimiter` is `true`, the user has a quota (a whole number of MB) in **Edit User**, and the user is not an administrator. |
 | A role cannot be deleted | `admin` and `deactivated` are system roles. |
 | A user cannot sign in | The user has the **Disabled** tag: click **Enable User**. |
 | **Disable User** is refused | You cannot disable your own account or the last active administrator. Make another user an administrator first. |

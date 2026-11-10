@@ -117,13 +117,18 @@ the disable and enable endpoints change it. A role can also limit who may use a 
 
 | Request | Access | What it does |
 |---|---|---|
-| `GET /users/storage` | Signed in | Your storage: `{ "total", "used" }` in bytes. `total` is `null` without a limit. |
-| `GET /users/{userName}/storage` | Admin | The storage of a user |
+| `GET /users/storage` | Signed in | Your storage: `{ "total", "used" }` in bytes. `total` is the limit that the server enforces: `null` when there is none, when the storage limiter is off and for an administrator. |
+| `GET /users/{userName}/storage` | Admin | The storage of a user, with the same `total` |
 | `GET /users/meta` | Signed in | Your metadata |
 | `GET /users/{userName}/meta` | Admin | The metadata of a user |
-| `POST /users/{userName}/meta` | Admin | Set the metadata of a user (a JSON object) |
+| `POST /users/{userName}/meta` | Admin | Set the metadata of a user (a JSON object). The keys that you send are merged into the metadata: the other keys stay, and a key set to `null` is removed. The roles of the user change only when the object has a `roles` key. |
 
-The storage limit of a user is the metadata key `maxStorageMB`. It applies when the storage
+Before this change `POST /users/{userName}/meta` replaced the whole metadata. A client that relied on that to remove keys now sends them as `null`.
+`GET /users/detailed` gives each user `storageQuota`, the stored quota in bytes, also when the limiter is off or the user is an administrator
+(`GET …/storage` gives only what is enforced).
+
+The storage limit of a user is the metadata key `maxStorageMB`: a whole number of MB, zero or more, or `null` to remove it. Another value is `400` with
+`errors.maxStorageMB` (**The storage quota must be a whole number of MB, zero or more**). It applies when the storage
 limiter is on (`storageLimiter` in `GET /sys/features`). It is the quota of the **owner of the
 organization** that counts, whoever writes: when the owner is over the quota, a member of the organization
 who uploads, pastes, copies, imports or starts a task that adds files gets `507` too. An administrator
