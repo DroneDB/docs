@@ -52,8 +52,7 @@ colormap and the range of values.
 
 2. A raster of values (an elevation model, a thermal mosaic) is painted when it opens, with
    **Viridis** (**Ironbow** for a thermal raster) over its default stretch, so it is not a black and
-   white mask. The map and the export draw the same colours (since DroneDB 2.3.1; on an older
-   server the map stays grey while the legend shows the colormap). Select another **Colormap**.
+   white mask. The map and the export draw the same colours. Select another **Colormap**.
    Type a **Rescale** range under **Min** and **Max**, for example `0` and `50`. Both fields start
    with the default stretch of the raster; clear both for the automatic range. Hub checks the range before it applies it: both numbers must be numbers, **Min** below
    **Max**, and an error under the field names the problem. The map keeps the last valid range meanwhile,
@@ -77,7 +76,7 @@ colormap and the range of values.
 | **Unit** | Raster Analysis | The unit that the panel shows with the values, for example `m`. | Read from the file; else `m` for an elevation model and none for other rasters |
 | **Reset** | Both | Puts the colormap, the **Rescale** range, the **Unit** and the **NoData value** back to their defaults. | — |
 | **Original** | Both | Shows the raster without the styling. Click **Hide Orig.** to go back. | — |
-| **Export**, **Visible extent** | Both | Downloads the raster, the whole raster or the part under the map. With a formula, or with a colormap on a single band such as a DEM (since DroneDB 2.3.1), it is the styled GeoTIFF picture that you see (**Export styled image (RGBA GeoTIFF, in the CRS of the file)**); with several bands and no formula it is the bands scaled to 8 bits, with no colormap (**Export scaled bands (8-bit GeoTIFF, in the CRS of the file)**). It is never the values. See [Export a raster](/hub-guide/processing/export-raster.mdx). | — |
+| **Export**, **Visible extent** | Both | Downloads the raster, the whole raster or the part under the map. With a formula, or with a colormap on a single band such as a DEM, it is the styled GeoTIFF picture that you see (**Export styled image (RGBA GeoTIFF, in the CRS of the file)**); with several bands and no formula it is the bands scaled to 8 bits, with no colormap (**Export scaled bands (8-bit GeoTIFF, in the CRS of the file)**). It is never the values. See [Export a raster](/hub-guide/processing/export-raster.mdx). | — |
 
 ### Colormaps
 

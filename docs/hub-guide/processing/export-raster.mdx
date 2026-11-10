@@ -56,11 +56,8 @@ the values". Otherwise it is **Export scaled bands (8-bit GeoTIFF, in the CRS of
 | Your settings | The exported GeoTIFF |
 |---|---|
 | A **Formula** (an index, or the unit of a thermal raster) | An 8-bit picture (red, green, blue and transparency) painted with the **Colormap** and the **Rescale** range. It does not hold the index or the temperature values. |
-| A **Colormap** on a single band, no formula (since DroneDB 2.3.1): a raster with one band, such as a DEM, or one band that you selected | The same kind of picture: 8-bit red, green, blue and transparency, painted with the **Colormap** over the **Rescale** range, or over the default stretch of the raster (its lowest to its highest value) when there is none. Pixels with no value are transparent. This is what **Raster Analysis** exports for an elevation model. |
+| A **Colormap** on a single band, no formula: a raster with one band, such as a DEM, or one band that you selected | The same kind of picture: 8-bit red, green, blue and transparency, painted with the **Colormap** over the **Rescale** range, or over the default stretch of the raster (its lowest to its highest value) when there is none. Pixels with no value are transparent. This is what **Raster Analysis** exports for an elevation model. |
 | **Bands (R,G,B)**, no formula | The bands you selected, as 8-bit values scaled to the **Rescale** range, with no colormap (several bands have no colormap). |
-
-A server older than DroneDB 2.3.1 does not paint a single band without a formula: it writes one 8-bit grey band, and
-the name of the button says a styled image all the same.
 
 The file has the coordinate system, the pixel size and the position of the raster, not Web Mercator. **Visible extent**
 is the part of the raster under the map, at the full resolution of the raster, so it is not bigger than
