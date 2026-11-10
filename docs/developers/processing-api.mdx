@@ -265,7 +265,7 @@ that exists. `POST …/align/validate` checks the inputs first.
 
 ### merge-multispectral
 
-Merges single-band GeoTIFFs into one multi-band COG in the dataset.
+Merges single-band GeoTIFFs into one multi-band GeoTIFF in the dataset (a capture of a MicaSense, Sequoia or DJI camera keeps its camera metadata, so Plant Health opens it).
 
 ```json
 { "paths": ["red.tif", "green.tif", "blue.tif", "nir.tif"], "outputPath": "merged.tif", "overwrite": false }

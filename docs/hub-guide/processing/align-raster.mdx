@@ -18,7 +18,9 @@ requires: { access: write, data: Two GeoTIFFs of the same area in one folder }
 Two surveys of the same site rarely line up exactly: GPS drift moves one of them by some metres. Before you
 compare them, measure a change or compute a volume difference, align the less accurate raster (the
 **source**) to the more accurate one (the **reference**). Hub writes a new, aligned file. The source does not
-change.
+change. The new file is a GeoTIFF in the coordinate system, at the pixel size and with the bands (an
+alpha band too) of the source, compressed without loss. Only its georeference changes: it is not reprojected
+to Web Mercator and not resampled.
 
 ## Steps
 
@@ -36,7 +38,10 @@ change.
 5. Check the **Output file name**. The default is the source name with `_aligned.tif` at the end.
 
 6. Click **Validate**. Hub checks that the two rasters can be aligned. It shows **Compatible** with the
-   overlap in percent and the ground resolution, or the reason why not.
+   overlap in percent and the ground resolution, or the reason why not. When the coordinate systems
+   differ, the overlap is measured after the reference is reprojected. An overlap under 5 % is an error:
+   **Insufficient overlap (N%)**, or **Insufficient overlap after reprojection (N%)** when the coordinate
+   systems differ.
 
    <Screenshot id="processing/align-raster--validated" />
 
@@ -65,7 +70,7 @@ The new file appears in the folder. Compare it with the reference in the
 
 - You need write access to the dataset.
 - Both files must be georasters in GeoTIFF format (`.tif` or `.tiff`) in the same folder.
-- The rasters must overlap and have compatible coordinate systems. **Validate** tells you what is wrong.
+- The rasters must overlap (**Validate** refuses an overlap under 5 %) and have compatible coordinate systems. **Validate** tells you what is wrong.
 - **Align** is active only after a validation without errors.
 - The new file counts toward your storage.
 - If a file with the output name exists, the window says **This file exists and will be replaced**, and **Align** asks **Replace “aligned.tif”?** first (with the name of that file). Click **Replace** to go on, or **Cancel**. If the alignment fails or you cancel it, that file stays as it was.

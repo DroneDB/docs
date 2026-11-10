@@ -210,8 +210,13 @@ A Registry serves the same catalog over HTTP: see [STAC API](/developers/stac.md
 
 ### Merge single-band files
 
-Photogrammetry software often writes one GeoTIFF per band. Merge them into one multi-band COG.
-The band order of the output is the order of the inputs.
+Photogrammetry software often writes one GeoTIFF per band. Merge them into one multi-band GeoTIFF.
+The band order of the output is the order of the inputs. The merge is written beside the output and
+put in place with one rename, so a failed or cancelled run keeps the file that it would replace.
+Merging the bands of a camera capture (MicaSense, Sequoia, DJI) copies the camera EXIF of the first
+band (make, model, dates, orientation, focal length, plane resolution, GPS time and DOP) and an XMP
+packet (camera yaw, pitch and roll, GPS accuracy, the DJI gimbal tags, the band names and their
+central wavelengths) onto the merged file, so Plant Health opens it.
 
 ```bash
 ddb merge-multispectral -o merged.tif blue.tif green.tif red.tif nir.tif rededge.tif
@@ -224,7 +229,12 @@ the inputs without a merge:
 ddb merge-multispectral --validate blue.tif green.tif red.tif nir.tif rededge.tif
 ```
 
-The report is JSON. It includes the band shifts that DroneDB found:
+The report is JSON. `summary` gives the size of the output after the crop of the edges that the
+bands do not share (`width`, `height`), and `alignment.bands` gives the name and wavelength of every
+band, also when no shift is found. Camera images have no map coordinates: the check gives one
+warning for all of them (the merged file is placed on the map by the GPS position of the first band
+when it has one), and names the files without a geotransform when the others have one. It includes
+the band shifts that DroneDB found:
 
 ```json
 {
@@ -334,7 +344,11 @@ ddb mask orthophoto.tif -o custom.tif -c 0,0,128     # a custom border colour
 ### Align a raster to a reference
 
 Correct the georeference of an orthophoto or a DEM with a more accurate reference. The output
-is a COG in EPSG:3857.
+is a GeoTIFF in the coordinate system, at the pixel size and with the bands of the source (alpha
+included), compressed without loss (DEFLATE, with the predictor of the sample type); only its
+georeference changes. A vertical (Z) offset is applied in 64-bit floating point and rounded for an
+integer DEM. Before 2.2 it was a JPEG-compressed COG in EPSG:3857: run `ddb cog` on the output when a
+consumer needs one.
 
 ```bash
 ddb align -i source.tif -r reference.tif -o aligned.tif                   # similarity (default)
@@ -348,8 +362,10 @@ ddb align -i source.tif -r reference.tif --validate                       # chec
 | `translation` | 2: X/Y shift | Phase correlation | Small GPS offsets, faster |
 
 `--no-seed` turns off the phase-correlation seed (a slower NCC search). `--validate` prints a
-JSON report: CRS compatibility, overlap, GSD comparison and the estimated shift. Both rasters
-must overlap and have compatible coordinate systems.
+JSON report: CRS compatibility, overlap, GSD comparison and the estimated shift. The overlap
+is computed after the reprojection when the coordinate systems differ, and an overlap under 5 % is
+refused before the run (`Insufficient overlap after reprojection (N%)`). Both rasters must overlap
+and have compatible coordinate systems.
 
 ### Raster analysis in the API
 
