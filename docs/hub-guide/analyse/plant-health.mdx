@@ -42,7 +42,8 @@ a colormap. Nothing is processed in advance: you can change the index at any tim
 
 5. Click **Copy Link** to copy a link that opens the map with the same **Formula**, **Colormap** and
    **Rescale** (a toast says **Link copied to the clipboard**), or **Export** to download the result as a
-   GeoTIFF.
+   styled GeoTIFF picture (**Visible extent** downloads the part under the map). The export is a task with
+   a **Cancel** button: see [Export a raster](/hub-guide/processing/export-raster.mdx).
 
 </Steps>
 
@@ -90,7 +91,7 @@ band whatever the band order of the camera.
   **Single band image. Use Merge Multispectral to combine bands for vegetation indices.** The merge of
   the bands of a MicaSense, Sequoia or DJI capture keeps the camera data, so Plant Health opens the
   merged file.
-- **Export** is greyed out when the server estimates the file (the pixels that have a value, 4 bytes each) as larger than its export limit; its tooltip gives the limit.
+- **Export** is greyed out when the server estimates the file (the pixels that have a value, 4 bytes each) as larger than its export limit; the panel says the estimate and the limit under it, and **Visible extent** exports a part. See [Export a raster](/hub-guide/processing/export-raster.mdx).
 - The **Histogram** covers the range the index can have (NDVI: -1 to 1), narrowed to the values near
   the bulk of the data (within one spread of the 2nd to 98th percentiles). When some values are outside
   what it shows, a note under it says **Outliers: the values go from … to …** with the real lowest and

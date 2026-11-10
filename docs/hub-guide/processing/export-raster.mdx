@@ -1,9 +1,9 @@
 ---
 title: Export a raster (GeoTIFF)
-description: Download what the Plant Health panel shows (bands, a vegetation index, a colormap) as a GeoTIFF.
+description: Download what the Plant Health or Raster Analysis panel shows (bands, a vegetation index, a colormap) as a styled GeoTIFF, the whole raster or the visible extent.
 hub_feature: [task:raster-export]
 datasets: [odx/micasense]
-requires: { access: read, data: A georaster with two bands or more }
+requires: { access: read, data: A georaster }
 ---
 
 <Screenshot id="processing/export-raster--panel" />
@@ -15,9 +15,11 @@ requires: { access: read, data: A georaster with two bands or more }
 
 ## When to use it
 
-You styled a raster in the Plant Health panel, for example an NDVI map with a colormap or a false-colour band
-combination. You want that result as a file for a report or for a GIS program. Export writes it as a GeoTIFF
-and your browser downloads it.
+You styled a raster, for example an NDVI map with a colormap, a false-colour band combination or a
+thermal mosaic with Ironbow, and you want that picture as a file for a report or a GIS program. Export
+writes it as a GeoTIFF and your browser downloads it. The file is a **styled image**, not the values:
+for the temperatures or elevations themselves, download the original file or use the
+[CLI](/developers/cli/cookbook.mdx).
 
 ## Steps
 
@@ -25,40 +27,55 @@ and your browser downloads it.
 
 1. Open the raster on the map.
 
-2. Click **Plant Health** in the layer controls.
+2. Click **Plant Health** (a raster with two bands or more) or **Raster Analysis** (a raster with one
+   band: a DEM, a thermal mosaic) in the layer controls.
 
 3. Set the view: a **Preset**, a **Formula**, the **Bands (R,G,B)**, the **Colormap**, the **Stretch** or the
-   **Rescale** range. See [Plant health](/hub-guide/analyse/plant-health.mdx) for each control.
+   **Rescale** range. See [Plant health](/hub-guide/analyse/plant-health.mdx) and
+   [Colormaps, bands & histogram](/hub-guide/analyse/colormaps.mdx) for each control.
 
    <Screenshot id="processing/export-raster--formula" />
 
-4. Click **Export**. The button turns into a spinner while Hub makes the file.
+4. In **Export**, click **Export** for the whole raster, or **Visible extent** for the part that the map
+   shows now. The panel shows the task: **Queued** while it waits, then **Exporting** with the percent
+   and a **Cancel** button.
 
-5. Your browser downloads `<name>_export.tif`.
+5. When the file is ready, the toast **Export ready:** names it and your browser downloads it:
+   `<name>_export.tif`, or `<name>_extent_export.tif` for the visible extent.
 
 </Steps>
 
 ## What the file holds
 
+The **Export** button is named **Export styled image (RGBA GeoTIFF, in the CRS of the file)**, and the
+panel says "the picture of the style, not the values" under it. Either way the file is 8-bit, so it
+never holds the values.
+
 | Your settings | The exported GeoTIFF |
 |---|---|
-| A **Preset** | The bands of the preset |
-| **Bands (R,G,B)**, no formula | The three bands you selected |
-| A **Formula** | The index, with the **Colormap** and the **Rescale** range you set |
+| A **Formula** (an index, or the unit of a thermal raster) | An 8-bit picture (red, green, blue and transparency) painted with the **Colormap** and the **Rescale** range. It does not hold the index or the temperature values. |
+| **Bands (R,G,B)**, no formula | The bands you selected, as 8-bit values scaled to the **Rescale** range, with no colormap. A raster with one band and no formula, such as a DEM, exports as one 8-bit grey band. |
+
+The file has the coordinate system, the pixel size and the position of the raster, not Web Mercator. **Visible extent**
+is the part of the raster under the map, at the full resolution of the raster, so it is not bigger than
+the raster: use it to take a large raster in parts.
 
 The export runs as a task on the server: **Export raster (GeoTIFF)** in the [Tasks tab](/hub-guide/processing/tasks.mdx). There
-you can download the result again until it expires.
+you can download the result again until it expires, and read how long it waited in the queue (**waited 50s**) next to its duration.
 
 ## Limits & requirements
 
 - Read access is enough: you can export from any public dataset.
-- Plant Health, and so Export, is available for rasters with two data bands or more. Single-band rasters
-  (DEMs, thermal mosaics) do not offer Export.
-- The server limits the size of an export. When the estimated file is too large, **Export** is grey and its
-  tooltip gives the limit.
-
-{/* TODO verify: the old docs offered Export for thermal rasters; the Hub has the Export button only in the
-    Plant Health panel, which needs two data bands or more. */}
+- A raster of one band has the export in **Raster Analysis**, and a raster of two bands or more has it in **Plant Health**.
+- The server limits the size of an export. When the estimated file is too large, **Export** is
+  greyed out but you can still reach it with the keyboard, and the panel says why in the text under
+  it: **Too large to export: about 9.3 GB > 1 GB limit. Use Visible extent to export it in parts.**
+  The estimate is the pixels that have a value × 4 bytes. **Visible extent** gives its own estimate
+  (**Too large to export the visible extent: … Zoom in to export less.**), and says **Checking size…** while it
+  reads the size of a new view.
+- **Visible extent** needs a server with DroneDB 2.3 or later. On an older one the button is greyed out
+  with **Needs a newer server (libddb 2.3)** and **Export** exports the whole raster.
+- One export runs at a time in a panel: both buttons wait until it ends or you click **Cancel**.
 
 ## Related
 

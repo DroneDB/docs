@@ -51,7 +51,7 @@ temperature range and tells you the temperature of any point you click.
 | **Rescale** | The lowest and the highest value of the colormap, in the **Min** and **Max** fields. | The default stretch of the raster (its mean ± 2.33 standard deviations, inside its range) |
 | **Inspect** | Shows the value at the point you click. | — |
 | **Original** | Shows the raster without the colormap. | — |
-| **Export** | Downloads the raster as you see it, as a GeoTIFF. | — |
+| **Export**, **Visible extent** | Downloads the raster as you see it, as a styled GeoTIFF picture in the coordinate system of the file (**Export styled image (RGBA GeoTIFF, in the CRS of the file)**): colours, not temperatures. **Visible extent** exports the part under the map. A task shows the progress and a **Cancel** button. See [Export a raster](/hub-guide/processing/export-raster.mdx). | — |
 
 ## How Hub finds the temperatures
 
@@ -74,7 +74,7 @@ values of the survey, not degrees.
   colours: hide that raster with its eye in the layer panel.
 - A thermal photo (a radiometric JPEG) has no **Raster Analysis** on the map. Process the photos
   into a thermal orthophoto first.
-- **Export** is greyed out when the server estimates the file (the pixels that have a value, 4 bytes each) as larger than its export limit; its tooltip gives the limit.
+- **Export** is greyed out when the server estimates the file (the pixels that have a value, 4 bytes each) as larger than its export limit; the panel says the estimate and the limit under it, and **Visible extent** exports a part. See [Export a raster](/hub-guide/processing/export-raster.mdx).
 
 ## Related
 

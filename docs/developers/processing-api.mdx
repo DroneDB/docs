@@ -219,7 +219,9 @@ spectral index, a colormap, a rescale. Memory stays bounded at any size.
   "bandFilter": null,
   "colormap": "rdylgn",
   "rescale": "-1,1",
-  "fileName": null
+  "fileName": null,
+  "nodata": null,
+  "bbox": null
 }
 ```
 
@@ -230,9 +232,20 @@ near-infrared band. An unknown formula answers `Unknown formula: <name>`. `resca
 range of a 32-bit float with `min` below `max`; another value is `400` before the task is queued. The tile, thumbnail and analysis endpoints that take a `rescale` check it the same way.
 
 An export larger than the limit of the server (`MaxExportSizeBytes`, `exportLimitBytes` of `GET …/raster-value-info`)
-is refused with `400` before the task is queued: `Export output exceeds maximum allowed size (… > …)`. The size is
+is refused with `400` before the task is queued: `Export output exceeds maximum allowed size (… > …)`. The
+ProblemDetails has the numbers: `estimatedExportBytes` and `exportLimitBytes`. The size is
 estimated as the number of pixels that have a value × 4 bytes, with no compression factor
 (`estimatedExportBytes` of value info).
+
+`nodata` is a finite number that replaces the no-data value of the bands. `bbox` is a window,
+`[minLon, minLat, maxLon, maxLat]` in WGS 84: the task exports the pixels of the raster whose centre is
+inside it, at the resolution of the raster, in its coordinate system and with the position of the window.
+The estimate and the limit apply to the window (the same estimate as value info with `bbox`). A box that is not four
+finite numbers, or that has no pixel of the raster, is `400` at `errors.bbox`. A window needs libddb 2.3 or later: on an
+older server it is `400` at `errors.bbox` (`Exporting the visible extent needs libddb 2.3 or later`),
+because the older library would export the whole raster. `rasterExportWindow` of `GET /sys/features` says whether the
+server takes it. The file is in the coordinate system of the source (not Web Mercator). With a `formula` it is an 8-bit RGBA picture of the style, not the index values; without one it is the selected bands as 8-bit values scaled to `rescale`, with no colormap. This is what Hub's
+**Export** and **Visible extent** buttons send.
 
 ### raster-contours
 

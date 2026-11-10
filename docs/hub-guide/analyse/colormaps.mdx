@@ -76,7 +76,7 @@ colormap and the range of values.
 | **Unit** | Raster Analysis | The unit that the panel shows with the values, for example `m`. | Read from the file; else `m` for an elevation model and none for other rasters |
 | **Reset** | Both | Puts the colormap, the **Rescale** range, the **Unit** and the **NoData value** back to their defaults. | — |
 | **Original** | Both | Shows the raster without the styling. Click **Hide Orig.** to go back. | — |
-| **Export** | Both | Downloads the raster as you see it, as a GeoTIFF. | — |
+| **Export**, **Visible extent** | Both | Downloads the raster as you see it, as a styled GeoTIFF picture (**Export styled image (RGBA GeoTIFF, in the CRS of the file)**), the whole raster or the part under the map. It is colours, not the values. See [Export a raster](/hub-guide/processing/export-raster.mdx). | — |
 
 ### Colormaps
 
@@ -92,7 +92,7 @@ colormap and the range of values.
   thermal image. With two or more such rasters, an **Elevation model** selector sets the one it
   works on. A raster on top with full opacity hides the colormap of the one below: hide it with
   its eye in the layer panel, or lower its opacity.
-- **Export** is greyed out when the server estimates the file (the pixels that have a value, 4 bytes each) as larger than its export limit; its tooltip gives the limit.
+- **Export** is greyed out when the server estimates the file (the pixels that have a value, 4 bytes each) as larger than its export limit; the panel says the estimate and the limit under it, and **Visible extent** exports a part. See [Export a raster](/hub-guide/processing/export-raster.mdx).
 - The settings apply to what you see. They do not change the file.
 - The style stays on the map when you close **Raster Analysis** or **Plant Health**, and a closed panel
   changes nothing. Only an edit or **Reset** changes it. Opening **Stockpile Volume** does not
