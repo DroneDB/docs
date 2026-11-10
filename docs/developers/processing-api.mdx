@@ -225,7 +225,8 @@ spectral index, a colormap, a rescale. Memory stays bounded at any size.
 `path` is required. The others are optional. A `formula` that the raster cannot compute is
 refused with `400` before the task is queued, for example `NDVI is not available for this raster:
 Requires bands: RN` on an RGB orthophoto. Use `VARI` on RGB, and `NDVI` on a raster with a
-near-infrared band. An unknown formula answers `Unknown formula: <name>`.
+near-infrared band. An unknown formula answers `Unknown formula: <name>`. `rescale` is `min,max`: two finite numbers within the
+range of a 32-bit float with `min` below `max`; another value is `400` before the task is queued. The tile, thumbnail and analysis endpoints that take a `rescale` check it the same way.
 
 An export larger than the limit of the server (`MaxExportSizeBytes`, `exportLimitBytes` of `GET …/raster-value-info`)
 is refused with `400` before the task is queued: `Export output exceeds maximum allowed size (… > …)`. The size is

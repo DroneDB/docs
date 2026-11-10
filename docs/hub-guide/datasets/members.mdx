@@ -22,8 +22,11 @@ organization.
 <Steps>
 
 1. To create an organization, open **My Organizations** and click **Create Organization**.
-   Type a **Name** and an optional **Description**, select **Public** for a public organization,
-   and click **Create**. Anyone, signed in or not, can see a public organization and its public
+   Type a **Name**, check the **URL (slug)** that Hub suggests from it (you can edit it) and type an optional
+   **Description**. Both fields show a counter against their limit (256 characters for the name, 2000 for the
+   description). Select **Public** for a public organization, and click **Create**. The window checks the
+   fields on **Create** and shows a refusal at its field (a taken slug, a name without a Latin letter or a
+   digit when the slug has none); it stays open with what you typed. Anyone, signed in or not, can see a public organization and its public
    datasets. Only members can change it.
 
    <Screenshot id="datasets/members--create-organization" />
@@ -36,7 +39,7 @@ organization.
    at the bottom.
 4. Under **Add Member**, type the exact **User name** and select the **Permissions**. Click **Add**,
    or press Enter. If the server refuses the name (no such user, or already a member), the window
-   shows its message.
+   shows its message at the field, for example **No user named x**.
 
    <Screenshot id="datasets/members--add" />
 
@@ -67,7 +70,7 @@ its datasets.
   administrator turns member management on. When it is off, nobody can manage the members, server
   administrators included, and the **Members** and **Manage members** buttons do not show.
 - Hub does not list the users of the server. Ask the person for their exact user name.
-- A slug is made from the organization name. It cannot change after creation.
+- The slug is suggested from the organization name, and you can edit it when you create the organization. It cannot change after creation, so editing the name later does not change the address.
 - **Public** applies to the organization only. Each dataset keeps its own
   [visibility](/hub-guide/sharing/visibility.mdx).
 - The server administrator can make organizations read-only in Hub. Then the create, edit and delete

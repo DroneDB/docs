@@ -54,7 +54,9 @@ colormap and the range of values.
    **Viridis** (**Ironbow** for a thermal raster) over its default stretch, so it is not a black and
    white mask. Select another **Colormap**. Type a **Rescale** range under **Min** and **Max**, for
    example `0` and `50`. Both fields start with the default stretch of the raster; clear both for the
-   automatic range.
+   automatic range. Hub checks the range before it applies it: both numbers must be numbers, **Min** below
+   **Max**, and an error under the field names the problem. The map keeps the last valid range meanwhile,
+   so a typo does not blank the layer.
 
    <Screenshot id="analyse/colormaps--colormap-dropdown" />
 

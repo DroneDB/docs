@@ -22,6 +22,9 @@ files that you do not need.
 
 1. To create a folder, open the parent folder and click **New folder** in the toolbar. You can
    also right-click and click **New folder**. Type the **Folder name** and click **Create folder**.
+   The window checks the name as you type and says what is wrong under the field, nothing before
+   you type: a name with `/`, or one that a file or folder of the folder has already, in any letter case.
+   It stays open with what you typed until the folder is made.
 
    <Screenshot id="files/folders--new-folder" />
 
@@ -30,7 +33,9 @@ files that you do not need.
    successfully** has an **Undo** button, which puts the file back. If something took the old place in the
    meantime, **Undo** does not move it and says **Cannot undo: … exists again**.
 3. To rename a file or a folder, select it and click **Rename** in the toolbar, or right-click it and
-   click **Rename**. Type the new name and click **Rename**.
+   click **Rename**. Type the new name and click **Rename**. A name that is taken (the server compares
+   without regard to letter case) shows **A file or folder named '…' already exists in this folder** at the
+   field, and the window stays open.
 4. If the file has sidecar files, such as `ortho_measurements.geojson` next to `ortho.tif`, keep
    **Also rename sidecar files** selected. Hub then renames them with the file.
 5. To delete, select the files and folders, then click **Delete** in the toolbar, press Delete
@@ -60,7 +65,8 @@ files that you do not need.
 
 ## Limits & requirements
 
-- A name cannot contain `/`, `\` or `..`, and cannot start with `.`.
+- A name cannot contain `/`, `\` or `..`, and cannot start with `.`. **New folder** does not make nested
+  folders: use one folder at a time.
 - You cannot move a folder into itself or into one of its subfolders.
 - A move never replaces a file: when the destination has a file or folder of that name, Hub says that the
   name is already taken, moves nothing and offers no **Undo**.

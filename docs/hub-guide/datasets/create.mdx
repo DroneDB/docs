@@ -24,7 +24,11 @@ thumbnail, a visibility and a license. You can change all of them later.
 
    <Screenshot id="datasets/create--dialog" />
 
-2. Type a **Dataset Name**. Hub makes the **Dataset Slug** (the name in the address) from it.
+2. Type a **Dataset Name**. Hub suggests the **Dataset Slug** (the name in the address) from it: accents are
+   dropped and letters such as `ø`, `æ`, `ß` and `ł` become `o`, `ae`, `ss` and `l`. You can edit the slug.
+   The window counts the name against its limit (for example `12/256`) and checks every field when you click
+   **Create**: a refusal shows at its field, for example **A dataset with this slug already exists in this
+   organization.**, and the window stays open with what you typed.
 3. Select the **Visibility** and type an optional **Tagline**.
 4. Select **Open dataset after creation** to go to the new dataset; Hub remembers this choice.
    Click **Create**. Without it, the new dataset shows in the list: click it to open it.
@@ -47,11 +51,12 @@ To change the name, tagline or visibility from the datasets page, click the penc
 
 | Option | Where | What it does | Default |
 |---|---|---|---|
-| **Dataset Name** | Create, Edit | The name in the lists. The slug comes from it: lower case letters, numbers, `-` and `_` | — |
+| **Dataset Name** | Create, Edit | The name in the lists, up to 256 characters. It needs a Latin letter or a digit, unless you type a slug that has one (a name such as `Москва` works with a slug that you enter) | — |
+| **Dataset Slug** | Create | The name in the address, from the name until you edit it: 2 to 128 lower case letters, numbers, `-` and `_` (see below). An edit shows it read-only: tick **Change URL (slug)** to give it a **New slug** | From the name |
 | **Visibility** | Create, Edit, Settings | **Private**, **Unlisted** or **Public**. See [Visibility](/hub-guide/sharing/visibility.mdx) | Private |
 | **Tagline** | Create, Edit, Settings | A short description under the name, up to 256 characters. The dataset search finds it | Empty |
 | **Thumbnail** | Settings | **Upload** a WebP, JPEG or PNG image, or **Remove** it | None |
-| **Readme** | Settings | **Add Readme** creates `README.md` at the root of the dataset, a file to describe it, and opens it | None |
+| **Readme** | Settings | **Add Readme** creates `README.md` at the root of the dataset, a file to describe it | None |
 | **License** | Settings | The license of the data, from a list of common licenses | Proprietary |
 | **Rescan Dataset** | Settings | See [Rescan a dataset](/hub-guide/files/rescan.mdx) | — |
 
@@ -65,8 +70,9 @@ To change the name, tagline or visibility from the datasets page, click the penc
 - You need write access to the organization. The server administrator can turn off dataset
   creation.
 - Two datasets of an organization cannot have the same slug.
-- A new name changes the slug, so the address of the dataset changes. Old links to the dataset
-  stop working.
+- Editing the name does not change the slug: the address stays. Only **Change URL (slug)** gives the
+  dataset a new address, and then links to the old one (the dialog names it) stop working. You can always
+  edit a dataset: a name that it keeps is not checked again.
 - The thumbnail is a file in the root of the dataset: `thumbnail.webp`, `.jpg` or `.png`, or
   `cover.webp`, `.jpg` or `.png`. Hub uses the first one it finds in this order. Without one, the
   list shows a placeholder.

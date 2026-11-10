@@ -31,7 +31,10 @@ drawing on the map.
 3. Select **Coordinate system** and type an EPSG code (`EPSG:32632`, or only `32632`) or a WKT
    definition. To keep the drawing off the map, select **Local drawing coordinates (not placed on
    the map)**.
-4. Click **Apply**. Hub saves the coordinate system and builds the drawing again.
+4. Click **Apply**. Hub checks the form of what you typed first and says under the field what to enter:
+   a number or `EPSG:` and a number, or a WKT definition that starts with `PROJCS`, `GEOGCS`, `PROJCRS` or
+   `GEOGCRS`. Whether the code exists is for the server to say: its answer shows under the same field. Then Hub
+   saves the coordinate system and builds the drawing again.
 
 </Steps>
 
@@ -57,8 +60,10 @@ it used.
 
 ## Limits & requirements
 
-- DWG files from AutoCAD R13 to R2018 (AutoCAD 2018 and later save as R2018). If a DWG does not
-  convert, export it as DXF from your CAD software and upload the DXF.
+- DWG files from AutoCAD R13 to R2018 (AutoCAD 2018 and later save as R2018). A DWG needs the LibreDWG
+  converter (`dwg2dxf`) on the server. Without it the build fails with **DWG support needs dwg2dxf
+  (LibreDWG)**: ask the administrator, or export the drawing as DXF from your CAD software and upload the
+  DXF. If a DWG does not convert for another reason, do the same.
 - 3D solids are not converted. A drawing that has only 3D solids shows nothing.
 - A drawing without a coordinate system is not on the map and not in the OGC services (WMS, WFS,
   WMTS, OGC API).

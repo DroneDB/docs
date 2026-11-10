@@ -27,6 +27,15 @@ curl -X POST -H "$AUTH" $HUB/orgs/my-org/ds \
 `PUT /orgs/{orgSlug}/ds/{dsSlug}` (form fields `name`, `visibility`). Rename the dataset with
 `POST …/rename` (form field `slug`).
 
+The name of a dataset or an organization (up to 256 characters, 2000 for a description) must give a slug with a
+Latin letter (a–z) or a digit, or the request must give a slug that has one: a name such as `Москва` is accepted
+only with a slug that you send. The slug that a name gives (`ToSlug`) drops accents and transliterates `ø`, `æ`, `ß`
+and `ł`, and has no trailing `-` or `_`. Otherwise the answer is `400`, `Use at least one Latin letter (a–z) or
+digit in the name, or enter a slug` (`Use at least one Latin letter (a–z) or digit` for `POST /share/init`, which has
+no slug field). The rule applies to every request that sets a name: create, the name of a dataset or organization,
+`share/init` and the imports. An edit checks a new name with the slug that is stored and never refuses a name that
+it keeps, so an existing dataset can always be edited. A taken slug is `400` with `errors.slug`.
+
 ## Upload files
 
 ### One request
@@ -108,6 +117,21 @@ a session that was made before the update that keeps the file id, and the chunks
 `{ bytes, serverMs }`. Use it to measure the upload speed. Any signed-in user may call it, 28
 times per minute.
 
+### Names that exist
+
+Registry never replaces an entry silently, and compares names without regard to letter case. An upload (a
+file part, or the first chunk of a chunked upload) whose name exists in its folder, a move or a rename onto a
+name that exists, and a new folder with a name that exists are refused with `409` ProblemDetails: the message
+is `A file or folder named '<name>' already exists in this folder`, and `conflictPath` is the path of the
+entry that exists, in its own letter case. The check runs before the first byte is stored or a file is
+touched. Send `overwrite=true` before the file part to replace a file with an upload (a folder is never
+replaced). A move never replaces anything, so it has no `overwrite`.
+
+```bash
+curl -X PUT -H "$AUTH" $DS/obj -F source=images/a.jpg -F dest=archive/a.jpg      # move or rename: 200, or 409
+curl -X POST -H "$AUTH" $DS/obj -F path=archive                                  # a folder: 201, or 409
+```
+
 ## List, search and download
 
 ```bash
@@ -165,9 +189,11 @@ artifact. `404`: it is not built, or has no artifact of that role.
 ### Builds that wait
 
 A build that misses a companion file (an `.obj` without its `.mtl` or a texture, a `.shp`
-without its `.shx` or `.dbf`) waits for the file. No timer retries it. When a file with the
-missing name arrives (upload, push, move, copy or transfer; any folder, letter case ignored),
-the build starts at once.
+without its `.shx` or `.dbf`) waits for the file. No timer retries it. When the file that the missing
+name stands for arrives (upload, push, move, copy or transfer), the build starts at once. The name is
+a dataset path, or a path relative to the folder of the entry, and letter case is ignored; a file of
+the same name in another folder does not release the build. Each entry has its own marker, so two
+identical models in two folders wait for their own companions.
 
 In a listing such an entry has `buildStatus: "pending"`, `buildMissingDependencies` and
 `buildAwaitingFiles: true`. Read the flag; do not derive it from the missing files. In
