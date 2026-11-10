@@ -38,25 +38,36 @@ your computer and your connection are not used. This is fast for large files.
 
 <Steps>
 
-1. Open the datasets page of the organization and click **Import Dataset**.
+1. Open the datasets page of the organization and click **Import**.
 2. Select the **Source**:
-   - **DroneDB Registry / Hub**: type the **Registry URL**, for example `https://hub.dronedb.app`.
+   - **DroneDB Registry / Hub**: type the **Registry URL**, for example `https://hub.dronedb.app`, or paste
+     the link of a dataset (`https://hub.dronedb.app/r/odm/brighton-beach`) to fill in every field. `odm/brighton-beach` without a
+     server is a dataset of `hub.dronedb.app`, as in the `ddb` command line; a text with a `/` that Hub cannot read says
+     **Add the registry address, e.g. hub.dronedb.app/admin/brighton-beach**.
      For a private dataset, open **Credentials (optional)** and type the **Username** and the **Password** of
      an account on that server. The credentials fold again when they are empty, and open by themselves when **Verify** fails.
-     Click **Browse organizations** and **Browse datasets** to select the **Organization** and the
-     **Dataset**, or type their slugs. Each list has a search field (**Search organizations**, **Search
-     datasets**), so a long list is not scrolled.
+     Click the list button next to **Organization** (**Browse organizations**), then the one next to **Dataset**
+     (**Browse datasets**), to select them, or type their slugs. Each list has a search field (**Search organizations**, **Search
+     datasets**), so a long list is not scrolled. **Verify** and the list buttons work as soon as a link is typed, before you leave the field.
    - **Archive URL**: type the **Archive URL** of a ZIP, TAR, 7z or RAR file, and an optional user name
      and password. **Verify** refuses a web page with "The file is not a ZIP, TAR, 7z or RAR archive".
      It also works with a server that refuses a check of the headers.
 3. Click **Verify**. Hub shows the number of files and the size, scrolls to the next step and puts the
-   cursor in the dataset name. **Import** stays at the bottom of the window, in view.
+   cursor in the dataset name. **Import** stays at the bottom of the window, in view. When you change the
+   address, the credentials or the dataset, the result of **Verify** and its error go away: they
+   were about the old values.
+
+   For a dataset of another Registry, Hub reads its name and tagline and suggests them, with the slug of the
+   remote dataset. A dataset that you imported before gets **Name (2)** and `slug-2`.
 
    <Screenshot id="files/import--dataset-dialog" />
 
 4. Type the **Dataset Name**, select the **Visibility** and check the **Slug**.
-5. Click **Import**. Click **Run in background** to close the window while the import runs. Follow the
-   import in the **Tasks** tab of the new dataset. Click **Cancel** there to stop it.
+5. Click **Import**. The window shows the progress, by bytes, and the time left, from the speed of the last 30 seconds. Click
+   **Run in background** to close the window while the import runs. Follow the
+   import in the **Tasks** tab of the new dataset. Click **Cancel** there to stop it: see
+   [What happens](#what-happens). If the server refuses the import, the reason shows
+   next to **Import** and **Source reachable** goes away.
 
 While the import runs, the dataset is not shown as empty. Its row in the list of the organization has the
 tag **Importing… 40 %**, and the dataset page has a banner **Importing… 40 % — the files appear here when the
@@ -82,7 +93,9 @@ import deletes the dataset it created), or **Import cancelled**.
 
 ## Limits & requirements
 
-- Only `http` and `https` URLs. The server refuses addresses of private and local networks.
+- Only `http` and `https` URLs. The server refuses addresses of private and local networks, and says **This server cannot import
+  from local or private network addresses (host). Use the public address of the registry.** To import from
+  a server of your own network, give the server a public address.
 - The server administrator sets the largest file and import size, and can block some file types.
 - **Import Dataset** needs write access to the organization. **Import from URL** needs write access
   to the dataset.
