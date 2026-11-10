@@ -50,12 +50,16 @@ colormap and the range of values.
 1. Open a raster with one band on the map, for example a DSM. Click **Raster Analysis** in the
    toolbar at the top right.
 
-2. Select a **Colormap**. Type a **Rescale** range, for example `0,50`, or leave it empty for the
-   range of the raster.
+2. A raster of values (an elevation model, a thermal mosaic) is painted when it opens, with
+   **Viridis** (**Ironbow** for a thermal raster) over its default stretch, so it is not a black and
+   white mask. Select another **Colormap**. Type a **Rescale** range under **Min** and **Max**, for
+   example `0` and `50`. Both fields start with the default stretch of the raster; clear both for the
+   automatic range.
 
    <Screenshot id="analyse/colormaps--colormap-dropdown" />
 
-3. Click **Reset** to put all settings back to their defaults.
+3. Click **Reset** to put the colormap, the **Rescale** range, the **Unit** and the **NoData value** back
+   to the defaults of the raster.
 
 </Steps>
 
@@ -66,9 +70,9 @@ colormap and the range of values.
 | **Bands (R,G,B)** | Plant Health | The band that shows as red, green and blue. It shows for rasters with more than three bands. | The bands Hub matched to the camera |
 | **Histogram** | Plant Health | The values of the first band, with two handles that set the range. Far outliers are left out, and a note names them; see [Plant health](/hub-guide/analyse/plant-health.mdx). | — |
 | **Colormap** | Plant Health (with a formula), Raster Analysis | The colours of the values. | Red-Yellow-Green (index), Viridis (raster), Ironbow (thermal) |
-| **Rescale** | Both | The lowest and the highest value of the colormap. Empty: automatic. | Automatic |
+| **Rescale** | Both | The lowest and the highest value of the colormap, in the **Min** and **Max** fields. Clear both for the automatic range. | The default stretch of the raster: its mean ± 2.33 standard deviations, kept inside its range (from the server; an 8-bit raster of several bands keeps its own colours) |
 | **Unit** | Raster Analysis | The unit that the panel shows with the values, for example `m`. | Read from the file; else `m` for an elevation model and none for other rasters |
-| **Reset** | Both | Puts every setting back to its default. | — |
+| **Reset** | Both | Puts the colormap, the **Rescale** range, the **Unit** and the **NoData value** back to their defaults. | — |
 | **Original** | Both | Shows the raster without the styling. Click **Hide Orig.** to go back. | — |
 | **Export** | Both | Downloads the raster as you see it, as a GeoTIFF. | — |
 
@@ -88,6 +92,11 @@ colormap and the range of values.
   its eye in the layer panel, or lower its opacity.
 - **Export** is greyed out when the server estimates the file (the pixels that have a value, 4 bytes each) as larger than its export limit; its tooltip gives the limit.
 - The settings apply to what you see. They do not change the file.
+- The style stays on the map when you close **Raster Analysis** or **Plant Health**, and a closed panel
+  changes nothing. Only an edit or **Reset** changes it. Opening **Stockpile Volume** does not
+  recolour the raster, and changing the colormap or the range swaps the tiles in place, so the
+  map does not go blank. A layer that a [saved view](/hub-guide/viewing/map-views.mdx) records keeps the
+  style of the view.
 - A raster with more than 8 bits per sample, such as a 16-bit multispectral orthophoto, opens stretched over the range of its values (about its mean ± 2.33 standard deviations), not over the whole 16-bit range, so it is not almost black.
 
 ## Related

@@ -11,7 +11,7 @@ requires: { access: read, data: "A raster with two or more bands, for example a 
 <Requires />
 
 <TryLive org="odx" ds="micasense" path="odm_orthophoto/odm_orthophoto.tif" view="map"
-         hint="Click the leaf button (Plant Health) next to the opacity slider, then select NDVI." />
+         hint="Click the leaf button (Plant Health) next to the opacity slider, then select Normalized Difference Vegetation Index." />
 
 ## When to use it
 
@@ -27,7 +27,8 @@ a colormap. Nothing is processed in advance: you can change the index at any tim
    to the opacity slider. You can also right-click the file in the dataset and select
    **Plant Health**.
 
-2. In the **Plant Health** panel, select a **Formula**, for example **NDVI**.
+2. In the **Plant Health** panel, select a **Formula**, for example **Normalized Difference Vegetation
+   Index** (NDVI). The list gives the full names; the table of indices below gives their short names.
 
    <Screenshot id="analyse/plant-health--ndvi" />
 
@@ -39,8 +40,9 @@ a colormap. Nothing is processed in advance: you can change the index at any tim
 
    <Screenshot id="analyse/plant-health--formulas-dialog" />
 
-5. Click **Copy Link** to copy a link that opens the map with the same settings, or **Export** to
-   download the result as a GeoTIFF.
+5. Click **Copy Link** to copy a link that opens the map with the same **Formula**, **Colormap** and
+   **Rescale** (a toast says **Link copied to the clipboard**), or **Export** to download the result as a
+   GeoTIFF.
 
 </Steps>
 
@@ -68,7 +70,8 @@ a colormap. Nothing is processed in advance: you can change the index at any tim
 | Red edge, near-infrared | NDRE |
 | Visible bands only | NDYI, MPRI |
 
-The list shows every index. An index that the raster cannot compute has a ✗. Its tooltip, and
+The list shows every index, and **Celsius Temperature** and **Kelvin Temperature**, which are for
+thermal rasters only (they have a ✗ on the others). An index that the raster cannot compute has a ✗. Its tooltip, and
 the formulas dialog, give the reason:
 
 - **A band is missing**: the message names the bands the index needs.
@@ -83,12 +86,16 @@ band whatever the band order of the camera.
 
 - Plant Health needs a georaster with two or more data bands, or a GeoTIFF photo with a
   footprint. A raster with one band per file needs
-  [Merge multispectral bands](/hub-guide/processing/merge-multispectral.mdx) first.
+  [Merge multispectral bands](/hub-guide/processing/merge-multispectral.mdx) first: the panel says
+  **Single band image. Use Merge Multispectral to combine bands for vegetation indices.** The merge of
+  the bands of a MicaSense, Sequoia or DJI capture keeps the camera data, so Plant Health opens the
+  merged file.
 - **Export** is greyed out when the server estimates the file (the pixels that have a value, 4 bytes each) as larger than its export limit; its tooltip gives the limit.
-- The **Histogram** shows the range the index can have (NDVI: -1 to 1), around the 2nd to 98th
-  percentiles of the values. When some values are far outside it (outliers), a note under the
-  histogram gives the real lowest and highest values. If too few bars fit in that range, the
-  histogram has no bars, but the handles still set the range.
+- The **Histogram** covers the range the index can have (NDVI: -1 to 1), narrowed to the values near
+  the bulk of the data (within one spread of the 2nd to 98th percentiles). When some values are outside
+  what it shows, a note under it says **Outliers: the values go from … to …** with the real lowest and
+  highest values. If too few bars fit in the range, the histogram has no bars, but the handles still set
+  the range.
 - When the map shows two or more rasters, each raster with bands has its own leaf button in the
   layer opacity panel.
 

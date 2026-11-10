@@ -29,8 +29,8 @@ temperature range and tells you the temperature of any point you click.
 2. Read the **Temperature Range** of the raster. Select the **Unit**: **Celsius (°C)** or
    **Kelvin (K)**.
 
-3. Select a thermal **Colormap**. Type a **Rescale** range, for example `10,40`, to give all the
-   colours to the temperatures you care about.
+3. Select a thermal **Colormap**. Type a **Rescale** range under **Min** and **Max**, for example `10`
+   and `40`, to give all the colours to the temperatures you care about.
 
 4. Click **Inspect**, then click on the map. A label shows the value at that point. Press `Esc` to
    stop.
@@ -48,7 +48,7 @@ temperature range and tells you the temperature of any point you click.
 |---|---|---|
 | **Unit** | **Celsius (°C)** or **Kelvin (K)**. | Celsius |
 | **Colormap** | Ironbow, White Hot, Black Hot, Arctic, Lava, Inferno, Magma, Plasma. | Ironbow |
-| **Rescale** | The lowest and the highest value of the colormap. Empty: the range of the raster. | Automatic |
+| **Rescale** | The lowest and the highest value of the colormap, in the **Min** and **Max** fields. | The default stretch of the raster (its mean ± 2.33 standard deviations, inside its range) |
 | **Inspect** | Shows the value at the point you click. | — |
 | **Original** | Shows the raster without the colormap. | — |
 | **Export** | Downloads the raster as you see it, as a GeoTIFF. | — |
