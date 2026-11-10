@@ -89,11 +89,13 @@ colormap and the range of values.
 ## Limits & requirements
 
 - **Raster Analysis** shows in the toolbar when the map shows a raster with one data band, or a
-  thermal image. With two or more such rasters, an **Elevation model** selector sets the one it
-  works on. A raster on top with full opacity hides the colormap of the one below: hide it with
+  thermal image. With two or more such rasters, a **Raster** selector sets the one it
+  works on (**Elevation model** in Stockpile Volume). A raster on top with full opacity hides the colormap of the one below: hide it with
   its eye in the layer panel, or lower its opacity.
 - **Export** is greyed out when the server estimates the file (the pixels that have a value, 4 bytes each) as larger than its export limit; the panel says the estimate and the limit under it, and **Visible extent** exports a part. See [Export a raster](/hub-guide/processing/export-raster.mdx).
 - The settings apply to what you see. They do not change the file.
+- The buttons of the panel (**Inspect**, **Area**, **Contours**, **Reset**, **Original**, **Export**…) stay in a footer that is always in view; a fade over
+  the bottom of the panel says that more is above them. A styled raster has a [legend](/hub-guide/analyse/plant-health.mdx) on the map.
 - The style stays on the map when you close **Raster Analysis** or **Plant Health**, and a closed panel
   changes nothing. Only an edit or **Reset** changes it. Opening **Stockpile Volume** does not
   recolour the raster, and changing the colormap or the range swaps the tiles in place, so the

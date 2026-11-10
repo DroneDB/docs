@@ -57,12 +57,14 @@ someone who works in a drawing program.
 | **Min elevation** / **Max elevation** | Only lines between these elevations. Empty: the range of the raster. | Empty |
 | **Simplification tolerance** | Makes the lines simpler, in the units of the coordinate system of the raster. 0 disables it. | 0 |
 
-When you open the dialog again, it shows the options you used last.
+When you open the dialog again, it shows the options you used last. For a raster that is not an elevation model (a thermal mosaic Hub does
+not recognise as thermal, for example) the dialog says **raster** and **value** where it says elevation: **Base value**,
+**Min value** and **Max value**.
 
 ## Limits & requirements
 
-- **Raster Analysis** shows when the map has a raster with one band. With two or more elevation
-  models, the **Elevation model** selector sets the one the contours are drawn on. The **Contours**
+- **Raster Analysis** shows when the map has a raster with one band. With two or more rasters, the **Raster**
+  selector sets the one the contours are drawn on. The **Contours**
   button is not there for thermal rasters.
 - Contours are measurements: they are saved, listed and exported with the other
   [measurements on the map](/hub-guide/measure/map.mdx). Saving needs write access to the dataset.

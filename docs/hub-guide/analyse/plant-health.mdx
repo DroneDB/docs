@@ -27,8 +27,9 @@ a colormap. Nothing is processed in advance: you can change the index at any tim
    to the opacity slider. You can also right-click the file in the dataset and select
    **Plant Health**.
 
-2. In the **Plant Health** panel, select a **Formula**, for example **Normalized Difference Vegetation
-   Index** (NDVI). The list gives the full names; the table of indices below gives their short names.
+2. In the **Plant Health** panel, select a **Formula**, for example **NDVI – Normalized Difference Vegetation
+   Index**. Each item starts with the short name, so it reads even when the full name is cut. The panel names the
+   camera it found (for example **MicaSense RedEdge-MX**) and, when it knows the camera, a **Preset**.
 
    <Screenshot id="analyse/plant-health--ndvi" />
 
@@ -36,11 +37,14 @@ a colormap. Nothing is processed in advance: you can change the index at any tim
    of values the colormap covers.
 
 4. To learn what each index shows, click the information button next to **Formula**. The
-   **Vegetation index formulas** dialog shows the formula, the bands it needs and when to use it.
+   **Vegetation index formulas** dialog gives each formula its short and full name, **What it measures**, the **Formula**, the
+   **Bands required** (Red, NIR…) and **When to use** it. A formula that the raster cannot compute says **Not available on this
+   raster** and why.
 
    <Screenshot id="analyse/plant-health--formulas-dialog" />
 
-5. Click **Copy Link** to copy a link that opens the map with the same **Formula**, **Colormap** and
+5. The buttons at the foot of the panel stay in view when the panel scrolls: **Reset**, **Original**, **Copy Link** and **Export**.
+   Click **Copy Link** to copy a link that opens the map with the same **Formula**, **Colormap** and
    **Rescale** (a toast says **Link copied to the clipboard**), or **Export** to download the result as a
    styled GeoTIFF picture (**Visible extent** downloads the part under the map). The export is a task with
    a **Cancel** button: see [Export a raster](/hub-guide/processing/export-raster.mdx).
@@ -54,8 +58,8 @@ a colormap. Nothing is processed in advance: you can change the index at any tim
 
 | Option | What it does | Default |
 |---|---|---|
-| **Preset** | A band combination or an index made for the camera that took the images. It shows when Hub knows the camera. | — |
-| **Formula** | The vegetation index. **None (bands only)** shows the bands; see [Colormaps, bands & histogram](/hub-guide/analyse/colormaps.mdx). | None |
+| **Preset** | A band combination or an index made for the camera that took the images, for example **True Color** or **Color Infrared**. It shows when Hub knows the camera, and lists only the presets whose bands the raster has. A preset of an index sets its **Formula** and **Colormap**. | — |
+| **Formula** | The vegetation index, as **NDVI – Normalized Difference Vegetation Index**. **None (bands only)** shows the bands; see [Colormaps, bands & histogram](/hub-guide/analyse/colormaps.mdx). | None |
 | **Colormap** | The colours of the index. | Red-Yellow-Green |
 | **Stretch** | How Hub maps the values to the colours: **Percentile (2%-98%)**, **Min / Max**, **Std Dev (±2σ)** or **Custom**. | Percentile |
 | **Rescale** | The minimum and the maximum value, for example `-1,1`. Empty: automatic. | Automatic |
@@ -71,17 +75,26 @@ a colormap. Nothing is processed in advance: you can change the index at any tim
 | Red edge, near-infrared | NDRE |
 | Visible bands only | NDYI, MPRI |
 
-The list shows every index, and **Celsius Temperature** and **Kelvin Temperature**, which are for
-thermal rasters only (they have a ✗ on the others). An index that the raster cannot compute has a ✗. Its tooltip, and
-the formulas dialog, give the reason:
+| Thermal band | **Celsius Temperature**, **Kelvin Temperature** |
 
-- **A band is missing**: the message names the bands the index needs.
+The list is by kind of raster. A raster that can compute a thermal formula lists the thermal ones, and a raster that can compute a
+vegetation index lists the vegetation ones, so a raster that has both (a MicaSense Altum, for example) lists both. A raster that can
+compute neither lists the vegetation indices, each with a ✗. An index that the raster cannot compute has a ✗, and a line under the
+list says **✗ 3 formulas are not available for this raster: it lacks the bands**, which a screen reader reads with the list.
+Its tooltip, and the formulas dialog, give the reason:
+
+- **A band is missing**: the message names the bands the index needs. A raster of fewer than three data bands (a single-band image,
+  from DroneDB 2.3) cannot compute the RGB indices (VARI, EXG, GLI, vNDVI), so they show ✗ and do not blank the image. If a formula is refused anyway, the panel says
+  **This formula cannot be computed for this image.**
 - **The raster is not reflectance**: SAVI, OSAVI and EVI need values from 0 to 1 (a
   floating-point raster). On 8-bit or 16-bit rasters they give wrong values, so Hub does not offer
   them. Use NDVI, NDRE or another ratio index on such rasters.
 
 Hub reads the bands from the camera profile it matched to the file, so each index uses the right
-band whatever the band order of the camera.
+band whatever the band order of the camera. From DroneDB 2.3 a raster of another camera is read by the names of its bands: **R**, **G**, **B**,
+**NIR**, **Near Infrared** and **Red Edge** (in any letter case) are known, and the presets and the formulas use them. If the bands have no names
+(**Band 1**…), the order of the camera profile stands. A 4-band raster of that kind has the presets of the bands it has: no **True Color**
+without a blue band, no **Color Infrared** without a near-infrared one. Its profile is called **Generic 4-band**.
 
 ## Limits & requirements
 
@@ -93,10 +106,13 @@ band whatever the band order of the camera.
   merged file.
 - **Export** is greyed out when the server estimates the file (the pixels that have a value, 4 bytes each) as larger than its export limit; the panel says the estimate and the limit under it, and **Visible extent** exports a part. See [Export a raster](/hub-guide/processing/export-raster.mdx).
 - The **Histogram** covers the range the index can have (NDVI: -1 to 1), narrowed to the values near
-  the bulk of the data (within one spread of the 2nd to 98th percentiles). When some values are outside
-  what it shows, a note under it says **Outliers: the values go from … to …** with the real lowest and
-  highest values. If too few bars fit in the range, the histogram has no bars, but the handles still set
+  the bulk of the data (within one spread of the 2nd to 98th percentiles). Only values outside the range the index can have are
+  **Outliers**: then a note under the histogram says **Outliers: the values go from … to …** with the real lowest and highest values. An
+  index with values inside its own range has no note, and an index with no range of its own says **The histogram shows
+  the central part, … to …; the values go from … to …**. If too few bars fit in the range, the histogram has no bars, but the handles still set
   the range.
+- The map shows a **legend** for a styled raster: a colour bar of the colormap with the two ends of the range and the unit of the values (an
+  index has no unit). It follows the style of the layer, so it shows in a [saved view](/hub-guide/viewing/map-views.mdx) and in an embed.
 - When the map shows two or more rasters, each raster with bands has its own leaf button in the
   layer opacity panel.
 
