@@ -229,7 +229,7 @@ spectral index, a colormap, a rescale. Memory stays bounded at any size.
 refused with `400` before the task is queued, for example `NDVI is not available for this raster:
 Requires bands: RN` on an RGB orthophoto. Use `VARI` on RGB, and `NDVI` on a raster with a
 near-infrared band. An unknown formula answers `Unknown formula: <name>`. `rescale` is `min,max`: two finite numbers within the
-range of a 32-bit float with `min` below `max`; another value is `400` before the task is queued. The tile, thumbnail and analysis endpoints that take a `rescale` check it the same way.
+range of a 32-bit float with `min` below `max`; another value is `400` before the task is queued. The tile, thumbnail and analysis endpoints that take a `rescale` check it the same way. With a thermal `formula` they take `rescaleUnit` too (`K`, `C` or `F`, from DroneDB 2.3 and the Registry that comes with it): a `rescale` written in that unit is converted to the unit of the formula, as Hub does when a user changes the unit after setting a range.
 
 An export larger than the limit of the server (`MaxExportSizeBytes`, `exportLimitBytes` of `GET …/raster-value-info`)
 is refused with `400` before the task is queued: `Export output exceeds maximum allowed size (… > …)`. The
@@ -559,7 +559,7 @@ marks as no data. They need read access. All of them take `path` and, optionally
 | Parameter | Meaning |
 |---|---|
 | `nodata` | A finite number that replaces the no-data value of every band for this request. In the body of `raster-profile` and `contours`. Value info says in `nodata` which value applies and in `nodataOverridden` whether it is yours; `nodataInvalid` is `true` when the value of the file cannot be held by the type of the band. |
-| `formula` | A vegetation index for the default stretch of value info, or `CELSIUS` or `KELVIN` to read a thermal value in that unit |
+| `formula` | A vegetation index for the default stretch of value info, or `CELSIUS`, `KELVIN` or (from DroneDB 2.3) `FAHRENHEIT` to read a thermal value in that unit. The library converts from the unit of the band, so the values, the range of value info, the unit in the answer and the contours are in the unit you ask. A formula that is not a thermal one is `400` for a point, an area and a profile |
 
 | Request | Parameters and answer |
 |---|---|

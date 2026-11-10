@@ -23,7 +23,7 @@ The ABI follows semantic versioning: a removed or changed export needs a new maj
 | 2.0 | 2.0.0 | The first 2.x C API |
 | 2.1 | 2.1.0 | `DDBAlignRasterEx`, `DDBMergeMultispectralEx` and `DDBMaskBordersEx`, which take an options struct with `overwrite` ([Output files](#output-files)) |
 | 2.2 | 2.2.0 | `DDBRasterOptions` and ten raster value exports that take it ([Raster values](#raster-values)), and the build key of every build ([Build key](#build-key)) |
-| 2.3 | 2.3 (not released yet) | `DDBGenerateContoursEx2`, which reports progress and can be cancelled, and the window of `DDBExportRaster3` ([Raster values](#raster-values)) |
+| 2.3 | 2.3 (not released yet) | `DDBGenerateContoursEx2`, which reports progress and can be cancelled, the window of `DDBExportRaster3`, the thermal unit conversion with `FAHRENHEIT` and the `rescaleUnit` field of `DDBRasterOptions` ([Raster values](#raster-values)) |
 
 Every release publishes, next to the `.deb` and the Windows zip:
 
@@ -261,11 +261,12 @@ typedef struct {
     uint32_t flags;        /* DDB_RASTER_OPT_NODATA 0x1, DDB_RASTER_OPT_BBOX 0x2: which fields are set */
     double nodata;         /* with DDB_RASTER_OPT_NODATA: a finite value that replaces the NoData of every band */
     double bbox[4];        /* with DDB_RASTER_OPT_BBOX (value info; the window of DDBExportRaster3 from 2.3): minLon, minLat, maxLon, maxLat (WGS 84) */
-    const char *formula;   /* an index for the stretch of value info; CELSIUS or KELVIN for a thermal value; or NULL */
+    const char *formula;   /* an index for the stretch of value info; CELSIUS, KELVIN or FAHRENHEIT (2.3) for a thermal value; or NULL */
+    const char *rescaleUnit; /* 2.3: with a thermal formula, the unit of the rescale of a tile, thumbnail or export ("K", "C", "F", "degC", "Kelvin"...); NULL: the unit of the formula */
 } DDBRasterOptions;
 ```
 
-A `NULL` options pointer means every option unset. Set `structSize` and every field explicitly: a later version may append fields, and a library that does not know them refuses a struct whose unknown bytes are not zero (`DDBERR_INVALIDARGS`), as it refuses an invalid option. These ten exports take it, and all ten are cancellable:
+A `NULL` options pointer means every option unset. Set `structSize` and every field explicitly: a later version may append fields, and a library that does not know them refuses a struct whose unknown bytes are not zero (`DDBERR_INVALIDARGS`), as it refuses an invalid option. A 2.2 struct, which stops before `rescaleUnit`, still works with a 2.3 library: the field reads as `NULL`. These ten exports take it, and all ten are cancellable:
 
 | Export | What it adds to the export without `Ex` |
 |--------|------------------------------------------|
@@ -281,6 +282,8 @@ A `NULL` options pointer means every option unset. Set `structSize` and every fi
 | `DDBExportRaster3(…, progress, userData, options)` | The same, for an exported GeoTIFF. From 2.3 `DDB_RASTER_OPT_BBOX` exports a window (below) |
 
 **Export of a window.** From 2.3 `DDBExportRaster3` with `DDB_RASTER_OPT_BBOX` exports the part of the raster under the WGS 84 box: the pixels whose centre is inside it, cut at the edges of the raster, at the resolution of the input, in its coordinate system (the library moves the box to it) and with the position of the window. The formula export (RGBA) and the band export both take it, and a formula export without a rescale takes its automatic range from the window. A box across the antimeridian is refused unless the raster crosses it. A box without a pixel of the raster, or a raster without a geotransform, is `DDBERR_INVALIDARGS` and leaves no file. There is no new export or struct field: a 2.2 library ignores the box and exports the whole raster, and before 2.3 the box applied to the value info only (its estimate of the export). So a host checks `DDBGetAbiVersion()` for a minor of 3 or more before it sends a box to an export.
+
+**Thermal units.** From 2.3 the thermal formulas `CELSIUS`, `KELVIN` and the new `FAHRENHEIT` convert from the unit of the first band (`K`, degrees Celsius or degrees Fahrenheit, as the file says it) to their own, in one place, for tiles, thumbnails, exports and the values alike. Before, a thermal formula read the band as degrees Celsius: `CELSIUS` over a Kelvin raster did not convert, and `KELVIN` added 273.15 to a value that was already in K. With a thermal `formula` in the options, value info (`valueMin`, `valueMax`, `unit` and `stretch`), a point, an area, a profile and contours answer in the unit of the formula, and a formula that is not a thermal one is refused there (`DDBERR_INVALIDARGS`); the contours of a formula that is an index ignore it, as 2.2 ignored every formula. The `rescaleUnit` option converts a rescale that was written in another unit to the unit of the formula, so a rescale keeps its temperatures when a user changes the unit. The formula list of `DDBGetRasterMetadata` has `FAHRENHEIT` (19 formulas) with `requiredBands` `["Thermal"]` and category `thermal`. No export is added, and the 2.3 ABI minor comes from `DDBGenerateContoursEx2`. A Kelvin raster stays in K by default.
 
 **Contours.** The output of `DDBGenerateContours`, `DDBGenerateContoursEx` and, from 2.3, `DDBGenerateContoursEx2` holds at most 100,000 lines. From 2.3 it says when the lines were cut: `"truncated": true` and `"featureCap": 100000` (the 2.2 output stopped at the cap without a word; a result of exactly the cap is not truncated). `DDBGenerateContoursEx2(…, options, progress, progressUserData, &out)` is `DDBGenerateContoursEx` with a `DDBProgressCallback`: it gets the fraction done in 0 to 1 and the phase (`statistics`, `levels` or `lines`), and a non-zero return cancels the call with `DDBERR_CANCELED`. A cancel token stops it too. A host that has to run on an older library checks `DDBGetCapabilities()` for the export and falls back to `DDBGenerateContoursEx` under a cancel token.
 
