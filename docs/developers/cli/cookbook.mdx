@@ -352,7 +352,7 @@ Correct the georeference of an orthophoto or a DEM with a more accurate referenc
 is a GeoTIFF in the coordinate system, at the pixel size and with the bands of the source (alpha
 included), compressed without loss (DEFLATE, with the predictor of the sample type); only its
 georeference changes. A vertical (Z) offset is applied in 64-bit floating point and rounded for an
-integer DEM. Before 2.2 it was a JPEG-compressed COG in EPSG:3857: run `ddb cog` on the output when a
+integer DEM. Before 2.4 it was a JPEG-compressed COG in EPSG:3857: run `ddb cog` on the output when a
 consumer needs one.
 
 ```bash
@@ -480,7 +480,7 @@ DroneDB converts a DWG to a temporary DXF with LibreDWG `dwg2dxf`, then builds t
 - A conversion may run for 120 seconds (`DDB_DWG2DXF_MAX_SECONDS`).
 - A file that does not convert fails the build with a message that names the DWG version.
   Export the drawing as DXF from your CAD software instead.
-- Without `dwg2dxf` (and without `DDB_DWG2DXF_PATH`), since DroneDB 2.3 the entry of the drawing is indexed with the
+- Without `dwg2dxf` (and without `DDB_DWG2DXF_PATH`), since DroneDB 2.4 the entry of the drawing is indexed with the
   warning text and `"warningCode": "dwg-converter-missing"` in its `properties`, a stable value that a client words for
   its users and that says a retry cannot help. Install the converter and run `ddb rescan -e dwg` to index the drawings again.
 

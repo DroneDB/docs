@@ -50,9 +50,9 @@ An item has the footprint of the file as its geometry, and assets with the downl
 file (`roles: ["data"]`) and of its thumbnail (`roles: ["thumbnail"]`).
 
 The footprints, and the spatial extent of a collection that is made of them, are in WGS 84 longitude
-and latitude. A vector file whose coordinate system cannot be read has no footprint. DroneDB 2.2 kept the raw
+and latitude. A vector file whose coordinate system cannot be read has no footprint. DroneDB 2.0 kept the raw
 envelope of such a vector, in the metres of a UTM file, so a collection mixed degrees with metres. From
-DroneDB 2.3.0 the footprint is always WGS 84, and the first start of Registry with it reads the
+DroneDB 2.4.0 the footprint is always WGS 84, and the first start of Registry with it reads the
 vector entries again once to correct the footprints of an old index (the same background job that
 rebuilds the models after an upgrade).
 

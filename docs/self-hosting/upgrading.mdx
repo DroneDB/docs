@@ -1,6 +1,6 @@
 ---
 title: "Upgrading"
-description: "Update Registry, upgrade to Registry 3.0 with DroneDB 2.0, and move old datasets to COPC point clouds and bm3d 3D models."
+description: "Update Registry, upgrade to Registry 3.0 with DroneDB 2.4, and move old datasets to COPC point clouds and bm3d 3D models."
 ---
 
 ## Update Registry
@@ -47,10 +47,10 @@ links to the release pages on GitHub. Embedded views (`?embed=1`) skip the check
 Branding files in `data/branding/` are never touched by the upgrade (see
 [Hub UI customization](/self-hosting/configuration.mdx#hub-ui-customization)).
 
-## Upgrade to Registry 3.0 (DroneDB 2.3)
+## Upgrade to Registry 3.0 (DroneDB 2.4)
 
-Registry 3.0 needs DroneDB 2.3 or later (the image and the Windows release ship DroneDB 2.3.0): a
-2.0, 2.1 or 2.2 library stops the start, with a message that names the C API version that Registry needs.
+Registry 3.0 needs DroneDB 2.4 or later (the image and the Windows release ship DroneDB 2.4.0): a
+1.x or 2.0 library stops the start, with a message that names the C API version that Registry needs.
 It changes the deployment in a few places.
 
 ### Before the upgrade
@@ -113,7 +113,7 @@ It changes the deployment in a few places.
   the environment of every Registry process if relative altitudes should come from the world
   elevation model.
 - **3D models** are rebuilt in the background: see [the next section](#3d-models-nexus-to-bm3d).
-- **Build keys.** DroneDB 2.2 names the build folder of each entry by a build key: the content
+- **Build keys.** DroneDB 2.4 names the build folder of each entry by a build key: the content
   hash, or the hash and a digest of the georeference for a model or a Gaussian splat that has one, so
   a georeferenced copy of a model gets its own build, and identical models in different folders wait
   for their own companion files.
