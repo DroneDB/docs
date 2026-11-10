@@ -75,7 +75,7 @@ a colormap. Nothing is processed in advance: you can change the index at any tim
 | Red edge, near-infrared | NDRE |
 | Visible bands only | NDYI, MPRI |
 
-| Thermal band | **Celsius Temperature**, **Kelvin Temperature**, **Fahrenheit Temperature** (from DroneDB 2.3) |
+| Thermal band | **Celsius Temperature**, **Kelvin Temperature**, **Fahrenheit Temperature** (since DroneDB 2.3) |
 
 The list is by kind of raster. A raster that can compute a thermal formula lists the thermal ones, and a raster that can compute a
 vegetation index lists the vegetation ones, so a raster that has both (a MicaSense Altum, for example) lists both. A raster that can
@@ -84,14 +84,14 @@ list says **✗ 3 formulas are not available for this raster: it lacks the bands
 Its tooltip, and the formulas dialog, give the reason:
 
 - **A band is missing**: the message names the bands the index needs. A raster of fewer than three data bands (a single-band image,
-  from DroneDB 2.3) cannot compute the RGB indices (VARI, EXG, GLI, vNDVI), so they show ✗ and do not blank the image. If a formula is refused anyway, the panel says
+  since DroneDB 2.3) cannot compute the RGB indices (VARI, EXG, GLI, vNDVI), so they show ✗ and do not blank the image. If a formula is refused anyway, the panel says
   **This formula cannot be computed for this image.**
 - **The raster is not reflectance**: SAVI, OSAVI and EVI need values from 0 to 1 (a
   floating-point raster). On 8-bit or 16-bit rasters they give wrong values, so Hub does not offer
   them. Use NDVI, NDRE or another ratio index on such rasters.
 
 Hub reads the bands from the camera profile it matched to the file, so each index uses the right
-band whatever the band order of the camera. From DroneDB 2.3 a raster of another camera is read by the names of its bands: **R**, **G**, **B**,
+band whatever the band order of the camera. Since DroneDB 2.3 a raster of another camera is read by the names of its bands: **R**, **G**, **B**,
 **NIR**, **Near Infrared** and **Red Edge** (in any letter case) are known, and the presets and the formulas use them. If the bands have no names
 (**Band 1**…), the order of the camera profile stands. A 4-band raster of that kind has the presets of the bands it has: no **True Color**
 without a blue band, no **Color Infrared** without a near-infrared one. Its profile is called **Generic 4-band**.
