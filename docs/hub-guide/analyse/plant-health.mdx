@@ -84,7 +84,7 @@ band whatever the band order of the camera.
 - Plant Health needs a georaster with two or more data bands, or a GeoTIFF photo with a
   footprint. A raster with one band per file needs
   [Merge multispectral bands](/hub-guide/processing/merge-multispectral.mdx) first.
-- **Export** is not available when the result is larger than the export limit of the Hub.
+- **Export** is greyed out when the server estimates the file (the pixels that have a value, 4 bytes each) as larger than its export limit; its tooltip gives the limit.
 - The **Histogram** shows the range the index can have (NDVI: -1 to 1), around the 2nd to 98th
   percentiles of the values. When some values are far outside it (outliers), a note under the
   histogram gives the real lowest and highest values. If too few bars fit in that range, the

@@ -47,7 +47,7 @@ along the line.
 
 | Option | What it does | Default |
 |---|---|---|
-| **Unit** | The unit the chart shows with the values, for example `m`. | Read from the file; else `m` for an elevation model and none for other rasters |
+| **Unit** | The unit the chart shows with the values, for example `m`. On a thermal raster it is the **Celsius (°C)** or **Kelvin (K)** choice of the panel. | Read from the file; else `m` for an elevation model and none for other rasters |
 | **Profile** / **Redraw** | Draws a new line. The current line goes. | — |
 | **Export CSV** | Downloads the samples as `raster-profile.csv`. | — |
 
@@ -59,6 +59,9 @@ saves it with the other [measurements on the map](/hub-guide/measure/map.mdx).
 - The profile works on a raster with one band. **Raster Analysis** shows when the map has such a
   raster. With two or more, an **Elevation model** selector sets the one the profile is drawn on.
 - Hub samples the line at 256 evenly spaced points.
+- The values are those of the source file in the unit of the band, with its scale and offset applied. A
+  sample without a value (a masked or no-data pixel, or a place outside the raster) shows as a gap in the chart.
+  The profile uses the **NoData value** of the panel, as [Inspect and Area](/hub-guide/analyse/area-statistics.mdx) do.
 - The distances on the chart follow the units of your [preferences](/hub-guide/account/preferences.mdx),
   as the measurements on the map: m up to 100 m, then km, or ft. The values stay in the **Unit** of
   the raster.

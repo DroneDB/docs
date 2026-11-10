@@ -22,7 +22,7 @@ The ABI follows semantic versioning: a removed or changed export needs a new maj
 |-----|---------|-------|
 | 2.0 | 2.0.0 | The first 2.x C API |
 | 2.1 | 2.1.0 | `DDBAlignRasterEx`, `DDBMergeMultispectralEx` and `DDBMaskBordersEx`, which take an options struct with `overwrite` ([Output files](#output-files)) |
-| 2.2 | 2.2.0 | `DDBRasterOptions` and ten raster value exports that take it, and the build key of every build |
+| 2.2 | 2.2.0 | `DDBRasterOptions` and ten raster value exports that take it ([Raster values](#raster-values)), and the build key of every build |
 
 Every release publishes, next to the `.deb` and the Windows zip:
 
@@ -235,6 +235,43 @@ A failed or canceled call may leave a partial `outFolder`: delete it. The export
 `DDBGetRasterInfo` reports, in `indexLayer`, the spectral indices `DDBRenderRasterIndex` (the WMS index layer) can render from the raster: a subset of `NDVI`, `NDRE`, `NDWI`, `SAVI`, `EVI`, in that order, `[]` when there are none. The bands come from the raster's sensor profile; a raster without named bands and with five data bands or more is read as R, G, B, RedEdge, NIR. SAVI and EVI are listed only for floating-point rasters. `DDBRenderRasterIndex` refuses an index the list does not hold, with the reason.
 
 The formula list of `DDBGetRasterMetadata` marks the formulas a raster cannot compute with `"disabled": true` and a `disabledReason` ("Requires bands: ..." or, for SAVI, OSAVI and EVI on an integer raster, "... needs reflectance values"). See [How DroneDB reads the bands](/developers/cli/cookbook.mdx#how-dronedb-reads-the-bands).
+
+Since 2.1, `DDBGetRasterMetadata`, `DDBMemoryTileEx`, `DDBExportRaster` and `DDBExportRaster2` return `DDBERR_INVALIDARGS` for a formula that does not exist or whose bands the raster lacks, with the reason in `DDBGetLastError()` (`Requires bands: RN` for NDVI on an RGB raster: use VARI), instead of drawing one colour. `CELSIUS` and `KELVIN` still render an elevation model. The thumbnail export returns `DDBERR_EXCEPTION`. Offer only the formulas that the raster has.
+
+## Raster values
+
+Since 2.2 the values of a raster that the library reports (value info, point values, area statistics, profiles and contours) are **physical values read from the source file**: `raw × scale + offset` in the unit of the band, without the pixels that the file masks or marks as no data. A band stored as tenths of a degree gives `29.1`, not `291`. A host that applied a scale or an offset itself drops it, and compares saved values against 2.2 output. The default render of a raster of several bands that is not Byte, and of a single band, stretches over the mean ± 2.33 standard deviations clamped to the range, so thermal and elevation rasters are no longer washed out.
+
+One options type carries the settings of every raster value export:
+
+```c
+typedef struct {
+    uint32_t structSize;   /* sizeof(DDBRasterOptions) */
+    uint32_t flags;        /* DDB_RASTER_OPT_NODATA 0x1, DDB_RASTER_OPT_BBOX 0x2: which fields are set */
+    double nodata;         /* with DDB_RASTER_OPT_NODATA: a finite value that replaces the NoData of every band */
+    double bbox[4];        /* with DDB_RASTER_OPT_BBOX (value info only): minLon, minLat, maxLon, maxLat (WGS 84) */
+    const char *formula;   /* an index for the stretch of value info; CELSIUS or KELVIN for a thermal value; or NULL */
+} DDBRasterOptions;
+```
+
+A `NULL` options pointer means every option unset. Set `structSize` and every field explicitly: a later version may append fields, and a library that does not know them refuses a struct whose unknown bytes are not zero (`DDBERR_INVALIDARGS`), as it refuses an invalid option. These ten exports take it, and all ten are cancellable:
+
+| Export | What it adds to the export without `Ex` |
+|--------|------------------------------------------|
+| `DDBGetRasterValueInfoEx(file, options, &out)` | `nodata`, `bbox`, `formula` (the index of the stretch) |
+| `DDBGetRasterPointValueEx(file, lon, lat, options, &out)` | A point in map coordinates (WGS 84); the answer adds `lon` and `lat` |
+| `DDBGetRasterAreaStatsEx(file, minLon, minLat, maxLon, maxLat, options, &out)` | A window in map coordinates (the pixels whose centre is inside it; `bounds` are those pixels) |
+| `DDBGetRasterPointValuePixelEx(file, x, y, options, &out)` | A pixel of a raster without a map (an R-JPEG), with `nodata` and a thermal `formula`; the answer adds `unit` |
+| `DDBGetRasterAreaStatsPixelEx(file, x0, y0, x1, y1, options, &out)` | A rectangle of pixels of such a raster, with the same options |
+| `DDBGetRasterProfileEx(file, lineString, samples, options, &out)` | `nodata` |
+| `DDBGenerateContoursEx(…, options, &out)` | `nodata`; levels, statistics and elevations in the units of the band, without the masked pixels |
+| `DDBGenerateMemoryThumbnailEx2(…, options, &buffer, &size)` | `nodata`: a pixel equal to it is transparent and out of the stretch |
+| `DDBMemoryTileEx2(…, options, &buffer, &size)` | The same, for a tile |
+| `DDBExportRaster3(…, progress, userData, options)` | The same, for an exported GeoTIFF |
+
+The map-coordinate queries use the one conversion from longitude and latitude to the pixel of the file that the profile, the region render and the stockpile tools use. A window across the antimeridian is refused unless the raster crosses it. A point or window outside the raster, or whose pixels all lack a value, returns `DDBERR_INVALIDARGS` with the reason, as do a formula that does not exist, a thermal formula that is not `CELSIUS` or `KELVIN`, and invalid options. `DDBGetRasterValueInfoEx` reports the exact range of the pixels that have a value in the unit of the band (`valueMin`, `valueMax`), `pixelCount`, `validPixelCount`, `windowPixelCount`, the default `stretch` (one `{min, max}` per band, one for an index, none for a Byte raster of several bands), `nodata`, `nodataOverridden`, `scale` and `offset`, and `nodataInvalid` when the NoData value is not a number that the type of the band can hold.
+
+The statistics behind these values are exact raw statistics, keyed by the version of the file, the band and the effective NoData value, kept in a version 2 sidecar; an old or approximate sidecar is replaced. A confined worker can read them: the artifact check no longer creates the cache folder. A **thumbnail** of a raster larger than 2048 × 2048 pixels whose exact statistics are not stored yet takes its stretch from a bounded sample (an overview within the budget, else whole blocks on a lattice) so that it stays within the time limit of the thumbnail worker, and never stores that sample. Value info, tiles, contours and the COG build stay exact, so such a thumbnail can differ slightly from the stretch of value info until the raster is built.
 
 ## Index files
 

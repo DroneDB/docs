@@ -26,11 +26,11 @@ the mean height of one part of a site.
 1. Open the raster on the map. Click **Raster Analysis** in the toolbar at the top right. The panels of the analysis are wider on a large screen, with larger text.
 
 2. Read the **Value Range** (the **Temperature Range** for a thermal raster): the lowest and the
-   highest value of the raster.
+   highest value of the raster, counted over the pixels that have a value, in the unit of the raster.
 
-3. Click **Inspect**, then click on the map. A label shows the value at that point. The panel keeps
-   the last value as **Spot Value** (**Spot Temperature** for a thermal raster), with its latitude
-   and longitude. Press `Esc` to stop.
+3. Click **Inspect**, then click on the map. A label shows the value of the pixel under the click.
+   The panel keeps the last value as **Spot Value** (**Spot Temperature** for a thermal raster), with
+   the latitude and longitude of the point that you clicked. Press `Esc` to stop.
 
    <Screenshot id="analyse/area-statistics--value-range" />
 
@@ -41,7 +41,13 @@ the mean height of one part of a site.
 5. To remove the rectangle and its statistics, click the eraser next to **Area Statistics**. A new
    rectangle replaces the old one.
 
-6. For a raster with two or more bands, open [Plant health](/hub-guide/analyse/plant-health.mdx). Its
+6. Optional: if the background of the raster is not marked as no data in the file, for example a
+   thermal mosaic with a border of zeros, type its value under **NoData value**. Hub reads the raster
+   again with it: the range, **Inspect**, **Area**, the profile and the colours on the map all leave
+   those pixels out. The field shows the value of the file as its hint, for example `-9999 (of the
+   file)`. Click **Reset** to go back to the value of the file.
+
+7. For a raster with two or more bands, open [Plant health](/hub-guide/analyse/plant-health.mdx). Its
    **Statistics** show the minimum, the maximum, the mean and the standard deviation of the first
    band, and its **Histogram** shows how the values spread.
 
@@ -51,8 +57,9 @@ the mean height of one part of a site.
 
 | Statistic | Where | What it is |
 |---|---|---|
-| **Value Range** / **Temperature Range** | Raster Analysis | The lowest and the highest value of the whole raster. |
-| **Inspect** | Raster Analysis | The value of the pixel you click, with its latitude and longitude. |
+| **Value Range** / **Temperature Range** | Raster Analysis | The lowest and the highest value of the whole raster: exact, over the pixels that have a value, not an estimate from a reduced copy. |
+| **Inspect** | Raster Analysis | The value of the pixel you click, with the latitude and longitude of the point that you clicked. |
+| **NoData value** | Raster Analysis | The value that stands for "no data" and replaces the one of the file, for the colours on the map and for every number of the panel. Empty: the value of the file. |
 | **Area** | Raster Analysis | **Min**, **Max**, **Mean**, **Median** and **Std dev** of the pixels in the rectangle, in the unit of the raster, the number of **Pixels** counted and, if there are some, the pixels with **No data**. |
 | **Statistics** | Plant Health | Min, Max, Mean and StdDev of the first band of the whole raster. |
 | **Histogram** | Plant Health | How many pixels have each value. |
@@ -64,12 +71,19 @@ the mean height of one part of a site.
   while the map is split.
 - One map tool works at a time: **Area**, **Inspect** or **Profile**. A new one stops the other.
   The measure toolbar waits while you draw the rectangle.
-- Pixels with the nodata value of the band do not count in **Area Statistics**. A rectangle with only
-  such pixels shows an error.
-- A rectangle outside the raster shows **The rectangle is outside the raster.**
-- The rectangle and the inspected point are exact for a raster in the projection of the map (Web
-  Mercator). For a raster in a projected coordinate system such as UTM, they are approximate: close
-  for a small area.
+- The values are those of the source file, in the unit of the band: the scale and the offset of the
+  band are applied (a band stored in tenths of a degree shows `29.1`, not `291`), and the pixels
+  that the file masks or marks as no data are left out.
+- Pixels with the nodata value of the band do not count in **Area Statistics**. A rectangle outside
+  the raster, or with only such pixels, shows **No statistics for this area: it may hold only pixels
+  without data.**
+- **Inspect** and **Area** work in any coordinate system, Web Mercator or UTM, with the same
+  accuracy: Hub sends the point or the corners as longitude and latitude, and the server finds the
+  pixels of the file under them, with the conversion that the elevation profile and the stockpile
+  tools also use. **Area** counts the pixels whose centre is inside the rectangle.
+- If the no-data value of the file cannot be held by its data type (65536 in a 16-bit band), no pixel
+  is treated as no data and the panel says so: type the value of the background under **NoData
+  value**.
 - Another raster, or closing the panel, removes the rectangle.
 
 ## Related
@@ -80,8 +94,10 @@ the mean height of one part of a site.
 
 <ForDevelopers api="/docs/developers/api/workflows">
 
-`GET /orgs/{org}/ds/{ds}/raster-area-stats?path=…&x0=…&y0=…&x1=…&y1=…` returns `min`, `max`,
-`mean`, `stddev`, `median` and `pixelCount` of the rectangle between the pixels (`x0`, `y0`) and
-(`x1`, `y1`) of the raster. The **Area** tool sends the pixels under the rectangle you draw.
+`GET /orgs/{org}/ds/{ds}/raster-area-stats?path=…&bbox=minLon,minLat,maxLon,maxLat` returns `min`,
+`max`, `mean`, `stddev`, `median` and `pixelCount` of the pixels of the file under the window
+(WGS 84). The **Area** tool sends the corners of the rectangle you draw as `bbox`, and **Inspect**
+sends `raster-point-value?path=…&lon=…&lat=…`. Add `nodata=` for the **NoData value**. The
+[Processing platform API](/developers/processing-api.mdx#raster-values) lists the parameters.
 
 </ForDevelopers>

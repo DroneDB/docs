@@ -226,6 +226,11 @@ refused with `400` before the task is queued, for example `NDVI is not available
 Requires bands: RN` on an RGB orthophoto. Use `VARI` on RGB, and `NDVI` on a raster with a
 near-infrared band. An unknown formula answers `Unknown formula: <name>`.
 
+An export larger than the limit of the server (`MaxExportSizeBytes`, `exportLimitBytes` of `GET …/raster-value-info`)
+is refused with `400` before the task is queued: `Export output exceeds maximum allowed size (… > …)`. The size is
+estimated as the number of pixels that have a value × 4 bytes, with no compression factor
+(`estimatedExportBytes` of value info).
+
 ### bulk-download
 
 Packs some entries, or the whole dataset, into a ZIP.
@@ -467,7 +472,41 @@ Some quick operations are plain endpoints of a dataset, not tasks:
 | `POST …/mask-borders` | Starts a background job that writes `<name>_masked.tif` next to a GeoRaster. Body `{ "path", "near": 15, "white": false }`. Needs write access. |
 | `POST …/mask-borders/check` | Whether the masked file exists already, and its path |
 | `POST …/contours` | Contour lines of a raster, as GeoJSON |
-| `POST …/raster-profile`, `GET …/raster-area-stats`, `GET …/raster-point-value` | Values of a raster along a line, in an area, at a point |
+| `GET …/raster-value-info`, `GET …/raster-point-value`, `GET …/raster-area-stats`, `POST …/raster-profile` | The range of a raster, and its values at a point, in an area and along a line: see [Raster values](#raster-values) |
 | `POST …/stockpile/detect`, `…/stockpile/detect-all`, `…/stockpile/calculate` | Stockpile footprint and volume on an elevation model |
 
 Their parameters are in the [API reference](/developers/api/reference.mdx) of the server.
+
+### Raster values
+
+The raster endpoints read the **source file** of the entry, not its build, and give the values of
+the band in its own unit (`raw × scale + offset`), leaving out the pixels that the file masks or
+marks as no data. They need read access. All of them take `path` and, optionally:
+
+| Parameter | Meaning |
+|---|---|
+| `nodata` | A finite number that replaces the no-data value of every band for this request. In the body of `raster-profile` and `contours`. Value info says in `nodata` which value applies and in `nodataOverridden` whether it is yours; `nodataInvalid` is `true` when the value of the file cannot be held by the type of the band. |
+| `formula` | A vegetation index for the default stretch of value info, or `CELSIUS` or `KELVIN` to read a thermal value in that unit |
+
+| Request | Parameters and answer |
+|---|---|
+| `GET …/raster-value-info` | `bbox` (`minLon,minLat,maxLon,maxLat`, WGS 84) is optional. The exact range of the valid pixels (`valueMin`, `valueMax`), `pixelCount`, `validPixelCount`, `windowPixelCount`, `unit`, `nodata`, `scale`, `offset`, the default colour `stretch` (one `{min, max}` per band, one for an index, none for a Byte raster of several bands), and `estimatedExportBytes` and `exportLimitBytes` of a [raster export](#raster-export). With `bbox` the estimate is that of the window. |
+| `GET …/raster-point-value` | `lon` and `lat` (WGS 84): the value of the pixel under the point, with `lon` and `lat` in the answer. For a raster without a map (a radiometric JPEG) send `x` and `y`, a pixel of its raw thermal grid, and the answer has its `unit`. |
+| `GET …/raster-area-stats` | `bbox` (WGS 84): `min`, `max`, `mean`, `stddev`, `median` and `pixelCount` of the pixels of the file whose centre is inside the window. For a radiometric JPEG send `x0`, `y0`, `x1` and `y1` (pixels). |
+| `POST …/raster-profile` | Body `{ "path", "lineString", "samples", "nodata", "formula" }`: `lineString` is a GeoJSON LineString in WGS 84 and `samples` is clamped to 2 to 4096. Each sample has `distance` (metres), `value` (`null` where the raster has none), `lon` and `lat`. |
+| `POST …/contours` | The contour lines of a band in the units of the raster, without the masked pixels. Takes `nodata`. |
+
+Map coordinates and pixels are never mixed: a request with both is `400`, and so are pixel
+coordinates on a georeferenced raster (`errors.x`, `errors.x0`) and a `bbox` that is not four finite
+numbers inside longitude -180 to 180 and latitude -90 to 90. A point or a window outside the raster,
+or with only pixels that have no value, is `400` with the reason. A `formula` that does not exist, or
+that the raster cannot compute (`Requires bands: RN`), is `400` too. One conversion from longitude
+and latitude to the pixel of the file serves all of these endpoints, the stockpile tools and the
+elevation profile. The first value info of a large raster computes its exact statistics and keeps
+them (keyed by the version of the file, the band and the effective no-data value), so the next one is fast.
+
+A [thumbnail](/developers/library.mdx#raster-values) of a raster larger than 2048 × 2048 pixels whose
+exact statistics are not stored yet takes its colour stretch from a bounded sample, so that it comes
+within the time limit of the thumbnail worker. Value info, tiles, contours and the COG build stay
+exact, so such a thumbnail can differ a little from the stretch of value info until the raster is
+built.
