@@ -182,6 +182,7 @@ parameters. These are the tools of Registry 3.0.
 | `bulk-download` | Download archive (ZIP) | Read | `.zip` |
 | `align-raster` | Align GeoTIFF to reference | Write | No |
 | `merge-multispectral` | Merge multispectral bands | Write | No |
+| `mask-borders` | Mask Borders | Write | No |
 | `archive-extract` | Extract archive | Write | No |
 | `rescan-index` | Rescan index | Write | No |
 | `import-file` | Import file from URL | Write | No |
@@ -274,6 +275,22 @@ Merges single-band GeoTIFFs into one multi-band GeoTIFF in the dataset (a captur
 `paths` (at least two, in band order) and `outputPath` are required. `overwrite` (default
 `false`) replaces an output that exists.
 `POST …/merge-multispectral/validate` and `…/preview` check the inputs first.
+
+### mask-borders
+
+Makes the border pixels of a georaster transparent and adds the result as `<name>_masked.tif` next to the
+source, in the same folder. The task is named after the new file (`targetLabel`), counts in the storage
+quota and is rolled back like the other tools that add files. The new file is indexed and its build is
+queued as a child of the task.
+
+```json
+{ "path": "odm_orthophoto/odm_orthophoto.tif", "near": 15, "white": false, "overwrite": false }
+```
+
+`path` is required. `near` (0 to 255, default `15`) is how far from black (or white) a pixel can be and still
+be border, `white` masks the white border, and `overwrite` (default `false`) replaces a masked copy that
+exists: without it the start is `409`, as for the other tools, and a second mask of the same output while
+one runs is `409` too.
 
 ### archive-extract
 
@@ -469,7 +486,7 @@ Some quick operations are plain endpoints of a dataset, not tasks:
 
 | Request | What it does |
 |---|---|
-| `POST …/mask-borders` | Starts a background job that writes `<name>_masked.tif` next to a GeoRaster. Body `{ "path", "near": 15, "white": false }`. Needs write access. |
+| `POST …/mask-borders` | Starts a background job that writes `<name>_masked.tif` next to a GeoRaster. Body `{ "path", "near": 15, "white": false, "overwrite": false }`; an existing masked copy is `409` without `overwrite`. Needs write access. Hub uses the `mask-borders` tool instead; this endpoint keeps working for other clients. |
 | `POST …/mask-borders/check` | Whether the masked file exists already, and its path |
 | `POST …/contours` | Contour lines of a raster, as GeoJSON |
 | `GET …/raster-value-info`, `GET …/raster-point-value`, `GET …/raster-area-stats`, `POST …/raster-profile` | The range of a raster, and its values at a point, in an area and along a line: see [Raster values](#raster-values) |

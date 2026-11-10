@@ -30,8 +30,12 @@ Hub writes a new file. The original file does not change.
 
 4. If the masked file exists already, Hub asks **Replace “black2_masked.tif”?** (with the name of that file) and says that this cannot be undone. Click **Replace**, or **Cancel**. If the masking fails or you cancel it, the file that was there stays as it was.
 
-5. Wait. Hub shows **Masking started**. The new file `<name>_masked.tif` appears next to the original,
-   and Hub [builds](/hub-guide/processing/builds.mdx) it.
+5. Wait. Hub shows **Masking started for** and the name of the file. Masking runs as a task named after the new file, in
+   the [Tasks tab](/hub-guide/processing/tasks.mdx). When it ends, the toast **Masked file ready:** and
+   the name of the new file (`<name>_masked.tif`) appears, and the new file is already in the file list: you
+   do not click Refresh.
+   It is next to the original, and Hub [builds](/hub-guide/processing/builds.mdx) it as a task of its
+   own (a child of the masking, under the new file's name).
 
 6. Open the new file on the map. The border is transparent.
 

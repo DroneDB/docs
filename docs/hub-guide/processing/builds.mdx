@@ -43,8 +43,27 @@ A file without a badge is ready. The file browser, the table view and the detail
 | Triangle | **On Hold**: a temporary error | Nothing. Hub tries again by itself |
 | Red cross | **Failed** | Read why on the build task in the [Tasks tab](/hub-guide/processing/tasks.mdx), or in your [build notification e-mail](/hub-guide/account/build-notifications.mdx). Fix the file, then build it again |
 
+A file that builds keeps its spinner until the build ends, with **Building…** over its dimmed type icon, and
+its tile is not a broken image meanwhile. Hub follows every build by itself, so you do not click **Refresh**: the
+badge, the thumbnail and the viewers update when the build ends. Point at a tile to read its path, its
+type, its size and, for a file that is built, the state of its build in one word: **Built**, **Building…**,
+**Queued**, **On hold** or **Failed**.
+
 Point at a badge to see the reason. When you open a file that is not ready, a window tells you why. It
 offers **Start Processing**, **Wait and Open** or **Retry Processing**, as the case needs.
+
+A viewer (the 3D model, splat and other viewers) that opens a file that is not built shows its state over the
+view:
+
+| Notice | Meaning | Button |
+|---|---|---|
+| **Building… 40 %** | The file is being built. The viewer opens by itself when the build ends, also when it ended while Hub was checking the file. | — |
+| **Not built yet** | The file has no build to show. | **Build** |
+| **Rebuild needed** | The build has no output that this viewer can show, for example a model built before the viewer existed. | **Rebuild** |
+| **The build failed** | Read why in the [Tasks tab](/hub-guide/processing/tasks.mdx). | **Rebuild** |
+
+The button is for somebody who can write to the dataset; the others read that somebody who can write
+can build the file. **Rebuild** builds the file again even if its build looks complete.
 
 ## Steps: build a file again
 
