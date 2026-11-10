@@ -26,7 +26,9 @@ files that you do not need.
    <Screenshot id="files/folders--new-folder" />
 
 2. To move files, select them and drag them onto a folder. You can drag from the list to the tree,
-   and from the tree to the list. Hub highlights the folder that gets the files.
+   and from the tree to the list. Hub highlights the folder that gets the files. The notice **File moved
+   successfully** has an **Undo** button, which puts the file back. If something took the old place in the
+   meantime, **Undo** does not move it and says **Cannot undo: … exists again**.
 3. To rename a file or a folder, select it and click **Rename** in the toolbar, or right-click it and
    click **Rename**. Type the new name and click **Rename**.
 4. If the file has sidecar files, such as `ortho_measurements.geojson` next to `ortho.tif`, keep
@@ -60,6 +62,8 @@ files that you do not need.
 
 - A name cannot contain `/`, `\` or `..`, and cannot start with `.`.
 - You cannot move a folder into itself or into one of its subfolders.
+- A move never replaces a file: when the destination has a file or folder of that name, Hub says that the
+  name is already taken, moves nothing and offers no **Undo**.
 - To move files to another dataset, use [Copy, cut, paste & transfer](/hub-guide/files/copy-paste.mdx).
 - You cannot undo a delete.
 - **Rename** and **Delete** stay in the toolbar when they do not apply. They are dimmed, and their

@@ -130,6 +130,10 @@ curl -H "$AUTH" -o index.zip "$DS/ddb"                          # the DroneDB in
 
 Repeat `path` for each file. `inline=1` shows a file in the browser instead of a download.
 `GET …/thumb?path=…` returns a WebP thumbnail.
+`GET /orgs/{orgSlug}/ds/{dsSlug}` has `hasThumbnail`: `true` when one of the cover candidates of the
+dataset exists, so a client asks for the cover only then. Metadata that nobody wrote is an answer, not
+an error: `GET …/meta/get/{key}` of a list key (a key that ends with `s`, such as `views` or `tags`) that
+nobody wrote returns `200` with `[]`, while a single key that does not exist stays `404`.
 
 ## Builds and build files
 
