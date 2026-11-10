@@ -52,9 +52,10 @@ colormap and the range of values.
 
 2. A raster of values (an elevation model, a thermal mosaic) is painted when it opens, with
    **Viridis** (**Ironbow** for a thermal raster) over its default stretch, so it is not a black and
-   white mask. Select another **Colormap**. Type a **Rescale** range under **Min** and **Max**, for
-   example `0` and `50`. Both fields start with the default stretch of the raster; clear both for the
-   automatic range. Hub checks the range before it applies it: both numbers must be numbers, **Min** below
+   white mask. The map and the export draw the same colours (since DroneDB 2.3.1; on an older
+   server the map stays grey while the legend shows the colormap). Select another **Colormap**.
+   Type a **Rescale** range under **Min** and **Max**, for example `0` and `50`. Both fields start
+   with the default stretch of the raster; clear both for the automatic range. Hub checks the range before it applies it: both numbers must be numbers, **Min** below
    **Max**, and an error under the field names the problem. The map keeps the last valid range meanwhile,
    so a typo does not blank the layer.
 

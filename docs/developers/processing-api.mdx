@@ -246,7 +246,7 @@ The estimate and the limit apply to the window (the same estimate as value info 
 finite numbers, or that has no pixel of the raster, is `400` at `errors.bbox`. A window needs libddb 2.3 or later: on an
 older server it is `400` at `errors.bbox` (`Exporting the visible extent needs libddb 2.3 or later`),
 because the older library would export the whole raster. `rasterExportWindow` of `GET /sys/features` says whether the
-server takes it. The file is in the coordinate system of the source (not Web Mercator). With a `formula` it is an 8-bit RGBA picture of the style, not the index values; without one it is the selected bands as 8-bit values scaled to `rescale`, with no colormap. This is what Hub's
+server takes it. The file is in the coordinate system of the source (not Web Mercator). With a `formula` it is an 8-bit RGBA picture of the style, not the index values. Without one, a `colormap` on exactly one band (a raster of one band such as a DEM, or `bands` that name one band) is the same RGBA picture of that band over `rescale`, else over its minimum to maximum, transparent where it has no value (since DroneDB 2.3.1, as the tiles and thumbnails draw it); otherwise it is the selected bands as 8-bit values scaled to `rescale`, with no colormap. This is what Hub's
 **Export** and **Visible extent** buttons send.
 
 ### raster-contours
