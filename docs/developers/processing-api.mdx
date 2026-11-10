@@ -563,7 +563,7 @@ marks as no data. They need read access. All of them take `path` and, optionally
 
 | Request | Parameters and answer |
 |---|---|
-| `GET …/raster-value-info` | `bbox` (`minLon,minLat,maxLon,maxLat`, WGS 84) is optional. The exact range of the valid pixels (`valueMin`, `valueMax`), `pixelCount`, `validPixelCount`, `windowPixelCount`, `unit`, `nodata`, `scale`, `offset`, the default colour `stretch` (one `{min, max}` per band, one for an index, none for a Byte raster of several bands), and `estimatedExportBytes` and `exportLimitBytes` of a [raster export](#raster-export). With `bbox` the estimate is that of the window. |
+| `GET …/raster-value-info` | `bbox` (`minLon,minLat,maxLon,maxLat`, WGS 84) is optional. The exact range of the valid pixels (`valueMin`, `valueMax`), `pixelCount`, `validPixelCount`, `windowPixelCount`, `unit`, `nodata`, `scale`, `offset`, the default colour `stretch` (one `{min, max}` per band, one for an index, none for a Byte raster of several bands), and `estimatedExportBytes` and `exportLimitBytes` of a [raster export](#raster-export). With `bbox` the estimate is that of the window. For a thermal raster it also has `isThermal`, `isDirectValue` and, when a calibration turns raw counts into temperatures, a [`calibration`](#thermal-calibration). |
 | `GET …/raster-point-value` | `lon` and `lat` (WGS 84): the value of the pixel under the point, with `lon` and `lat` in the answer. For a raster without a map (a radiometric JPEG) send `x` and `y`, a pixel of its raw thermal grid, and the answer has its `unit`. |
 | `GET …/raster-area-stats` | `bbox` (WGS 84): `min`, `max`, `mean`, `stddev`, `median` and `pixelCount` of the pixels of the file whose centre is inside the window. For a radiometric JPEG send `x0`, `y0`, `x1` and `y1` (pixels). |
 | `POST …/raster-profile` | Body `{ "path", "lineString", "samples", "nodata", "formula" }`: `lineString` is a GeoJSON LineString in WGS 84 and `samples` is clamped to 2 to 4096. Each sample has `distance` (metres), `value` (`null` where the raster has none), `lon` and `lat`. |
@@ -572,11 +572,24 @@ marks as no data. They need read access. All of them take `path` and, optionally
 Map coordinates and pixels are never mixed: a request with both is `400`, and so are pixel
 coordinates on a georeferenced raster (`errors.x`, `errors.x0`) and a `bbox` that is not four finite
 numbers inside longitude -180 to 180 and latitude -90 to 90. A point or a window outside the raster,
-or with only pixels that have no value, is `400` with the reason. A `formula` that does not exist, or
+or with only pixels that have no value, is `400` with the reason (so is a pixel of a radiometric picture whose raw count has no temperature in the calibration). A `formula` that does not exist, or
 that the raster cannot compute (`Requires bands: RN`), is `400` too. One conversion from longitude
 and latitude to the pixel of the file serves all of these endpoints, the stockpile tools and the
 elevation profile. The first value info of a large raster computes its exact statistics and keeps
 them (keyed by the version of the file, the band and the effective no-data value), so the next one is fast.
+
+#### Thermal calibration
+
+A radiometric picture (an R-JPEG: FLIR, or a DJI thermal camera) has no map, so its value info, point value and area statistics take pixels (`x`, `y`) of its raw thermal image, and answer in the unit of the `formula` you send (`CELSIUS` by default in Hub). Since DroneDB 2.3:
+
+- A **FLIR** picture has a `calibration` only when the file gives the five Planck constants (`planckR1`, `planckB`, `planckF`, `planckO`, `planckR2`). They come from the CameraInfo record of the FLIR FFF data in the file, and from the XMP only when the file has no such record. The raw image is the one of the RawData record (16-bit counts); a RawData record stored as a PNG image is not decoded yet. There is no default by make and model.
+- The `calibration` adds, only when the file gives them, `emissivity`, `objectDistance`, `reflectedApparentTemperature` and `atmosphericTemperature` (°C), `relativeHumidity` (a fraction, 0 to 1), `irWindowTemperature`, `irWindowTransmission` and, since 2.3, `atmosphericTransAlpha1`, `atmosphericTransAlpha2`, `atmosphericTransBeta1`, `atmosphericTransBeta2` and `atmosphericTransX`. A raw count outside the calibration has no value (`400`), not `0` °C.
+- A **DJI** R-JPEG (M2EA, H20T, H20N, M30T, M3T and M3TD, H30T and any model with raw thermal data) is read from its raw thermal data, but its counts need DJI's own conversion, which DroneDB does not have yet. Its answers have `unit` `""`, `isDirectValue` `false` and no `calibration`: raw counts, not temperatures.
+- A thermal formula (`CELSIUS`, `KELVIN`, `FAHRENHEIT`) on values without a calibration is `400` at a point, an area and a profile, with the reason in the message: **No thermal calibration: …** the 8-bit colours of the preview of a picture whose raw thermal data cannot be read; raw sensor counts without the Planck constants in the file; or the raw counts of a DJI R-JPEG, which need DJI's own conversion. A sample of a profile whose raw count has no temperature is `null`.
+- A thermal UInt16 band with a scale or an offset (the Landsat encoding) holds physical values: it keeps its unit and its thermal formulas and has no Planck calibration. A UInt16 band without them holds raw counts without a unit.
+- The raw counts of a picture without a unit are not temperatures: a client does not label them in °C. Rescan the image entries after the upgrade so that the wide and zoom pictures of DJI thermal drones lose `sensorCategory` `thermal` and the DJI thermal pictures gain it.
+
+A thumbnail with a `colormap` of such a picture is drawn from the temperatures of its raw thermal data, in the unit of the `formula`, over the `rescale` or else its minimum to maximum, not from the colour preview.
 
 A [thumbnail](/developers/library.mdx#raster-values) of a raster larger than 2048 × 2048 pixels whose
 exact statistics are not stored yet takes its colour stretch from a bounded sample, so that it comes

@@ -68,6 +68,21 @@ camera to temperatures with the calibration data of the file. The panel then say
 - **Raw counts of a sensor** (no calibration data, no unit): the panel says **No thermal calibration data: Showing raw values.** and offers no unit,
   because the values are not temperatures.
 
+A thermal photo (a radiometric JPEG) is read the same way, from the data that its camera wrote in the file:
+
+- **A radiometric FLIR picture**: Hub reads the five Planck constants and the settings of the measurement (emissivity, distance, reflected
+  and air temperature, humidity) from the camera information record of the FLIR data in the file, and the raw thermal image from its
+  raw data record. The temperatures follow from them. A file that lacks the Planck constants has no temperatures, and a raw count
+  outside the calibration has no value (not 0 °C).
+- **A radiometric DJI picture** (M2EA, H20T, H20N, M30T, M3T and M3TD, H30T and any model with raw thermal data): Hub knows it is thermal and reads its raw
+  thermal data, but DroneDB does not have DJI's own conversion of the raw counts yet. It shows the raw counts **without a unit**, never
+  as °C, and says so in a notice, until that conversion is integrated.
+- **Raw data stored as a PNG image** (some FLIR files) is not decoded yet: the picture shows its colour preview, without a unit.
+
+These pictures open in the [photo viewer](/hub-guide/viewing/photos.mdx), which shows the temperature under the pointer.
+Rescan a dataset that was indexed before DroneDB 2.3 ([Rescan](/hub-guide/files/rescan.mdx)) to have its DJI pictures
+recognised, and its wide and zoom pictures (not thermal) no longer marked as thermal.
+
 A thermal mosaic that Hub does not recognise as thermal opens as a value raster. The panel is then
 **Raster Analysis**, with the colormaps of other single-band rasters, and the values are those of
 the file. The Hat Creek mosaics of the example open like this: their values are tenths of a degree Celsius (157 is 15.7 °C) and 0 is no data.
@@ -78,8 +93,8 @@ Type `0` in **NoData value**, and read the values as tenths of a degree. The con
 - **Raster Analysis** works on one raster at a time. With two or more rasters it can work on, a
   **Raster** selector sets the one it uses. A raster on top with full opacity hides its
   colours: hide that raster with its eye in the layer panel.
-- A thermal photo (a radiometric JPEG) has no **Raster Analysis** on the map. Process the photos
-  into a thermal orthophoto first.
+- A thermal photo (a radiometric JPEG) has no **Raster Analysis** on the map. Read its temperatures in the
+  [photo viewer](/hub-guide/viewing/photos.mdx), or process the photos into a thermal orthophoto first.
 - **Export** is greyed out when the server estimates the file (the pixels that have a value, 4 bytes each) as larger than its export limit; the panel says the estimate and the limit under it, and **Visible extent** exports a part. See [Export a raster](/hub-guide/processing/export-raster.mdx).
 
 ## Related
@@ -87,4 +102,5 @@ Type `0` in **NoData value**, and read the values as tenths of a degree. The con
 - [Colormaps, bands & histogram](/hub-guide/analyse/colormaps.mdx)
 - [Elevation profile](/hub-guide/analyse/elevation-profile.mdx)
 - [Compare layers](/hub-guide/analyse/compare-layers.mdx)
+- [Photo viewer](/hub-guide/viewing/photos.mdx)
 - [Photogrammetry](/hub-guide/processing/photogrammetry.mdx)

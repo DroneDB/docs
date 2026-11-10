@@ -1,0 +1,63 @@
+---
+title: "Photo viewer & thermal photos"
+description: "Open a photo over the page with zoom, read its information, and read the temperature under the pointer of a radiometric thermal photo."
+hub_feature: []
+datasets: []
+requires: { access: read, data: "A photo. Temperatures need a radiometric thermal photo (an R-JPEG) and DroneDB 2.3 or later on the server" }
+---
+
+<Requires />
+
+{/* TODO: add a <Screenshot> and a <TryLive> when a public dataset with a radiometric R-JPEG exists on hub.dronedb.app (showcase data gap). */}
+
+## When to use it
+
+Open a photo to look at it at full size, zoom into a detail and read its information. For a **radiometric thermal photo** (an R-JPEG of a FLIR camera or a DJI thermal drone) the viewer also gives the temperature of any pixel.
+
+## Steps
+
+<Steps>
+
+1. In the file list, double-click a photo. It opens over the page. When the folder has more photos, the arrows beside the photo (or the `Left` and `Right` keys) go to the previous and the next one.
+
+2. Zoom with the wheel, a pinch, a double-click or the **Zoom in** and **Zoom out** buttons. **Fit to screen** (or `0`) goes back to the whole photo. A zoomed photo is dragged, and the arrow keys pan it.
+
+3. Click **Information** (or press `I`) to read the file information beside the photo. **Open in new tab** opens the file, and **Close** (or `Escape`) closes the viewer.
+
+4. For a thermal photo with temperatures, a bar under the title has the thermal controls. Select the **Unit**: **Celsius (°C)**, **Kelvin (K)** or **Fahrenheit (°F)**. The viewer starts in °C, and every number follows the unit.
+
+5. Select a **Palette**: **As shot** or a thermal colormap such as Ironbow, White Hot or Lava. The photo is drawn again with it, and a legend at the top left shows the colours over the range.
+
+6. Read the **Range** of the photo (its lowest and highest temperature), and move the pointer over the photo: the bar shows the temperature under it and the pixel of the thermal image, for example **21.4 °C at 120, 96**. A pixel with no temperature says **No value**.
+
+7. The **Information** panel has a **Thermal** group: the sensor, the range and the settings that the file has (emissivity, distance, reflected and air temperature, humidity).
+
+</Steps>
+
+## Options
+
+| Option | What it does | Default |
+|---|---|---|
+| **Unit** | Shows the range and the temperatures in °C, K or °F. The server converts them, so a value is never shifted twice. | Celsius (°C) |
+| **Palette** | **As shot** or a thermal colormap, with a legend. | As shot |
+
+## Limits & requirements
+
+- A photo that is thermal but has **no temperatures** shows as the camera made it, with a notice instead of the controls: **No thermal calibration data: showing the picture as shot, without temperatures.** The file has no raw thermal image that can be read, or no calibration to turn it into temperatures.
+- A **DJI** thermal photo says that its temperatures need DJI's own conversion of the raw sensor values, **which is not available yet**. The viewer does not show raw counts as degrees. FLIR photos with the Planck constants in the file have temperatures.
+- A FLIR photo whose raw thermal data is stored as a PNG image is not decoded yet: it shows as shot.
+- The temperature is that of a pixel of the thermal image, which is smaller than the photo for many cameras; the pointer is mapped to it at any zoom.
+- After a DroneDB upgrade, [rescan the dataset](/hub-guide/files/rescan.mdx) so that DJI thermal photos are marked as thermal and the wide and zoom photos of DJI thermal drones are not.
+
+## Related
+
+- [Thermal imagery](/hub-guide/analyse/thermal.mdx)
+- [File browser](/hub-guide/files/browser.mdx)
+- [Map viewer](/hub-guide/viewing/map.mdx)
+- [Rescan a dataset](/hub-guide/files/rescan.mdx)
+
+<ForDevelopers api="/docs/developers/processing-api">
+
+The viewer asks `GET …/raster-value-info` (with `formula` set to `CELSIUS`, `KELVIN` or `FAHRENHEIT`) for the range, the size of the raw thermal image and the `calibration`, and `GET …/raster-point-value` with the pixel `x` and `y` of that image for the temperature under the pointer. See [Raster values](/developers/processing-api.mdx#raster-values).
+
+</ForDevelopers>

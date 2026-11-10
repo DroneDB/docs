@@ -45,6 +45,7 @@ const sidebars = {
       'hub-guide/viewing/splats',
       'hub-guide/viewing/splats-georeferenced',
       'hub-guide/viewing/splat-downloads',
+      'hub-guide/viewing/photos',
       'hub-guide/viewing/panoramas',
       'hub-guide/viewing/videos',
       'hub-guide/viewing/markdown-pdf',

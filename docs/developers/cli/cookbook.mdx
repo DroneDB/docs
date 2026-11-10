@@ -282,9 +282,14 @@ cameras). It uses the band count, the data type and the XMP/EXIF metadata. The p
 band names and the default render. Other sensors are generic multi-band rasters; DroneDB reads
 band names and wavelengths from XMP when the file has them.
 
-For thermal R-JPEGs DroneDB reads the Planck constants, the emissivity and the temperature
-range, and computes the temperatures from the raw 16-bit data. A georeferenced thermal GeoTIFF
-holds temperatures in degrees Celsius.
+For thermal R-JPEGs DroneDB reads the raw 16-bit thermal image and the calibration from the
+FLIR data of the file (the CameraInfo and RawData records of its FFF data; the XMP only when the file
+has no such record): the five Planck constants and, when the file has them, the emissivity, the
+distance and the conditions of the measurement. A FLIR file without the Planck constants has no
+temperatures. DJI R-JPEGs (M2EA, H20T, H20N, M30T, M3T, H30T and any model with raw thermal data) are
+recognised and read, but their raw counts are reported without a unit until DroneDB has DJI's own
+conversion. A thermal GeoTIFF holds temperatures in the unit of its band (Celsius, Kelvin or Fahrenheit),
+and the thermal formulas convert from it.
 
 The spectral indices that a raster can compute:
 
