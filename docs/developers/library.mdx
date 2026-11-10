@@ -23,6 +23,7 @@ The ABI follows semantic versioning: a removed or changed export needs a new maj
 | 2.0 | 2.0.0 | The first 2.x C API |
 | 2.1 | 2.1.0 | `DDBAlignRasterEx`, `DDBMergeMultispectralEx` and `DDBMaskBordersEx`, which take an options struct with `overwrite` ([Output files](#output-files)) |
 | 2.2 | 2.2.0 | `DDBRasterOptions` and ten raster value exports that take it ([Raster values](#raster-values)), and the build key of every build ([Build key](#build-key)) |
+| 2.3 | 2.3 (not released yet) | `DDBGenerateContoursEx2`, which reports progress and can be cancelled ([Raster values](#raster-values)) |
 
 Every release publishes, next to the `.deb` and the Windows zip:
 
@@ -122,7 +123,7 @@ A cancel token stops the work of a call from another thread:
 3. `DDBCancel(token)` from any thread: the call stops at its next checkpoint and returns `DDBERR_CANCELED`;
 4. `DDBFreeCancelToken(token)` when the host no longer needs it.
 
-The `cancellable` list of `DDBGetCapabilities()` names the exports that honour a token. In 2.0.0 there were 29, in 2.1.0 30 and in 2.2.0 there are 40:
+The `cancellable` list of `DDBGetCapabilities()` names the exports that honour a token. In 2.0.0 there were 29, in 2.1.0 30 and in 2.2.0 there are 40 (`DDBGenerateContoursEx2`, new in 2.3, is cancellable too):
 
 - tiles, renders and thumbnails: `DDBTile`, `DDBMemoryTile`, `DDBMemoryTileEx`, `DDBMemoryTileEx2`, `DDBMemoryTileFmt`, `DDBRenderRasterRegion`, `DDBRenderRasterRegionEx`, `DDBRenderRasterIndex`, `DDBGenerateThumbnail`, `DDBGenerateMemoryThumbnail`, `DDBGenerateMemoryThumbnailEx`, `DDBGenerateMemoryThumbnailEx2`;
 - exports and builds: `DDBExportRaster`, `DDBExportRaster2`, `DDBExportRaster3`, `DDBBuild`, `DDBBuildEx`;
@@ -278,6 +279,8 @@ A `NULL` options pointer means every option unset. Set `structSize` and every fi
 | `DDBGenerateMemoryThumbnailEx2(…, options, &buffer, &size)` | `nodata`: a pixel equal to it is transparent and out of the stretch |
 | `DDBMemoryTileEx2(…, options, &buffer, &size)` | The same, for a tile |
 | `DDBExportRaster3(…, progress, userData, options)` | The same, for an exported GeoTIFF |
+
+**Contours.** The output of `DDBGenerateContours`, `DDBGenerateContoursEx` and, from 2.3, `DDBGenerateContoursEx2` holds at most 100,000 lines. From 2.3 it says when the lines were cut: `"truncated": true` and `"featureCap": 100000` (the 2.2 output stopped at the cap without a word; a result of exactly the cap is not truncated). `DDBGenerateContoursEx2(…, options, progress, progressUserData, &out)` is `DDBGenerateContoursEx` with a `DDBProgressCallback`: it gets the fraction done in 0 to 1 and the phase (`statistics`, `levels` or `lines`), and a non-zero return cancels the call with `DDBERR_CANCELED`. A cancel token stops it too. A host that has to run on an older library checks `DDBGetCapabilities()` for the export and falls back to `DDBGenerateContoursEx` under a cancel token.
 
 The map-coordinate queries use the one conversion from longitude and latitude to the pixel of the file that the profile, the region render and the stockpile tools use. A window across the antimeridian is refused unless the raster crosses it. A point or window outside the raster, or whose pixels all lack a value, returns `DDBERR_INVALIDARGS` with the reason, as do a formula that does not exist, a thermal formula that is not `CELSIUS` or `KELVIN`, and invalid options. `DDBGetRasterValueInfoEx` reports the exact range of the pixels that have a value in the unit of the band (`valueMin`, `valueMax`), `pixelCount`, `validPixelCount`, `windowPixelCount`, the default `stretch` (one `{min, max}` per band, one for an index, none for a Byte raster of several bands), `nodata`, `nodataOverridden`, `scale` and `offset`, and `nodataInvalid` when the NoData value is not a number that the type of the band can hold.
 

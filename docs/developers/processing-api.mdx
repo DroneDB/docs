@@ -47,7 +47,7 @@ All task endpoints are below `/orgs/{orgSlug}/ds/{dsSlug}/tasks`.
 | `GET …/tasks/{id}` | State, progress, log tail and artifact of a task |
 | `GET …/tasks/{id}/log?since={cursor}` | The log lines after a cursor |
 | `GET …/tasks/{id}/result` | Download the artifact (range requests work) |
-| `DELETE …/tasks/{id}` | Cancel a task. Only its owner or an administrator can. |
+| `DELETE …/tasks/{id}` | Cancel a task. Only its owner or an administrator can, and a signed-in user can cancel their own task of a tool that needs only read access (for example `raster-contours` and `raster-export`) without write access to the dataset. |
 | `POST …/tasks/{id}/retry` | Run a failed task again from the beginning. `409` for a succeeded, cancelled or committed task, and for one that already runs. The request is checked as a new submit (`400`, `409`, `507`) |
 | `POST …/tasks/{id}/delete` | Remove one terminal task and its artifact from the history. `400` for a task that is still active. |
 | `POST …/tasks/clear?toolId=` | Remove every terminal task (of one tool, with `toolId`) and its artifacts |
@@ -144,7 +144,7 @@ row can offer:
 
 | Field | Meaning |
 |-------|---------|
-| `actions` | What the caller may do with the task: `cancel`, `retry`, `delete` and `viewLog`. A caller who may not touch the task gets an empty list. A reader with no write access gets only `viewLog`. A task that has saved its result has no `cancel` and no `retry` |
+| `actions` | What the caller may do with the task: `cancel`, `retry`, `delete` and `viewLog`. A caller who may not touch the task gets an empty list. A reader with no write access gets only `viewLog`, and also `cancel` for their own task of a tool that needs only read access (`raster-contours`, `raster-export`). A task that has saved its result has no `cancel` and no `retry` |
 | `targetLabel` | The files of the task in words, as the tool says them, or `null` |
 | `waitingForNode` | `true` while a processing node holds the task in its queue. The `state` filter `Enqueued` includes such a task |
 | `cancelledBy` | The name of the user who cancelled a `Deleted` task, or `null` |
@@ -179,6 +179,7 @@ parameters. These are the tools of Registry 3.0.
 |---|---|---|---|
 | `build` | Build | Write | No |
 | `raster-export` | Export raster (GeoTIFF) | Read | `.tif` |
+| `raster-contours` | Contour lines | Read | `.geojson` |
 | `bulk-download` | Download archive (ZIP) | Read | `.zip` |
 | `align-raster` | Align GeoTIFF to reference | Write | No |
 | `merge-multispectral` | Merge multispectral bands | Write | No |
@@ -232,6 +233,35 @@ An export larger than the limit of the server (`MaxExportSizeBytes`, `exportLimi
 is refused with `400` before the task is queued: `Export output exceeds maximum allowed size (… > …)`. The size is
 estimated as the number of pixels that have a value × 4 bytes, with no compression factor
 (`estimatedExportBytes` of value info).
+
+### raster-contours
+
+Generates the contour lines of a raster as a GeoJSON file, with progress and a cancel. The body is that of
+[`POST …/contours`](#raster-values), checked the same way at submit (a `400` before the task is queued).
+
+```json
+{
+  "path": "odm_dem/dsm.tif",
+  "interval": 5,
+  "count": null,
+  "baseOffset": 0,
+  "minElev": null,
+  "maxElev": null,
+  "simplifyTolerance": 0,
+  "bandIndex": 1,
+  "nodata": null,
+  "formula": null,
+  "fileName": null
+}
+```
+
+`path` is required. `interval` wins over `count`; `formula` is `CELSIUS` or `KELVIN` for a thermal raster (and, from DroneDB 2.3, `FAHRENHEIT`) and
+an index is ignored. The result is the FeatureCollection of `POST …/contours` (a LineString per line, with `elev`), the
+artifact of the task: read it from `GET …/tasks/{id}/result`. Progress goes from the `statistics` phase to `levels` and
+`lines`. A large raster is read from the COG of its build, as at the endpoint. The result has at most 100,000 lines. When
+the lines were cut it has `"truncated": true` and `featureCap`, and the log of the task says
+`Contours truncated at 100000 lines`. From DroneDB 2.3 the result has `truncated` and `featureCap` (the 2.2 result stopped
+at 100,000 lines without saying it), and a server with it reports progress while the lines are made.
 
 ### bulk-download
 
@@ -489,7 +519,7 @@ Some quick operations are plain endpoints of a dataset, not tasks:
 |---|---|
 | `POST …/mask-borders` | Starts a background job that writes `<name>_masked.tif` next to a GeoRaster. Body `{ "path", "near": 15, "white": false, "overwrite": false }`; an existing masked copy is `409` without `overwrite`. Needs write access. Hub uses the `mask-borders` tool instead; this endpoint keeps working for other clients. |
 | `POST …/mask-borders/check` | Whether the masked file exists already, and its path |
-| `POST …/contours` | Contour lines of a raster, as GeoJSON |
+| `POST …/contours` | Contour lines of a raster, as GeoJSON, in one request. Hub runs every contour request as the [`raster-contours`](#raster-contours) task instead; this endpoint keeps working for other clients |
 | `GET …/raster-value-info`, `GET …/raster-point-value`, `GET …/raster-area-stats`, `POST …/raster-profile` | The range of a raster, and its values at a point, in an area and along a line: see [Raster values](#raster-values) |
 | `POST …/stockpile/detect`, `…/stockpile/detect-all`, `…/stockpile/calculate` | Stockpile footprint and volume on an elevation model: see [Stockpiles](#stockpiles) |
 

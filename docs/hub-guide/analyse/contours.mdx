@@ -33,11 +33,16 @@ someone who works in a drawing program.
 3. Select the **Spacing**: a **Fixed interval** between the lines, or a **Target count** of
    lines. Set the other options if you need them. Click **Generate**.
 
-4. The lines show on the map, coloured from low (blue) to high (white).
+4. The dialog stays open and shows the task of the contours with its progress. Click **Cancel**
+   in the dialog to stop it. A request of more than 50 levels asks first: see
+   [Limits & requirements](#limits--requirements).
+
+5. When the task ends the dialog closes and the lines show on the map, coloured from low (blue)
+   to high (white).
 
    <Screenshot id="analyse/contours--result" />
 
-5. Click **Save Measurements** in the measure toolbar to keep the lines in the dataset, or
+6. Click **Save Measurements** in the measure toolbar to keep the lines in the dataset, or
    **Export Measurements** to download them as GeoJSON.
 
 </Steps>
@@ -62,6 +67,19 @@ When you open the dialog again, it shows the options you used last.
 - Contours are measurements: they are saved, listed and exported with the other
   [measurements on the map](/hub-guide/measure/map.mdx). Saving needs write access to the dataset.
 - **Generate** again replaces the contours that you did not save.
+- Contours run as a task, like an export, so a large raster no longer blocks the page. It can
+  take minutes on a very large raster, and **Cancel** in the dialog stops it; the dialog cannot be
+  closed while the task runs. The task is listed as **Contour lines** in the
+  [Tasks tab](/hub-guide/processing/tasks.mdx) with its log. A signed-in reader can cancel their own
+  contours: the task needs read access only.
+- With more than 50 levels (the **Number of levels**, or the range of the raster divided by the
+  **Interval**) the dialog shows **About N contour levels** and **Generate** asks **Generate many
+  contour lines?** before it starts. Click **Change settings** to go back, or **Generate** to run it.
+  A larger interval, or **Min elevation** and **Max elevation**, makes it faster.
+- A result has at most 100,000 lines. When the raster has more, Hub says **Contours truncated**:
+  the lines are truncated at 100,000 lines and the rest of the raster has none. Use a larger
+  interval or limit the elevation range, and generate again. A server older than DroneDB 2.3 cuts
+  the result at 100,000 lines without saying it.
 
 ## Related
 
