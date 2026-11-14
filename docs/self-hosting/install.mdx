@@ -270,7 +270,7 @@ To use MySQL or MariaDB instead of SQLite, see
 Windows refuses a path of 260 characters or more unless long paths are turned on. A build writes
 its temporary files about 130 characters below the root of the dataset, so a dataset in a deep
 folder fails to build. On Windows, libddb builds inside the Registry process: `Registry.Web.exe`
-and the DroneDB programs (`ddb`, `bm3d`, `gdal-util`, `metadata-util`, `untwine`) declare
+and the DroneDB programs (`ddb`, `bm3d`, `gdal-util`, `metadata-util`) declare
 themselves long path aware, but Windows must allow it. As an administrator, in PowerShell:
 
 ```powershell

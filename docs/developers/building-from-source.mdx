@@ -63,7 +63,6 @@ cd DroneDB
 | `build/bm3d.exe` | 3D model builder (`.bm3d` files; see below) |
 | `build/gdal-util.exe` | Helper that reads the files of users with GDAL (see below) |
 | `build/metadata-util.exe` | Helper that reads and writes image metadata (EXIF, XMP) |
-| `build/untwine.exe` | COPC accelerator *(optional, see below)* |
 | `build/build-lod.exe` | Gaussian Splat LOD producer *(required for Gaussian Splat builds, see below)* |
 | `build/Obj2Tiles.exe` | OGC 3D Tiles generator *(optional, see below)* |
 | `build/dwg2dxf.exe` | DWG to DXF converter *(optional, see below)* |
@@ -107,7 +106,6 @@ Accepted values follow CMake conventions: `Release`, `Debug`, `RelWithDebInfo`, 
 | `build/bm3d` | 3D model builder (`.bm3d` files; see below) |
 | `build/gdal-util` | Helper that reads the files of users with GDAL (see below) |
 | `build/metadata-util` | Helper that reads and writes image metadata (EXIF, XMP) |
-| `build/untwine` | COPC accelerator *(optional, see below)* |
 | `build/build-lod` | Gaussian Splat LOD producer *(required for Gaussian Splat builds, see below)* |
 | `build/Obj2Tiles` | OGC 3D Tiles generator *(optional, see below)* |
 | `build/dwg2dxf` | DWG to DXF converter *(optional, see below)* |
@@ -172,37 +170,6 @@ git submodule update --init vendor/metadata-util
 
 `ddb` looks for `metadata-util` next to its own executable, next to `libddb`, in `../bin` and on
 `PATH`; set `DDB_METADATA_UTIL_PATH` to use a program in another location.
-
----
-
-## Untwine COPC Accelerator (optional)
-
-[Untwine](https://github.com/hobuinc/untwine) is an optional component that dramatically accelerates the generation of **Cloud Optimized Point Clouds (COPC)** from LAS/LAZ files. It is included as a git submodule under `vendor/untwine`.
-
-If the submodule is not present, DroneDB automatically falls back to the built-in PDAL `writers.copc` pipeline - no configuration required.
-
-### Enabling Untwine
-
-```bash
-# Initialise the submodule
-git submodule update --init vendor/untwine
-
-# Then run the build script as usual
-.\full-build-win.ps1               # Windows
-./full-build-linux.sh              # Linux
-```
-
-### Configuration Consistency
-
-:::warning
-Untwine **must** be built with the **same build type** as DroneDB.
-
-Both executables share vcpkg-managed shared libraries (pdalcpp, gdal, proj, …). Mixing configurations - e.g. DroneDB in `Debug` and Untwine in `Release` - links them against different C runtimes, causing a crash at startup.
-:::
-
-The build scripts enforce this automatically: `full-build-win.ps1` passes `-BuildType` to both CMake invocations, and `full-build-linux.sh` passes the same first argument to both.
-
-A Untwine build failure is **non-blocking**: the scripts print a warning and DroneDB continues to work using the PDAL fallback.
 
 ---
 
@@ -311,7 +278,3 @@ Close any process that might hold `ddb.lib` open (running `ddbcmd.exe`, Visual S
 ### ddbcmd crashes immediately after a Debug → Release switch (or vice versa)
 Delete the `build/` directory and rebuild from scratch so all DLLs are refreshed to the correct variant.
 
-### Untwine submodule missing
-```bash
-git submodule update --init vendor/untwine
-```

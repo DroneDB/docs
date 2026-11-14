@@ -28,7 +28,7 @@ and it syncs datasets with Hub or a self-hosted Registry. To run your own Regist
 Windows refuses a path of 260 characters or more unless long paths are allowed. A build writes
 temporary files about 130 characters below the root of the dataset, so a dataset in a deep
 folder fails to build without long paths. The programs of the package (`ddb`, `bm3d`,
-`gdal-util`, `metadata-util`, `untwine`) are long path aware, but Windows must allow it.
+`gdal-util`, `metadata-util`) are long path aware, but Windows must allow it.
 
 As an administrator, run in PowerShell:
 
@@ -67,7 +67,6 @@ systems, [build from source](/developers/building-from-source.mdx).
 | `metadata-util` | Reads and writes image metadata (EXIF, XMP). |
 | `bm3d` | Builds `.bm3d` 3D models. |
 | `build-lod` | Builds the level-of-detail file of Gaussian splats. |
-| `untwine` | Builds COPC point clouds faster (optional). |
 | `Obj2Tiles` | Writes OGC 3D Tiles from 3D models (optional). |
 | `dwg2dxf` | Converts DWG drawings (optional). |
 
