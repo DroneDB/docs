@@ -682,6 +682,7 @@ The asynchronous tasks (exports, imports, archive extraction, photogrammetry and
 | `MaxConcurrentTasksGlobal` | `32` | Tasks that run at the same time on the whole Registry |
 | `MaxEstimatedOutputBytesPerSubmit` | `21474836480` (20 GiB) | Largest estimated output of one task |
 | `MaxArchiveExtractSizeBytes` | `5368709120` (5 GiB) | Largest compressed archive for `archive-extract` |
+| `MaxArchiveEntries` | `100000` | Most files in one archive that `archive-extract`, an archive import or the results of a processing node extract (folders do not count). A larger archive is refused before anything is extracted, or rolled back. At least `1`. |
 | `DiskSafetyMarginBytes` | `268435456` (256 MiB) | Free space kept on the dataset volume while an archive is extracted or a dataset is imported. The extraction stops and rolls back before it uses this margin. `0` turns this check off (the size cap of the archive still applies). |
 | `OrgDailyOutputBytes` | `{"default": 107374182400}` | Daily output budget per organization in bytes, by organization slug; `default` applies to the others |
 | `MaxConcurrentUrlImportsPerUser` | `2` | `import-file` tasks (single-file URL imports) of one user, queued or running |

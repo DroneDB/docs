@@ -27,7 +27,9 @@ curl -X POST https://hub.dronedb.app/users/authenticate \
 sets (7 by default, `TokenExpirationInDays` in the
 [configuration](/docs/self-hosting/configuration)).
 
-Wrong credentials answer `401`. A deactivated account cannot sign in. When the Registry checks
+Wrong credentials answer `401`. After 5 wrong passwords in a row, the account is locked for 5 minutes:
+every sign-in answers `429` with `Retry-After`, even with the right password. One client address can
+try 10 sign-ins per minute; more answer `429` with `Retry-After`. A deactivated account cannot sign in. When the Registry checks
 users against LDAP, send the LDAP user name and password the same way. When the Registry uses an
 external authentication service, that service decides, and the form field `token` can replace
 the user name and the password.
