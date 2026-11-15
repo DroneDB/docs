@@ -7,7 +7,8 @@ toc_max_heading_level: 3
 Registry reads its settings from `appsettings.json` in the storage folder (`/data/appsettings.json`
 in the container). The first start creates the file from the built-in defaults
 (`appsettings-default.json`). After that, Registry does not rewrite the file: it only adds a
-`Secret` or a `ThumbnailGeneratorToken` that is empty.
+`Secret` or a `ThumbnailGeneratorToken` that is empty and that no other source (the environment, for
+example) gives. If the file is read-only then, the start stops with a message that names the key.
 
 ## How settings work
 
