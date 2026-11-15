@@ -72,7 +72,7 @@ process-wide settings with `DDBConfigure` instead (see [DroneDB library](/develo
 | `DDB_INDEX_THREADS` | cores, at most 8 | Files that `ddb add` (and a Registry that indexes uploads) hashes and reads at the same time. `0`: every core. `1`: one file at a time. |
 | `DDB_CPU_POOL_SIZE` | cores − 1 | Worker threads the library may run at once beside the calling threads. `0` runs everything on the calling thread. |
 | `DDB_IO_THREADS` | `4` | Threads of one disk-bound step, such as hashing pushed files or deleting build folders. |
-| `DDB_BUILD_THREADS` | `min(8, cores)` | Threads of one build: GDAL warping and compression in a COG build, the `bm3d` program in a model build. `0`: all cores. `ddb build --threads` lowers it for one build. |
+| `DDB_BUILD_THREADS` | `min(8, cores)` | Threads of one build: the COG builder in a raster build, the COPC builder in a point cloud build, the `bm3d` program in a model build. `0`: all cores. `ddb build --threads` lowers it for one build. |
 | `DDB_MIN_FREE_DISK_MB` | `512` | Free MiB a build needs on the volume it writes to. Below it the build fails as retryable. `0` turns the check off. |
 
 ### Helper programs
