@@ -29,7 +29,8 @@ sets (7 by default, `TokenExpirationInDays` in the
 
 Wrong credentials answer `401`. After 5 wrong passwords in a row, the account is locked for 5 minutes:
 every sign-in answers `429` with `Retry-After`, even with the right password. One client address can
-try 10 sign-ins per minute; more answer `429` with `Retry-After`. A deactivated account cannot sign in. When the Registry checks
+try 10 sign-ins per minute; more answer `429` with `Retry-After` and a ProblemDetails body. Failed HTTP Basic
+credentials (see below) count toward the same 10. A deactivated account cannot sign in. When the Registry checks
 users against LDAP, send the LDAP user name and password the same way. When the Registry uses an
 external authentication service, that service decides, and the form field `token` can replace
 the user name and the password.
@@ -56,8 +57,10 @@ the cookie.
 | `POST /users/authenticate/refresh` | Returns a new token, with a new `expires`, for the token in the request. Call it before the token expires. |
 | `POST /users/logout` | Deletes the auth cookie. The token itself stays valid until it expires. |
 
-An administrator can block a token before it expires with the `RevokedTokens` setting of the
-configuration.
+A password change or an administrator's password reset ends every token issued before it: those
+tokens answer `401`, on every request and on refresh. `POST /users/changePwd` returns a new token
+for the session that made the change. An administrator can also block a token before it expires
+with the `RevokedTokens` setting of the configuration.
 
 ## HTTP Basic for GIS clients
 
@@ -70,6 +73,9 @@ credentials (`Authorization: Basic base64(user:password)`):
   QGIS opens.
 
 Wrong or missing Basic credentials leave the request anonymous, so public data stays readable.
+Each wrong password counts toward the sign-in limit of the client address: after 10 failures in a
+minute, Basic requests from that address answer `429` with `Retry-After`. Valid credentials never
+count, so a client can send them with every request.
 When an anonymous request is denied, the answer is `401` with a `WWW-Authenticate: Basic`
 challenge, so the client asks for credentials. A signed-in user without access gets `403`.
 

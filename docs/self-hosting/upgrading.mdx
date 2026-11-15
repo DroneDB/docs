@@ -1,6 +1,6 @@
 ---
 title: "Upgrading"
-description: "Update Registry, upgrade to Registry 3.0 with DroneDB 2.4, and move old datasets to COPC point clouds and bm3d 3D models."
+description: "Update Registry, upgrade to Registry 3.0 with DroneDB 2.6, and move old datasets to COPC point clouds and bm3d 3D models."
 ---
 
 ## Update Registry
@@ -71,7 +71,10 @@ Registry 3.0. It changes the deployment in a few places.
 3. **Give the data to the container user.** The image runs Registry as the user `registry`
    (uid/gid `1654`), no longer as root. The first start gives `/data`, `/data/temp`,
    `appsettings.json` and the paths of `REGISTRY_EXTRA_OWNED_PATHS` to that user, recursively,
-   which takes long on a large volume. Do it first, with the containers stopped:
+   which takes long on a large volume. Do it first, with the containers stopped. On a large volume
+   this step is required: a first start that changes the owner of millions of files can outlast the
+   health check of the web container, which then never turns healthy and keeps the processing nodes
+   from starting:
 
    ```bash
    sudo chown -R 1654:1654 ./data ./appsettings.json
