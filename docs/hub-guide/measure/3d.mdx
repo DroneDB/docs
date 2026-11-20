@@ -28,7 +28,7 @@ any data it shows, for the session only.
 
 1. Open a point cloud. Saved measurements of the point cloud show automatically.
 
-2. Click a measuring tool in the tool panel over the view: **Point**, **Distance**, **Height** or **Area**.
+2. Click a measuring tool in the toolbar at the top left of the view: **Point**, **Distance**, **Height** or **Area**.
    The other tools (angle, circle, volume, height profile) are in the **Tools** section of the side menu (the
    menu button of the viewer).
 
@@ -40,7 +40,7 @@ any data it shows, for the session only.
 4. Double-click a measurement to give it a name and a description, or to change its colours.
    Click **Save**.
 
-5. Click **Save Measurements** to save the measurements in the dataset.
+5. Click **Save** in the toolbar to save the measurements in the dataset.
 
    <Screenshot id="measure/3d--pointcloud-saved" />
 
@@ -68,14 +68,14 @@ any data it shows, for the session only.
 
 | Control | What it does |
 |---|---|
-| Point, distance, height, circle, angle, area measurement | The measurements that **Save Measurements** saves. |
+| Point, distance, height, circle, angle, area measurement | The measurements that **Save** saves. |
 | Volume measurement, height profile | Work in the viewer. They are not saved. |
 | **Annotation** | A labelled 3D point with a name and a description. Double-click it to edit it or to copy its position. It is saved with the measurements. |
 | **Undo** / **Redo** | Undo or redo adding or deleting a measurement (`Ctrl+Z`, `Ctrl+Y`). |
 | **Delete measurement tool** | Click a measurement to delete it. |
-| **Units** | **Metric (m)** or **Imperial (ft)**. The same setting as the **Measurement Units** of the map and the **Units** tab of the [preferences](/docs/hub-guide/account/preferences). |
-| **Save Measurements** | Makes the saved file the same as the viewer. |
-| **Delete Saved** | Deletes the saved 3D measurements from the dataset. |
+| **Units** | In the bar at the bottom left. **Metric (m)** or **Imperial (ft)**. The same setting as the **Measurement Units** of the map and the **Units** tab of the [preferences](/docs/hub-guide/account/preferences). |
+| **Save** | Makes the saved file the same as the viewer. |
+| **Delete saved measurements** | In the menu beside **Save** (the three dots). Deletes the saved 3D measurements from the dataset. |
 
 ### 3D viewer
 
@@ -94,8 +94,8 @@ change at once.
 
 ## Limits & requirements
 
-- **Save Measurements** shows only for users with write access to the dataset.
-  **Delete Saved** shows only for users who can delete in the dataset.
+- **Save** shows only for users with write access to the dataset.
+  **Delete saved measurements** shows only for users who can delete in the dataset.
 - The lines and the labels of the measurements grow with the size of the view, from 12 to 18 px for the labels and 3 px for the lines, so they stay readable on a 4K screen.
 - The point cloud viewer saves next to the point cloud, with `_measurements.geojson` in place of
   the extension. The [map](/hub-guide/measure/map.mdx) uses the same file when it shows the point cloud. Each

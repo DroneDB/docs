@@ -35,7 +35,7 @@ Use the point cloud viewer to look at a point cloud in 3D, change how its points
    - Double-click a point to fly to it.
    - Click **Fullscreen** (the last button of the view bar) or press `F` to fill the screen; press it again to leave. An embed has the button in a corner of the view. In fly navigation `F` flies down, so use the button.
 
-3. Use the tool panel over the view. It has labelled buttons (icons only on a phone): the measuring tools **Point**, **Distance**, **Height** and **Area**, **Clip volume** and **Remove clips**, the views **Top**, **Front**, **Left** and **Right**, and **Colour by**. The menu button (top right) opens the side menu, for the advanced settings. Its sections are **Appearance**, **Tools**, **Scene**, **Filters** and **About**. It follows what you do in the tool panel.
+3. Use the two bars over the view. The toolbar at the top left has the tools, with their names (icons only on a phone): the measuring tools **Point**, **Distance**, **Height** and **Area**, and **Clip volume** with the eraser that removes the clip volumes. The bar at the bottom left sets how the cloud is shown: the views **Top**, **Front**, **Left** and **Right**, **Colour by** and the units. The menu button (top right) opens the side menu, for the advanced settings. Its sections are **Appearance**, **Tools**, **Scene**, **Filters** and **About**. It follows what you do in the two bars.
 
    <Screenshot id="viewing/point-cloud--menu" />
 
@@ -43,9 +43,9 @@ Use the point cloud viewer to look at a point cloud in 3D, change how its points
 
    <Screenshot id="viewing/point-cloud--attribute" />
 
-5. To look at the cloud from a side, click **Top**, **Front**, **Left** or **Right**. To keep only the points inside a box, click **Clip volume**, then click to place the box (`Esc` or **Cancel** stops placing it). **Remove clips** removes the boxes. To change the navigation, open **Tools** in the side menu. Under **Navigation**, choose orbit, fly, helicopter or earth controls.
+5. To look at the cloud from a side, click **Top**, **Front**, **Left** or **Right**. To keep only the points inside a box, click **Clip volume**, then click to place the box (`Esc` or **Cancel** stops placing it). The eraser beside it, **Remove the clip volumes**, removes the boxes. To change the navigation, open **Tools** in the side menu. Under **Navigation**, choose orbit, fly, helicopter or earth controls.
 
-6. To measure, click **Point**, **Distance**, **Height** or **Area** in the tool panel. Click the points; double-click, right-click or press `Enter` to finish, and `Esc` to cancel. For the other tools (angle, circle, volume), open **Tools** in the side menu. See [Measurements in 3D](/hub-guide/measure/3d.mdx). **Undo** (`Ctrl+Z`) and **Redo** (`Ctrl+Y`), at the top left, undo and redo adding and deleting a measurement.
+6. To measure, click **Point**, **Distance**, **Height** or **Area** in the toolbar. Click the points; double-click, right-click or press `Enter` to finish, and `Esc` to cancel. For the other tools (angle, circle, volume), open **Tools** in the side menu. See [Measurements in 3D](/hub-guide/measure/3d.mdx). With a measurement in the view, the toolbar also has **Undo** (`Ctrl+Z`) and **Redo** (`Ctrl+Y`), which undo and redo adding and deleting a measurement.
 
 </Steps>
 
@@ -53,15 +53,15 @@ Use the point cloud viewer to look at a point cloud in 3D, change how its points
 
 | Option | Where | What it does |
 |---|---|---|
-| **Units** | Top left | **Metric (m)** or **Imperial (ft)** for the measurements. The map uses the same setting |
+| **Units** | Bottom bar | **Metric (m)** or **Imperial (ft)** for the measurements. The map uses the same setting |
 | **Point budget** | **Appearance** | The most points drawn at one time. A lower value is faster |
 | **Field of view** | **Appearance** | The angle of the camera |
 | **Eye-Dome-Lighting** | **Appearance** | Shading that makes the shape of the points easier to see. Off when the viewer opens |
 | **Point size**, **Opacity** | **Scene**, point cloud | The size and the transparency of the points |
-| **Colour by** | Tool panel | How the points are coloured: **Colour**, **Elevation**, **Intensity**, **Classification** or **Return number** |
+| **Colour by** | Bottom bar | How the points are coloured: **Colour**, **Elevation**, **Intensity**, **Classification** or **Return number** |
 | **Attribute** | **Scene**, point cloud | The same, with every attribute of the file |
-| **Clip volume**, **Remove clips** | Tool panel | Shows only the points inside a box that you place, and removes the boxes |
-| **Top**, **Front**, **Left**, **Right** | Tool panel | Looks at the point cloud from that side |
+| **Clip volume**, **Remove the clip volumes** | Toolbar | Shows only the points inside a box that you place, and removes the boxes |
+| **Top**, **Front**, **Left**, **Right** | Bottom bar | Looks at the point cloud from that side |
 | **Clipping** | **Tools** | Shows only the points inside or outside a box or a polygon |
 | **Classification**, **Returns** | **Filters** | Shows or hides the classes and the returns of a LiDAR cloud |
 
