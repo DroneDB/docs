@@ -200,6 +200,12 @@ In a listing such an entry has `buildStatus: "pending"`, `buildMissingDependenci
 `GET …/builds/pending`, `awaitingFiles` is `true` for a build that waits for files and `false`
 for one that Registry retries.
 
+`POST …/build` for an entry that waits for files returns `409`, and the `detail` names the missing
+files: a build that starts before they arrive builds nothing. With `force=true` the build starts
+anyway and waits again if the files are still missing. The task list keeps one build task for such
+an entry: when a build ends and the entry still waits, the tasks of the earlier builds of the same
+content are removed.
+
 A build that failed for a temporary reason (low disk space, a full disk, a tool that stopped
 printing) is retried after 1, 2, 5, 10, 20, 40, then 60 minutes, at most 12 times. A build
 that fails for another reason (invalid input, a missing tool) is not retried.

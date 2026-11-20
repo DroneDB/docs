@@ -97,6 +97,11 @@ files** with the missing names. The **Tasks** tab shows the same yellow tag on t
 starts at once, with no timer. If you turned on [build notification e-mails](/hub-guide/account/build-notifications.mdx),
 you get one e-mail that names the missing files.
 
+While a file waits, Hub does not offer **Build** for it: a build that starts before the files arrive
+waits again and builds nothing. The **Tasks** tab keeps one task for the file. If something builds the
+file again before the files arrive (for example, you upload the same file again), the new task
+replaces the earlier one.
+
 Each file waits for its own companions. A file of the same name in another folder does not release
 the build, and two identical models in different folders each wait for their own `.mtl`: the second
 one never shows **Succeeded** without it.
