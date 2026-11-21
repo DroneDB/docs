@@ -46,7 +46,8 @@ save the measurements in the dataset, so the next visitor sees them too.
 5. Click **Measurement List** to see all the measurements. Click **New Group** to make a group
    with a name and a colour. Use **Move to group** on a row to put a measurement in a group. The
    eye button of a group hides or shows its measurements. The buttons of a row show when you point at it
-   and also when you move the keyboard focus to it with `Tab`.
+   and also when you move the keyboard focus to it with `Tab`. A line under the list says
+   **Saved in** and the path of the file that holds the measurements.
 
    <Screenshot id="measure/map--list" />
 
@@ -142,16 +143,29 @@ coordinates as `latitude, longitude`.
 
 - **Save Measurements** shows only for users with write access to the dataset.
   **Delete Saved Measurements** shows only for users who can delete in the dataset.
-- The measurements belong to a file. Hub saves them next to it, with `_measurements.geojson` in
-  place of the extension: `odm_orthophoto.tif` saves `odm_orthophoto_measurements.geojson`. On
-  the **Map** tab, they belong to the first orthophoto, raster or point cloud on show; with none,
-  to a `measurements.geojson` file in the folder.
+- The measurements belong to the files on show. With **one file** on the map, Hub saves them next to
+  it, with `_measurements.geojson` in place of the extension: `odm_orthophoto.tif` saves
+  `odm_orthophoto_measurements.geojson`. With **anything else**, they belong to a
+  `measurements.geojson` file in the folder of the first file on show: a folder selected in the file
+  tree (its files are on the map), several files, or a map viewer with a base file and layers. In the root
+  of the dataset the file is `measurements.geojson`. The raster that **Stockpile Volume** or **Raster Analysis**
+  works on does not change the file.
+- Measurements that an older version saved for a folder are in the `_measurements.geojson` of its first
+  raster. They stay there, and show when you open that file alone.
 - The map and the [point cloud viewer](/hub-guide/measure/3d.mdx) use the same file for the same point cloud.
   Each view saves and deletes only its own measurements, and keeps the measurements and groups
   of the other view in the file.
 - Hub writes the file in format 2.0. A file in an older format opens as it is and is upgraded the
   next time you save. Opening a file never changes it.
-- When the map changes to another file, unsaved changes are lost. Hub shows a warning.
+- When the files on the map change so that the measurements belong to another file, and you have unsaved
+  changes, Hub asks **Save the measurements to … before showing …?** **Save** writes them to the file
+  they were made in, and then Hub shows the other file. **Discard** drops them. **Keep editing** (or
+  closing the question) keeps them on the map, still in their own file: the measurement list shows
+  **Saved in …** with that file. When you save them later, Hub shows the measurements of the new
+  file. A user without write access cannot save, so Hub drops them and shows a warning. If **Save**
+  fails, the map stays on the first file.
+- Leaving the page with unsaved measurements (another page, a reload, closing the tab) asks first. On
+  the map viewer, the question is the one about the view, with the measurements in it.
 
 ## Related
 

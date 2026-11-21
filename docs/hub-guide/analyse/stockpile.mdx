@@ -29,8 +29,9 @@ also gives the weight and the cost of the pile.
 
 2. Optional: choose the base in **Base Plane Method**. The information button next to it explains
    each method. Until you choose one, a clicked pile uses **Best-fit plane** and a drawn polygon
-   uses **Lowest perimeter**. After you choose one, every next pile uses it, and the pile on screen
-   is measured again with it.
+   uses **Lowest perimeter**. The base you choose is the base of the pile you work on: Hub measures
+   that pile again with it, and no other pile changes. With no pile of the map chosen, it is the base
+   of the piles you find or draw next, and of the list of **Find all piles**.
 
 3. Click **Click map**: the button reads **Click map…** while it waits for your click. Then click on the pile. Hub outlines the pile down to its foot and
    computes its volume against the ground around it, so detection works on a slope too. Check the
@@ -47,20 +48,52 @@ also gives the weight and the cost of the pile.
    the result stays in view. Click **Settings** to open them.
 
    To find every pile of the raster at once, click **Find all piles** (it reads **Finding piles…** while it
-   works). It scans the whole raster with the **Detection Sensitivity** above and lists the piles with their
-   area, their estimated volume and their confidence. The list is **Piles found (n)**, or **Largest 50 piles**
-   when more were found and it is cut. Click a pile to make it the one pile of the panel: it is outlined and
-   measured like a pile that you clicked, with the base plane, the material and the other results. With no pile
-   the panel says **No piles found. Raise the detection sensitivity to find finer ones.**
+   works). It scans the whole raster with the **Detection Sensitivity** above. Hub draws every pile it found
+   on the map, with the number of its row, and lists them with their area, their **Volume** and their
+   confidence. The list is **Piles found (n)**, or **Largest 50 piles** when more were found and it is cut.
+   Each row shows a spinner until Hub has measured the volume of that pile, from the base plane the list
+   names (**Volumes above the best-fit plane**). When you choose another base plane, Hub measures the list again.
+   With no pile found the panel says **No piles found. Raise the detection sensitivity to find finer ones.**
+
+   Point at a row to emphasise its outline on the map. Click a row, or click the outline on the map, to
+   choose the pile: the map zooms to it when you click the row, the list scrolls to it when you click the
+   map, and the panel shows its result. Choosing a pile does not add it to the measurements. To add
+   piles, click **Add** on a row, tick rows and click **Add selected (n)**, or click **Add all**. A pile that
+   is added shows a check mark and is dimmed on the map: it is a measurement of the map, and a pile is
+   added once. When you search again later (after a reload, for example), a pile that is already a
+   measurement of the map on the same elevation model, with the same outline, shows the check mark too.
+   If you delete the measurement, the check mark goes and you can add the pile again. The
+   piles you add are not saved until you click **Save Measurements**. **Clear**, a new search, another
+   elevation model and closing the panel take the found piles off the map.
 
 4. Select a **Material**. The panel shows the **Weight** and the **Est. cost** of the pile.
 
    <Screenshot id="analyse/stockpile--material-cost" />
 
 5. Type a title and a description under **Identification**. Click **Save Measurements** in the
-   measure toolbar to save the pile, or **Export GeoJSON** to download its outline.
+   measure toolbar to save the pile, or **Export GeoJSON** to download its outline. Hub saves the
+   pile in the [measurements file of the map](/hub-guide/measure/map.mdx), with the elevation model it
+   was measured on and its base plane.
 
 </Steps>
+
+## Work on a pile that is on the map
+
+While **Stockpile Volume** is open, click a pile on the map, saved or not, to choose it. The panel
+shows its result, its base plane, its material, its title and its description, and the line **Measured
+on …** when the pile was measured on another elevation model than the one the panel is on. The base plane,
+the flat elevation, the material, the title and the description in the panel are those of that pile
+only. A change to the pile is an unsaved change of the map until you save it.
+
+- **Base plane method**: Hub measures the pile again from the new base, on the elevation model it was
+  measured on. With **Flat (elevation = 0)**, a **Flat elevation** field sets the elevation of the plane.
+- **Material**: only the **Weight** and the **Est. cost** change.
+- **Edit outline** (in the footer of the panel, while a pile is chosen): drag a corner to move it, drag the
+  middle of an edge to add a corner, press `Alt` and click a corner to remove it, and press `Shift` and drag to move the
+  whole pile. `Ctrl+Z` undoes a change and `Esc` or **Done editing** ends the mode. Only the chosen pile can be edited. When you stop
+  moving the outline, Hub measures the pile again, also when the panel is closed and when you edit with the
+  **Edit/Move Measurements** tool of the measure toolbar. If Hub cannot measure the new outline, the label of the pile says **(not recalculated)**,
+  the pile keeps the figures of the previous outline, and a message says so.
 
 ## See the pile on an orthophoto
 
@@ -77,9 +110,8 @@ Add the orthophoto as a layer to see the pile as in a photo.
 </Steps>
 
 With two or more elevation models on the map, **Stockpile Volume** shows an **Elevation model**
-selector. At first it uses the model of the measurements, or else the top one. Hub saves a pile with
-the model you select. If you select another model with unsaved measurements, Hub asks **Discard the
-unsaved measurements of …?**.
+selector. At first it uses the top one. Hub saves a pile with
+the model you select.
 
 An opaque orthophoto on top hides the **Raster Analysis** colours of the DSM below it. Hide it with its
 eye in the layer panel, or lower its opacity. The volume does not depend on the other layers.
@@ -88,9 +120,9 @@ eye in the layer panel, or lower its opacity. The volume does not depend on the 
 
 | Option | What it does | Default |
 |---|---|---|
-| **Base Plane Method** | The surface under the pile. See the table below. | Lowest perimeter for a drawn polygon; Best-fit plane for a detected pile |
+| **Base Plane Method** | The surface under the pile you work on. See the table below. **Flat elevation** sets the plane of **Flat**. | Lowest perimeter for a drawn polygon; Best-fit plane for a detected pile |
 | **Detection Sensitivity** | How easily the detection separates the pile from the ground, from 0 to 1. Higher values find lower piles, but can take in nearby ground. | 0.50 |
-| **Search Radius (m)** | How far from your click Hub looks for the edge of the pile. A pile that is longer than this area is not found whole: use a radius that contains the whole pile. | 50 |
+| **Search Radius (m)** | How far from your click Hub looks for the edge of the pile. A pile that is longer than this area is not found whole: use a radius that contains the whole pile. It is used by **Click map** only, not by **Find all piles**. | 50 |
 | **Material (optional)** | The material that gives the weight and the cost. **+ Custom…** lets you type a density and a cost for this pile only. The density must be more than 0 and at most 30 t/m³ (the panel says the limit in your unit, for example **Density must be greater than 0**); with a density that is refused, **Weight** and **Est. cost** say why instead of disappearing. | none |
 
 <Screenshot id="analyse/stockpile--base-methods" />
@@ -115,8 +147,9 @@ eye in the layer panel, or lower its opacity. The volume does not depend on the 
 | **Weight** | The larger of the cut and the net volume, times the density of the material. |
 | **Est. cost** | The weight times the price of the material. |
 
-**Clear** resets the panel and the detection overlay. A pile that you already saved on the map
-stays there. A detected pile that you did not save is removed.
+**Clear** resets the panel, the found piles and the detection overlay. A pile that you already saved on the
+map stays there, and so does a pile that you added from the list or chose on the map. A pile that you just
+found with **Click map** or drew, and did not save, is removed.
 
 ## Materials, units and currency
 
@@ -139,8 +172,9 @@ with.
   [saved view](/hub-guide/viewing/map-views.mdx).
 - **Edit materials…** needs a signed-in account.
 - Saving the pile needs write access to the dataset.
-- **Click map** and **Draw** work on one pile each time. **Find all piles** lists up to 50 piles and you
-  choose one of them: the panel measures one pile at a time.
+- **Click map** and **Draw** work on one pile each time. **Find all piles** lists up to 50 piles, measures
+  four at a time, and you add the ones you want to the measurements.
+- **Edit outline** and the choice of a pile on the map work on the piles of the measurements of the map.
 
 {/* TODO data: the DSM of odm/caliterra used by the shots is local only; publish it on hub.dronedb.app before the re-capture from production. */}
 

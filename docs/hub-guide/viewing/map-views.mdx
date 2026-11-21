@@ -112,7 +112,11 @@ The details panel of a georaster lists the saved views that use it under **Used 
 - A link with **Viewer only** hides the Hub header, the view bar and the buttons that add or remove layers.
   The measurement tools stay: a user with write access can still save the measurements.
 - [Measurements](/hub-guide/measure/map.mdx) and stockpiles keep their own files and their own
-  **Save**, not the saved view.
+  **Save**, not the saved view. A map of one file and no layer saves its measurements next to that
+  file, in `<name>_measurements.geojson`. A map with a base file and layers saves them in the
+  `measurements.geojson` file of the folder of the lowest layer, which is usually the base file.
+- Leaving the page with unsaved measurements asks first, in the same question as the unsaved changes
+  of the view: **Save** saves both.
 
 ## Related
 
