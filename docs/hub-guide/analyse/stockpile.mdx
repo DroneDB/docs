@@ -60,9 +60,11 @@ also gives the weight and the cost of the pile.
    map, and the panel shows its result. Choosing a pile does not add it to the measurements. To add
    piles, click **Add** on a row, tick rows and click **Add selected (n)**, or click **Add all**. A pile that
    is added shows a check mark and is dimmed on the map: it is a measurement of the map, and a pile is
-   added once. When you search again later (after a reload, for example), a pile that is already a
-   measurement of the map on the same elevation model, with the same outline, shows the check mark too.
-   If you delete the measurement, the check mark goes and you can add the pile again. The
+   added once. The row of an added pile shows the volume and the outline of the measurement: when you
+   edit its outline or change its base plane, the row follows. When you search again later (after a reload,
+   for example), a pile that you added from the list on the same elevation model shows the check mark too,
+   also when you edited its outline since. If you delete the measurement, the check mark goes, the row
+   gets the outline that was found back, and you can add the pile again. The
    piles you add are not saved until you click **Save Measurements**. **Clear**, a new search, another
    elevation model and closing the panel take the found piles off the map.
 
@@ -79,7 +81,10 @@ also gives the weight and the cost of the pile.
 
 ## Work on a pile that is on the map
 
-While **Stockpile Volume** is open, click a pile on the map, saved or not, to choose it. The panel
+While **Stockpile Volume** is open, click a pile on the map, saved or not, to choose it. You can also
+open the **Measurement List** of the measure toolbar and click the stockpile button of a pile: Hub opens
+**Stockpile Volume** on the elevation model the pile was measured on (when it is on the map) and chooses
+the pile. The panel
 shows its result, its base plane, its material, its title and its description, and the line **Measured
 on …** when the pile was measured on another elevation model than the one the panel is on. The base plane,
 the flat elevation, the material, the title and the description in the panel are those of that pile
