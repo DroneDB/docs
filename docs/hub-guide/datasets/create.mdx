@@ -33,8 +33,10 @@ thumbnail, a visibility and a license. You can change all of them later.
 4. Select **Open dataset after creation** to go to the new dataset; Hub remembers this choice.
    Click **Create**. Without it, the new dataset shows in the list: click it to open it.
 5. To configure the dataset, open it and click **Settings** (the wrench button at the top right).
-   The changes are saved as you make them. The dataset page shows the result: its **name**, its visibility
-   and its **tagline** in a header above the tabs, and the README under the files of the root.
+   Change the fields and click **Save**: Hub saves them and closes the window. **Cancel** closes it without
+   saving, and asks first if you changed something. The buttons under **Files** (thumbnail and README) change
+   the files of the dataset at once, without **Save**. The dataset page shows the result: its **name**, its
+   visibility and its **tagline** in a header above the tabs, and the README under the files of the root.
 
    <Screenshot id="datasets/create--settings" />
 
@@ -57,9 +59,9 @@ To change the name, tagline or visibility from the datasets page, click the penc
 | **Dataset Slug** | Create | The name in the address, from the name until you edit it: 2 to 128 lower case letters, numbers, `-` and `_` (see below). An edit shows it read-only: tick **Change URL (slug)** to give it a **New slug** | From the name |
 | **Visibility** | Create, Edit, Settings | **Private**, **Unlisted** or **Public**. See [Visibility](/hub-guide/sharing/visibility.mdx) | Private |
 | **Tagline** | Create, Edit, Settings | A short description under the name, up to 256 characters. The dataset search finds it | Empty |
-| **Name** | Settings | The name of the dataset, in the header, the tree and the lists. It saves when you leave the field, and the address does not change | The name you gave it |
-| **URL slug** | Settings | The name in the address (`/r/<organization>/<slug>`). Type a new slug and click **Change URL**. The window says that links to the old address will stop working, and asks first when files of the dataset are still uploading, because the change stops the upload | The slug |
-| **Thumbnail** | Settings | **Upload** a WebP, JPEG or PNG image, or **Remove** it | None |
+| **Name** | Settings | The name of the dataset, in the header, the tree and the lists. The address does not change | The name you gave it |
+| **URL slug** | Settings | The name in the address (`/r/<organization>/<slug>`). Type a new slug and click **Save**. Hub asks first: it names the old and the new address, says that links to the old address will stop working and, when files of the dataset are still uploading, that the change stops the upload | The slug |
+| **Thumbnail** | Settings | **Upload** a WebP, JPEG or PNG image, or **Remove** it. This changes the file at once, without **Save** | None |
 | **Readme** | Settings | **Add Readme** creates `README.md` at the root of the dataset and opens it in the text editor. With a README, **Open** shows it in the viewer and **Edit** opens the editor | None |
 | **License** | Settings | The license of the data, from a list of common licenses | Proprietary |
 | **Rescan Dataset** | Settings | See [Rescan a dataset](/hub-guide/files/rescan.mdx) | — |
@@ -75,7 +77,7 @@ To change the name, tagline or visibility from the datasets page, click the penc
   creation.
 - Two datasets of an organization cannot have the same slug.
 - Editing the name does not change the slug: the address stays, in **Edit dataset** and in **Settings** alike.
-  Only **Change URL (slug)** there, or **Change URL** in **Settings**, gives the
+  Only **Change URL (slug)** there, or a new **URL slug** saved in **Settings**, gives the
   dataset a new address, and then links to the old one (the dialog names it) stop working. You can always
   edit a dataset: a name that it keeps is not checked again.
 - The thumbnail is a file in the root of the dataset: `thumbnail.webp`, `.jpg` or `.png`, or
