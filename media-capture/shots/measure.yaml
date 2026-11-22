@@ -327,3 +327,173 @@
   highlight: "[aria-label='Pins']"
   crop: null
   blocked: null
+
+# ---- Inspection fields, photos, 3D capture, reports and report settings -------------------------------------
+#
+# These shots need a demo dataset that reset-demo.mjs does not create yet: `report-demo` in the
+# organization acme-surveys, with a copy of odm/brighton-beach (the orthophoto, the point cloud and
+# the drone images), a saved measurements file on the orthophoto with a few annotations that have a
+# reference, a category, a status, a due date and photos (one annotation in the 3D file too), and one
+# report named "Beach inspection" (the orthophoto measurements as source, the orthophoto as cover
+# view, all sections on). The selectors of the report shots are read from the Hub source and a later
+# pass checks them on screen.
+
+- id: measure/annotations--fields
+  type: screenshot
+  alt: The Details tab of a point annotation with the Inspection fields - reference, category, severity, status, assignee, due date and Include in reports
+  page: hub-guide/measure/annotations
+  open: { org: odm, ds: brighton-beach, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Point Annotation']"
+    - mouse: { click: [720, 450] }
+    - wait: "#mp-description"
+    - fill: { selector: "#mp-description", value: Erosion at the foot of the dune }
+    - click: "#mp-category"
+    - click: "role=option[name='Defect']"
+    - click: "#mp-status"
+    - click: "role=option[name='Open']"
+    - fill: { selector: "#mp-assignee", value: J. Doe }
+  highlight: ".annotation-fields"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: measure/annotations--photos
+  type: screenshot
+  alt: The Photos tab of an annotation with its photos, and the photos that cover it with the Approximate location marker
+  page: hub-guide/measure/annotations
+  open: { org: odm, ds: brighton-beach, path: odm_orthophoto/odm_orthophoto.tif, view: map }
+  base: hub
+  auth: none
+  waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
+  actions:
+    - click: "[aria-label='Point Annotation']"
+    - mouse: { click: [720, 450] }
+    - wait: "#mp-description"
+    - click: "role=tab[name='Photos']"
+    - wait: "[data-testid='coverage-list']"   # a reader sees the covering photos with no Add buttons: capture it as a writer for those
+  highlight: ".photo-marker"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: measure/3d--capture
+  type: screenshot
+  alt: The window of a 3D measurement with Capture for report, after a capture
+  page: hub-guide/measure/3d
+  open: { org: acme-surveys, ds: report-demo, path: odm_georeferencing/odm_georeferenced_model.laz, view: pointcloud }
+  base: hub
+  auth: demo
+  waitFor: { selector: "#potree_render_area canvas", networkIdle: true, extraMs: 4000 }
+  actions:
+    - click: "#potree_render_area [aria-label='Menu']"
+    - click: "img[title='Distance measurement']"
+    - mouse: { click: [1000, 640] }
+    - mouse: { click: [1080, 800] }
+    - mouse: { click: [1080, 800], button: right }
+    - wait: 1000
+    - mouse: { dblclick: [1040, 720] }   # the label of the measurement opens its window
+    - click: "text=Capture for report"
+    - wait: "[role='status']:has-text('Captured')"
+  highlight: "text=Capture for report"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: measure/reports--page
+  type: screenshot
+  alt: The live page of a report with its bar - Download PDF, Publish PDF, Edit and Delete - and the cover
+  page: hub-guide/measure/reports
+  url: /r/acme-surveys/report-demo
+  base: hub
+  auth: demo
+  waitFor: { selector: "[data-testid='report-download-pdf']", networkIdle: true, extraMs: 3000 }   # the snapshots render when they come into view
+  actions:
+    - rightClick: "text=Beach inspection"   # under Reports in the folder tree
+    - click: { selector: "role=menuitem[name='Open']", popup: true }   # the report opens in a new tab
+  highlight: "[data-testid='report-download-pdf']"
+  crop: null
+  blocked: null
+
+- id: measure/reports--editor
+  type: screenshot
+  alt: The report editor with the name, the template, the sources with their labels, the cover view and the filter
+  page: hub-guide/measure/reports
+  url: /r/acme-surveys/report-demo
+  base: hub
+  auth: demo
+  waitFor: { selector: "text=Beach inspection", networkIdle: true }
+  actions:
+    - rightClick: "text=Beach inspection"
+    - click: "role=menuitem[name='Edit']"
+    - wait: "#reportEditorDialog"
+  highlight: null
+  crop: "#reportEditorDialog"
+  blocked: null
+
+- id: measure/reports--publish
+  type: screenshot
+  alt: The question Replace reports/beach-inspection with the date, asked when the PDF is published again
+  page: hub-guide/measure/reports
+  url: /r/acme-surveys/report-demo
+  base: hub
+  auth: demo
+  waitFor: { selector: "text=Beach inspection", networkIdle: true }
+  actions:
+    - rightClick: "text=Beach inspection"
+    - click: { selector: "role=menuitem[name='Open']", popup: true }
+    - click: "[data-testid='report-publish-pdf']"   # publish twice: the second time asks Replace
+    - wait: "text=PDF published"
+    - click: "[data-testid='report-publish-pdf']"
+    - wait: "role=button[name='Replace']"
+  highlight: "role=button[name='Replace']"
+  crop: "[role='dialog']"
+  blocked: null
+
+- id: measure/report-settings--templates
+  type: screenshot
+  alt: The Templates tab of the Report settings window - name, colours, paper, texts, sections, logo and the preview page
+  page: hub-guide/measure/report-settings
+  url: /organizations
+  base: hub
+  auth: demo
+  waitFor: { selector: "[aria-label='Report settings']", networkIdle: true }
+  actions:
+    - click: "[aria-label='Report settings']"
+    - wait: "#reportSettingsDialog"
+  highlight: null
+  crop: "#reportSettingsDialog"
+  blocked: null
+
+- id: measure/report-settings--preview
+  type: screenshot
+  alt: The preview page of a template, next to the fields that set its colours, texts and paper
+  page: hub-guide/measure/report-settings
+  url: /organizations
+  base: hub
+  auth: demo
+  waitFor: { selector: "[aria-label='Report settings']", networkIdle: true }
+  actions:
+    - click: "[aria-label='Report settings']"
+    - wait: "#reportSettingsDialog"
+    - fill: { selector: "#report-template-header", value: Acme Surveys - site inspection }
+    - fill: { selector: "#report-template-footer", value: Confidential }
+  highlight: "[data-test='preview-page']"
+  crop: "#reportSettingsDialog"
+  blocked: null
+
+- id: measure/report-settings--schema
+  type: screenshot
+  alt: The Annotation schema tab with the categories, severities and statuses, and the Closed box of a status
+  page: hub-guide/measure/report-settings
+  url: /organizations
+  base: hub
+  auth: demo
+  waitFor: { selector: "[aria-label='Report settings']", networkIdle: true }
+  actions:
+    - click: "[aria-label='Report settings']"
+    - click: "role=tab[name='Annotation schema']"
+    - wait: "[data-test='schema-statuses']"
+  highlight: "[data-test='schema-statuses']"
+  crop: "#reportSettingsDialog"
+  blocked: null

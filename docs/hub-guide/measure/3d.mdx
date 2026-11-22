@@ -1,7 +1,7 @@
 ---
 title: "Measurements in 3D"
 description: "Measure points, distances, heights, angles, areas and volumes on a point cloud, and points, distances and areas in the 3D viewer."
-hub_feature: [pointcloud:measure, unified:measure]
+hub_feature: [pointcloud:measure, unified:measure, pointcloud:capture-for-report]
 datasets: [odm/brighton-beach]
 requires: { access: read, data: "A point cloud, or a file the 3D viewer opens" }
 ---
@@ -38,9 +38,18 @@ any data it shows, for the session only.
    cancel: the shape is dropped. A right-drag pans the view and does not finish the shape.
 
 4. Double-click a measurement to give it a name and a description, or to change its colours.
-   Click **Save**.
+   The window has the same **Inspection** fields and **Photos** tab as the map: reference,
+   category, severity, status, assignee, due date and photos. See
+   [Point annotations](/hub-guide/measure/annotations.mdx). Click **Save**.
 
-5. Click **Save** in the toolbar to save the measurements in the dataset.
+5. To give the measurement a picture for a [report](/hub-guide/measure/reports.mdx), click
+   **Capture for report** in the same window. Hub frames the measurement and keeps one image of
+   the 3D view. The window says **Captured. Save the measurements to keep the capture with the
+   item.** A new capture replaces the old one.
+
+   <Screenshot id="measure/3d--capture" />
+
+6. Click **Save** in the toolbar to save the measurements in the dataset.
 
    <Screenshot id="measure/3d--pointcloud-saved" />
 
@@ -70,7 +79,8 @@ any data it shows, for the session only.
 |---|---|
 | Point, distance, height, circle, angle, area measurement | The measurements that **Save** saves. |
 | Volume measurement, height profile | Work in the viewer. They are not saved. |
-| **Annotation** | A labelled 3D point with a name and a description. Double-click it to edit it or to copy its position. It is saved with the measurements. |
+| **Annotation** | A labelled 3D point with a name and a description. Double-click it to edit it, to copy its position, to set its inspection fields and photos, or to capture it. It is saved with the measurements. |
+| **Capture for report** | In the window of a measurement or an annotation, for users with write access. Writes an image of the 3D view, framed on the item, to the dataset. |
 | **Undo** / **Redo** | Undo or redo adding or deleting a measurement (`Ctrl+Z`, `Ctrl+Y`). |
 | **Delete measurement tool** | Click a measurement to delete it. |
 | **Units** | In the bar at the bottom left. **Metric (m)** or **Imperial (ft)**. The same setting as the **Measurement Units** of the map and the **Units** tab of the [preferences](/docs/hub-guide/account/preferences). |
@@ -102,8 +112,16 @@ change at once.
   file on the map; with a folder, several files or layers on the map, it saves in the `measurements.geojson` of the folder.
   Each view saves and deletes only its own measurements; the other view's measurements and groups stay
   in the file.
-- The file is in format 2.0. A file in an older format opens as it is and is upgraded the next
-  time you save. Opening a file never changes it.
+- The file is in format 3.0. A file in an older format opens as it is and is upgraded the next
+  time you save. Opening a file never changes it. A Hub page that you opened before Hub was
+  updated cannot save a 3.0 file: it says that the file is of a newer format. Reload the page, then
+  save again.
+- A capture is a WebP file in the `annotations` folder next to the measurement file:
+  `<id>-3d.webp`. Deleting the measurement does not delete it. A measurement with no capture shows
+  **No 3D snapshot** in a report.
+- The photos of a 3D measurement are searched from its position. A point cloud without a
+  coordinate system has no position on the earth, so the **Photos** tab offers only **Upload** and
+  **Pick from the dataset**. A report shows **Not georeferenced** for it.
 - The saved coordinates are in the coordinate system of the point cloud, converted to WGS84:
   longitude and latitude, with the height in the units of the point cloud. A GIS program and the
   map read the right place. A point cloud without a coordinate system saves its local coordinates,
@@ -116,4 +134,5 @@ change at once.
 - [Point cloud viewer](/hub-guide/viewing/point-cloud.mdx)
 - [3D viewer](/hub-guide/viewing/3d-viewer.mdx)
 - [Measurements on the map](/hub-guide/measure/map.mdx)
+- [Reports](/hub-guide/measure/reports.mdx)
 - [Measure & pin a splat](/hub-guide/measure/splat.mdx)

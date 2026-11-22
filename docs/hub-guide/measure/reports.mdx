@@ -1,0 +1,178 @@
+---
+title: "Reports"
+description: "Turn the measurements and annotations of a dataset into a report: a page with its own link, and a PDF to download or to publish in the dataset."
+hub_feature: ["route:Report", "dataset:reports", "map:report"]
+datasets: [odm/brighton-beach]
+requires: { access: write, data: "A saved measurements file in the dataset" }
+---
+
+<Screenshot id="measure/reports--page" />
+
+<Requires />
+
+<TryLive hint="Sign in, open a dataset with saved measurements and click New report under the folder tree." />
+
+## When to use it
+
+Make a report when the measurements must go to someone who does not use Hub: a client, an
+inspector, a site manager. A report holds a cover with a map, a summary, tables, one section for each
+annotation, with its map, its photos and its status, and your notes.
+
+A report is a page with its own link. It shows the measurements as they are now. Anyone who can open
+the dataset can open it and download its PDF. A user with write access can also publish the PDF in
+the dataset.
+
+## Create a report
+
+<Steps>
+
+1. Start the report in one of two ways:
+
+   - Open the dataset page. Under the folder tree, in **Reports**, click **New report**. The report
+     has no source and no cover view yet: you choose them in step 3.
+   - On the [map](/hub-guide/measure/map.mdx), click **Report** in the map toolbar. The report
+     starts with the measurement file of the map as its source, and the view of the map as its
+     cover view. If you have measurements that are not saved, Hub asks **Save and continue**,
+     **Continue without saving** or **Cancel**: a report reads the saved file.
+
+2. Type a **Name**. Select a **Template**: its colours, logo, paper and texts come from the
+   [report settings of the organization](/hub-guide/measure/report-settings.mdx). Type the
+   **Title**, **Subtitle**, **Prepared by** and **Prepared for** of the cover, and the **Notes** in
+   Markdown.
+
+3. Under **Sources**, add the measurement files to read. Under **Cover view**, select a saved
+   view, or tick layers of the dataset. Maps of the report use these layers and their basemap.
+
+   <Screenshot id="measure/reports--editor" />
+
+4. Under **Filter**, tick what to include. Under **Sections**, switch the parts on or off and move
+   them up or down. Select the **Units**.
+
+5. Click **Save**. Hub opens the report.
+
+</Steps>
+
+## Options
+
+### Sources and labels
+
+A report can read more than one measurement file: for example the file of the map and the file of
+a point cloud. Each source has a **label** of 1 to 3 letters or digits: `A`, `B`, `C`. When a report
+has more than one source, each item shows `<label>-<reference>`, for example `B-12`, because
+references are unique in one file only.
+
+### Filter
+
+| List | What it keeps |
+|---|---|
+| **Groups** | Measurements in the groups you tick |
+| **Categories**, **Severities**, **Statuses** | Annotations with those values |
+| **Kinds** | **Points**, **Lengths**, **Areas**, **Volumes**, **Profiles**, **3D measurements** |
+| **Made in** | **2D map** or **3D point cloud viewer** |
+
+An item must pass every list that has a tick. A list with no tick lets everything through. An item
+that has no value in a list that you ticked does not pass. An annotation with **Include in reports**
+off never shows. Items are sorted by source, then by reference (`2` before `10`).
+
+### Sections
+
+| Section | What it shows |
+|---|---|
+| **Cover** | Logo, title, subtitle, prepared by and for, date, dataset name, a map with all items, and a QR code of the address of the report |
+| **Summary** | The number of items by type, category, status and severity, how many are overdue, and the totals of area, length, net volume, weight and cost |
+| **Overview map** | One map with all items, their references and a legend of the category colours |
+| **Tables** | A table for each kind that has items, then a list of the items that have a status |
+| **Items** | A section for each item: reference, name, map, values, fields, status, description and photos |
+| **Notes** | Your notes, the units, the coordinate system, the layers and their build dates, the disclaimer of the template and a sign-off block |
+
+A new report copies the sections of its template. A later change of the template does not change
+the reports that exist. The map of an item frames it with some space around it, draws it in its own
+style and the others lighter. A profile has an elevation chart, sampled from the first elevation
+layer of the cover view. A 3D item has the picture from
+[**Capture for report**](/hub-guide/measure/3d.mdx), or **No 3D snapshot**. A stockpile has the
+cut, fill and net volume that were measured when it was saved.
+
+### Units
+
+**The units each reader has chosen** shows each reader the units of their
+[preferences](/hub-guide/account/preferences.mdx). **Metric** or **Imperial** fixes them for
+everyone.
+
+## Read a report
+
+The address is `/r/<organization>/<dataset>/reports/<id>`. Under **Reports**, in the dataset page,
+double-click a report to open it in a new tab. Right-click it for the other actions:
+
+| Action | Who | What it does |
+|---|---|---|
+| **Open** | Everyone who can open the dataset | Opens the report in a new tab |
+| **Copy Link** | Everyone who can open the dataset | Copies the address |
+| **Edit** | Users with write access | Opens the editor |
+| **Duplicate** | Users with write access | Makes a copy named `<name> (copy)` |
+| **Delete** | Users with write access | Deletes the report. Its link stops working. The measurement files and the published PDFs stay. |
+
+The link follows the [visibility of the dataset](/hub-guide/sharing/visibility.mdx): anyone can
+open a report of a public dataset, anyone who has the link can open a report of an unlisted
+dataset, and a report of a private dataset asks to sign in and needs read access. Readers see the
+page and **Download PDF**. They do not see **Edit**, **Delete** or **Publish PDF**.
+
+Each item has a link icon next to its name: its address in the report, for example
+`#item-<id>`. **Open in viewer** opens the map or the point cloud viewer in a new tab, framed on
+the item. If an item is no longer in the report, the page says **This item is no longer in this
+report**. An item that has no reference yet shows a dash and has no link.
+
+## Download or publish a PDF
+
+<Steps>
+
+1. Open the report. Click **Download PDF**.
+
+2. A window shows the progress, **Rendered 3 of 12**, with **Cancel**. When it ends, the browser
+   saves `<name>-<yyyy-mm-dd>.pdf`: the name of the report as a slug, and the date of your computer.
+
+3. To keep the PDF with the data, click **Publish PDF** (users with write access). Hub writes it as
+   `reports/<name>-<yyyy-mm-dd>.pdf` in the root of the dataset. If the file exists, Hub asks
+   **Replace** or **Cancel**.
+
+   <Screenshot id="measure/reports--publish" />
+
+</Steps>
+
+The PDF has the paper and the orientation of the template, a table of contents, the logo and the
+title in the header, the page number and the footer text of the template in the footer, text that
+you can select and search, and a QR code on each item page that opens the item in the report.
+
+## Limits & requirements
+
+- Creating, editing and publishing need write access. A dataset holds up to 100 reports, and a
+  report is up to 32 KB.
+- A report needs one source and a cover view. If a source file is missing, the page shows the
+  other parts and names the file. If the cover view is deleted, the maps show the items on the
+  basemap only, and the page says **The cover view was deleted**. Choose another in the editor.
+- If the template no longer exists, the report uses the first template of the organization and
+  says so.
+- If someone saved the report after you opened it, **Save** asks **Overwrite** or **Save as
+  new**.
+- **Save** writes a reference in the files of the sources that have measurements without one. If
+  that fails for a file, the report is saved, and the editor names the file and the reason.
+- Some basemap providers do not allow their tiles in an exported image. The map then has no
+  basemap and says **Basemap not shown: provider does not allow export**. The layers of the dataset
+  stay. Every map of a report shows the attribution of its basemap.
+- A measurement of a point cloud with no coordinate system is not drawn on the maps. Its row
+  says **Not georeferenced**.
+- A PDF is made in your browser. A report with many items and photos takes time and memory.
+
+## Related
+
+- [Report settings of an organization](/hub-guide/measure/report-settings.mdx)
+- [Point annotations](/hub-guide/measure/annotations.mdx)
+- [Measurements on the map](/hub-guide/measure/map.mdx)
+- [Measurements in 3D](/hub-guide/measure/3d.mdx)
+- [Map views & saved views](/hub-guide/viewing/map-views.mdx)
+
+<ForDevelopers api="/docs/developers/api/workflows">
+
+A report is an entry of the `reports` list in the metadata of the dataset. The Registry removes
+it from the dataset record, as it does for `views`.
+
+</ForDevelopers>

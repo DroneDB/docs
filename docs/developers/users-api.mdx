@@ -227,6 +227,28 @@ Administrators can manage memberships from the user side too:
 | `PUT /users/{userName}/orgs/{orgSlug}` | Change the permission: JSON `{ "permissions": 3 }` |
 | `DELETE /users/{userName}/orgs/{orgSlug}` | Remove the user from the organization. The owner cannot be removed. |
 
+## Report settings
+
+The report templates and the annotation schema of an organization. Members read them, and
+administrators of the organization write them. See
+[Report settings of an organization](/hub-guide/measure/report-settings.mdx).
+
+| Request | Access | What it does |
+|---|---|---|
+| `GET /orgs/{orgSlug}/report-settings` | Member | `{ "templates", "schema", "version" }`. An organization that stored nothing gets the default schema and one template, `standard`. |
+| `PUT /orgs/{orgSlug}/report-settings` | Organization administrator | Replaces the templates and the schema (JSON). Send the `version` you read: `200` with the new one, `409` if someone wrote since, `400` with the broken rule. |
+| `GET /orgs/{orgSlug}/report-settings/templates/{templateId}/logo` | Member | The image of the logo, `404` without one |
+| `PUT /orgs/{orgSlug}/report-settings/templates/{templateId}/logo` | Organization administrator | Sets the logo: `multipart/form-data` with the field `file`, a PNG, JPEG, WebP or SVG of at most 512 KB. `200` with `{ "logo", "version" }`. The template must be stored: `404` otherwise. |
+| `DELETE /orgs/{orgSlug}/report-settings/templates/{templateId}/logo` | Organization administrator | Removes the logo: `200` with `{ "version" }` |
+| `GET /orgs/{orgSlug}/ds/{dsSlug}/report-settings` | Read access to the dataset | `{ "templates", "schema" }` of the organization, for a reader of a dataset |
+| `GET /orgs/{orgSlug}/ds/{dsSlug}/report-settings/logo/{templateId}` | Read access to the dataset | The logo of a template |
+
+A `PUT` ignores the `logo` of a template: the logo endpoints set it. It deletes the logo files of
+the templates that are no longer in the list. A template `id` and an `id` of the schema match
+`^[a-z0-9-]{1,32}$` and do not change. Limits: 20 templates, 50 categories, 10 severities,
+10 statuses, names of 1 to 60 characters. The first write, a `PUT` or a logo, stores the default
+template as an ordinary template.
+
 ## External authentication and LDAP
 
 When the Registry signs users in through LDAP or an external authentication service, the

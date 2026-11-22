@@ -1,7 +1,7 @@
 ---
 title: "Measurements on the map"
 description: "Measure lengths, areas and points on the map, put them in groups, save them in the dataset and export them as GeoJSON or CSV."
-hub_feature: [map:measure, map:measurement-list, map:measurement-groups, map:measurement-units]
+hub_feature: [map:measure, map:measurement-list, map:measurement-groups, map:measurement-units, map:references, map:report]
 datasets: [odm/brighton-beach]
 requires: { access: read }
 ---
@@ -17,7 +17,9 @@ requires: { access: read }
 
 Use the measure tools to get a length, an area or the position of a point from an orthophoto or
 from any other data on the map. Anyone who can open the map can measure. Users with write access
-save the measurements in the dataset, so the next visitor sees them too.
+save the measurements in the dataset, so the next visitor sees them too. Every measurement has a
+reference, and can have inspection fields and photos. A [report](/hub-guide/measure/reports.mdx)
+turns the measurements into a page and a PDF.
 
 ## Steps
 
@@ -42,7 +44,8 @@ save the measurements in the dataset, so the next visitor sees them too.
    or put it in a group. To put it in a new group, click **New group** next to **Group**, type a name,
    choose a colour and click **Create**. The Hub makes the group when you click **Save**, and not
    if you click **Cancel**. Open **Appearance** to change its colours, its line width and its fill
-   opacity, and **Inspection** to set its category, severity, status, due date and assignee. A closed
+   opacity, and **Inspection** to set its category, severity, status, due date and assignee. Add photos in
+   the **Photos** tab (see [Point annotations](/hub-guide/measure/annotations.mdx)). A closed
    part shows what it holds on one line under its title. The parts stay open or closed as you leave
    them, and **Inspection** opens by itself when the measurement has inspection values. Click **Save**.
 
@@ -129,11 +132,16 @@ measurements.
 | **Edit/Move Measurements** | Drag a point to move it. `Shift`+drag moves the whole measurement. Double-click opens the properties. `Ctrl+Z` undoes. `Esc` exits. |
 | **Stop Measuring** | Cancels the current tool (`Esc`), and the shape you were drawing. |
 | **Measurement List** | Opens the list of measurements and groups. |
+| **Show References** | Draws the reference of each annotation next to it, or hides it. On at the start. |
 | **Save Measurements** | Makes the saved file the same as the map. With nothing left on the map, it removes the saved measurements. |
 | **Clear All Measurements** | Removes all measurements from the map. The saved file does not change until you save again. |
 | **Export Measurements as GeoJSON** | Downloads the measurements, with their groups, as a GeoJSON file. |
 | **Export Measurements as CSV** | Downloads one row per measurement as a CSV table. See [CSV columns](#csv-columns). |
 | **Delete Saved Measurements** | Deletes the saved measurements from the dataset. |
+
+**Report** is not in the measure toolbar. It is a button of the map toolbar, for users with write
+access. It starts a [report](/hub-guide/measure/reports.mdx#create-a-report) from the measurements
+and the view of the map.
 
 ### How lengths and areas are measured
 
@@ -172,6 +180,11 @@ The label of a [stockpile](/hub-guide/analyse/stockpile.mdx) on the map and its 
 | `value`, `unit` | The length or the area in the units the map shows. A stockpile has its net volume in m³ or yd³; a point has no value |
 | `longitude`, `latitude` | The position of a point, in WGS84 |
 | `wkt` | The shape of the measurement as WKT, in WGS84 |
+| `id` | The identifier of the measurement. It never changes. |
+| `ref` | The reference of the measurement |
+| `category`, `severity`, `status` | The ids of the values from the organization schema |
+| `assignee`, `dueDate` | The assignee, and the due date as `YYYY-MM-DD` |
+| `photoCount` | How many photos the measurement has |
 
 Other properties of the measurements follow in more columns.
 
@@ -197,8 +210,11 @@ coordinates as `latitude, longitude`.
 - The map and the [point cloud viewer](/hub-guide/measure/3d.mdx) use the same file for the same point cloud.
   Each view saves and deletes only its own measurements, and keeps the measurements and groups
   of the other view in the file.
-- Hub writes the file in format 2.0. A file in an older format opens as it is and is upgraded the
-  next time you save. Opening a file never changes it.
+- Hub writes the file in format 3.0. A file in an older format opens as it is and is upgraded the
+  next time you save. Opening a file never changes it. The upgrade gives a reference to each
+  measurement that has none. A Hub page that you opened before Hub was updated cannot save a 3.0
+  file: it says that the file is of a newer format. Reload the page, then save again.
+- Hub keeps the properties of a measurement that it does not know when it saves the file.
 - When the files on the map change so that the measurements belong to another file, and you have unsaved
   changes, Hub asks **Save the measurements to … before showing …?** **Save** writes them to the file
   they were made in, and then Hub shows the other file. **Discard** drops them. **Keep editing** (or
@@ -212,6 +228,7 @@ coordinates as `latitude, longitude`.
 ## Related
 
 - [Point annotations](/hub-guide/measure/annotations.mdx)
+- [Reports](/hub-guide/measure/reports.mdx)
 - [Measurements in 3D](/hub-guide/measure/3d.mdx)
 - [Stockpile volume](/hub-guide/analyse/stockpile.mdx)
 - [Map viewer](/hub-guide/viewing/map.mdx)

@@ -55,6 +55,8 @@ const sidebars = {
       'hub-guide/measure/3d',
       'hub-guide/measure/splat',
       'hub-guide/measure/annotations',
+      'hub-guide/measure/reports',
+      'hub-guide/measure/report-settings',
     ]),
     category('Analyse rasters', [
       'hub-guide/analyse/colormaps',

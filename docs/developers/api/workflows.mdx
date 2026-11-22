@@ -159,6 +159,36 @@ dataset exists, so a client asks for the cover only then. Metadata that nobody w
 an error: `GET …/meta/get/{key}` of a list key (a key that ends with `s`, such as `views` or `tags`) that
 nobody wrote returns `200` with `[]`, while a single key that does not exist stays `404`.
 
+## Reports and photo coverage
+
+Hub stores the reports of a dataset as the list `reports` in its metadata, as it stores saved
+views in `views`. Read it with `GET …/meta/get/reports`. The Registry removes `reports` and `views`
+from the dataset record, so the list of datasets stays small. The format of a report is Hub's own.
+
+`POST …/coverage` returns the images of the dataset that see a place, best view first. The body is
+JSON: `geometry` is a GeoJSON Point, LineString or Polygon in WGS84 (at most 10000 positions), and
+`limit` is 1 to 100 (default 20). Read access is enough. The body is at most 64 KB.
+
+```bash
+curl -X POST -H "$AUTH" -H "Content-Type: application/json" $DS/coverage \
+     -d '{"geometry": {"type": "Point", "coordinates": [8.5417, 47.3769]}, "limit": 5}'
+```
+
+```json
+[
+  {"path": "images/DJI_0412.JPG", "score": 0.08, "overlap": 1.0, "pixel": [2731, 1904]},
+  {"path": "images/DJI_0413.JPG", "score": 0.21, "overlap": 1.0, "pixel": null}
+]
+```
+
+`score` is 0 for the image whose middle is on the geometry: lower is better. `overlap` is the
+part of a polygon that the image covers (0 to 1), and 1 for a point or a line. `pixel` is the
+`[x, y]` of the centre of the geometry in the image, or `null` when the camera data does not tell
+it. A bad geometry or `limit` answers `400`.
+
+The report settings of an organization have their own endpoints:
+[Report settings](/developers/users-api.mdx#report-settings).
+
 ## Builds and build files
 
 Registry builds every buildable file after it arrives. To start a build yourself:

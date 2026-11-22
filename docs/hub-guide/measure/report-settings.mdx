@@ -1,0 +1,95 @@
+---
+title: "Report settings of an organization"
+description: "Set the report templates, the logo and the list of categories, severities and statuses once for all the members of an organization."
+hub_feature: [org:report-settings]
+requires: { access: owner, data: "Administrators change the settings; every member can read them" }
+---
+
+<Screenshot id="measure/report-settings--templates" />
+
+<Requires />
+
+<TryLive hint="Sign in, click Organizations in the header and click Report settings on an organization." />
+
+## When to use it
+
+Set the look of the [reports](/hub-guide/measure/reports.mdx) and the words of the
+[inspection fields](/hub-guide/measure/annotations.mdx#inspection-fields) once for the whole
+organization. Two members see the same templates and the same categories, severities and statuses.
+
+## Steps
+
+<Steps>
+
+1. Click **Organizations** in the header. On the card of the organization, click **Report
+   settings** (the button with a page icon). Every member sees this button.
+
+2. In the **Templates** tab, select a template, or click **Add template**. Type a **Name**. Set the
+   **Primary colour** and the **Accent colour**, the **Paper**, the **Orientation**, the **Header
+   text**, the **Footer text** and the **Disclaimer**. The **Preview** shows a page with your values.
+
+   <Screenshot id="measure/report-settings--preview" />
+
+3. Under **Sections of a new report**, tick the parts that a new report has.
+
+4. To add a logo, click **Save**, then **Upload logo**, and select the file. A logo is stored at
+   once, without **Save**.
+
+5. In the **Annotation schema** tab, edit the **Categories**, the **Severities** and the
+   **Statuses**. Click **Add category**, **Add severity** or **Add status**, type a name, and pick a
+   colour. Tick **Closed** for a status that ends the work. Use the arrows to change the order.
+
+   <Screenshot id="measure/report-settings--schema" />
+
+6. Click **Save**. The window stays open.
+
+</Steps>
+
+## Options
+
+| Setting | What it does |
+|---|---|
+| **Name** | The name in the **Template** list of the report editor. 1 to 60 characters. |
+| **Primary colour** | The colour of the titles and of the headings of the PDF. |
+| **Accent colour** | The colour of the links in the notes of the PDF. |
+| **Paper**, **Orientation** | **A4** or **Letter**; **Portrait** or **Landscape**. The PDF uses them. |
+| **Header text**, **Footer text** | Up to 200 characters each. They go on every page of the PDF, with the logo and the page number. |
+| **Disclaimer** | Markdown, up to 5000 characters. It closes every report. |
+| **Sections of a new report** | A new report copies them. Reports that exist keep their sections. |
+| **Logo** | PNG, JPEG, WebP or SVG, up to 512 KB. **Replace logo** and **Remove logo** change it. |
+
+An organization that stored nothing has the template **Standard**, and this schema:
+
+| List | Values |
+|---|---|
+| **Categories** | General, Defect, Observation, Safety, Stockpile |
+| **Severities** | Low, Medium, High, Critical |
+| **Statuses** | Open, In progress, Resolved (closed) |
+
+## Limits & requirements
+
+- Only an administrator of the organization changes the settings: the owner, a member with the
+  **Admin** permission, or a Registry administrator. Other members see the settings and a note.
+  Readers of a dataset get the templates and the schema of its organization through the dataset.
+- An organization has up to 20 templates, 50 categories, 10 severities and 10 statuses. It keeps at
+  least one template, one category and one status.
+- The **ID** of a template or of a value is made from its name and does not change after you save.
+  A rename changes only the name that shows. Annotations keep their values.
+- A template that you delete goes when you save. The reports that use it use the first template,
+  and say so.
+- Without a logo, a report shows the logo of the site, if the site has one.
+- If someone else saved the settings while you edited, Hub says **The settings changed**. Click
+  **Reload** to see their version. Your changes are lost.
+
+## Related
+
+- [Reports](/hub-guide/measure/reports.mdx)
+- [Point annotations](/hub-guide/measure/annotations.mdx)
+- [Organizations, members & roles](/hub-guide/datasets/members.mdx)
+
+<ForDevelopers api="/docs/developers/users-api">
+
+The settings are the endpoints `…/report-settings` of the organization. See
+[Report settings](/developers/users-api.mdx#report-settings).
+
+</ForDevelopers>
