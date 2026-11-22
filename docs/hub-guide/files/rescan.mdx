@@ -27,7 +27,9 @@ file with the wrong entry type.
    <Screenshot id="files/rescan--settings" />
 
 3. Read the side effects and click **Rescan**.
-4. Open the **Tasks** tab to follow the rescan.
+4. The dataset closes until the rescan ends: the page says **This dataset is being rescanned** with the
+   progress. Click **Cancel rescan** to stop it, or **Back to datasets**. In the list of the organization,
+   the row has the tag **Rescanning… 40 %**.
 
 </Steps>
 
@@ -37,6 +39,8 @@ file with the wrong entry type.
   other properties) with the new values.
 - Hub deletes the cached thumbnails, tiles and built files of the dataset, and builds them again.
 - Until a file is built again, its viewers are not available.
+- While the rescan runs, nobody can open, edit, upload to or share the dataset. It can only be
+  deleted: the delete stops the rescan first. When the rescan ends, the dataset opens again by itself.
 
 ## Limits & requirements
 

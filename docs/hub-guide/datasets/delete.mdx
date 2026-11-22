@@ -35,6 +35,9 @@ To delete only some files of a dataset, see [Folders, rename & delete](/hub-guid
 
 - The dataset leaves the list at once. The server then deletes its folder in the background: the
   files, the builds and the thumbnails. It also stops the builds that run for the dataset.
+- A dataset that is importing or rescanning can be deleted too. The warning says **The import stops
+  first, then the dataset and all its files are deleted.** (or **The rescan stops first, …**). The
+  server stops the task, and deletes the folder only when the task has stopped.
 - When you delete an organization, Hub deletes all of its datasets too.
 - Links and embeds of a deleted dataset stop working.
 

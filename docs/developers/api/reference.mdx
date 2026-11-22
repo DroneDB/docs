@@ -72,7 +72,7 @@ Errors are RFC 9457 `ProblemDetails` with the media type `application/problem+js
 | `401` | Not signed in, or the token is no longer valid. The body is `ProblemDetails` with `detail` "Not signed in", and the answer has `WWW-Authenticate: Bearer`. `GET /orgs` without a token answers its own `401` ("Invalid user"). |
 | `403` | Signed in without permission (a `401` before Registry 3.0). Admin-only endpoints say "Only administrators can perform this operation". |
 | `404` | Not found, also for a request other than `GET` or `HEAD` to a path that no endpoint answers, and for any request to an unknown path under `/orgs`, `/users`, `/sys`, `/share` or `/stac` |
-| `409` | Conflict |
+| `409` | Conflict. A dataset that is importing or rescanning answers `409` to every request but its delete and its tasks, with `datasetBusy` (`importing` or `rescanning`), `taskId` (the task to follow or cancel) and `noRetry: true` |
 | `413` | Too large (`noRetry: true`) |
 | `429` | Too many requests: the concurrent download limit, a rate limit (sign-in, failed HTTP Basic credentials, upload probe) or a locked account. Read `Retry-After`. |
 | `500` | Server error |

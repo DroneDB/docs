@@ -64,15 +64,15 @@ your computer and your connection are not used. This is fast for large files.
 
 4. Type the **Dataset Name**, select the **Visibility** and check the **Slug**.
 5. Click **Import**. The window shows the progress, by bytes, and the time left, from the speed of the last 30 seconds. Click
-   **Run in background** to close the window while the import runs. Follow the
-   import in the **Tasks** tab of the new dataset. Click **Cancel** there to stop it: see
-   [What happens](#what-happens). If the server refuses the import, the reason shows
+   **Run in background** to close the window while the import runs. To stop the import, open the
+   dataset and click **Cancel import**: see [What happens](#what-happens). If the server refuses the import, the reason shows
    next to **Import** and **Source reachable** goes away.
 
-While the import runs, the dataset is not shown as empty. Its row in the list of the organization has the
-tag **Importing… 40 %**, and the dataset page has a banner **Importing… 40 % — the files appear here when the
-import ends.** with a **View in Tasks** button. The folder does not say that it is empty meanwhile. When the
-import ends, the list of files loads by itself. A notice tells you when an import that runs in the background
+While the import runs, the dataset is closed. Its row in the list of the organization has the tag
+**Importing… 40 %**, and its name is not a link: **Open** and **Edit** are off, with the reason **The
+dataset is being imported**. Only **Delete** works, and it stops the import first. A link to the dataset
+shows **This dataset is being imported** with the progress, **Back to datasets** and **Cancel import**.
+When the import ends, the dataset opens by itself. A notice tells you when an import that runs in the background
 ends, wherever you are in Hub: **Import complete** with an **Open dataset** button, **Import failed** with the
 reason of the task (and **Open dataset** only while the dataset still exists, because a failed or cancelled
 import deletes the dataset it created), or **Import cancelled**.
