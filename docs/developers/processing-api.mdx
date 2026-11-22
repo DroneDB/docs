@@ -188,6 +188,7 @@ parameters. These are the tools of Registry 3.0.
 | `mask-borders` | Mask Borders | Write | No |
 | `archive-extract` | Extract archive | Write | No |
 | `rescan-index` | Rescan index | Write | No |
+| `rescan-entries` | Rescan entries | Write | No |
 | `import-file` | Import file from URL | Write | No |
 | `import-dataset` | Import dataset | Write | No |
 | `photogrammetry` | Photogrammetry (NodeODX) | Write | No |
@@ -387,6 +388,22 @@ curl -X POST -H "Authorization: Bearer $ADMIN_TOKEN" -H "Content-Type: applicati
 At least one of `types` and `extensions` is required. The answer is `202` with the id of a
 background job, which starts a `rescan-index` task for each dataset with matching entries. The
 tasks run on the build queue.
+
+### rescan-entries
+
+Reads the metadata of some entries again, as `rescan-index` does, and builds again the ones that
+can be built. The dataset stays usable while the task runs: it is not busy.
+
+```json
+{ "paths": ["photos/DJI_0001.JPG", "orthos"], "stopOnError": false }
+```
+
+`paths` is required: dataset-relative entry paths. A folder rescans the entries below it. An empty
+list, the dataset root or an invalid path is a `400`; a path that is not in the dataset is a `404`.
+An entry whose file fails to read does not fail the task (unless `stopOnError`): the task log
+counts it. `POST /orgs/{orgSlug}/ds/{dsSlug}/rescan?paths=a.jpg&paths=orthos` starts the same task
+and answers `202`; `paths` cannot be combined with `types` or `extensions` (`400`). Like any request
+on the dataset, it answers `409` while the dataset is busy with an import or a `rescan-index`.
 
 ### import-file
 

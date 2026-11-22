@@ -1,6 +1,6 @@
 ---
-title: "Rescan a dataset"
-description: "Read the metadata of every file of a dataset again and rebuild its derived files."
+title: "Rescan files or a dataset"
+description: "Read the metadata of some files, or of every file of a dataset, again and rebuild their derived files."
 hub_feature: [rescan-dataset]
 requires: { access: write }
 ---
@@ -17,7 +17,22 @@ Rescan a dataset after a DroneDB upgrade that reads more from some files, or whe
 metadata of files looks wrong: a missing GPS position, a wrong time, a missing thumbnail, a
 file with the wrong entry type.
 
-## Steps
+Rescan only the files that look wrong when you can: the rest of the dataset stays open, and it
+takes the time of those files only. Rescan the whole dataset after an upgrade.
+
+## Rescan some files or folders
+
+<Steps>
+
+1. In the file explorer, select the files and folders to rescan. A folder rescans every file inside it.
+2. Right-click the selection and choose **Tools → Rescan**.
+3. Read the list of what is rescanned and click **Rescan**.
+4. The rescan runs as a task: follow it in the **Tasks** tab. The dataset stays open while it runs.
+   When it ends, the explorer shows the files with their new metadata.
+
+</Steps>
+
+## Rescan the whole dataset
 
 <Steps>
 
@@ -35,18 +50,22 @@ file with the wrong entry type.
 
 ## What happens
 
-- DroneDB reads every file again and replaces its metadata (GPS position, time, type and the
+- DroneDB reads each file again and replaces its metadata (GPS position, time, type and the
   other properties) with the new values.
-- Hub deletes the cached thumbnails, tiles and built files of the dataset, and builds them again.
+- Hub builds the rescanned files that can be built again. A rescan of the whole dataset first deletes
+  the cached thumbnails, tiles and built files of the dataset.
 - Until a file is built again, its viewers are not available.
-- While the rescan runs, nobody can open, edit, upload to or share the dataset. It can only be
-  deleted: the delete stops the rescan first. When the rescan ends, the dataset opens again by itself.
+- While a rescan of the whole dataset runs, nobody can open, edit, upload to or share the dataset. It
+  can only be deleted: the delete stops the rescan first. When the rescan ends, the dataset opens again
+  by itself.
+- A rescan of some files leaves the dataset open. A file that is uploaded again or deleted while it is
+  rescanned keeps what the upload or the delete did.
 
 ## Limits & requirements
 
 - A rescan of a large dataset can take a long time.
-- The rescan of Hub covers all the files of the dataset. To rescan only some entry types or file
-  extensions, use the CLI or the API (below).
+- **Tools → Rescan** is not available while the whole dataset is being rescanned or imported.
+- To rescan only some entry types or file extensions of the whole dataset, use the CLI or the API (below).
 - A server administrator can rescan the matching files of every dataset with one API request, for
   example all DWG and DXF drawings after an upgrade. See [Upgrading](/docs/self-hosting/upgrading).
 
@@ -57,5 +76,6 @@ file with the wrong entry type.
 - [Tasks panel & logs](/hub-guide/processing/tasks.mdx)
 
 <ForDevelopers cli={`ddb rescan
+ddb rescan photos/DJI_0001.JPG orthos
 ddb rescan -t georaster,pointcloud
-ddb rescan -e dwg,dxf`} api="/docs/developers/processing-api" apiLabel="The rescan-index task in the processing API" />
+ddb rescan -e dwg,dxf`} api="/docs/developers/processing-api" apiLabel="The rescan-entries and rescan-index tasks in the processing API" />

@@ -107,7 +107,7 @@ An entry path is a path inside a dataset, relative to its root (`photos/a.jpg`),
 - `\` and `/` both separate segments; `.` segments and repeated or trailing separators are dropped, so `a\b`, `./a//b/` and `a/b` name the same entry;
 - a path that is absolute (a leading `/` or `\`, or a drive such as `C:`), has a `..` segment, names the reserved `.ddb` folder or its NTFS short name (`ddb~` and digits, such as `DDB~1` or `ddb~2`, in any case, on every platform) at any depth, or is not valid UTF-8 is refused: the call returns `DDBERR_INVALIDARGS`, changes nothing, and the last error reads `Invalid <argument> '<path>': <code>` (`absolute`, `traversal`, `reserved`, `encoding`, `empty`).
 
-This applies to `DDBGet`, `DDBListEntries` and `DDBListEntriesEx` (folder; `""` and `"."` are the root), `DDBSearch`, `DDBMoveEntry`, `DDBBuild` (source), `DDBIsBuildable`, `DDBIsBuildActive`, `DDBIsBuildComplete`, `DDBGetBuildStatus`, `DDBGetBuildArtifacts`, the `DDBMeta*` exports (and the rows of `DDBMetaRestore`), `DDBStac` and `DDBStacData`, `DDBResolveBuildFile`, and every path inside a delta (`DDBApplyDelta`, `DDBApplyDeltaEx`, `DDBComputeDeltaLocals`). It also applies to the exports that existed in 1.x, whose other invalid arguments still return `DDBERR_EXCEPTION`.
+This applies to `DDBGet`, `DDBListEntries` and `DDBListEntriesEx` (folder; `""` and `"."` are the root), `DDBSearch`, `DDBMoveEntry`, `DDBBuild` (source), `DDBIsBuildable`, `DDBIsBuildActive`, `DDBIsBuildComplete`, `DDBGetBuildStatus`, `DDBGetBuildArtifacts`, `DDBRescanEx2` (paths), the `DDBMeta*` exports (and the rows of `DDBMetaRestore`), `DDBStac` and `DDBStacData`, `DDBResolveBuildFile`, and every path inside a delta (`DDBApplyDelta`, `DDBApplyDeltaEx`, `DDBComputeDeltaLocals`). It also applies to the exports that existed in 1.x, whose other invalid arguments still return `DDBERR_EXCEPTION`.
 
 Filesystem paths are not entry paths and keep their meaning: the files `DDBAdd`, `DDBAddWithOptions` and `DDBAddWithHints` add, the paths of `DDBRemove`, `DDBList` and `DDBInfo`, dataset folders, output files and `DDBBuild`'s destination.
 
@@ -304,6 +304,8 @@ The statistics behind these values are exact raw statistics, keyed by the versio
 ## Index files
 
 The library keeps idle index connections open between calls and leaves committed changes in `.ddb/dbase.sqlite-wal`. Call `DDBCheckpoint` before copying `dbase.sqlite` without its WAL, and `DDBReleaseConnections` before deleting, moving or replacing a dataset folder from the same process. Details and settings: [CLI reference](/developers/cli/reference.mdx#library-hosts-index-connections).
+
+`DDBRescanEx2` (new in 2.9) rescans the entries a list of entry paths names: a file is that entry, a folder the entries below it, and the type and extension filters still apply. With no paths it is `DDBRescanEx`. A path that is not in the index is an element `{"path", "error": "Not in index: <path>", "success": false}` (`DDBERR_NOTFOUND` with `stopOnError`). Each entry is parsed outside the writer lock and written on its own, so the dataset stays usable during the call; the entries written before a stop stay written.
 
 ## Output contract
 
