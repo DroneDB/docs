@@ -52,12 +52,15 @@ takes the time of those files only. Rescan the whole dataset after an upgrade.
 
 - DroneDB reads each file again and replaces its metadata (GPS position, time, type and the
   other properties) with the new values.
-- Hub builds the rescanned files that can be built again. A rescan of the whole dataset first deletes
-  the cached thumbnails, tiles and built files of the dataset.
+- When the rescan ends, Hub starts a build of each rescanned file that can be built. A rescan of the
+  whole dataset first deletes the cached thumbnails, tiles and built files of the dataset, then starts
+  one build of the whole dataset.
+- The builds are tasks of their own. In the **Tasks** tab they show under the rescan. A build that fails
+  shows as a failed build: the rescan itself still succeeded.
 - Until a file is built again, its viewers are not available.
 - While a rescan of the whole dataset runs, nobody can open, edit, upload to or share the dataset. It
   can only be deleted: the delete stops the rescan first. When the rescan ends, the dataset opens again
-  by itself.
+  by itself, while its builds run.
 - A rescan of some files leaves the dataset open. A file that is uploaded again or deleted while it is
   rescanned keeps what the upload or the delete did.
 

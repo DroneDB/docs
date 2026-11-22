@@ -359,9 +359,11 @@ that reads more.
 ```
 
 All optional. An entry must match both filters. An unknown type or an invalid extension (such
-as `*.dwg`) is a `400`. Without a filter, the task clears the build cache and builds the whole
-dataset again. With a filter, it builds only the rescanned entries that can be built, one at a
-time; a failed build does not fail the task.
+as `*.dwg`) is a `400`. Without a filter, the task clears the build cache and queues a forced
+`build` task of the whole dataset. With a filter, it queues a forced `build` task for each rescanned
+entry that can be built, and only for those. The builds are child tasks of the rescan (their
+`parentJobId` is the id of the rescan task): the rescan does not wait for them, and a failed build
+does not fail the rescan.
 
 While the task runs, the dataset is busy: every request on it but its delete, its tasks and its map tiles answers
 `409` with `datasetBusy` `rescanning` (see [Errors](/developers/api/reference.mdx#errors)).
@@ -391,8 +393,9 @@ tasks run on the build queue.
 
 ### rescan-entries
 
-Reads the metadata of some entries again, as `rescan-index` does, and builds again the ones that
-can be built. The dataset stays usable while the task runs: it is not busy.
+Reads the metadata of some entries again, as `rescan-index` does, and queues a forced `build` task,
+a child of the rescan, for each of them that can be built. The dataset stays usable while the task
+runs: it is not busy.
 
 ```json
 { "paths": ["photos/DJI_0001.JPG", "orthos"], "stopOnError": false }
