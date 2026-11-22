@@ -362,7 +362,7 @@ as `*.dwg`) is a `400`. Without a filter, the task clears the build cache and bu
 dataset again. With a filter, it builds only the rescanned entries that can be built, one at a
 time; a failed build does not fail the task.
 
-While the task runs, the dataset is busy: every request on it but its delete and its tasks answers
+While the task runs, the dataset is busy: every request on it but its delete, its tasks and its map tiles answers
 `409` with `datasetBusy` `rescanning` (see [Errors](/developers/api/reference.mdx#errors)).
 `POST /orgs/{orgSlug}/ds/{dsSlug}/rescan` (with the optional `types`, `extensions` and `stopOnError`,
 default `false`) starts the same task and answers `202` with the task submit answer (`taskId`,
@@ -431,7 +431,7 @@ endpoints do the whole flow:
 | `POST /orgs/{orgSlug}/import/browse` | Lists the organizations or datasets of a `registry` source |
 | `POST /orgs/{orgSlug}/import` | Creates an empty dataset and starts the import |
 
-While the import runs, the dataset is busy: every request on it but its delete and its tasks answers
+While the import runs, the dataset is busy: every request on it but its delete, its tasks and its map tiles answers
 `409` with `datasetBusy` `importing`. `GET /orgs/{orgSlug}/ds` lists it with
 `busy` (`kind`, `taskId`, `progress`). A delete stops the import first; the server deletes the folder
 when the task has stopped.

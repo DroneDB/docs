@@ -87,7 +87,8 @@ import deletes the dataset it created), or **Import cancelled**.
 - If you cancel an import, or it fails, Hub deletes the files that the import added. This is also
   true for **Import from URL**. The files that were in the dataset before, and the files that other
   users add meanwhile, stay. The confirmation of **Cancel** says what is deleted.
-- A dataset that the import created is deleted a few minutes later if it is still empty.
+- A dataset that the import created is deleted if it is still empty: at once when you cancel the import,
+  a few minutes later when the import fails, so that its error can still be read.
 - A failed import shows its reason as the error of the task in the **Tasks** tab.
 - If the server restarts during an import, Hub rolls it back in the same way.
 
