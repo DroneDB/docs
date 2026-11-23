@@ -10,7 +10,7 @@ requires: { access: write, data: "A saved measurements file in the dataset" }
 
 <Requires />
 
-<TryLive hint="Sign in, open a dataset with saved measurements and click New report under the folder tree." />
+<TryLive hint="Sign in, open the map of a dataset with saved measurements and click Report in the map toolbar." />
 
 ## When to use it
 
@@ -28,31 +28,62 @@ the dataset.
 
 1. Start the report in one of two ways:
 
-   - Open the dataset page. Under the folder tree, in **Reports**, click **New report**. The report
-     has no source and no cover view yet: you choose them in step 3.
    - On the [map](/hub-guide/measure/map.mdx), click **Report** in the map toolbar. The report
-     starts with the measurement file of the map as its source, and the view of the map as its
-     cover view. If you have measurements that are not saved, Hub asks **Save and continue**,
-     **Continue without saving** or **Cancel**: a report reads the saved file.
+     reads the measurement file of the map and uses the view of the map. If you have measurements
+     that are not saved, Hub asks **Save and continue**, **Continue without saving** or
+     **Cancel**: a report reads the saved file.
+   - Open the dataset page. Under the folder tree, in **Reports**, click **New report**.
 
-2. Type a **Name**. Select a **Template**: its colours, logo, paper and texts come from the
-   [report settings of the organization](/hub-guide/measure/report-settings.mdx). Type the
-   **Title**, **Subtitle**, **Prepared by** and **Prepared for** of the cover, and the **Notes** in
-   Markdown.
-
-3. Under **Sources**, add the measurement files to read. Under **Cover view**, select a saved
-   view, or tick layers of the dataset. Maps of the report use these layers and their basemap.
+2. Hub fills in the form: a **Name** with the date, the **Measurement files** and the **View**.
+   Change them if necessary. See [What Hub fills in](#what-hub-fills-in).
 
    <Screenshot id="measure/reports--editor" />
 
-4. Under **Filter**, tick what to include. Under **Sections**, switch the parts on or off and move
-   them up or down. Select the **Units**.
-
-5. Click **Save**. Hub opens the report.
+3. Click **Create report**. Hub opens the report.
 
 </Steps>
 
+From the map, a report is two clicks: **Report**, then **Create report**.
+
 ## Options
+
+### What Hub fills in
+
+| Field | Value |
+|---|---|
+| **Measurement files** | The file of the map. Else the files of the newest report of the dataset. Else the only measurement file of the dataset. |
+| **View** | The saved view of the map. Else the view of the newest report. Else the only saved view. Else a new view of a file (see [The view](#the-view)). |
+| **Name** | The name of the saved view (or of the dataset) and the date |
+| **Title**, **Subtitle** | The name of the dataset, the name of the saved view |
+| **Prepared by**, **Prepared for**, **Template**, **Sections**, **Units** | The values of the newest report of the dataset. Else your user name and the first template of the organization. |
+
+The filter and the notes start empty.
+
+### The view
+
+The maps of a report use the layers, the position and the basemap of one
+[saved view](/hub-guide/viewing/map-views.mdx). In **View**, select one of:
+
+- A saved view of the dataset.
+- **The map as it is now**: when you start from the map and the map shows a view that is not
+  saved, or a saved view with changes.
+- **A file of the dataset**: an orthophoto, another georaster, a point cloud or a vector file.
+
+For a new view, type its name. When you click **Create report**, Hub saves the view under
+**Views** first, then the report. You do not have to save a view before you make a report.
+
+### More options
+
+Click **More options** to change the rest. Its header shows the template, the units, the filter
+and the number of sections. If a field in it is not correct when you click **Create report**, the
+group opens.
+
+- **Template**: its colours, logo, paper and texts come from the
+  [report settings of the organization](/hub-guide/measure/report-settings.mdx).
+- **Title**, **Subtitle**, **Prepared by** and **Prepared for** of the cover, and the **Notes** in
+  Markdown.
+- **Units**, the **labels** of the measurement files, the **Filter** and the **Sections**.
+
 
 ### Sources and labels
 

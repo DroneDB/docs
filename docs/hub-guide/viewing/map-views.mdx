@@ -44,7 +44,7 @@ settings of each layer, the split, the map position, the basemap and the elevati
 
    <Screenshot id="viewing/map-views--layers" />
 
-4. Users with write access click **Save** in the bar above the map (on a phone, in **View actions**, the three dots) and type a **Name**. The
+4. Until you save it, the bar above the map shows **Not saved**. Users with write access click **Save** in that bar (on a phone, in **View actions**, the three dots) and type a **Name**. The
    prompt starts with the name of the file the map was opened on (without its extension, at most 100
    characters) selected, so you can accept it or type over it. The
    address of the page becomes the link of the saved view.
@@ -80,10 +80,19 @@ The tools of the map work on every view: **Stockpile Volume** and **Raster Analy
 selector (**Raster**, or **Elevation model** in Stockpile Volume) when the view has two or more rasters it can work on. They are off while
 the map is split. See [Stockpile volume](/hub-guide/analyse/stockpile.mdx).
 
+### Other ways to save a view
+
+- On the **Map** tab of the dataset page, click **Save as view** in the map toolbar. Hub saves
+  the georasters on the map, their settings, the position and the basemap as a new view, after it
+  asks for a name. The button is dimmed when the map shows no georaster.
+- When you make a [report](/hub-guide/measure/reports.mdx), Hub can save a new view of the map
+  or of a file with the report.
+
 ### Saved views in the dataset
 
-The folder tree of the dataset lists the saved views under **Views**. Double-click one to open it
-in a new tab, or right-click it:
+The folder tree of the dataset lists the saved views under **Views**. Users with write access see
+**Views** also when the dataset has no saved view, with a note on how to make one. Double-click a
+view to open it in a new tab, or right-click it:
 
 | Action | Who | What it does |
 |---|---|---|

@@ -417,16 +417,15 @@
 
 - id: measure/reports--editor
   type: screenshot
-  alt: The report editor with the name, the template, the sources with their labels, the cover view and the filter
+  alt: The new report form filled in, with the name, the measurement files, the view and the closed More options group
   page: hub-guide/measure/reports
   url: /r/acme-surveys/report-demo
   base: hub
   auth: demo
   waitFor: { selector: "text=Beach inspection", networkIdle: true }
   actions:
-    - rightClick: "text=Beach inspection"
-    - click: "role=menuitem[name='Edit']"
-    - wait: "#reportEditorDialog"
+    - click: "[data-testid='group-action']"
+    - wait: "#report-view"
   highlight: null
   crop: "#reportEditorDialog"
   blocked: null
