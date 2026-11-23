@@ -43,13 +43,27 @@ save the measurements in the dataset, so the next visitor sees them too.
 
    <Screenshot id="measure/map--properties" />
 
-5. Click **Measurement List** to see all the measurements. Click **New Group** to make a group
-   with a name and a colour. Use **Move to group** on a row to put a measurement in a group. The
-   eye button of a group hides or shows its measurements. The buttons of a row show when you point at it
-   and also when you move the keyboard focus to it with `Tab`. A line under the list says
-   **Saved in** and the path of the file that holds the measurements. When an elevation model is on the
-   map, a stockpile has one more button, which opens [Stockpile Volume](/hub-guide/analyse/stockpile.mdx)
-   on that pile.
+5. Click **Measurement List** to see all the measurements. The list shows the numbered annotations by
+   reference, then the other measurements by name. Type in the search box to find a measurement by
+   name or by reference, and use the **Type**, **Category** and **Status** filters to show fewer rows.
+   Click **New group** to make a group with a name and a colour. The eye button of a group hides or
+   shows its measurements. The buttons of a row show when you point at it and also when you move the
+   keyboard focus to it with `Tab`. A line under the list says **Saved in** and the path of the file
+   that holds the measurements. When an elevation model is on the map, a stockpile has one more
+   button, which opens [Stockpile Volume](/hub-guide/analyse/stockpile.mdx) on that pile.
+
+   To work on many measurements at once, select them (see
+   [Select measurements in the list](#select-measurements-in-the-list)). A bar under the list shows
+   how many you selected and their total length, area and pile volume. From the bar:
+
+   - **Move to** puts them in a group, or takes them out of their groups (**Ungrouped**).
+   - **Show on map** closes the list and zooms the map to them. They stay highlighted until you click
+     the map.
+   - **Export** downloads only them, as GeoJSON or CSV.
+   - **Delete** deletes them, after one question.
+
+   **New group** makes a group of the selected measurements. You can also drag measurements onto a
+   group, or onto **Ungrouped**: drag a selected row to move all the selected rows.
 
    <Screenshot id="measure/map--list" />
 
@@ -61,6 +75,27 @@ save the measurements in the dataset, so the next visitor sees them too.
    <Screenshot id="measure/map--export" />
 
 </Steps>
+
+## Select measurements in the list
+
+| Action | What it does |
+| --- | --- |
+| Click a row | Selects only that row |
+| `Ctrl`+click (`Cmd`+click on a Mac) | Adds the row to the selection, or removes it |
+| `Shift`+click | Selects all the rows from the last row you clicked |
+| Check box of a row | Adds the row to the selection, or removes it (on a touch screen too) |
+| Check box of a group | Selects all the rows of the group, or none of them |
+| **Select all** | Selects all the rows that the search and the filters show |
+| `↑` `↓` `Home` `End` | Move in the list and select the row. With `Shift`, the selection grows |
+| `Space` | Adds the row to the selection, or removes it |
+| `Enter` | Opens the properties of the row |
+| `Ctrl`+`A` (`Cmd`+`A`) | Selects all the rows that the list shows |
+| `Delete` | Asks to delete the selected measurements |
+| `Esc` | Clears the selection. With no selection, closes the list |
+
+A search or a filter removes the rows that it hides from the selection, so an action never changes a
+measurement that you cannot see. Changes in the list are on the map only until you click
+**Save Measurements**.
 
 ## Keys and gestures
 

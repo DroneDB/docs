@@ -108,7 +108,7 @@
 
 - id: measure/map--list
   type: screenshot
-  alt: The Measurements list with a group and the ungrouped measurements
+  alt: The Measurements list with a group, the measurements selected and the bar of the selection
   page: hub-guide/measure/map
   open: { org: odm, ds: brighton-beach, path: odm_orthophoto/odm_orthophoto.tif, view: map }
   base: hub
@@ -116,12 +116,14 @@
   waitFor: { selector: "[aria-label='Map'] canvas", networkIdle: true, extraMs: 1500 }
   actions:
     - click: "[aria-label='Measurement List']"
-    - click: "text=New Group"
+    - click: "[data-testid='measurement-row-check'] >> nth=0"   # two rows selected: New group takes them
+    - click: "[data-testid='measurement-row-check'] >> nth=1"
+    - click: "[data-testid='measurement-new-group']"
     - fill: { selector: "#mg-name", value: North beach }
     - click: "text=Create"
     - wait: 500
-    - hover: "[aria-label='Move to group']"   # the row actions show on hover
-  highlight: "[aria-label='Move to group']"
+    - click: "[data-testid='measurement-select-all']"           # the bar of the selection shows
+  highlight: "[data-testid='measurement-selection-bar']"
   crop: "[role='dialog']"
   blocked: null
 
