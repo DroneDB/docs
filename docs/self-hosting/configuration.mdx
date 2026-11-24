@@ -844,6 +844,7 @@ The default schedules:
 | [`ArtifactCompletenessCheckerCron`](#artifactcompletenesscheckercron) | `0 2 * * *` |
 | [`OrphanedDatasetCleanupCron`](#orphaneddatasetcleanupcron) | `0 3 * * *` |
 | [`JobIndexCleanupCron`](#jobindexcleanupcron) | `0 4 * * *` |
+| [`CacheCleanupCron`](#cachecleanupcron) | `30 4 * * *` |
 | [`IndexReconciliationCron`](#indexreconciliationcron) | `0 * * * *` (hourly) |
 | [`UpdateCheckCron`](#updatecheckcron) | once a day, at a time that depends on the instance |
 
@@ -911,6 +912,23 @@ that still waits for files) and sends the notifications that waited for more tha
 [Build notifications](/self-hosting/email.mdx#when-an-e-mail-is-sent)). `POST /sys/cleanup-jobindices`
 (administrators) runs it once; the optional `retentionDays` query parameter overrides the
 retention for that run.
+
+### CacheCleanupCron
+
+The job that removes old entries of the DroneDB cache (`Ddb:CacheDir`) and the folders that
+interrupted DroneDB requests left in the temporary folder. Each kind goes when nothing in it
+changed for its number of days:
+
+| Key | Removes | Default |
+|-----|---------|---------|
+| `CacheCleanupTileDays` | Rendered map tiles | `5` |
+| `CacheCleanupDownloadDays` | Copies of remote rasters downloaded for map tiles | `7` |
+| `CacheCleanupDsmDays` | Elevation tiles of the DSM service | `30` |
+| `CacheCleanupTempDays` | Folders of interrupted requests, in the cache and in the temporary folder | `2` |
+
+Each age is 0 to 36500 days; `0` removes those entries at every run. The cache folder of map tiles'
+source files that earlier versions kept (`<cache>/artefacts`) is removed at the first run. The job
+logs what it removed of each kind.
 
 ### IndexReconciliationCron
 
@@ -1042,10 +1060,8 @@ These variables are not in `appsettings.json`.
 | `DDB_BUILDLOD_PATH` | Path to `build-lod` |
 | `DDB_BUILDLOD_IDLE_TIMEOUT_SECONDS` | Replaces the idle deadline of `build-lod`, 1 to 86400. See [Troubleshooting](/self-hosting/troubleshooting.mdx#a-splat-build-stops-without-output). |
 
-`DDB_ARTEFACT_CACHE_MB` bounds the disk space of the cache of map tiles' source files (4096 MB by
-default): the COG made for each photo or raster that is shown on a map, about 5 MB for a 12 MP
-photo. On a server whose users browse many photos, set it in the environment of the Registry
-container for the photos viewed in a few days. See [the artefact cache](/docs/developers/cli/reference#the-artefact-cache).
+`DDB_ARTEFACT_CACHE_MB` and `Ddb:ArtefactCacheMb` have no effect from Registry 3.0 (libddb 2.13),
+which keeps no artefact cache; they are still accepted. See [raster reads and the cache folder](/docs/developers/cli/reference#raster-reads-and-the-cache-folder).
 
 The `Ddb` section and `ProcessingBudget` set `DDB_CPU_POOL_SIZE`, `DDB_IO_THREADS`,
 `DDB_MIN_FREE_DISK_MB`, `DDB_GDAL_CACHE_MB`, `DDB_BUILD_THREADS`, `DDB_COG_CACHE_MB` and

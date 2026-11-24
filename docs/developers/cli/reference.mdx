@@ -145,32 +145,43 @@ exits normally. Thus:
 | `DDB_RASTER_CACHE_IDLE_SECONDS` | `60` | Idle ones close after this many seconds. |
 | `DDBT_COPC_NODE_CACHE_MB` | ddb-tilers' default | Memory for decoded COPC nodes that point-cloud tiles share. |
 | `DDBT_COPC_TILE_CACHE_MB` | ddb-tilers' default | Memory for encoded point-cloud tiles kept for the next requests. |
-| `DDB_ARTEFACT_CACHE_MB` | `4096` | The most disk space in MB that the artefact cache may take (see below). `0`: no bound. |
+| `DDB_ARTEFACT_CACHE_MB` | `0` | No effect from version 2.13, which keeps no artefact cache (see below). Still accepted, so an older configuration works. |
 | `DDB_RENDER_THREADS` | `4` | Warper threads of a map render (WMS GetMap, WCS GetCoverage) that runs alone. Under load each render uses one thread. `0`: all cores. |
 
 A kept raster is used again only while the file has the same modification time, size and (on
 Linux and macOS) inode, so a rebuilt COG is opened again.
 
-#### The artefact cache
+#### Raster reads and the cache folder
 
-A raster or a photo that is not the output of a build is tiled from a Cloud Optimized GeoTIFF that
-the library makes the first time its tiles are asked for, and keeps in the cache folder
-(`<cache>/artefacts`, `<cache>` being `cacheDir`). A photo gets one when it is shown on a map: its
-footprint on the map, or its own map view. Its COG is warped from the corners of the photo's
-footprint and takes about 0.9 to 1.4 times the size of the JPEG (a 12 MP DJI photo: 3.5 to 5.4
-MB). The normalized copies of rasters that some operations read are kept in the same folder.
+The library keeps no copy of a user's raster:
 
-Two rules keep the folder small:
+- A GeoTIFF is read in place after the raster helper has checked it: in its sandbox, `gdal-util`
+  decodes every block of every level once. The statistics of that pass are kept for the first
+  value info.
+- Any other raster (JPEG 2000, a GeoTIFF that fails the check) is read through a copy that the
+  helper writes into `<cache>/requests` (`<cache>` being `cacheDir`). The copy is removed when its
+  reader closes.
+- A raster that is not the output of a build is tiled from a Cloud Optimized GeoTIFF made in
+  `<cache>/requests` and removed when its tiler closes.
+- A photo is tiled from the photo itself: each tile is drawn from the photo's footprint by the
+  helper, and nothing is kept.
 
-- A file that was not used for 5 days is removed.
-- When a new file takes the folder past `DDB_ARTEFACT_CACHE_MB` (4096 MB by default), the files
-  used least recently are removed until it is within the bound again. A file used in the last 5
-  minutes is never removed, so the folder can stay above the bound for that long while many files
-  are in use. On Windows, a file that a reader holds open stays until the next time.
+The tiles themselves are kept in `<cache>/tiles`. `DDBCleanupCache` removes, by the last change of
+each entry:
 
-A file that is removed is made again the next time its tiles are asked for. For a server that shows
-many photos, size `DDB_ARTEFACT_CACHE_MB` for the photos viewed in a few days: about 5 MB for each
-12 MP photo. The tiles themselves are kept in `<cache>/tiles` and removed after 5 days without use.
+| Kind | Where | Default age |
+|---|---|---|
+| Rendered tiles | `<cache>/tiles/<file>/<zoom>/…` | 5 days |
+| Copies of remote rasters | `<cache>/tiles/*.tif` | 7 days |
+| Elevation tiles of the DSM service | `<cache>/dsm_service_cache` | 30 days |
+| Folders of interrupted requests and the library's folders in the temporary folder | `<cache>/requests`, `$TMPDIR/ddb_*` | 2 days |
+| The artefact cache of version 2.12 and earlier | `<cache>/artefacts` | any age |
+
+Its options are a JSON object: `tileDays`, `downloadDays`, `dsmDays`, `tempDays` (0 to 36500) and
+`dryRun` (count, remove nothing). It returns the entries and bytes of each kind. Tile requests run
+it with the default ages once in a thousand requests; the Registry runs it every night
+([`CacheCleanupCron`](/self-hosting/configuration.mdx#cachecleanupcron)). `DDBRegisterProcess`
+removes `<cache>/artefacts` left by an earlier version.
 
 Tiles are PNG, JPEG or WebP. Thumbnails are WebP at quality 80. A JPEG that holds a smaller copy
 of the photo (the MPF preview of DJI cameras and most phones) is thumbnailed from that copy,
