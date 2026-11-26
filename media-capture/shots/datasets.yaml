@@ -190,6 +190,23 @@
   crop: "[role='dialog']"
   blocked: null
 
+- id: datasets/members--organization-logo
+  type: screenshot
+  alt: The Edit organization dialog with the Logo field and its Upload logo button
+  page: hub-guide/datasets/members
+  url: /r/acme-surveys
+  auth: demo
+  waitFor:
+    selector: "[aria-label='Edit Organization']"
+    networkIdle: true
+  actions:
+    - click: "[aria-label='Edit Organization']"
+    - wait: "text=Logo"
+    - wait: 400
+  # never upload or remove: the shot shows the field as the organization has it
+  crop: "[role='dialog']"
+  blocked: null
+
 - id: datasets/delete--dataset-confirm
   type: screenshot
   alt: The confirmation before a dataset is deleted, with the irreversible warning
