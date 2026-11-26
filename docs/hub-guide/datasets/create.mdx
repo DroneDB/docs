@@ -48,8 +48,9 @@ thumbnail, a visibility and a license. You can change all of them later.
 
 </Steps>
 
-To change the name, tagline or visibility from the datasets page, click the pencil button
-(**Edit dataset**) in the **Actions** column.
+To change the name, tagline, visibility or thumbnail from the datasets page, click the pencil button
+(**Edit dataset**) in the **Actions** column. There, a new thumbnail is saved with **Save**, and **Cancel**
+leaves the dataset as it was.
 
 ## Options
 
@@ -61,7 +62,7 @@ To change the name, tagline or visibility from the datasets page, click the penc
 | **Tagline** | Create, Edit, Settings | A short description under the name, up to 256 characters. The dataset search finds it | Empty |
 | **Name** | Settings | The name of the dataset, in the header, the tree and the lists. The address does not change | The name you gave it |
 | **URL slug** | Settings | The name in the address (`/r/<organization>/<slug>`). Type a new slug and click **Save**. Hub asks first: it names the old and the new address, says that links to the old address will stop working and, when files of the dataset are still uploading, that the change stops the upload | The slug |
-| **Thumbnail** | Settings | **Upload** a WebP, JPEG or PNG image, or **Remove** it. This changes the file at once, without **Save** | None |
+| **Thumbnail** | Edit, Settings | **Upload** a WebP, JPEG or PNG image, **Choose from dataset** an image or a raster of the dataset (search by part of the name, then **Use**: its thumbnail becomes the dataset thumbnail), or **Remove** it. **Undo** drops a choice that is not saved. In **Edit dataset**, **Save** writes it; in **Settings**, it changes the file at once, without **Save** | None |
 | **Readme** | Settings | **Add Readme** creates `README.md` at the root of the dataset and opens it in the text editor. With a README, **Open** shows it in the viewer and **Edit** opens the editor | None |
 | **License** | Settings | The license of the data, from a list of common licenses | Proprietary |
 | **Rescan Dataset** | Settings | See [Rescan a dataset](/hub-guide/files/rescan.mdx) | — |
@@ -83,8 +84,10 @@ To change the name, tagline or visibility from the datasets page, click the penc
 - The thumbnail is a file in the root of the dataset: `thumbnail.webp`, `.jpg` or `.png`, or
   `cover.webp`, `.jpg` or `.png`. Hub uses the first one it finds in this order. Without one, the
   list shows a placeholder.
-- **Set as Dataset Thumbnail** replaces the current thumbnail. Hub asks first, and it adds a file
-  `thumbnail.webp` to the root of the dataset (the toast says so).
+- A new thumbnail replaces the current one. An uploaded image keeps its type (`thumbnail.webp`, `.jpg` or
+  `.png`); an image or a raster of the dataset gives `thumbnail.webp`. Hub then deletes the other thumbnail
+  files of the root, so the new one is the one that shows. **Set as Dataset Thumbnail** asks first, and the
+  toast names the file.
 - The header of the dataset page and the README panel follow the settings: a new name shows in the header and
   on the root of the tree at once, and the README is read again when you save it.
 
