@@ -32,8 +32,15 @@ organization. Two members see the same templates and the same categories, severi
 
 3. Under **Sections of a new report**, tick the parts that a new report has.
 
-4. To add a logo, click **Save**, then **Upload logo**, and select the file. A logo is stored at
-   once, without **Save**.
+4. Under **Logo**, select **Organization logo** or **Custom logo**. **Organization logo** shows the
+   logo of the organization, which you set with **Edit organization** (see
+   [Organizations, members & roles](/hub-guide/datasets/members.mdx)). For a logo of this template
+   only, select **Custom logo**, click **Save** if the template is new, then click **Upload logo** and
+   select an image or SVG of up to 20 MB. Hub prepares it in your browser: a larger image is shrunk to
+   600 pixels on its longest side and saved as WebP, and an SVG stays an SVG. A message says what was
+   saved, for example **Saved as WebP, 600 × 338, 61 KB**. The logo is stored at once, without
+   **Save**. To go back to the logo of the organization, select **Organization logo** and confirm:
+   Hub removes the custom logo.
 
 5. In the **Annotation schema** tab, edit the **Categories**, the **Severities** and the
    **Statuses**. Click **Add category**, **Add severity** or **Add status**, type a name, and pick a
@@ -56,7 +63,7 @@ organization. Two members see the same templates and the same categories, severi
 | **Header text**, **Footer text** | Up to 200 characters each. They go on every page of the PDF, with the logo and the page number. |
 | **Disclaimer** | Markdown, up to 5000 characters. It closes every report. |
 | **Sections of a new report** | A new report copies them. Reports that exist keep their sections. |
-| **Logo** | PNG, JPEG, WebP or SVG, up to 512 KB. **Replace logo** and **Remove logo** change it. |
+| **Logo** | **Organization logo** (the default) or **Custom logo**: any image or SVG of up to 20 MB, which Hub stores as at most 512 KB. **Replace logo** changes a custom logo. |
 
 An organization that stored nothing has the template **Standard**, and this schema:
 
@@ -77,7 +84,9 @@ An organization that stored nothing has the template **Standard**, and this sche
   A rename changes only the name that shows. Annotations keep their values.
 - A template that you delete goes when you save. The reports that use it use the first template,
   and say so.
-- Without a logo, a report shows the logo of the site, if the site has one.
+- A report shows the custom logo of its template. Without one, it shows the logo of the
+  organization, and without that, the logo of the site, if the site has one. A reader of a public
+  dataset of a private organization also sees the logo of the organization on its reports.
 - If someone else saved the settings while you edited, Hub says **The settings changed**. Click
   **Reload** to see their version. Your changes are lost.
 
