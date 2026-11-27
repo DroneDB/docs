@@ -170,7 +170,10 @@ async function main() {
   const browser = await chromium.launch({
     channel: 'chromium',
     headless: !args.headed,
-    args: ['--use-gl=angle', '--ignore-gpu-blocklist', '--enable-gpu-rasterization', '--hide-scrollbars']
+    args: ['--use-gl=angle', '--ignore-gpu-blocklist', '--enable-gpu-rasterization', '--hide-scrollbars', '--lang=en-US'],
+    // The date fields of the pages follow the language of the browser (on Linux, of its environment), not the locale of
+    // the context: US English, whatever the language of the machine that captures
+    env: {...process.env, LANG: 'en_US.UTF-8', LANGUAGE: 'en_US', LC_ALL: 'en_US.UTF-8'}
   });
   const results = [];
   try {
@@ -518,6 +521,12 @@ async function runAction(page, action, isClip) {
       await center(page, v, isClip);
       await page.locator(v).first().click({button: 'right'});
       break;
+    case 'dblclick': {
+      const {selector, force} = typeof v === 'string' ? {selector: v} : v;
+      await center(page, selector, isClip);
+      await page.locator(selector).first().dblclick({force});
+      break;
+    }
     case 'hover':
       await center(page, v, isClip);
       await page.locator(v).first().hover();

@@ -10,7 +10,7 @@ nobody makes docs images by hand. The shot definitions are in `shots/` (format:
 | `overlay.js` | Injected into the pages: cursor dot and click ripple in clips, red highlight box |
 | `encode.sh` | ffmpeg: screenshots to WebP (≤ 250 KB), clips to H.264 MP4 and a poster |
 | `build-media-index.mjs` | Writes `src/data/media.json` from the shots and the images (`npm run media:index`) |
-| `reset-demo.mjs` | Puts the demo data back in its fixed state (`npm run reset-demo`) |
+| `reset-demo.mjs` | Puts the demo data back in its fixed state (`npm run reset-demo`): the datasets, their files and metadata (saved views, reports), and the logo and report settings of the organization |
 | `demo-inputs.yaml` | The demo datasets and their files, as data |
 | `YOUTUBE.md` | How to upload the clips |
 | `local/` | The local Registry 3.0 that mirrors the showcase datasets (usage at the top of `start.sh` and `mirror-datasets.sh`) |

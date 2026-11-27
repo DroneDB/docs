@@ -416,14 +416,14 @@
     "type": "screenshot",
     "width": 2880,
     "height": 1800,
-    "alt": "The table view of the file browser with the Name, Type, Size and Modified columns",
+    "alt": "The list view of the file browser with the Name, Type, Size and Modified columns",
     "youtubeId": null
   },
   "files/browser--views": {
     "type": "clip",
     "width": 1920,
     "height": 1200,
-    "alt": "The images folder of a dataset in the grid view, then the table view and the expanded table view",
+    "alt": "The images folder of a dataset in the grid view, then the list view with and without thumbnails",
     "youtubeId": null
   },
   "files/copy-paste--clipboard-panel": {
@@ -692,6 +692,13 @@
     "alt": "The Upload Progress window with the files, the speed and the time left",
     "youtubeId": null
   },
+  "measure/3d--capture": {
+    "type": "screenshot",
+    "width": 1248,
+    "height": 1668,
+    "alt": "The window of a 3D annotation with Capture for report, after a capture",
+    "youtubeId": null
+  },
   "measure/3d--pointcloud-distance": {
     "type": "clip",
     "width": 1920,
@@ -725,6 +732,20 @@
     "width": 780,
     "height": 868,
     "alt": "The Point Annotation dialog with a colour and a description",
+    "youtubeId": null
+  },
+  "measure/annotations--fields": {
+    "type": "screenshot",
+    "width": 1248,
+    "height": 1668,
+    "alt": "The Details tab of a point annotation with the Inspection fields - reference, category, severity, status, assignee, due date and Include in reports",
+    "youtubeId": null
+  },
+  "measure/annotations--photos": {
+    "type": "screenshot",
+    "width": 1248,
+    "height": 1668,
+    "alt": "The Photos tab of an annotation with its photos, and the photos that cover it with the Approximate location marker",
     "youtubeId": null
   },
   "measure/annotations--popup": {
@@ -774,6 +795,48 @@
     "width": 2160,
     "height": 1350,
     "alt": "The measure toolbar on an orthophoto with its two saved measurements",
+    "youtubeId": null
+  },
+  "measure/report-settings--preview": {
+    "type": "screenshot",
+    "width": 2608,
+    "height": 1668,
+    "alt": "The preview page of a template, next to the fields that set its colours, texts and paper",
+    "youtubeId": null
+  },
+  "measure/report-settings--schema": {
+    "type": "screenshot",
+    "width": 2608,
+    "height": 1668,
+    "alt": "The Annotation schema tab with the categories, severities and statuses, and the Closed box of a status",
+    "youtubeId": null
+  },
+  "measure/report-settings--templates": {
+    "type": "screenshot",
+    "width": 2608,
+    "height": 1668,
+    "alt": "The Templates tab of the Report settings window - name, colours, paper, texts, sections, logo and the preview page",
+    "youtubeId": null
+  },
+  "measure/reports--editor": {
+    "type": "screenshot",
+    "width": 1552,
+    "height": 1204,
+    "alt": "The new report form filled in, with the name, the measurement files, the view and the closed More options group",
+    "youtubeId": null
+  },
+  "measure/reports--page": {
+    "type": "screenshot",
+    "width": 2880,
+    "height": 1800,
+    "alt": "The live page of a report with its bar - Download PDF, Publish PDF, Edit and Delete - and the cover",
+    "youtubeId": null
+  },
+  "measure/reports--publish": {
+    "type": "screenshot",
+    "width": 1472,
+    "height": 440,
+    "alt": "The question Replace reports/beach-inspection with the date, asked when the PDF is published again",
     "youtubeId": null
   },
   "measure/splat--distance": {

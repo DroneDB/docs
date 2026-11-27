@@ -351,10 +351,12 @@
     - mouse: { click: [720, 450] }
     - wait: "#mp-description"
     - fill: { selector: "#mp-description", value: Erosion at the foot of the dune }
+    - click: "[data-testid='mp-inspection']"   # the Inspection part is folded until opened
     - click: "#mp-category"
     - click: "role=option[name='Defect']"
     - click: "#mp-status"
     - click: "role=option[name='Open']"
+    - fill: { selector: "#mp-due", value: "2026-11-30" }
     - fill: { selector: "#mp-assignee", value: J. Doe }
   highlight: ".annotation-fields"
   crop: "[role='dialog']"
@@ -372,7 +374,7 @@
     - click: "[aria-label='Point Annotation']"
     - mouse: { click: [720, 450] }
     - wait: "#mp-description"
-    - click: "role=tab[name='Photos']"
+    - click: "[id$='_tab_photos']"   # the tab says how many photos the annotation has: Photos (0)
     - wait: "[data-testid='coverage-list']"   # a reader sees the covering photos with no Add buttons: capture it as a writer for those
   highlight: ".photo-marker"
   crop: "[role='dialog']"
@@ -380,20 +382,14 @@
 
 - id: measure/3d--capture
   type: screenshot
-  alt: The window of a 3D measurement with Capture for report, after a capture
+  alt: The window of a 3D annotation with Capture for report, after a capture
   page: hub-guide/measure/3d
   open: { org: acme-surveys, ds: report-demo, path: odm_georeferencing/odm_georeferenced_model.laz, view: pointcloud }
   base: hub
   auth: demo
   waitFor: { selector: "#potree_render_area canvas", networkIdle: true, extraMs: 4000 }
   actions:
-    - click: "#potree_render_area [aria-label='Menu']"
-    - click: "img[title='Distance measurement']"
-    - mouse: { click: [1000, 640] }
-    - mouse: { click: [1080, 800] }
-    - mouse: { click: [1080, 800], button: right }
-    - wait: 1000
-    - mouse: { dblclick: [1040, 720] }   # the label of the measurement opens its window
+    - dblclick: { selector: ".annotation:has-text('Loose boulder') .annotation-titlebar", force: true }   # the title of a 3D annotation opens its window; it moves with each frame
     - click: "text=Capture for report"
     - wait: "[role='status']:has-text('Captured')"
   highlight: "text=Capture for report"
@@ -407,10 +403,12 @@
   url: /r/acme-surveys/report-demo
   base: hub
   auth: demo
-  waitFor: { selector: "[data-testid='report-download-pdf']", networkIdle: true, extraMs: 3000 }   # the snapshots render when they come into view
+  waitFor: { selector: "text=Beach inspection", networkIdle: true }
   actions:
     - rightClick: "text=Beach inspection"   # under Reports in the folder tree
     - click: { selector: "role=menuitem[name='Open']", popup: true }   # the report opens in a new tab
+    - wait: "[data-testid='report-download-pdf']"
+    - wait: 6000   # the cover map renders when it comes into view
   highlight: "[data-testid='report-download-pdf']"
   crop: null
   blocked: null
@@ -453,7 +451,7 @@
   type: screenshot
   alt: The Templates tab of the Report settings window - name, colours, paper, texts, sections, logo and the preview page
   page: hub-guide/measure/report-settings
-  url: /organizations
+  url: /r
   base: hub
   auth: demo
   waitFor: { selector: "[aria-label='Report settings']", networkIdle: true }
@@ -468,7 +466,7 @@
   type: screenshot
   alt: The preview page of a template, next to the fields that set its colours, texts and paper
   page: hub-guide/measure/report-settings
-  url: /organizations
+  url: /r
   base: hub
   auth: demo
   waitFor: { selector: "[aria-label='Report settings']", networkIdle: true }
@@ -485,7 +483,7 @@
   type: screenshot
   alt: The Annotation schema tab with the categories, severities and statuses, and the Closed box of a status
   page: hub-guide/measure/report-settings
-  url: /organizations
+  url: /r
   base: hub
   auth: demo
   waitFor: { selector: "[aria-label='Report settings']", networkIdle: true }

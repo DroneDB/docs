@@ -39,6 +39,8 @@ Every screenshot and clip of the documentation is defined here, one YAML file pe
     - click: "[aria-label='Plant Health']"
     - rightClick: "text=odm_orthophoto.tif"   # opens the context menu of a file; the same as
     - click: { selector: "text=odm_orthophoto.tif", button: right }   # button: left | right | middle
+    - dblclick: { selector: ".annotation:has-text('Loose boulder') .annotation-titlebar", force: true }   # force: an element
+                                     # that never stops moving (a label of the 3D viewer, redrawn each frame)
     - click: { selector: "text=IMG_0180_2.tif", modifiers: [Control] } # Alt, Control, ControlOrMeta, Meta, Shift
     - click: { selector: "role=menuitem[name='Compare in Map']", popup: true }  # the shot goes on in the
                                      # tab the click opens (screenshots only)

@@ -20,12 +20,62 @@
 #                                  is downloaded or uploaded and its build comes along, so it is not
 #                                  built again. For large files. Globs as with `from`.
 # `bytes: N` with from or file keeps only the first N bytes (a damaged file).
+#
+# A dataset can have `meta:` entries ({ key, data }), added as list items of its metadata after its
+# files (saved views, reports); a string "{{hash:<path>}}" in the data is the hash of that file. The
+# organization can have a `logo` (a from/file source) and `reportSettings` (its report templates, its
+# annotation schema and `logos`: a source for each template that has a logo of its own).
 # Input files are never committed to the docs repository.
 
 org:
   slug: acme-surveys
   name: Acme Surveys
   description: Demo organization of the documentation
+  # The logo of the organization (the report templates without a logo of their own show it)
+  logo:
+    file: docs-generated/report-demo/acme-logo.png
+  # The report settings of the organization: its templates and its annotation schema (the report shots)
+  reportSettings:
+    templates:
+      - id: site-inspection
+        name: Site inspection
+        primary: "#0f2a4a"
+        accent: "#0891b2"
+        paper: A4
+        orientation: portrait
+        headerText: Site inspection report
+        footerText: Acme Surveys · Field services
+        disclaimer: "Measurements come from an orthophoto and a point cloud processed without ground control: absolute positions are within a few metres, relative lengths within a few centimetres per metre."
+        defaultSections: [cover, summary, overview, tables, items, notes]
+      - id: punch-list
+        name: Punch list (landscape)
+        primary: "#7f1d1d"
+        accent: "#64748b"
+        paper: A4
+        orientation: landscape
+        headerText: Open items
+        footerText: Acme Surveys · Issued for action
+        disclaimer: ""
+        defaultSections: [cover, summary, tables, notes]
+    schema:
+      categories:
+        - { id: defect, name: Defect, colour: "#dc2626" }
+        - { id: safety, name: Safety, colour: "#eab308" }
+        - { id: environment, name: Environment, colour: "#16a34a" }
+        - { id: asset, name: Asset, colour: "#0070e0" }
+        - { id: observation, name: Observation, colour: "#64748b" }
+      severities:
+        - { id: low, name: Low, colour: "#16a34a" }
+        - { id: medium, name: Medium, colour: "#eab308" }
+        - { id: high, name: High, colour: "#dc2626" }
+        - { id: critical, name: Critical, colour: "#7f1d1d" }
+      statuses:
+        - { id: open, name: Open, closed: false }
+        - { id: in-progress, name: In progress, closed: false }
+        - { id: monitoring, name: Monitoring, closed: false }
+        - { id: resolved, name: Resolved, closed: true }
+        - { id: no-action, name: No action needed, closed: true }
+    logos: {}
 
 account:
   # The Preferences of the demo account go back to the Hub defaults (every section deleted)
@@ -178,3 +228,77 @@ datasets:
     files:
       - dest: orthophoto.tif
         from: odm/brighton-beach/odm_orthophoto/odm_orthophoto.tif
+
+  # Reports: the "Beach inspection" of Brighton Beach, with annotations on the map (A) and on the point
+  # cloud (B), their photos and 3D captures, a saved view and the report. The measurement files and the
+  # pictures were made on a local Registry (2D items drawn on the orthophoto, 3D items captured in the
+  # point cloud viewer) and are kept in docs-generated/report-demo (BSD 2-Clause, as odm/brighton-beach).
+  # The images are copied on the server: the Photos tab finds them by their footprints.
+  - slug: report-demo
+    name: Report demo
+    visibility: private
+    files:
+      - dest: odm_orthophoto/odm_orthophoto.tif
+        copy: odm/brighton-beach/odm_orthophoto/odm_orthophoto.tif
+      - dest: odm_georeferencing/odm_georeferenced_model.laz
+        copy: odm/brighton-beach/odm_georeferencing/odm_georeferenced_model.laz
+      - dest: images/
+        copy: odm/brighton-beach/images/DJI_*.JPG
+      - dest: odm_orthophoto/odm_orthophoto_measurements.geojson
+        file: docs-generated/report-demo/odm_orthophoto/odm_orthophoto_measurements.geojson
+      - dest: odm_georeferencing/odm_georeferenced_model_measurements.geojson
+        file: docs-generated/report-demo/odm_georeferencing/odm_georeferenced_model_measurements.geojson
+      - dest: odm_orthophoto/annotations/409e881b-f482-4053-8de8-e7dacf41458f-1.jpg
+        file: docs-generated/report-demo/odm_orthophoto/annotations/409e881b-f482-4053-8de8-e7dacf41458f-1.jpg
+      - dest: odm_orthophoto/annotations/84176915-1992-47e4-9ec5-16a276b7e6ab-1.jpg
+        file: docs-generated/report-demo/odm_orthophoto/annotations/84176915-1992-47e4-9ec5-16a276b7e6ab-1.jpg
+      - dest: odm_georeferencing/annotations/2ee2c269-d639-4c2b-8883-e75edb9aac6f-3d.webp
+        file: docs-generated/report-demo/odm_georeferencing/annotations/2ee2c269-d639-4c2b-8883-e75edb9aac6f-3d.webp
+      - dest: odm_georeferencing/annotations/83f19f83-7a81-44d9-93a9-388d364a9d8d-3d.webp
+        file: docs-generated/report-demo/odm_georeferencing/annotations/83f19f83-7a81-44d9-93a9-388d364a9d8d-3d.webp
+      - dest: odm_georeferencing/annotations/e21b4702-ee83-4e74-b2a8-15e64389f113-3d.webp
+        file: docs-generated/report-demo/odm_georeferencing/annotations/e21b4702-ee83-4e74-b2a8-15e64389f113-3d.webp
+    meta:
+      - key: views
+        data:
+          uid: v_beach001
+          name: Beach — orthophoto
+          v: 1
+          base: { path: odm_orthophoto/odm_orthophoto.tif, hash: "{{hash:odm_orthophoto/odm_orthophoto.tif}}" }
+          layers:
+            - { path: odm_orthophoto/odm_orthophoto.tif, hash: "{{hash:odm_orthophoto/odm_orthophoto.tif}}", opacity: 1, visible: true, vizParams: null }
+          split: { enabled: false, positions: [] }
+          view: null
+          display: { basemap: null }
+          analysis: { target: null }
+          createdAt: "2026-06-18T09:00:00.000Z"
+          createdBy: demo
+          updatedAt: "2026-06-18T09:00:00.000Z"
+          updatedBy: demo
+      - key: reports
+        data:
+          uid: r_beach001
+          version: 1
+          name: Beach inspection
+          templateId: site-inspection
+          title: Beach inspection
+          subtitle: Brighton Beach park · June 2026
+          preparedBy: J. Doe — Acme Surveys
+          preparedFor: Parks department (sample client)
+          notes: "Inspection from the drone flight of 18 June 2026 and a walk-over the same day.\n\n- **Priority:** the dead limb over the park road (A-8).\n- The gazebo roof is booked with the facilities team (A-2).\n- 3D items (source B) come from the point cloud; their pictures were captured in the 3D viewer."
+          sources:
+            - { file: odm_orthophoto/odm_orthophoto_measurements.geojson, label: A }
+            - { file: odm_georeferencing/odm_georeferenced_model_measurements.geojson, label: B }
+          filter: { groups: [], categories: [], severities: [], statuses: [], kinds: [], owners: [] }
+          cover: { viewId: v_beach001 }
+          sections:
+            - { kind: cover, enabled: true }
+            - { kind: summary, enabled: true }
+            - { kind: overview, enabled: true }
+            - { kind: tables, enabled: true }
+            - { kind: items, enabled: true }
+            - { kind: notes, enabled: true }
+          units: null
+          createdBy: demo
+          createdAt: "2026-06-18T10:00:00.000Z"
+          modifiedAt: "2026-06-18T10:00:00.000Z"

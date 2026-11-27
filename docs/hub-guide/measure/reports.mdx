@@ -109,11 +109,11 @@ off never shows. Items are sorted by source, then by reference (`2` before `10`)
 
 | Section | What it shows |
 |---|---|
-| **Cover** | Logo, title, subtitle, prepared by and for, date, dataset name, a map with all items, and a QR code of the address of the report |
-| **Summary** | The number of items by type, category, status and severity, how many are overdue, and the totals of area, length, net volume, weight and cost |
+| **Cover** | Logo, a band of the primary colour of the template with the title, the subtitle and a QR code of the address of the report, then prepared by and for, date, dataset name, four figures (items, open, overdue, closed) and a map with all items |
+| **Summary** | The four figures, the totals of area, length, net volume, weight and cost, and bars of the number of items by type, category, severity and status, in the colours of the annotation schema |
 | **Overview map** | One map with all items, their references and a legend of the category colours |
 | **Tables** | A table for each kind that has items, then a list of the items that have a status |
-| **Items** | A section for each item: reference, name, map, values, fields, status, description and photos |
+| **Items** | A card for each item: its reference on a square of the colour of its category, its name, kind and badges (category, severity, status, Overdue), the QR code of the item, then its map and 3D picture, values and fields, description and photos |
 | **Notes** | Your notes, the units, the coordinate system, the layers and their build dates, the disclaimer of the template and a sign-off block |
 
 A new report copies the sections of its template. A later change of the template does not change
@@ -172,7 +172,9 @@ report**. An item that has no reference yet shows a dash and has no link.
 
 The PDF has the paper and the orientation of the template, a table of contents, the logo and the
 title in the header, the page number and the footer text of the template in the footer, text that
-you can select and search, and a QR code on each item page that opens the item in the report.
+you can select and search, and a QR code on each item page that opens the item in the report. An
+item takes one page: on a landscape page its map is on the left with its photos under it, and its
+values and description are on the right.
 
 ## Limits & requirements
 

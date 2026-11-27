@@ -69,6 +69,13 @@ export class Registry {
     return this.request('POST', `${this.dsPrefix(org, ds)}/transfer`, {body});
   }
 
+  /** Sends a local file as the multipart field `file` of a form (a logo). */
+  async uploadForm(endpoint, file, method = 'POST') {
+    const form = new FormData();
+    form.append('file', await fs.openAsBlob(file), path.basename(file));
+    return this.request(method, endpoint, {body: form});
+  }
+
   /** Uploads a local file to `dest` (a path in the dataset). */
   async upload(org, ds, file, dest) {
     const size = fs.statSync(file).size;

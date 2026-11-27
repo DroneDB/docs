@@ -3,7 +3,9 @@
 // as media-capture/demo-inputs.yaml describes it: signed in as the demo account, it deletes every
 // dataset of the demo organization (creating the organization when it is missing), creates the
 // listed datasets again, uploads their files (or copies them on the server from a public dataset of
-// the same Hub), waits for their builds and resets the account's Preferences to the Hub defaults. Run it before a capture of the shots with `auth: demo`.
+// the same Hub), adds their metadata (saved views, reports), puts the report settings and the logos of
+// the organization back, waits for their builds and resets the account's Preferences to the Hub
+// defaults. Run it before a capture of the shots with `auth: demo`.
 //
 //   node media-capture/reset-demo.mjs [options]       (npm run reset-demo)
 //
@@ -77,7 +79,12 @@ async function main() {
     plan.push({ds, files});
     console.log(`  ${ds.slug} (${ds.visibility}): ${files.length} file(s), ${mb(files.reduce((n, f) => n + f.size, 0))}`);
   }
+  // The logos of the organization and of its report templates, resolved like the files
+  const logos = {};
+  if (spec.org.logo) logos[''] = (await resolveLocalFile({...spec.org.logo, dest: 'logo'}))[0];
+  for (const [id, src] of Object.entries(spec.org.reportSettings?.logos || {})) logos[id] = (await resolveLocalFile({...src, dest: id}))[0];
   if (args['dry-run']) {
+    for (const [id, l] of Object.entries(logos)) console.log(`    logo ${id || 'of the organization'} <- ${l.origin}`);
     for (const {ds, files} of plan) for (const f of files) console.log(`    ${ds.slug}/${f.dest} <- ${f.origin}`);
     console.log('Dry run: nothing changed.');
     return;
@@ -100,6 +107,8 @@ async function main() {
     await reg.request('PUT', orgPath, {body: orgForm()});
   }
 
+  await resetOrganizationLook(reg, orgPath, logos);
+
   // Every dataset of the organization goes (also those a capture created), or only the --only ones
   const existing = await reg.request('GET', `${orgPath}/ds`);
   for (const d of existing) {
@@ -120,6 +129,7 @@ async function main() {
       uploaded.push({ds: ds.slug, path: f.dest});
       console.log(`  ${ds.slug}/${f.dest} (${mb(f.size)}${f.copy ? ', copied on the server' : ''}, ${((Date.now() - t) / 1000).toFixed(1)} s)`);
     }
+    await addMeta(reg, org, ds);
     console.log(`Created ${org}/${ds.slug}`);
   }
 
@@ -138,6 +148,61 @@ async function main() {
   console.log(`Done in ${((Date.now() - t0) / 1000).toFixed(0)} s`);
 }
 
+/**
+ * The look of the organization: its logo, and its report settings (templates, annotation schema) with
+ * the logos of the templates. Left as they are when the inputs have none.
+ */
+async function resetOrganizationLook(reg, orgPath, logos) {
+  if (logos['']) {
+    await reg.uploadForm(`${orgPath}/logo`, logos[''].local, 'PUT');
+    console.log('Logo of the organization uploaded');
+  }
+  const settings = spec.org.reportSettings;
+  if (!settings) return;
+  const {version} = await reg.request('GET', `${orgPath}/report-settings`);
+  // The template logos are the Registry's: written after the templates, each by its own call
+  const templates = settings.templates.map(t => ({...t, logo: null}));
+  await reg.request('PUT', `${orgPath}/report-settings`, {json: {templates, schema: settings.schema, version}});
+  for (const t of settings.templates) {
+    const logoPath = `${orgPath}/report-settings/templates/${encodeURIComponent(t.id)}/logo`;
+    if (logos[t.id]) await reg.uploadForm(logoPath, logos[t.id].local, 'PUT');
+  }
+  console.log(`Report settings: ${templates.length} template(s), ${Object.keys(logos).filter(Boolean).length} template logo(s)`);
+}
+
+/**
+ * The metadata of a dataset (`meta:` entries: a key and its data, added as a list item), after its
+ * files: "{{hash:<path>}}" in a string of the data is the hash of that file of the dataset, which a
+ * saved view keeps for its layers.
+ */
+async function addMeta(reg, org, ds) {
+  if (!ds.meta?.length) return;
+  const prefix = reg.dsPrefix(org, ds.slug);
+  const hashes = new Map();
+  const hashOf = async file => {
+    if (!hashes.has(file)) {
+      const [entry] = await reg.request('POST', `${prefix}/list`, {body: new URLSearchParams({path: file})}) || [];
+      if (!entry?.hash) throw new Error(`${ds.slug}: no file ${file} to take the hash of`);
+      hashes.set(file, entry.hash);
+    }
+    return hashes.get(file);
+  };
+  const fill = async value => {
+    if (typeof value === 'string') {
+      const m = /^\{\{hash:(.+)\}\}$/.exec(value);
+      return m ? hashOf(m[1]) : value;
+    }
+    if (Array.isArray(value)) return Promise.all(value.map(fill));
+    if (value && typeof value === 'object') return Object.fromEntries(await Promise.all(Object.entries(value).map(async ([k, v]) => [k, await fill(v)])));
+    return value;
+  };
+  for (const item of ds.meta) {
+    const data = await fill(item.data);
+    await reg.request('POST', `${prefix}/meta/add`, {body: new URLSearchParams({key: item.key, data: JSON.stringify(data), path: ''})});
+    console.log(`  ${ds.slug}: meta ${item.key} ${data.name ? `"${data.name}"` : ''}`.trimEnd());
+  }
+}
+
 /** Checks the demo inputs file; returns it with defaults. */
 function checkSpec(doc) {
   const errors = [];
@@ -152,6 +217,10 @@ function checkSpec(doc) {
     d.visibility ??= 'private';
     d.files ??= [];
     if (!(d.visibility in VISIBILITY)) errors.push(`${where}: visibility private | unlisted | public`);
+    d.meta ??= [];
+    for (const [j, m] of d.meta.entries()) {
+      if (!m?.key || typeof m.data !== 'object') errors.push(`${where} meta[${j}]: key and data (an object)`);
+    }
     for (const [j, f] of d.files.entries()) {
       const kinds = ['from', 'file', 'text', 'zip', 'copy'].filter(k => f?.[k] !== undefined);
       if (!f?.dest || kinds.length !== 1) errors.push(`${where} files[${j}]: dest and one of from | file | text | zip | copy`);

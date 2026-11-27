@@ -48,6 +48,8 @@ export const ACTIONS = {
     (v.popup === undefined || typeof v.popup === 'boolean') && !unknownKeys(v, ['selector', 'button', 'modifiers', 'popup']).length)
     ? null : `click: a selector, or { selector, button: left | right | middle, modifiers: [${MODIFIERS.join(', ')}], popup: true }`,
   rightClick: v => isStr(v) ? null : 'rightClick: a selector (opens a context menu)',
+  dblclick: v => isStr(v) || (isObj(v) && isStr(v.selector) && (v.force === undefined || typeof v.force === 'boolean') && !unknownKeys(v, ['selector', 'force']).length)
+    ? null : 'dblclick: a selector, or { selector, force: true } for an element that never stops moving (a label of the 3D viewer)',
   hover: v => isStr(v) ? null : 'hover: a selector',
   press: v => isStr(v) ? null : 'press: a key name (Enter, Escape, Control+A …)',
   fill: v => isObj(v) && isStr(v.selector) && v.value !== undefined && !unknownKeys(v, ['selector', 'value']).length
