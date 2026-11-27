@@ -262,7 +262,7 @@ datasets:
       - key: views
         data:
           uid: v_beach001
-          name: Beach — orthophoto
+          name: "Beach: orthophoto"
           v: 1
           base: { path: odm_orthophoto/odm_orthophoto.tif, hash: "{{hash:odm_orthophoto/odm_orthophoto.tif}}" }
           layers:
@@ -283,7 +283,7 @@ datasets:
           templateId: site-inspection
           title: Beach inspection
           subtitle: Brighton Beach park · June 2026
-          preparedBy: J. Doe — Acme Surveys
+          preparedBy: J. Doe, Acme Surveys
           preparedFor: Parks department (sample client)
           notes: "Inspection from the drone flight of 18 June 2026 and a walk-over the same day.\n\n- **Priority:** the dead limb over the park road (A-8).\n- The gazebo roof is booked with the facilities team (A-2).\n- 3D items (source B) come from the point cloud; their pictures were captured in the 3D viewer."
           sources:
